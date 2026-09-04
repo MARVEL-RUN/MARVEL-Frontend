@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #080c16;
+  --marvel-red: #ed1d24;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: #fff;
+}
+
+body {
+  font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-display {
+  font-family: var(--font-display), "Oswald", sans-serif;
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.page-chevrons {
+  pointer-events: none;
+  position: absolute;
+  top: 36%;
+  bottom: 8%;
+  width: 72px;
+  background: repeating-linear-gradient(-38deg,
+      transparent 0 9px,
+      rgba(110, 190, 255, 0.16) 9px 13px,
+      transparent 13px 18px,
+      rgba(255, 214, 90, 0.12) 18px 22px);
+}
+
+.page-chevrons--left {
+  left: 0;
+  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+}
+
+.page-chevrons--right {
+  right: 0;
+  mask-image: linear-gradient(-90deg, #000 0%, transparent 100%);
+}
+
+.run-watermark {
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  left: -12%;
+  top: 46%;
+  font-family: var(--font-display), "Oswald", sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: min(42vw, 280px);
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  color: rgba(255, 255, 255, 0.05);
+  transform: rotate(-22deg);
+}
+
+.hero-banner {
+  position: relative;
+  height: 188px;
+  overflow: hidden;
+  transform: skewX(-14deg);
+}
+
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(-26deg,
+      transparent 0 22px,
+      rgba(255, 255, 255, 0.1) 22px 26px);
+}
+
+.hero-banner__track {
+  display: flex;
+  height: 100%;
+  width: 108%;
+  margin-left: -4%;
+  transform: skewX(14deg);
+}
+
+.hero-banner__slot {
+  position: relative;
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+@media (max-width: 639px) {
+  .page-chevrons {
+    display: none;
+  }
+}
+
+@media (min-width: 480px) {
+  .hero-banner {
+    height: 220px;
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "characters": {
+    "comic": [],
+    "live-action": [
+      {
+        "slug": "captain-america",
+        "original": "ASGARD-116781766962-AVDD_L_0040_P2.psd",
+        "path": "source-assets/disney/characters/live-action/captain-america__ASGARD-116781766962-AVDD_L_0040_P2.psd",
+        "bytes": 381352503
+      },
+      {
+        "slug": "mr-fantastic",
+        "original": "ASGARD-116781766962-AVDD_L_0043_P2.psd",
+        "path": "source-assets/disney/characters/live-action/mr-fantastic__ASGARD-116781766962-AVDD_L_0043_P2.psd",
+        "bytes": 162807399
+      },
+      {
+        "slug": "cyclops",
+        "original": "AVDD_L_0045_P2.psd",
+        "path": "source-assets/disney/characters/live-action/cyclops__AVDD_L_0045_P2.psd",
+        "bytes": 163543218
+      }
+    ]
+  },
+  "symbols": [
+    {
+      "slug": "team-collision",
+      "original": "AVDD_0031_P2.psd",
+      "path": "source-assets/disney/symbols/team-collision__AVDD_0031_P2.psd",
+      "bytes": 143430332
+    }
+  ],
+  "key-visuals": [
+    {
+      "slug": "avengers-doomsday-battle",
+      "original": "AVDD_0012_P4.psd",
+      "path": "source-assets/disney/key-visuals/avengers-doomsday-battle__AVDD_0012_P4.psd",
+      "bytes": 544987712
+    },
+    {
+      "slug": "doctor-doom-poster",
+      "original": "AVDD_0030_P4.psd",
+      "path": "source-assets/disney/key-visuals/doctor-doom-poster__AVDD_0030_P4.psd",
+      "bytes": 161179839
+    },
+    {
+      "slug": "doctor-doom-portrait",
+      "original": "ASGARD-116781766962-AVDD_0006_P1.psd",
+      "path": "source-assets/disney/key-visuals/doctor-doom-portrait__ASGARD-116781766962-AVDD_0006_P1.psd",
+      "bytes": 90291823
+    },
+    {
+      "slug": "avengers-logo-green",
+      "original": "ASGARD-116781766962-AVDD_0011_P4.psd",
+      "path": "source-assets/disney/key-visuals/avengers-logo-green__ASGARD-116781766962-AVDD_0011_P4.psd",
+      "bytes": 144468841
+    },
+    {
+      "slug": "avengers-logo-closeup",
+      "original": "ASGARD-116781766962-AVDD_0032_P4.psd",
+      "path": "source-assets/disney/key-visuals/avengers-logo-closeup__ASGARD-116781766962-AVDD_0032_P4.psd",
+      "bytes": 391959072
+    },
+    {
+      "slug": "avengers-logo-metallic",
+      "original": "ASGARD-116781766962-AVDD_0050_P1.psd",
+      "path": "source-assets/disney/key-visuals/avengers-logo-metallic__ASGARD-116781766962-AVDD_0050_P1.psd",
+      "bytes": 379451228
+    }
+  ],
+  "lockups": [
+    {
+      "slug": "character-name-strip",
+      "original": "ASGARD-116781766962-AVDD_L_0001_P2.psd",
+      "path": "source-assets/disney/lockups/character-name-strip__ASGARD-116781766962-AVDD_L_0001_P2.psd",
+      "bytes": 736599901
+    },
+    {
+      "slug": "character-banner-stack",
+      "original": "ASGARD-116781766962-AVDD_L_0002_P2.psd",
+      "path": "source-assets/disney/lockups/character-banner-stack__ASGARD-116781766962-AVDD_L_0002_P2.psd",
+      "bytes": 653501207
+    },
+    {
+      "slug": "worlds-collide",
+      "original": "AVDD_L_0003_P2.psd",
+      "path": "source-assets/disney/lockups/worlds-collide__AVDD_L_0003_P2.psd",
+      "bytes": 153558726
+    },
+    {
+      "slug": "worlds-collide-preview",
+      "original": "AVDD_L_0003_P2 복사.jpg",
+      "path": "source-assets/disney/lockups/worlds-collide-preview__AVDD_L_0003_P2-preview.jpg",
+      "bytes": 4468673
+    },
+    {
+      "slug": "diagonal-collage",
+      "original": "AVDD_L_0004_P2.psd",
+      "path": "source-assets/disney/lockups/diagonal-collage__AVDD_L_0004_P2.psd",
+      "bytes": 780688205
+    },
+    {
+      "slug": "doomsday-grid",
+      "original": "AVDD_L_0005_P2.psd",
+      "path": "source-assets/disney/lockups/doomsday-grid__AVDD_L_0005_P2.psd",
+      "bytes": 1289994565
+    },
+    {
+      "slug": "particle-ensemble",
+      "original": "AVDD_L_0007_P2.psd",
+      "path": "source-assets/disney/lockups/particle-ensemble__AVDD_L_0007_P2.psd",
+      "bytes": 879599950
+    },
+    {
+      "slug": "doom-green-energy",
+      "original": "AVDD_L_0014_P2.psd",
+      "path": "source-assets/disney/lockups/doom-green-energy__AVDD_L_0014_P2.psd",
+      "bytes": 1050096149
+    },
+    {
+      "slug": "doomsday-portrait-strip",
+      "original": "AVDD_L_0019_P2.psd",
+      "path": "source-assets/disney/lockups/doomsday-portrait-strip__AVDD_L_0019_P2.psd",
+      "bytes": 186595849
+    },
+    {
+      "slug": "doom-avengers-poster",
+      "original": "AVDD_L_0021_P2.psd",
+      "path": "source-assets/disney/lockups/doom-avengers-poster__AVDD_L_0021_P2.psd",
+      "bytes": 1119863868
+    }
+  ],
+  "duplicates": [
+    "AVDD_0030_P4 (1).psd",
+    "ASGARD-116781766962-AVDD_0006_P1 (2).psd",
+    "ASGARD-116781766962-AVDD_0006_P1 (1).psd",
+    "ASGARD-116781766962-AVDD_0006_P1(1).psd"
+  ],
+  "deleted_ai_sources": {
+    "note": "AI 원본은 삭제됨. 웹용 PNG는 public/images/ 에 slug 이름으로 남아 있음.",
+    "items": [
+      {
+        "slug": "ant-man",
+        "original": "ASGARD-116781766962-AVDD_0017_P4.ai"
+      },
+      {
+        "slug": "avengers",
+        "original": "ASGARD-112035760907-AVDD_0049_P1.ai"
+      },
+      {
+        "slug": "beast",
+        "original": "ASGARD-116781766962-AVDD_0013_P4.ai"
+      },
+      {
+        "slug": "black-panther",
+        "original": "AVDD_0014_P4.ai"
+      },
+      {
+        "slug": "black-panther",
+        "original": "AVDD_0050_P2.ai"
+      },
+      {
+        "slug": "cyclops",
+        "original": "AVDD_0022_P4.ai"
+      },
+      {
+        "slug": "doctor-doom",
+        "original": "AVDD_0028_P4.ai"
+      },
+      {
+        "slug": "doctor-doom",
+        "original": "AVDD_0051_P1.ai"
+      },
+      {
+        "slug": "doctor-doom-alt",
+        "original": "DoctorDoom_Iconb.ai"
+      },
+      {
+        "slug": "doctor-doom-standing",
+        "original": "ASGARD-116781766962-AVDD_0044_P1.ai"
+      },
+      {
+        "slug": "doom-crest",
+        "original": "Doom_Icon_1.ai"
+      },
+      {
+        "slug": "fantastic-four",
+        "original": "AVDD_0047_P2.ai"
+      },
+      {
+        "slug": "gambit",
+        "original": "ASGARD-116781766962-AVDD_0021_P4.ai"
+      },
+      {
+        "slug": "human-torch",
+        "original": "ASGARD-116781766962-AVDD_0027_P4.ai"
+      },
+      {
+        "slug": "mr-fantastic",
+        "original": "ASGARD-116781766962-AVDD_0024_P4.ai"
+      },
+      {
+        "slug": "professor-x",
+        "original": "ASGARD-116781766962-AVDD_0023_P4.ai"
+      },
+      {
+        "slug": "sentinel",
+        "original": "ASGARD-116781766962-AVDD_0029_P4.ai"
+      },
+      {
+        "slug": "shang-chi",
+        "original": "ASGARD-116781766962-AVDD_0020_P4.ai"
+      },
+      {
+        "slug": "the-thing",
+        "original": "AVDD_0025_P4.ai"
+      },
+      {
+        "slug": "thor",
+        "original": "AVDD_0018_P4.ai"
+      },
+      {
+        "slug": "winter-soldier",
+        "original": "AVDD_0015_P4.ai"
+      },
+      {
+        "slug": "worlds-collide-mark",
+        "original": "AVDD_0028_P2.ai"
+      },
+      {
+        "slug": "x-men",
+        "original": "AVDD_0048_P2.ai"
+      },
+      {
+        "slug": "yelena-belova",
+        "original": "AVDD_0019_P4.ai"
+      }
+    ]
+  }
+}
