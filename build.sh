@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
@@ -9,9 +9,8 @@ rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 copy_build_artifacts() {
-  local src="$1"
-  echo "[INFO] copying ${src}/ -> output/"
-  cp -R "${src}/." "$OUTPUT_DIR/"
+  echo "[INFO] copying $1/ -> output/"
+  cp -R "$1/." "$OUTPUT_DIR/"
 }
 
 if [ -f package.json ]; then
