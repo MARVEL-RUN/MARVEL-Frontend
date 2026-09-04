@@ -1,110 +1,238 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #080c16;
-  --marvel-red: #ed1d24;
+  --navy: #000320;
+  --silver: #ced4de;
+  --label: #b7bec9;
+  --note: #79808f;
+  --rule: rgba(255, 255, 255, 0.26);
 }
 
 html,
 body {
-  min-height: 100%;
-  background: var(--bg);
+  background: var(--navy);
   color: #fff;
 }
 
 body {
-  font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", sans-serif;
+  font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  min-height: 100vh;
+  background: var(--navy);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/*
+  시안의 대각선 모티프는 전부 수평 기준 -47도.
+  배경 띠·워터마크·셰브론이 같은 축을 공유합니다.
+*/
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.backdrop span {
+  position: absolute;
+  display: block;
+}
+
+/* 대각선 밝은 띠. 왼쪽 아래로 갈수록 조금 더 밝아집니다 */
+.backdrop__band {
+  inset: 0;
+  background-image: linear-gradient(
+    223deg,
+    rgba(255, 255, 255, 0.016) 28%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  -webkit-mask-image: linear-gradient(133deg, transparent 46.8%, #000 46.8% 72.3%, transparent 72.3%);
+  mask-image: linear-gradient(133deg, transparent 46.8%, #000 46.8% 72.3%, transparent 72.3%);
+}
+
+/* 원본 패턴이 검정이라 흰색으로 뒤집어 얹습니다 */
+.backdrop__art {
+  filter: invert(1);
+}
+
+.backdrop__run {
+  top: 63%;
+  left: 23.4%;
+  width: 35.6%;
+  aspect-ratio: 962 / 220;
+  background: url("/images/decor/run-wordmark.png") center / contain no-repeat;
+  transform: translate(-50%, -50%) rotate(-47deg);
+  opacity: 0.2;
+}
+
+.backdrop__tire {
+  top: 102%;
+  left: 2%;
+  width: 240%;
+  height: 7.5%;
+  background: url("/images/decor/tire-track.png") left center / auto 100% repeat-x;
+  transform-origin: 0 0;
+  transform: rotate(-47deg);
+  opacity: 0.03;
+}
+
+.backdrop__chevron {
+  top: 110.7%;
+  left: 32%;
+  width: 267%;
+  aspect-ratio: 1436 / 125;
+  background: url("/images/decor/chevron.png") left top / auto 100% repeat-x;
+  transform-origin: 0 0;
+  transform: rotate(-47deg);
+  opacity: 0.02;
+}
+
+/* 1em = 16px일 때 시안 폭 900px 기준. 아래 크기는 전부 이 값에서 파생 */
+.shell {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 2.9em;
+  font-size: clamp(8.5px, 1.78vw, 16px);
+}
+
+/* 키비주얼은 좌우·위로 재단해서 꽉 채웁니다 */
+.hero {
+  margin: -5.4em -8.13% 0 -6.37%;
+}
+
+.hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -12.8em;
+}
+
+.title__logo {
+  width: 32%;
+  height: auto;
+}
+
+.title__notice {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75em;
+  margin-top: 0.55em;
+}
+
+.title__date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15em;
+  padding-bottom: 0.4em;
+  font-size: 0.82em;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--silver);
+}
+
+.title__soon {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 2.15em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--silver);
+}
+
+.info {
+  width: 45%;
+  margin: 5.6em auto 0;
+}
+
+.info__heading {
+  margin-bottom: 1.1em;
+  text-align: center;
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+}
+
+.info__row {
+  padding: 1.15em 0;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+
+.info__label {
+  font-size: 0.7em;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.info__value {
+  margin-top: 0.25em;
+  font-size: 1.25em;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
-.font-display {
-  font-family: var(--font-display), "Oswald", sans-serif;
+.info__note {
+  margin-top: 0.5em;
+  font-size: 0.6em;
+  font-weight: 500;
+  color: var(--note);
 }
 
-.dot-grid {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
-  background-size: 16px 16px;
+.sponsors {
+  width: 45%;
+  margin: 0 auto;
+  padding: 1.15em 0 1.4em;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 
-.page-chevrons {
-  pointer-events: none;
-  position: absolute;
-  top: 36%;
-  bottom: 8%;
-  width: 72px;
-  background: repeating-linear-gradient(-38deg,
-      transparent 0 9px,
-      rgba(110, 190, 255, 0.16) 9px 13px,
-      transparent 13px 18px,
-      rgba(255, 214, 90, 0.12) 18px 22px);
+.sponsors__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 
-.page-chevrons--left {
-  left: 0;
-  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
-}
-
-.page-chevrons--right {
-  right: 0;
-  mask-image: linear-gradient(-90deg, #000 0%, transparent 100%);
-}
-
-.run-watermark {
-  pointer-events: none;
-  user-select: none;
-  position: absolute;
-  left: -12%;
-  top: 46%;
-  font-family: var(--font-display), "Oswald", sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-size: min(42vw, 280px);
-  line-height: 0.8;
-  letter-spacing: -0.06em;
-  color: rgba(255, 255, 255, 0.05);
-  transform: rotate(-22deg);
-}
-
-.hero-banner {
-  position: relative;
-  height: 188px;
-  overflow: hidden;
-  transform: skewX(-14deg);
-}
-
-.hero-banner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: repeating-linear-gradient(-26deg,
-      transparent 0 22px,
-      rgba(255, 255, 255, 0.1) 22px 26px);
-}
-
-.hero-banner__track {
+.sponsors__item {
   display: flex;
-  height: 100%;
-  width: 108%;
-  margin-left: -4%;
-  transform: skewX(14deg);
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55em;
 }
 
-.hero-banner__slot {
-  position: relative;
-  flex: 1 1 0;
-  overflow: hidden;
+.sponsors__role {
+  font-size: 0.68em;
+  font-weight: 500;
+  color: var(--label);
 }
 
-@media (max-width: 639px) {
-  .page-chevrons {
-    display: none;
-  }
+.sponsors__logo {
+  width: 5.6em;
+  height: 2.1em;
 }
 
-@media (min-width: 480px) {
-  .hero-banner {
-    height: 220px;
-  }
+.copyright {
+  margin-top: 2.5em;
+  text-align: center;
+  font-size: 0.58em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--note);
 }
