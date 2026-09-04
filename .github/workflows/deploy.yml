@@ -42,12 +42,12 @@ jobs:
       - name: Push to Gun06 repo
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.AUTO_ACTIONS2 }} # repo write 권한 포함 토큰
+          API_TOKEN_GITHUB: ${{ secrets.AUTO_ACTIONS }} # repo write 권한 포함 토큰
         with:
           source-directory: 'output' # build.sh와 반드시 일치
           destination-github-username: 'Gun06'
           destination-repository-name: 'MARVEL-RUN_Frontend'
-          user-email: ${{ secrets.EMAIL2 }}
+          user-email: ${{ secrets.EMAIL }}
           user-name: 'MARVEL CI Bot'
           commit-message: ${{ env.COMMIT_MSG }}
           target-branch: 'main'
