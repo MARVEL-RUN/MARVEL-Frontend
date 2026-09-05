@@ -1,9 +1,6 @@
 @import "tailwindcss";
 
-/*
-  알파벳만 도현이 맡고 한글·숫자·기호는 프리텐다드로 넘어갑니다.
-  도현은 굵기가 하나뿐이라 100~900을 전부 받아 가짜 볼드를 막습니다.
-*/
+/* Latin만 BM Dohyeon. weight range로 faux-bold 방지. */
 @font-face {
   font-family: "BM Dohyeon";
   src: url("/fonts/bm-dohyeon.woff2") format("woff2");
@@ -40,7 +37,7 @@ body {
   background: var(--navy);
 }
 
-/* 1em = 16px일 때 시안 폭 900px 기준. 아래 크기는 전부 이 값에서 파생 */
+/* em 레이아웃 기준. 900px일 때 1em = 16px. */
 .stage {
   position: relative;
   width: 100%;
@@ -50,7 +47,6 @@ body {
   font-size: clamp(8.5px, 1.78vw, 16px);
 }
 
-/* 키비주얼은 좌우·위로 재단해서 꽉 채웁니다 */
 .hero {
   position: absolute;
   top: -5.4em;
@@ -64,42 +60,16 @@ body {
   height: auto;
 }
 
-/*
-  키비주얼 위아래를 남색으로 덮어 그림만 가운데 남깁니다.
-  로고가 앉는 19.9em 아래로는 완전히 불투명한 단색입니다.
-*/
+/* 히어로 위·아래 남색, 캐릭터 구간만 투명. */
 .veil {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(
-    var(--navy) 1.25em,
-    var(--navy-0) 6.25em,
-    var(--navy-0) 14.38em,
-    var(--navy) 19.88em
-  );
-}
-
-/*
-  시안의 대각선 모티프는 전부 수평 기준 -47도.
-  배경 띠·워터마크·셰브론이 같은 축을 공유합니다.
-*/
-/*
-  무늬 위를 한 번 더 덮습니다.
-  로고~커밍순은 남색으로 가리고, 대회안내로 내려갈수록 걷혀 RUN이 드러납니다.
-*/
-.mist {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background: linear-gradient(
-    var(--navy-0) 14.38em,
-    var(--navy) 21.9em,
-    var(--navy) 34.4em,
-    var(--navy-0) 43em
-  );
+  background: linear-gradient(var(--navy) 1.25em,
+      var(--navy-0) 6.25em,
+      var(--navy-0) 14.38em,
+      var(--navy) 19.88em);
 }
 
 .backdrop {
@@ -111,58 +81,14 @@ body {
   user-select: none;
 }
 
-.backdrop span {
+/* top / left / width / opacity */
+.backdrop__motif {
   position: absolute;
-  display: block;
-}
-
-/* 대각선 밝은 띠. 왼쪽 아래로 갈수록 조금 더 밝아집니다 */
-.backdrop__band {
-  inset: 0;
-  background-image: linear-gradient(
-    223deg,
-    rgba(255, 255, 255, 0.016) 28%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  -webkit-mask-image: linear-gradient(133deg, transparent 46%, #000 53% 68%, transparent 73%);
-  mask-image: linear-gradient(133deg, transparent 46%, #000 53% 68%, transparent 73%);
-}
-
-/* 원본 패턴이 검정이라 흰색으로 뒤집어 얹습니다 */
-.backdrop__art {
-  filter: invert(1);
-}
-
-.backdrop__run {
-  top: 63.96%;
-  left: 23.63%;
-  width: 37.5%;
-  aspect-ratio: 962 / 220;
-  background: url("/images/decor/run-wordmark.png") center / contain no-repeat;
-  transform: translate(-50%, -50%) rotate(-47.5deg);
-  opacity: 0.2;
-}
-
-.backdrop__tire {
-  top: 102%;
-  left: 2%;
-  width: 240%;
-  height: 7.5%;
-  background: url("/images/decor/tire-track.png") left center / auto 100% repeat-x;
-  transform-origin: 0 0;
-  transform: rotate(-47.5deg);
-  opacity: 0.012;
-}
-
-.backdrop__chevron {
-  top: 110.7%;
-  left: 32%;
-  width: 267%;
-  aspect-ratio: 1436 / 125;
-  background: url("/images/decor/chevron.png") left top / auto 100% repeat-x;
-  transform-origin: 0 0;
-  transform: rotate(-47.5deg);
-  opacity: 0.013;
+  top: 25em;
+  left: -0%;
+  width: 230%;
+  height: auto;
+  opacity: 0.6;
 }
 
 .shell {
@@ -202,7 +128,7 @@ body {
   color: var(--silver);
 }
 
-/* 시안에서 '접수 OPEN'만 획이 두 배로 두껍습니다 */
+/* 접수 OPEN만 900 */
 .title__date strong {
   font-weight: 900;
 }
@@ -215,10 +141,7 @@ body {
   color: var(--silver);
 }
 
-/*
-  구분선은 두 폭입니다. 대회안내 아래와 맨 아래는 단 전체 폭,
-  항목 사이는 86%로 좁혀 들어옵니다.
-*/
+/* 외곽 구분선 전체폭, 중간은 86% */
 .info,
 .sponsors {
   width: 45.7%;
@@ -248,7 +171,7 @@ body {
   text-align: center;
 }
 
-.info__row + .info__row,
+.info__row+.info__row,
 .sponsors {
   background-image: linear-gradient(var(--rule), var(--rule));
   background-size: 86% 1px;

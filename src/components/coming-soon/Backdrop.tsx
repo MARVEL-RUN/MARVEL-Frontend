@@ -1,10 +1,12 @@
 export function Backdrop() {
   return (
     <div aria-hidden className="backdrop">
-      <span className="backdrop__band" />
-      <span className="backdrop__art backdrop__tire" />
-      <span className="backdrop__art backdrop__run" />
-      <span className="backdrop__art backdrop__chevron" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="backdrop__motif"
+        src="/images/decor/info-motif.svg"
+        alt=""
+      />
     </div>
   );
 }
