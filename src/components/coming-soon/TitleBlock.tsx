@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
+import { COMING_SOON_ASSETS } from "@/lib/assets";
 
 export function TitleBlock() {
   return (
     <div className="title">
       <Image
-        src="/images/marvel-run-logo.png"
+        src={COMING_SOON_ASSETS.logo}
         alt={EVENT.title}
         width={1057}
         height={514}

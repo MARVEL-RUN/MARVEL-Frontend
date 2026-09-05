@@ -1,10 +1,11 @@
 import Image from "next/image";
+import { COMING_SOON_ASSETS } from "@/lib/assets";
 
 export function HeroCharacters() {
   return (
     <div className="hero">
       <Image
-        src="/images/hero-characters.png"
+        src={COMING_SOON_ASSETS.hero}
         alt="사이클롭스, 씽, 닥터 둠, 토르, 캡틴 아메리카"
         width={3791}
         height={2083}

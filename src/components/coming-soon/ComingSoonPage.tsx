@@ -7,7 +7,7 @@ import { Sponsors } from "./Sponsors";
 
 export function ComingSoonPage() {
   return (
-    <main className="page">
+    <main className="coming-soon">
       <div className="stage">
         <HeroCharacters />
         <span aria-hidden className="veil" />

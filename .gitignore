@@ -8,8 +8,4 @@ out/
 .cursor/
 .env
 .env.*
-
-# 라이선스 원본 에셋 (PSD 등, 수 GB) — 로컬에서만 보관
-source-assets/**
-!source-assets/README.md
-!source-assets/manifest.json
+!.env.example
