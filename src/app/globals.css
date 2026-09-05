@@ -74,8 +74,8 @@ body {
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(
-    var(--navy) 1.94em,
-    var(--navy-0) 5.88em,
+    var(--navy) 1.25em,
+    var(--navy-0) 6.25em,
     var(--navy-0) 14.38em,
     var(--navy) 19.88em
   );
