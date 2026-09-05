@@ -9,10 +9,12 @@ export function ComingSoonPage() {
   return (
     <main className="page">
       <div className="stage">
+        {/* 아래에서 위로: 키비주얼 - 남색 베일 - 무늬 - 글씨 */}
+        <HeroCharacters />
+        <span aria-hidden className="veil" />
         <Backdrop />
 
         <div className="shell">
-          <HeroCharacters />
           <TitleBlock />
           <EventInfo />
           <Sponsors />

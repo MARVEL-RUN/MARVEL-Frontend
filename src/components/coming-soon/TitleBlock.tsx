@@ -16,7 +16,9 @@ export function TitleBlock() {
       <div className="title__notice">
         <p className="title__date">
           <span>{EVENT.openNoticeDate}</span>
-          <span>{EVENT.openNoticeTime}</span>
+          <span>
+            {EVENT.openNoticeTime} <strong>{EVENT.openNoticeAction}</strong>
+          </span>
         </p>
         <p className="title__soon">COMING SOON</p>
       </div>

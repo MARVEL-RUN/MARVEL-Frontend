@@ -1,7 +1,8 @@
 export const EVENT = {
   title: "MARVEL RUN 2026 KOREA",
   openNoticeDate: "2026. 09. 22. 화요일",
-  openNoticeTime: "오후 2시 접수 OPEN",
+  openNoticeTime: "오후 2시",
+  openNoticeAction: "접수 OPEN",
   info: [
     {
       label: "대회일시",

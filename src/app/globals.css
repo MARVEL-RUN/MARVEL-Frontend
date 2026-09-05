@@ -1,11 +1,27 @@
 @import "tailwindcss";
 
+/*
+  알파벳만 도현이 맡고 한글·숫자·기호는 프리텐다드로 넘어갑니다.
+  도현은 굵기가 하나뿐이라 100~900을 전부 받아 가짜 볼드를 막습니다.
+*/
+@font-face {
+  font-family: "BM Dohyeon";
+  src: url("/fonts/bm-dohyeon.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0041-005A, U+0061-007A;
+}
+
 :root {
+  --font-latin: "BM Dohyeon";
+  --font-korean: "Pretendard Variable", Pretendard;
   --navy: #000320;
-  --silver: #ced4de;
-  --label: #b7bec9;
-  --note: #79808f;
-  --rule: rgba(255, 255, 255, 0.26);
+  --navy-0: rgba(0, 3, 32, 0);
+  --silver: #d3d4dc;
+  --label: #eef0f6;
+  --note: #a4a5b4;
+  --rule: rgba(255, 255, 255, 0.62);
+  --dim: #b7b9c6;
 }
 
 html,
@@ -15,7 +31,7 @@ body {
 }
 
 body {
-  font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  font-family: var(--font-latin), var(--font-korean), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -24,12 +40,45 @@ body {
   background: var(--navy);
 }
 
+/* 1em = 16px일 때 시안 폭 900px 기준. 아래 크기는 전부 이 값에서 파생 */
 .stage {
   position: relative;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
   overflow: hidden;
+  font-size: clamp(8.5px, 1.78vw, 16px);
+}
+
+/* 키비주얼은 좌우·위로 재단해서 꽉 채웁니다 */
+.hero {
+  position: absolute;
+  top: -5.4em;
+  left: -6.37%;
+  right: -8.13%;
+}
+
+.hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/*
+  키비주얼 위아래를 남색으로 덮어 그림만 가운데 남깁니다.
+  로고가 앉는 19.9em 아래로는 완전히 불투명한 단색입니다.
+*/
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--navy) 1.94em,
+    var(--navy-0) 5.88em,
+    var(--navy-0) 14.38em,
+    var(--navy) 19.88em
+  );
 }
 
 /*
@@ -39,6 +88,7 @@ body {
 .backdrop {
   position: absolute;
   inset: 0;
+  z-index: 2;
   overflow: hidden;
   pointer-events: none;
   user-select: none;
@@ -57,8 +107,8 @@ body {
     rgba(255, 255, 255, 0.016) 28%,
     rgba(255, 255, 255, 0.05) 100%
   );
-  -webkit-mask-image: linear-gradient(133deg, transparent 46.8%, #000 46.8% 72.3%, transparent 72.3%);
-  mask-image: linear-gradient(133deg, transparent 46.8%, #000 46.8% 72.3%, transparent 72.3%);
+  -webkit-mask-image: linear-gradient(133deg, transparent 46%, #000 53% 68%, transparent 73%);
+  mask-image: linear-gradient(133deg, transparent 46%, #000 53% 68%, transparent 73%);
 }
 
 /* 원본 패턴이 검정이라 흰색으로 뒤집어 얹습니다 */
@@ -67,12 +117,12 @@ body {
 }
 
 .backdrop__run {
-  top: 63%;
-  left: 23.4%;
-  width: 35.6%;
+  top: 63.96%;
+  left: 23.63%;
+  width: 37.5%;
   aspect-ratio: 962 / 220;
   background: url("/images/decor/run-wordmark.png") center / contain no-repeat;
-  transform: translate(-50%, -50%) rotate(-47deg);
+  transform: translate(-50%, -50%) rotate(-47.5deg);
   opacity: 0.2;
 }
 
@@ -83,8 +133,8 @@ body {
   height: 7.5%;
   background: url("/images/decor/tire-track.png") left center / auto 100% repeat-x;
   transform-origin: 0 0;
-  transform: rotate(-47deg);
-  opacity: 0.03;
+  transform: rotate(-47.5deg);
+  opacity: 0.012;
 }
 
 .backdrop__chevron {
@@ -94,46 +144,33 @@ body {
   aspect-ratio: 1436 / 125;
   background: url("/images/decor/chevron.png") left top / auto 100% repeat-x;
   transform-origin: 0 0;
-  transform: rotate(-47deg);
-  opacity: 0.02;
+  transform: rotate(-47.5deg);
+  opacity: 0.013;
 }
 
-/* 1em = 16px일 때 시안 폭 900px 기준. 아래 크기는 전부 이 값에서 파생 */
 .shell {
   position: relative;
-  z-index: 1;
+  z-index: 3;
+  padding-top: 17.3em;
   padding-bottom: 2.9em;
-  font-size: clamp(8.5px, 1.78vw, 16px);
-}
-
-/* 키비주얼은 좌우·위로 재단해서 꽉 채웁니다 */
-.hero {
-  margin: -5.4em -8.13% 0 -6.37%;
-}
-
-.hero img {
-  display: block;
-  width: 100%;
-  height: auto;
 }
 
 .title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -12.8em;
 }
 
 .title__logo {
-  width: 32%;
+  width: 31.7%;
   height: auto;
 }
 
 .title__notice {
   display: flex;
   align-items: flex-end;
-  gap: 0.75em;
-  margin-top: 0.55em;
+  gap: 0.8em;
+  margin-top: 1.84em;
 }
 
 .title__date {
@@ -141,73 +178,101 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.15em;
-  padding-bottom: 0.4em;
-  font-size: 0.82em;
-  font-weight: 600;
-  line-height: 1.3;
+  padding-bottom: 0.1em;
+  font-size: 1em;
+  font-weight: 500;
+  line-height: 1.2;
   color: var(--silver);
 }
 
+/* 시안에서 '접수 OPEN'만 획이 두 배로 두껍습니다 */
+.title__date strong {
+  font-weight: 900;
+}
+
 .title__soon {
-  font-family: var(--font-archivo), system-ui, sans-serif;
-  font-size: 2.15em;
+  font-size: 2.5em;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.01em;
   color: var(--silver);
 }
 
+/*
+  구분선은 두 폭입니다. 대회안내 아래와 맨 아래는 단 전체 폭,
+  항목 사이는 86%로 좁혀 들어옵니다.
+*/
+.info,
+.sponsors {
+  width: 45.7%;
+  margin-inline: auto;
+}
+
 .info {
-  width: 45%;
-  margin: 5.6em auto 0;
+  margin-top: 6.25em;
 }
 
 .info__heading {
-  margin-bottom: 1.1em;
+  margin-bottom: 0.81em;
   text-align: center;
-  font-size: 0.95em;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-indent: 0.3em;
+  font-size: 1.33em;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+}
+
+.info__list {
+  border-top: 1px solid var(--rule);
 }
 
 .info__row {
-  padding: 1.15em 0;
-  border-top: 1px solid var(--rule);
+  padding: 1.13em 0 1.02em;
   text-align: center;
 }
 
+.info__row + .info__row,
+.sponsors {
+  background-image: linear-gradient(var(--rule), var(--rule));
+  background-size: 86% 1px;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+
 .info__label {
-  font-size: 0.7em;
+  font-size: 0.77em;
   font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  text-indent: 0.15em;
   color: var(--label);
 }
 
 .info__value {
-  margin-top: 0.25em;
-  font-size: 1.25em;
+  margin-top: 0.28em;
+  font-size: 1.26em;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 .info__note {
-  margin-top: 0.5em;
-  font-size: 0.6em;
+  margin-top: 0.36em;
+  font-size: 0.625em;
   font-weight: 500;
+  line-height: 1;
   color: var(--note);
 }
 
 .sponsors {
-  width: 45%;
-  margin: 0 auto;
-  padding: 1.15em 0 1.4em;
-  border-top: 1px solid var(--rule);
+  padding: 1.13em 0 0.69em;
   border-bottom: 1px solid var(--rule);
 }
 
 .sponsors__list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  width: 82%;
+  margin-inline: auto;
 }
 
 .sponsors__item {
@@ -218,21 +283,25 @@ body {
 }
 
 .sponsors__role {
-  font-size: 0.68em;
+  font-size: 0.77em;
   font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  text-indent: 0.15em;
   color: var(--label);
 }
 
 .sponsors__logo {
   width: 5.6em;
-  height: 2.1em;
+  height: 1.9em;
 }
 
 .copyright {
-  margin-top: 2.5em;
+  margin-top: 5.11em;
   text-align: center;
-  font-size: 0.58em;
+  font-size: 0.55em;
+  line-height: 1;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: var(--note);
+  color: var(--dim);
 }

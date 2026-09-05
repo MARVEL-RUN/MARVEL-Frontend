@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo } from "next/font/google";
 import "./globals.css";
-
-const archivo = Archivo({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-archivo",
-});
 
 export const metadata: Metadata = {
   title: "MARVEL RUN 2026 KOREA",
@@ -21,11 +14,18 @@ export default function RootLayout({
     <html lang="ko">
       <head>
         <link
+          rel="preload"
+          href="/fonts/bm-dohyeon.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
       </head>
-      <body className={archivo.variable}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
