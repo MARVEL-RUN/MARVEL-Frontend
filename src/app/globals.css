@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "../components/coming-soon/coming-soon.css";
+@import "../components/main/main.css";
+
+/* Latin만 BM Dohyeon. weight range로 faux-bold 방지. */
+@font-face {
+  font-family: "BM Dohyeon";
+  src: url("/fonts/bm-dohyeon.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0041-005A, U+0061-007A;
+}
+
+:root {
+  --font-latin: "BM Dohyeon";
+  --font-korean: "Pretendard Variable", Pretendard;
+  --navy: #000320;
+  --navy-0: rgba(0, 3, 32, 0);
+  --silver: #d3d4dc;
+  --label: #eef0f6;
+  --note: #a4a5b4;
+  --rule: rgba(255, 255, 255, 0.62);
+  --dim: #b7b9c6;
+}
+
+html,
+body {
+  background: var(--navy);
+  color: #fff;
+}
+
+body {
+  font-family: var(--font-latin), var(--font-korean), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
