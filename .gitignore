@@ -5,6 +5,7 @@ build/
 .next/
 out/
 .DS_Store
+.cursor/
 .env
 .env.*
 
