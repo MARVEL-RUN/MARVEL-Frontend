@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MAIN_ASSETS } from "@/lib/assets";
 import { NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
-import { BrandMark } from "./BrandMark";
 
 export function Header() {
   const pathname = usePathname();
@@ -42,7 +43,14 @@ export function Header() {
     >
       <div className="site-header__bar">
         <Link href="/" className="site-header__brand" aria-label="MARVEL RUN 홈">
-          <BrandMark compact />
+          <Image
+            src={MAIN_ASSETS.logo}
+            alt=""
+            width={1257}
+            height={98}
+            className="site-header__logo"
+            priority
+          />
         </Link>
 
         <nav className="site-header__nav" aria-label="주요 메뉴">

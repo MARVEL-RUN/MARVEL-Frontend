@@ -174,8 +174,10 @@ html.is-live .site-header {
 }
 
 .site-header__bar {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1.5rem;
   width: min(1200px, calc(100% - 2rem));
   height: 4.5rem;
@@ -183,14 +185,28 @@ html.is-live .site-header {
 }
 
 .site-header__brand {
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  min-width: 0;
   text-decoration: none;
 }
 
+.site-header__logo {
+  display: block;
+  height: 1.15rem;
+  width: auto;
+  max-width: min(48vw, 14rem);
+  object-fit: contain;
+  object-position: left center;
+}
+
 .site-header__nav {
+  position: absolute;
+  left: 50%;
   display: flex;
-  flex: 1;
-  justify-content: center;
   gap: 1.6rem;
+  transform: translateX(-50%);
 }
 
 .site-header__link {
@@ -218,6 +234,8 @@ html.is-live .site-header {
 }
 
 .site-header__cta {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
 }
 
