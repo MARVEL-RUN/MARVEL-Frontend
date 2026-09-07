@@ -26,8 +26,9 @@ jobs:
   build-push-deploy:
     # Fork PR에서는 AWS OIDC 권한을 사용하지 않는다.
     if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
 
     runs-on: ubuntu-latest
 
