@@ -188,36 +188,28 @@ html.is-intro .fx-letterbox span {
 }
 
 .intro__box {
-  padding: 0.28em 0.42em 0.16em;
-  background: var(--marvel);
-  color: #fff;
-  font-size: clamp(2.6rem, 11vw, 7rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1;
+  display: block;
+  width: min(42vw, 17.5rem);
+  height: auto;
   box-shadow: 0 0 70px 12px rgba(237, 29, 36, 0.55);
   opacity: 0;
   animation: logoSlam 0.62s 2.05s cubic-bezier(0.12, 1.4, 0.2, 1) both;
 }
 
 .intro__run {
-  margin-top: 0.12em;
-  font-size: clamp(3.2rem, 16vw, 10rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 0.86;
-  transform: skewX(-12deg);
+  display: block;
+  width: min(72vw, 34rem);
+  height: auto;
+  margin-top: 0.18em;
   opacity: 0;
   animation: runIn 0.55s 2.45s cubic-bezier(0.12, 1.35, 0.2, 1) both;
 }
 
 .intro__sub {
-  margin-top: 0.35em;
-  color: var(--gold);
-  font-size: clamp(0.7rem, 2vw, 1.05rem);
-  font-weight: 700;
-  letter-spacing: 0.42em;
-  text-indent: 0.42em;
+  display: block;
+  width: min(48vw, 17rem);
+  height: auto;
+  margin-top: 0.45em;
   opacity: 0;
   animation: fadeUp 0.5s 2.85s both;
 }
@@ -335,12 +327,12 @@ html.is-intro .fx-letterbox span {
 @keyframes runIn {
   from {
     opacity: 0;
-    transform: skewX(-12deg) translateX(-8%) scale(1.2);
+    transform: translateX(-8%) scale(1.2);
     filter: blur(8px);
   }
   to {
     opacity: 1;
-    transform: skewX(-12deg);
+    transform: none;
     filter: none;
   }
 }

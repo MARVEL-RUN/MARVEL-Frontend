@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { COMING_SOON_ASSETS } from "@/lib/assets";
+import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 
 const PANELS = [
   { pos: "12% 42%", tint: "rgba(237, 29, 36, 0.35)" },
@@ -64,9 +65,30 @@ export function OpeningIntro() {
       </div>
       <span className="intro__flash" aria-hidden />
       <div className="intro__logo">
-        <span className="intro__box">MARVEL</span>
-        <span className="intro__run">RUN</span>
-        <span className="intro__sub">2026 KOREA</span>
+        <Image
+          src={MAIN_ASSETS.introMarvel}
+          alt="MARVEL"
+          width={437}
+          height={197}
+          className="intro__box"
+          priority
+        />
+        <Image
+          src={MAIN_ASSETS.introRun}
+          alt="RUN"
+          width={1188}
+          height={197}
+          className="intro__run"
+          priority
+        />
+        <Image
+          src={MAIN_ASSETS.introKorea}
+          alt="2026 KOREA"
+          width={564}
+          height={56}
+          className="intro__sub"
+          priority
+        />
       </div>
       <button type="button" className="intro__skip" onClick={closeIntro}>
         SKIP

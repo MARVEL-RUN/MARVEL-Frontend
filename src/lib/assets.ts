@@ -8,4 +8,7 @@ export const MAIN_ASSETS = {
   logo: "/images/main/logo.svg",
   footerLogo: "/images/main/ft_logo.svg",
   sideBanner: "/images/main/sidebanner.svg",
+  introMarvel: "/images/main/intro-marvel.png",
+  introRun: "/images/main/intro-run.png",
+  introKorea: "/images/main/intro-korea.png",
 } as const;
