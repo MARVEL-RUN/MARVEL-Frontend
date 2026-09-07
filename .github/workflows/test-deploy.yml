@@ -1,0 +1,184 @@
+name: MarvelRun Frontend Test Deploy
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: marvelrun-frontend-test
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_ACCOUNT_ID: "705186435017"
+  ECR_REPOSITORY: marvelrun/frontend
+  EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+  FRONTEND_APP_MODE: ${{ vars.TEST_FRONTEND_APP_MODE }}
+  FRONTEND_API_BASE_URL: ${{ vars.TEST_FRONTEND_API_BASE_URL }}
+
+jobs:
+  build-push-deploy:
+    # Fork PR에서는 AWS OIDC 권한을 사용하지 않는다.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate deployment configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${EC2_INSTANCE_ID:-}" ]; then
+            echo "::error::EC2_INSTANCE_ID GitHub Variable이 없습니다."
+            exit 1
+          fi
+
+          if [[ ! "$EC2_INSTANCE_ID" =~ ^i-[a-f0-9]+$ ]]; then
+            echo "::error::EC2_INSTANCE_ID 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          case "${FRONTEND_APP_MODE:-}" in
+            coming-soon|main)
+              ;;
+            *)
+              echo "::error::TEST_FRONTEND_APP_MODE는 coming-soon 또는 main이어야 합니다."
+              exit 1
+              ;;
+          esac
+
+          if [ -z "${FRONTEND_API_BASE_URL:-}" ]; then
+            echo "::error::TEST_FRONTEND_API_BASE_URL GitHub Variable이 없습니다."
+            exit 1
+          fi
+
+          case "$FRONTEND_API_BASE_URL" in
+            http://*|https://*)
+              ;;
+            *)
+              echo "::error::TEST_FRONTEND_API_BASE_URL은 http:// 또는 https:// 로 시작해야 합니다."
+              exit 1
+              ;;
+          esac
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          allowed-account-ids: ${{ env.AWS_ACCOUNT_ID }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Resolve image tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CONFIG_HASH="$(
+            printf '%s' "${FRONTEND_APP_MODE}|${FRONTEND_API_BASE_URL}"             | sha256sum             | cut -c1-12
+          )"
+
+          IMAGE_TAG="${GITHUB_SHA}-${FRONTEND_APP_MODE}-${CONFIG_HASH}"
+
+          echo "CONFIG_HASH=$CONFIG_HASH" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+
+          echo "Frontend artifact tag: $IMAGE_TAG"
+
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}"
+
+          if aws ecr describe-images               --repository-name "$ECR_REPOSITORY"               --image-ids imageTag="$IMAGE_TAG"               --region "$AWS_REGION"               > /dev/null 2>&1; then
+
+            echo "Existing frontend artifact reused: $IMAGE_TAG"
+
+            # latest는 운영 식별자가 아니라 편의용 mutable pointer.
+            docker pull "$IMAGE_URI:$IMAGE_TAG"
+            docker tag "$IMAGE_URI:$IMAGE_TAG" "$IMAGE_URI:latest"
+            docker push "$IMAGE_URI:latest"
+          else
+            docker build               --build-arg APP_MODE="$FRONTEND_APP_MODE"               --build-arg NEXT_PUBLIC_API_BASE_URL="$FRONTEND_API_BASE_URL"               -t "$IMAGE_URI:$IMAGE_TAG"               -t "$IMAGE_URI:latest"               .
+
+            docker push "$IMAGE_URI:$IMAGE_TAG"
+            docker push "$IMAGE_URI:latest"
+          fi
+
+      - name: Deploy frontend with SSM Run Command
+        id: deploy
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import json
+          import os
+
+          region = os.environ["AWS_REGION"]
+          registry = os.environ["ECR_REGISTRY"]
+          tag = os.environ["IMAGE_TAG"]
+
+          commands = [
+              "set -e",
+              f"aws ecr get-login-password --region {region} "
+              f"| docker login --username AWS --password-stdin {registry}",
+              "cd /opt/marvelrun && "
+              f"FRONTEND_IMAGE_TAG={tag} "
+              "docker compose -f frontend-compose.yml pull frontend",
+              "cd /opt/marvelrun && "
+              f"FRONTEND_IMAGE_TAG={tag} "
+              "docker compose -f frontend-compose.yml up -d --no-deps frontend",
+              "cd /opt/marvelrun && "
+              f"FRONTEND_IMAGE_TAG={tag} "
+              "docker compose -f frontend-compose.yml ps frontend",
+              f"docker logout {registry} || true",
+              "docker image prune -f",
+          ]
+
+          with open("/tmp/frontend-ssm-parameters.json", "w", encoding="utf-8") as f:
+              json.dump({"commands": commands}, f)
+          PY
+
+          COMMAND_ID="$(
+            aws ssm send-command               --region "$AWS_REGION"               --instance-ids "$EC2_INSTANCE_ID"               --document-name "AWS-RunShellScript"               --parameters file:///tmp/frontend-ssm-parameters.json               --query 'Command.CommandId'               --output text
+          )"
+
+          echo "command_id=$COMMAND_ID" >> "$GITHUB_OUTPUT"
+          echo "SSM Command ID: $COMMAND_ID"
+
+      - name: Wait for deployment result
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          aws ssm wait command-executed             --region "$AWS_REGION"             --command-id "${{ steps.deploy.outputs.command_id }}"             --instance-id "$EC2_INSTANCE_ID"
+
+          aws ssm get-command-invocation             --region "$AWS_REGION"             --command-id "${{ steps.deploy.outputs.command_id }}"             --instance-id "$EC2_INSTANCE_ID"             --query '{Status:Status,StandardOutput:StandardOutputContent,StandardError:StandardErrorContent}'
+
+      - name: Cleanup temporary files
+        if: always()
+        shell: bash
+        run: |
+          rm -f /tmp/frontend-ssm-parameters.json
