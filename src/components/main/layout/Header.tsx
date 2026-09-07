@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MAIN_ASSETS } from "@/lib/assets";
 import { NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
-import { BrandMark } from "./BrandMark";
 
 export function Header() {
   const pathname = usePathname();
@@ -41,8 +42,22 @@ export function Header() {
       ].join(" ")}
     >
       <div className="site-header__bar">
-        <Link href="/" className="site-header__brand" aria-label="MARVEL RUN 홈">
-          <BrandMark compact />
+        <Link
+          href="/"
+          className="site-header__brand"
+          aria-label="MARVEL RUN 홈"
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        >
+          <Image
+            src={MAIN_ASSETS.logo}
+            alt=""
+            width={1257}
+            height={98}
+            className="site-header__logo"
+            priority
+            draggable={false}
+          />
         </Link>
 
         <nav className="site-header__nav" aria-label="주요 메뉴">

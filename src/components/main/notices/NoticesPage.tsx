@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { EVENT } from "@/lib/event";
-import { PageHero } from "../layout/PageHero";
+import { SideBanner } from "../layout/SideBanner";
 
 export function NoticesPage() {
   const [openId, setOpenId] = useState<string | null>(EVENT.notices[0]?.id ?? null);
 
   return (
     <main className="page">
-      <PageHero kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
+      <SideBanner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
       <div className="page__body wrap">
         <ul className="bulletin">
           {EVENT.notices.map((n) => {

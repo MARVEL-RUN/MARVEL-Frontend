@@ -1,26 +1,32 @@
+import Image from "next/image";
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
+import { MAIN_ASSETS } from "@/lib/assets";
 import { LEGAL_LINKS, OFFICE } from "@/lib/legal";
-import { BrandMark } from "./BrandMark";
 
 export function Footer() {
   return (
     <footer className="site-footer">
-      <div className="site-footer__inner">
-        <div className="site-footer__brand">
-          <Link href="/" aria-label="MARVEL RUN 홈">
-            <BrandMark />
-          </Link>
+      <div className="site-footer__top">
+        <div>
           <p className="site-footer__office-name">{OFFICE.name}</p>
           <address className="site-footer__office">
             <p>{OFFICE.address}</p>
-            <p>사업자번호 : {OFFICE.bizNo}</p>
-            <p>통신판매번호 : {OFFICE.mailOrderNo}</p>
-            <p>대표자 : {OFFICE.ceo}</p>
-            <p>Tel : {OFFICE.tel}</p>
-            <p>E-mail : {OFFICE.email}</p>
-            <p>사무국 운영시간 : {OFFICE.hours}</p>
+            <p>
+              대표자 : {OFFICE.ceo}
+              <span aria-hidden> | </span>
+              Tel : {OFFICE.tel}
+              <span aria-hidden> | </span>
+              Email: {OFFICE.email}
+            </p>
+            <p>
+              사업자번호: {OFFICE.bizNo}
+              <span aria-hidden> | </span>
+              통신판매번호: {OFFICE.mailOrderNo}
+            </p>
+            <p>※ 사무국 운영시간 : {OFFICE.hours}</p>
           </address>
+          <p className="site-footer__copy">{OFFICE.copyright}</p>
         </div>
 
         <nav className="site-footer__nav" aria-label="약관">
@@ -30,17 +36,31 @@ export function Footer() {
             </Link>
           ))}
         </nav>
-
-        <ul className="site-footer__sponsors">
-          {EVENT.sponsors.map((s) => (
-            <li key={s.role}>
-              <span>{s.role}</span>
-              <strong>{s.name}</strong>
-            </li>
-          ))}
-        </ul>
       </div>
-      <p className="site-footer__copy">{OFFICE.copyright}</p>
+
+      <ul className="site-footer__sponsors">
+        {EVENT.sponsors.map((s) => (
+          <li key={s.role}>
+            <span>{s.role}</span>
+            <strong>{s.name}</strong>
+          </li>
+        ))}
+      </ul>
+
+      <Link
+        href="/"
+        className="site-footer__logo"
+        aria-label="MARVEL RUN 홈"
+        draggable={false}
+      >
+        <Image
+          src={MAIN_ASSETS.footerLogo}
+          alt=""
+          width={1236}
+          height={98}
+          draggable={false}
+        />
+      </Link>
     </footer>
   );
 }

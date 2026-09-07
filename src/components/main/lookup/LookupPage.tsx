@@ -10,7 +10,7 @@ import {
   type EntryRecord,
   type GroupRecord,
 } from "@/lib/register";
-import { PageHero } from "../layout/PageHero";
+import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 
 type View = "form" | "hit" | "miss";
@@ -20,7 +20,7 @@ export function LookupPage() {
 
   return (
     <main className="page">
-      <PageHero kicker="INTEL" title="신청조회" en="FIND YOUR ENTRY" />
+      <SideBanner kicker="INTEL" title="신청조회" en="FIND YOUR ENTRY" />
       <div className="page__body wrap wrap--narrow">
         {!kind ? (
           <ApplyKindPick heading="조회 유형을 선택하세요" lookup onPick={setKind} />

@@ -119,7 +119,6 @@ export const EVENT = {
   sponsors: [
     { role: "주최", name: "ONEUNIVERSE" },
     { role: "주관", name: "FLUX SONIC" },
-    { role: "ESG주관", name: "LIVEWITH" },
   ],
   copyright: "©2026 MARVEL",
 } as const;

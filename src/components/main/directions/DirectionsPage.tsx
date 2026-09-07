@@ -1,10 +1,10 @@
 import { EVENT } from "@/lib/event";
-import { PageHero } from "../layout/PageHero";
+import { SideBanner } from "../layout/SideBanner";
 
 export function DirectionsPage() {
   return (
     <main className="page">
-      <PageHero kicker="LOCATION" title="오시는길" en="GET TO THE START LINE" />
+      <SideBanner kicker="LOCATION" title="오시는길" en="GET TO THE START LINE" />
       <div className="page__body wrap">
         <section className="block venue-card">
           <p className="kicker">VENUE</p>
