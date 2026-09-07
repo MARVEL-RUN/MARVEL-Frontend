@@ -3,6 +3,7 @@
 /* 본페이지 — 마블 레드·대각·하프톤. */
 
 html {
+  --header-h: 4.5rem;
   scroll-padding-top: 5.5rem;
 }
 
@@ -168,9 +169,8 @@ html.is-live .site-header {
 
 .site-header.is-solid,
 .site-header:not(.site-header--home) {
-  background: rgba(0, 3, 32, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
+  background: var(--navy);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .site-header__bar {
@@ -180,7 +180,7 @@ html.is-live .site-header {
   justify-content: space-between;
   gap: 1.5rem;
   width: min(1200px, calc(100% - 2rem));
-  height: 4.5rem;
+  height: var(--header-h);
   margin-inline: auto;
 }
 
@@ -877,7 +877,7 @@ html.is-live .hero__actions {
 
 /* inner pages */
 .page {
-  padding-top: 4.5rem;
+  padding-top: var(--header-h);
 }
 
 html.is-live .reveal:not(.is-in) {
@@ -957,6 +957,10 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .side-banner {
   position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 13.5rem;
   background: #00042e;
   user-select: none;
   -webkit-user-drag: none;
@@ -971,19 +975,11 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .side-banner::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: -2.8rem;
-  height: 9rem;
+  inset: 0 0 auto;
+  height: 3.2rem;
   z-index: 1;
   pointer-events: none;
-  background-image: radial-gradient(
-    rgba(237, 29, 36, 0.16) 0.7px,
-    transparent 0.9px
-  );
-  background-size: 7px 7px;
-  background-position: 0 -1.4rem;
-  mask-image: linear-gradient(180deg, #000 12%, transparent);
+  background: linear-gradient(180deg, #00042e, transparent);
 }
 
 .side-banner::after {
@@ -1002,17 +998,20 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .side-banner__art {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: 72% 40%;
 }
 
 .side-banner__copy {
-  position: absolute;
-  left: max(1.25rem, calc((100% - min(1200px, calc(100% - 2.5rem))) / 2));
-  top: 50%;
-  z-index: 65;
-  transform: translateY(-50%);
+  position: relative;
+  z-index: 2;
+  margin-left: max(1.25rem, calc((100% - min(1200px, calc(100% - 2.5rem))) / 2));
+  padding: 2.4rem 0;
   pointer-events: none;
 }
 
