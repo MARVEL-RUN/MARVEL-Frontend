@@ -47,12 +47,18 @@ export function Footer() {
         ))}
       </ul>
 
-      <Link href="/" className="site-footer__logo" aria-label="MARVEL RUN 홈">
+      <Link
+        href="/"
+        className="site-footer__logo"
+        aria-label="MARVEL RUN 홈"
+        draggable={false}
+      >
         <Image
-          src={MAIN_ASSETS.logo}
+          src={MAIN_ASSETS.footerLogo}
           alt=""
-          width={1257}
+          width={1236}
           height={98}
+          draggable={false}
         />
       </Link>
     </footer>

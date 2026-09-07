@@ -12,6 +12,7 @@ export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내" },
   { href: "/directions", label: "오시는길" },
   { href: "/precautions", label: "대회유의사항" },
+  { href: "/virtual", label: "버추얼런" },
   { href: "/lookup", label: "신청조회" },
   { href: "/notices", label: "공지사항" },
 ] as const;

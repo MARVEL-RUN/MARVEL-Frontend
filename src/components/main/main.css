@@ -190,6 +190,8 @@ html.is-live .site-header {
   z-index: 1;
   min-width: 0;
   text-decoration: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .site-header__logo {
@@ -199,6 +201,9 @@ html.is-live .site-header {
   max-width: min(48vw, 14rem);
   object-fit: contain;
   object-position: left center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .site-header__nav {
@@ -368,12 +373,17 @@ html.is-live .site-header {
   justify-content: center;
   width: min(1200px, calc(100% - 2.5rem));
   margin: 3.67rem auto 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .site-footer__logo img {
   display: block;
   width: auto;
   height: clamp(1.8rem, 4.2vw, 3.4rem);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* hero */
@@ -943,6 +953,90 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   height: 3rem;
   background: var(--navy);
   clip-path: polygon(0 55%, 100% 0, 100% 100%, 0 100%);
+}
+
+.side-banner {
+  position: relative;
+  background: #00042e;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.side-banner img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.side-banner::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2.8rem;
+  height: 9rem;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(237, 29, 36, 0.16) 0.7px,
+    transparent 0.9px
+  );
+  background-size: 7px 7px;
+  background-position: 0 -1.4rem;
+  mask-image: linear-gradient(180deg, #000 12%, transparent);
+}
+
+.side-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  width: min(48%, 34rem);
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #00042e 12%,
+    rgba(0, 4, 46, 0.88) 48%,
+    transparent
+  );
+}
+
+.side-banner__art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.side-banner__copy {
+  position: absolute;
+  left: max(1.25rem, calc((100% - min(1200px, calc(100% - 2.5rem))) / 2));
+  top: 50%;
+  z-index: 65;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.side-banner__copy .kicker {
+  margin-bottom: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.side-banner__title {
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #fff;
+}
+
+.side-banner__en {
+  margin-top: 0.55rem;
+  color: var(--gold);
+  font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  transform: skewX(-8deg);
+  transform-origin: left;
 }
 
 .page-hero__inner {

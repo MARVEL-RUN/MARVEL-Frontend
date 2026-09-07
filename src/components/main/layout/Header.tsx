@@ -42,7 +42,13 @@ export function Header() {
       ].join(" ")}
     >
       <div className="site-header__bar">
-        <Link href="/" className="site-header__brand" aria-label="MARVEL RUN 홈">
+        <Link
+          href="/"
+          className="site-header__brand"
+          aria-label="MARVEL RUN 홈"
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        >
           <Image
             src={MAIN_ASSETS.logo}
             alt=""
@@ -50,6 +56,7 @@ export function Header() {
             height={98}
             className="site-header__logo"
             priority
+            draggable={false}
           />
         </Link>
 

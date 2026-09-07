@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
-import { PageHero } from "../layout/PageHero";
+import { SideBanner } from "../layout/SideBanner";
 
 export function GuidePage() {
   return (
     <main className="page">
-      <PageHero kicker="GUIDE" title="대회안내" en="RACE BRIEFING" />
+      <SideBanner kicker="GUIDE" title="대회안내" en="RACE BRIEFING" />
       <div className="page__body wrap">
         <section className="block">
           <h2>한눈에 보기</h2>
