@@ -68,24 +68,24 @@ export function OpeningIntro() {
         <Image
           src={MAIN_ASSETS.introMarvel}
           alt="MARVEL"
-          width={437}
-          height={197}
+          width={219}
+          height={99}
           className="intro__box"
           priority
         />
         <Image
           src={MAIN_ASSETS.introRun}
           alt="RUN"
-          width={1188}
-          height={197}
+          width={594}
+          height={99}
           className="intro__run"
           priority
         />
         <Image
           src={MAIN_ASSETS.introKorea}
           alt="2026 KOREA"
-          width={564}
-          height={56}
+          width={282}
+          height={28}
           className="intro__sub"
           priority
         />
