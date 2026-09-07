@@ -16,11 +16,17 @@ export const NAV_ITEMS = [
   { href: "/notices", label: "공지사항" },
 ] as const;
 
-/** 티켓 예매 CTA */
-export const TICKET_HREF = "/register";
+/** 참가신청 CTA */
+export const REGISTER_HREF = "/register";
 
 /** 인스타 — URL 확정 후 채움 */
 export const INSTAGRAM_URL = "";
 
 /** 9/22 접수 오픈 전까지 false */
 export const registrationOpen = false;
+
+/** 퍼블리싱에서 신청 화면을 열어 봄. 배포 빌드에는 넣지 않음. */
+export const registerPreview =
+  process.env.NEXT_PUBLIC_REGISTER_PREVIEW === "1";
+
+export const registerUiOpen = registrationOpen || registerPreview;
