@@ -3,15 +3,12 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { EVENT } from "@/lib/event";
-import type { ConsentId } from "@/lib/legal";
 import {
-  CONSENT_FIELD,
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
   GENDERS,
   MAX_GROUP_SIZE,
   SHIRT_SIZES,
-  consentValues,
   courseById,
   formatFee,
   genderLabel,
@@ -24,14 +21,19 @@ import {
   type GroupRecord,
   type ParticipantDraft,
 } from "@/lib/register";
-import { ConsentList } from "./ConsentList";
 
 const STEPS = ["단체", "인원", "확인", "완료"] as const;
 type Step = 0 | 1 | 2 | 3;
 
-export function GroupFlow({ onBack }: { onBack: () => void }) {
+export function GroupFlow({
+  onBack,
+  consents,
+}: {
+  onBack: () => void;
+  consents: Consents;
+}) {
   const [step, setStep] = useState<Step>(0);
-  const [draft, setDraft] = useState<GroupDraft>(EMPTY_GROUP);
+  const [draft, setDraft] = useState<GroupDraft>({ ...EMPTY_GROUP, ...consents });
   const [record, setRecord] = useState<GroupRecord | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -280,12 +282,6 @@ export function GroupFlow({ onBack }: { onBack: () => void }) {
             참가자 추가
           </button>
           <p className="form__note">합계 {formatFee(total)}</p>
-          <ConsentList
-            values={consentValues(draft)}
-            onChange={(id: ConsentId, next) =>
-              patch({ [CONSENT_FIELD[id]]: next } as Partial<Consents>)
-            }
-          />
           <div className="flow__nav">
             <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
               이전

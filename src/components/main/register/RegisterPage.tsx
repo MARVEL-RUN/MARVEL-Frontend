@@ -7,7 +7,7 @@ export function RegisterPage() {
   return (
     <main className="page">
       <SideBanner kicker="ENTRY" title="참가신청" en="JOIN THE RUN" />
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         {registerUiOpen ? <RegisterFlow /> : <RegisterClosed />}
       </div>
     </main>

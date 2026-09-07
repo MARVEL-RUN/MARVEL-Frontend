@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { EVENT } from "@/lib/event";
-import type { ConsentId } from "@/lib/legal";
 import {
-  CONSENT_FIELD,
+  EMPTY_CONSENTS,
   EMPTY_DRAFT,
   GENDERS,
   SHIRT_SIZES,
-  consentValues,
   courseById,
   genderLabel,
   requiredConsentsOk,
@@ -20,8 +18,7 @@ import {
   type EntryDraft,
   type EntryRecord,
 } from "@/lib/register";
-import { ApplyKindPick } from "./ApplyKindPick";
-import { ConsentList } from "./ConsentList";
+import { ApplyTerms } from "./ApplyTerms";
 import { GroupFlow } from "./GroupFlow";
 
 const STEPS = ["코스", "정보", "확인", "완료"] as const;
@@ -29,18 +26,32 @@ type Step = 0 | 1 | 2 | 3;
 
 export function RegisterFlow() {
   const [kind, setKind] = useState<ApplyKind | "">("");
+  const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
+
   if (!kind) {
     return (
-      <ApplyKindPick heading="신청 유형을 선택하세요" onPick={setKind} />
+      <ApplyTerms
+        values={consents}
+        onChange={setConsents}
+        onPick={setKind}
+      />
     );
   }
-  if (kind === "group") return <GroupFlow onBack={() => setKind("")} />;
-  return <IndividualFlow onBack={() => setKind("")} />;
+  if (kind === "group") {
+    return <GroupFlow consents={consents} onBack={() => setKind("")} />;
+  }
+  return <IndividualFlow consents={consents} onBack={() => setKind("")} />;
 }
 
-function IndividualFlow({ onBack }: { onBack: () => void }) {
+function IndividualFlow({
+  onBack,
+  consents,
+}: {
+  onBack: () => void;
+  consents: Consents;
+}) {
   const [step, setStep] = useState<Step>(0);
-  const [draft, setDraft] = useState<EntryDraft>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState<EntryDraft>({ ...EMPTY_DRAFT, ...consents });
   const [record, setRecord] = useState<EntryRecord | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -220,12 +231,6 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
               ))}
             </div>
           </fieldset>
-          <ConsentList
-            values={consentValues(draft)}
-            onChange={(id: ConsentId, next) =>
-              patch({ [CONSENT_FIELD[id]]: next } as Partial<Consents>)
-            }
-          />
           <div className="flow__nav">
             <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
               코스 변경

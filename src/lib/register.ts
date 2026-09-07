@@ -167,6 +167,26 @@ export function requiredConsentsOk(c: Consents) {
   return c.agreeRules && c.agreePrivacy && c.agreeThirdParty && c.agreeConsign;
 }
 
+export function consentsAll(on: boolean): Consents {
+  return {
+    agreeRules: on,
+    agreePrivacy: on,
+    agreeThirdParty: on,
+    agreeConsign: on,
+    agreeMarketing: on,
+  };
+}
+
+export function consentsCheckedAll(c: Consents) {
+  return (
+    c.agreeRules &&
+    c.agreePrivacy &&
+    c.agreeThirdParty &&
+    c.agreeConsign &&
+    c.agreeMarketing
+  );
+}
+
 export function consentValues(c: Consents) {
   return {
     rules: c.agreeRules,
