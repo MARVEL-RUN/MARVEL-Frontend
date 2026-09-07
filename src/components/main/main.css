@@ -1501,16 +1501,25 @@ button.course {
   margin-top: 0.4rem;
 }
 
+.bulletin {
+  --bulletin-tag: 6.5rem;
+  --bulletin-gap: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
 .bulletin li {
-  display: block;
+  display: grid;
+  grid-template-columns: var(--bulletin-tag) minmax(0, 1fr) auto;
+  column-gap: var(--bulletin-gap);
+  align-items: start;
   padding: 1.15rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .bulletin__btn {
   display: grid;
-  grid-template-columns: 6.5rem 1fr auto;
-  gap: 1rem;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
   align-items: center;
   width: 100%;
   padding: 0;
@@ -1523,13 +1532,10 @@ button.course {
 }
 
 .bulletin__body {
-  margin: 0.85rem 0 0.15rem 6.5rem;
+  grid-column: 2;
+  margin: 0.7rem 0 0.15rem;
   color: var(--silver);
   line-height: 1.65;
-}
-
-.bulletin {
-  border-top: 1px solid var(--rule);
 }
 
 .bulletin__tag {
@@ -1633,6 +1639,7 @@ button.course {
   }
 
   .table__row,
+  .bulletin li,
   .bulletin__btn,
   .spec > div {
     grid-template-columns: 1fr;
@@ -1640,6 +1647,7 @@ button.course {
   }
 
   .bulletin__body {
+    grid-column: 1;
     margin-left: 0;
   }
 
