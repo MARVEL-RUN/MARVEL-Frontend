@@ -178,7 +178,7 @@
 
 .coming-soon .sponsors__list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   width: 82%;
   margin-inline: auto;
 }
