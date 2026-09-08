@@ -5,18 +5,18 @@ export function AdminFooter() {
   return (
     <footer className="admin-footer">
       <div className="admin-footer__inner">
-        <div>
+        <p>
           <strong>{OFFICE.name}</strong>
-          <p style={{ margin: "6px 0 0" }}>
-            {OFFICE.address} · Tel {OFFICE.tel}
-          </p>
-        </div>
-        <div>
+          <span> · </span>
+          {OFFICE.address}
+        </p>
+        <p>
           <Link href="/terms">이용약관</Link>
-          <span aria-hidden> · </span>
+          <span> · </span>
           <Link href="/privacy">개인정보 처리방침</Link>
-          <p style={{ margin: "6px 0 0" }}>{OFFICE.copyright}</p>
-        </div>
+          <span> · </span>
+          {OFFICE.copyright}
+        </p>
       </div>
     </footer>
   );

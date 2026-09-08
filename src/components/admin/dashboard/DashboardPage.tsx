@@ -42,32 +42,37 @@ export function DashboardPage() {
 
   return (
     <div className="admin-page">
-      <header className="admin-hero">
-        <p className="admin-hero__kicker">ADMIN CONTROL CENTER</p>
-        <h1>관리자 대시보드</h1>
-        <div className="admin-hero__pills">
-          <div className="admin-pill">
-            <span>개인 신청</span>
-            <strong>{n(data?.individualCount)}</strong>
-          </div>
-          <div className="admin-pill">
-            <span>미답변 문의</span>
-            <strong>{n(data?.unansweredCount)}</strong>
-          </div>
-          <div className="admin-pill">
-            <span>FAQ</span>
-            <strong>{n(data?.faqCount)}</strong>
-          </div>
-          <div className="admin-pill">
-            <span>공지</span>
-            <strong>{n(data?.noticeCount)}</strong>
-          </div>
-        </div>
+      <header className="admin-dash__head">
+        <h1>운영 홈</h1>
+        <p>마블런 2026 운영 현황을 한눈에 확인합니다.</p>
       </header>
+
+      <div className="admin-stat-row">
+        <Link href="/admin/applications/individual" className="admin-stat">
+          <span>개인 신청</span>
+          <strong>{n(data?.individualCount)}</strong>
+          <em>신청 내역 보기</em>
+        </Link>
+        <Link href="/admin/boards/inquiry" className="admin-stat">
+          <span>미답변 문의</span>
+          <strong>{n(data?.unansweredCount)}</strong>
+          <em>문의 처리하기</em>
+        </Link>
+        <Link href="/admin/boards/faq" className="admin-stat">
+          <span>FAQ</span>
+          <strong>{n(data?.faqCount)}</strong>
+          <em>FAQ 관리</em>
+        </Link>
+        <Link href="/admin/boards/notice" className="admin-stat">
+          <span>공지</span>
+          <strong>{n(data?.noticeCount)}</strong>
+          <em>공지 관리</em>
+        </Link>
+      </div>
 
       <div className="admin-grid">
         <section className="admin-card">
-          <h2>빠른 실행</h2>
+          <h2>바로가기</h2>
           <div className="admin-quick">
             {ACTIONS.map((item) => (
               <Link key={item.href} href={item.href}>
@@ -84,7 +89,7 @@ export function DashboardPage() {
         </section>
 
         <aside className="admin-card">
-          <h2>처리 현황</h2>
+          <h2>처리할 업무</h2>
           <div className="admin-quick">
             <Link href="/admin/boards/inquiry">
               <span>

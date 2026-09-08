@@ -10,6 +10,8 @@ export type AdminNavItem = {
   children: AdminNavChild[];
 };
 
+export const ADMIN_HOME = { name: "운영 홈", href: "/admin" } as const;
+
 export const ADMIN_NAV: AdminNavItem[] = [
   {
     key: "applications",
@@ -42,18 +44,31 @@ export const ADMIN_NAV: AdminNavItem[] = [
   },
 ];
 
+export const ADMIN_SETTINGS: AdminNavItem = {
+  key: "settings",
+  name: "설정",
+  href: "/admin/admins",
+  children: [{ name: "관리자 관리", href: "/admin/admins" }],
+};
+
 export function findAdminNav(pathname: string) {
   const path = pathname.replace(/\/+$/, "") || "/";
+
+  if (path === "/admin") {
+    return { item: null, child: null, home: true as const };
+  }
+
+  const groups: AdminNavItem[] = [...ADMIN_NAV, ADMIN_SETTINGS];
   const item =
-    ADMIN_NAV.find(
+    groups.find(
       (nav) =>
         path.startsWith(`/admin/${nav.key}`) ||
-    (path.startsWith("/admin/legal") && nav.key === "content") ||
-    (path.startsWith("/admin/notices") && nav.key === "boards") ||
-    nav.children.some((child) => path.startsWith(child.href)),
+        (path.startsWith("/admin/legal") && nav.key === "content") ||
+        (path.startsWith("/admin/notices") && nav.key === "boards") ||
+        nav.children.some((child) => path.startsWith(child.href)),
     ) ?? null;
 
-  if (!item) return { item: null, child: null };
+  if (!item) return { item: null, child: null, home: false as const };
 
   const child =
     item.children.find((c) => path === c.href) ??
@@ -69,7 +84,7 @@ export function findAdminNav(pathname: string) {
           ? item.children[0]
           : item.children[0]);
 
-  return { item, child };
+  return { item, child, home: false as const };
 }
 
 export function isAdminLoginPath(pathname: string) {

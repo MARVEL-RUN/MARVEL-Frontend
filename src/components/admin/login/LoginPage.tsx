@@ -29,7 +29,7 @@ export function LoginPage() {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!account.trim() || !password.trim()) {
-      setError("ID와 Password를 입력해 주세요.");
+      setError("아이디와 비밀번호를 입력해 주세요.");
       return;
     }
     try {
@@ -46,52 +46,68 @@ export function LoginPage() {
 
   return (
     <div className="admin-login">
-      <Image
-        src={MAIN_ASSETS.logo}
-        alt="MARVEL RUN"
-        width={1257}
-        height={98}
-        className="admin-login__mark"
-        priority
-      />
-      <h1 className="admin-login__title">관리자 로그인</h1>
-      <p className="admin-login__sub">Admin Login</p>
-      <form className="admin-login__form" onSubmit={submit}>
-        <div className="admin-login__field">
-          <input
-            name="account"
-            value={account}
-            onChange={(e) => setAccount(e.target.value)}
-            placeholder="ID"
-            autoComplete="username"
-            disabled={loading}
-          />
+      <section className="admin-login__brand">
+        <Image
+          src={MAIN_ASSETS.logo}
+          alt="MARVEL RUN"
+          width={1257}
+          height={98}
+          className="admin-login__mark"
+          priority
+        />
+        <div>
+          <h1>관리자</h1>
+          <p>
+            MARVEL RUN 2026 KOREA 운영 콘솔입니다.
+            <br />
+            게시판·약관·참가신청을 이곳에서 관리합니다.
+          </p>
         </div>
-        <div className="admin-login__field">
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            autoComplete="current-password"
-            disabled={loading}
-          />
-          <button
-            type="button"
-            className="admin-login__eye"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
+      </section>
+      <section className="admin-login__panel">
+        <div className="admin-login__card">
+          <h2 className="admin-login__title">로그인</h2>
+          <p className="admin-login__sub">관리자 아이디로 접속하세요</p>
+          <form className="admin-login__form" onSubmit={submit}>
+            <div className="admin-login__field">
+              <label htmlFor="admin-account">아이디</label>
+              <input
+                id="admin-account"
+                name="account"
+                value={account}
+                onChange={(e) => setAccount(e.target.value)}
+                autoComplete="username"
+                disabled={loading}
+              />
+            </div>
+            <div className="admin-login__field">
+              <label htmlFor="admin-password">비밀번호</label>
+              <input
+                id="admin-password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="admin-login__eye"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {error ? <p className="admin-login__error">{error}</p> : null}
+            <button className="admin-login__submit" type="submit" disabled={loading}>
+              {loading ? "로그인 중..." : "로그인"}
+            </button>
+          </form>
+          <p className="admin-login__hint">권한이 없는 계정은 접속할 수 없습니다</p>
         </div>
-        {error ? <p className="admin-login__error">{error}</p> : null}
-        <button className="admin-login__submit" type="submit" disabled={loading}>
-          {loading ? "로그인 중..." : "로그인"}
-        </button>
-      </form>
-      <p className="admin-login__hint">관리자 서비스를 이용하기 위해 로그인하세요</p>
+      </section>
     </div>
   );
 }

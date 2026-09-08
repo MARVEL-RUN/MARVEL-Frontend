@@ -39,7 +39,12 @@ export function AdminTableShell<T>({
         <h1>{title}</h1>
         {actions}
       </div>
-      {tools ? <div className="admin-table-shell__tools">{tools}</div> : null}
+      <div className="admin-toolbar">
+        <p className="admin-toolbar__count">
+          검색 결과 총 <strong>{loading ? "…" : rows.length}</strong>개
+        </p>
+        {tools ? <div className="admin-toolbar__fields">{tools}</div> : null}
+      </div>
       <div className="admin-table-wrap">
         {loading ? (
           <p className="admin-empty">불러오는 중…</p>
