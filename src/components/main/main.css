@@ -1313,6 +1313,33 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font-size: 0.95rem;
 }
 
+.form-row input.is-wide,
+.form-row textarea {
+  width: 100%;
+}
+
+.form-row textarea {
+  min-height: 16rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  resize: vertical;
+}
+
+.form-row.is-top {
+  align-items: start;
+}
+
+.form-row textarea:focus {
+  outline: none;
+  border-color: var(--marvel);
+}
+
 .form-row input::placeholder {
   color: rgba(255, 255, 255, 0.38);
 }
@@ -2397,8 +2424,14 @@ button.course {
 
   .form-row input[type="text"],
   .form-row input[type="email"],
-  .form-row input[type="tel"] {
+  .form-row input[type="tel"],
+  .form-row textarea {
     width: 100%;
+  }
+
+  .board-write__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .bulletin__body {
@@ -2446,34 +2479,53 @@ button.course {
   }
 }
 
-.inquiry-form {
-  display: grid;
+.board-write {
+  padding-bottom: 1rem;
+}
+
+.board-write__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 0.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #fff;
 }
 
-.inquiry-form label {
-  display: grid;
-  gap: 0.45rem;
-  font-size: 0.85rem;
-  font-weight: 700;
+.board-write__head h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
 }
 
-.inquiry-form input,
-.inquiry-form textarea {
-  width: 100%;
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--rule);
-  background: rgba(255, 255, 255, 0.04);
-  color: inherit;
-  font: inherit;
+.board-write__agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+  color: var(--silver);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  cursor: pointer;
 }
 
-.inquiry-form .btn {
-  justify-self: start;
+.board-write__agree input {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.15rem;
+  accent-color: var(--marvel);
 }
 
-.inquiry-form__actions {
+.board-write__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  margin-top: 1.6rem;
+}
+
+.board-write__actions-end {
   display: flex;
   gap: 0.55rem;
 }
