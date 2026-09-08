@@ -2091,6 +2091,139 @@ button.course {
   color: #fff;
 }
 
+.board {
+  border-top: 2px solid #fff;
+}
+
+.board__head,
+.board__row {
+  display: grid;
+  grid-template-columns: 4.4rem minmax(0, 1fr) 7rem;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1.05rem 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.board__head {
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.board__head span:nth-child(2) {
+  text-align: left;
+}
+
+.board__row {
+  color: inherit;
+  text-decoration: none;
+}
+
+.board__row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.board__no,
+.board__row time {
+  text-align: center;
+  color: var(--note);
+  font-size: 0.86rem;
+}
+
+.board__title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board__row.is-pin .board__no {
+  color: var(--marvel);
+  font-weight: 800;
+}
+
+.board__row.is-pin .board__title {
+  color: #fff;
+}
+
+.board__empty {
+  padding: 3.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--note);
+  text-align: center;
+}
+
+.post__head {
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.post__title {
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.post__meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.7rem;
+  color: var(--note);
+  font-size: 0.86rem;
+}
+
+.post__body {
+  min-height: 8rem;
+  padding: 1.6rem 0 2.2rem;
+  color: var(--silver);
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.post__nav {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.post__nav-row {
+  display: grid;
+  grid-template-columns: 4.4rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.95rem 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  text-decoration: none;
+}
+
+.post__nav-row span:first-child {
+  color: var(--note);
+  font-size: 0.82rem;
+}
+
+.post__nav-row strong {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post__nav-row:hover strong {
+  color: #fff;
+}
+
+.post__nav-row.is-empty {
+  margin: 0;
+  color: var(--note);
+}
+
+.post__foot {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.8rem;
+}
+
 .wait {
   text-align: center;
   padding: 2rem 0 3rem;
@@ -2212,6 +2345,24 @@ button.course {
   .bulletin__body {
     grid-column: 1;
     margin-left: 0;
+  }
+
+  .board__head {
+    display: none;
+  }
+
+  .board__head,
+  .board__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .board__no {
+    display: none;
+  }
+
+  .board__row time {
+    flex-shrink: 0;
+    font-size: 0.78rem;
   }
 
   .courses__grid,
