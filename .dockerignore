@@ -1,0 +1,13 @@
+.git
+.github
+
+node_modules
+.next
+out
+output
+
+.env
+.env.*
+!.env.example
+
+README.md

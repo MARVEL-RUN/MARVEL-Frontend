@@ -13,11 +13,12 @@ export function ComingSoonPage() {
         <span aria-hidden className="veil" />
         <Backdrop />
 
+        <p className="copyright">{EVENT.copyright}</p>
+
         <div className="shell">
           <TitleBlock />
           <EventInfo />
           <Sponsors />
-          <p className="copyright">{EVENT.copyright}</p>
         </div>
       </div>
     </main>

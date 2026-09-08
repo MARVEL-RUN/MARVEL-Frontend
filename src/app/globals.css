@@ -12,9 +12,45 @@
   unicode-range: U+0041-005A, U+0061-007A;
 }
 
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream3.otf") format("opentype");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream4.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream5.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream7.otf") format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream8.otf") format("opentype");
+  font-weight: 800;
+  font-display: swap;
+}
+
 :root {
   --font-latin: "BM Dohyeon";
   --font-korean: "Pretendard Variable", Pretendard;
+  --font-dream: "SC Dream";
   --navy: #000320;
   --navy-0: rgba(0, 3, 32, 0);
   --silver: #d3d4dc;

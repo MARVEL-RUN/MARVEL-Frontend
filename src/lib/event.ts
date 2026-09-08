@@ -117,7 +117,7 @@ export const EVENT = {
     },
   ],
   sponsors: [
-    { role: "주최", name: "ONEUNIVERSE" },
+    { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
   ],
   copyright: "©2026 MARVEL",
