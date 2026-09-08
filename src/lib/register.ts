@@ -179,7 +179,6 @@ export function consentsAll(on: boolean): Consents {
 
 export function consentsCheckedAll(c: Consents) {
   return (
-    c.agreeRules &&
     c.agreePrivacy &&
     c.agreeThirdParty &&
     c.agreeConsign &&

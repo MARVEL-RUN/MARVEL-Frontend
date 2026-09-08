@@ -43,8 +43,12 @@ export const LEGAL_LINKS = [
   { href: "/privacy", label: "개인정보 처리방침" },
 ] as const;
 
-export const APPLY_ALL_AGREE =
-  "[전체동의] 아래 모든 약관 및 안내 항목에 모두 동의합니다.";
+export const APPLY_TERMS_TITLE = "참가자 유의사항 및 동의 서약서";
+
+export const APPLY_TERMS_LEAD =
+  "참가를 원하시는 분은 아래의 참가자 유의사항과 동의 서약서를 읽고 동의해 주시기 바랍니다.";
+
+export const APPLY_ALL_AGREE = "전체동의";
 
 export const APPLY_NOTICE_POINTS = [
   {
