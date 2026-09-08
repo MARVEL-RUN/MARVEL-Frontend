@@ -41,6 +41,8 @@ export const OFFICE = {
 export const LEGAL_LINKS = [
   { href: "/terms", label: "이용약관" },
   { href: "/privacy", label: "개인정보 처리방침" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/inquiry", label: "문의사항" },
 ] as const;
 
 export const APPLY_TERMS_TITLE = "참가자 유의사항 및 동의 서약서";

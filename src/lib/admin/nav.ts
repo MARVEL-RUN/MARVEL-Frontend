@@ -21,16 +21,24 @@ export const ADMIN_NAV: AdminNavItem[] = [
     ],
   },
   {
-    key: "notices",
+    key: "boards",
     name: "게시판",
-    href: "/admin/notices",
-    children: [{ name: "공지사항", href: "/admin/notices" }],
+    href: "/admin/boards/notice",
+    children: [
+      { name: "공지사항", href: "/admin/boards/notice" },
+      { name: "문의사항", href: "/admin/boards/inquiry" },
+      { name: "FAQ", href: "/admin/boards/faq" },
+    ],
   },
   {
     key: "content",
     name: "콘텐츠",
     href: "/admin/content/sponsors",
-    children: [{ name: "스폰서", href: "/admin/content/sponsors" }],
+    children: [
+      { name: "스폰서", href: "/admin/content/sponsors" },
+      { name: "이용약관", href: "/admin/legal/terms" },
+      { name: "개인정보처리방침", href: "/admin/legal/privacy" },
+    ],
   },
 ];
 
@@ -40,7 +48,9 @@ export function findAdminNav(pathname: string) {
     ADMIN_NAV.find(
       (nav) =>
         path.startsWith(`/admin/${nav.key}`) ||
-        nav.children.some((child) => path.startsWith(child.href)),
+    (path.startsWith("/admin/legal") && nav.key === "content") ||
+    (path.startsWith("/admin/notices") && nav.key === "boards") ||
+    nav.children.some((child) => path.startsWith(child.href)),
     ) ?? null;
 
   if (!item) return { item: null, child: null };
@@ -51,7 +61,13 @@ export function findAdminNav(pathname: string) {
       .slice()
       .sort((a, b) => b.href.length - a.href.length)
       .find((c) => path.startsWith(c.href)) ??
-    item.children[0];
+    (path.startsWith("/admin/legal/privacy")
+      ? item.children.find((c) => c.href.includes("privacy"))
+      : path.startsWith("/admin/legal/terms")
+        ? item.children.find((c) => c.href.includes("terms"))
+        : path.startsWith("/admin/notices")
+          ? item.children[0]
+          : item.children[0]);
 
   return { item, child };
 }

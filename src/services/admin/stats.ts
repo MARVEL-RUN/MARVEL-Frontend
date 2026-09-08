@@ -1,3 +1,5 @@
+import { listFaqs } from "./faqs";
+import { listInquiries } from "./inquiries";
 import {
   listGroupApplications,
   listIndividualApplications,
@@ -10,13 +12,18 @@ export type AdminDashboardStats = {
   participantCount: number;
   pendingCount: number;
   noticeCount: number;
+  faqCount: number;
+  inquiryCount: number;
+  unansweredCount: number;
 };
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const [entries, groups, notices] = await Promise.all([
+  const [entries, groups, notices, faqs, inquiries] = await Promise.all([
     listIndividualApplications(),
     listGroupApplications(),
     listAdminNotices(),
+    listFaqs(),
+    listInquiries(),
   ]);
 
   const pendingCount =
@@ -29,5 +36,8 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     participantCount: groups.reduce((sum, row) => sum + row.participants.length, 0),
     pendingCount,
     noticeCount: notices.length,
+    faqCount: faqs.length,
+    inquiryCount: inquiries.length,
+    unansweredCount: inquiries.filter((row) => !row.answer).length,
   };
 }

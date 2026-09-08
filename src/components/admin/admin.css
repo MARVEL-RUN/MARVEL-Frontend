@@ -699,6 +699,105 @@ html.admin-mode body {
   pointer-events: none;
 }
 
+.admin-table td.is-wrap {
+  white-space: normal;
+  min-width: 220px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-form label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4c5163;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d9dce6;
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-form textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.admin-form textarea.is-tall {
+  min-height: 220px;
+}
+
+.admin-form__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.admin-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.admin-root .admin-btn,
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-root .admin-btn--red {
+  background: var(--marvel);
+  color: #fff;
+}
+
+.admin-root .admin-btn--ghost {
+  border: 1px solid #d9dce6;
+  background: #fff;
+}
+
+.admin-root .admin-btn--text {
+  color: #4c5163;
+  min-height: auto;
+  padding: 0;
+}
+
+.admin-section-card {
+  background: #fff;
+  border: 1px solid #e6e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-section-card h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.admin-legal-list {
+  display: grid;
+  gap: 16px;
+}
+
 @media (min-width: 880px) {
   .admin-header__nav {
     display: grid;

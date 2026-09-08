@@ -2,32 +2,32 @@
 
 import { getAdminDashboardStats } from "@/services/admin/stats";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, FileText, Users, UsersRound } from "lucide-react";
+import { Bell, FileText, HelpCircle, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 const ACTIONS = [
   {
-    href: "/admin/applications/individual",
-    title: "개인 신청",
-    description: "개인 접수 내역 확인",
-    icon: Users,
-  },
-  {
-    href: "/admin/applications/group",
-    title: "단체 신청",
-    description: "단체 접수·인원 관리",
-    icon: UsersRound,
-  },
-  {
-    href: "/admin/notices",
+    href: "/admin/boards/notice",
     title: "공지사항",
-    description: "공식 공지 확인·작성",
+    description: "공식 공지 등록·수정",
     icon: Bell,
   },
   {
-    href: "/admin/content/sponsors",
-    title: "스폰서",
-    description: "주최·주관 노출 관리",
+    href: "/admin/boards/inquiry",
+    title: "문의사항",
+    description: "문의 확인·답변",
+    icon: MessageSquare,
+  },
+  {
+    href: "/admin/boards/faq/write",
+    title: "FAQ 등록",
+    description: "자주 묻는 질문 작성",
+    icon: HelpCircle,
+  },
+  {
+    href: "/admin/legal/terms",
+    title: "이용약관",
+    description: "약관 조항 수정",
     icon: FileText,
   },
 ];
@@ -51,12 +51,12 @@ export function DashboardPage() {
             <strong>{n(data?.individualCount)}</strong>
           </div>
           <div className="admin-pill">
-            <span>단체 신청</span>
-            <strong>{n(data?.groupCount)}</strong>
+            <span>미답변 문의</span>
+            <strong>{n(data?.unansweredCount)}</strong>
           </div>
           <div className="admin-pill">
-            <span>결제 대기</span>
-            <strong>{n(data?.pendingCount)}</strong>
+            <span>FAQ</span>
+            <strong>{n(data?.faqCount)}</strong>
           </div>
           <div className="admin-pill">
             <span>공지</span>
@@ -86,16 +86,18 @@ export function DashboardPage() {
         <aside className="admin-card">
           <h2>처리 현황</h2>
           <div className="admin-quick">
+            <Link href="/admin/boards/inquiry">
+              <span>
+                <strong>문의사항</strong>
+                <span>
+                  {n(data?.inquiryCount)}건 · 미답변 {n(data?.unansweredCount)}
+                </span>
+              </span>
+            </Link>
             <Link href="/admin/applications/individual">
               <span>
                 <strong>개인 접수</strong>
                 <span>{n(data?.individualCount)}건</span>
-              </span>
-            </Link>
-            <Link href="/admin/applications/group">
-              <span>
-                <strong>단체 인원</strong>
-                <span>{n(data?.participantCount)}명</span>
               </span>
             </Link>
             <Link href="/admin/applications/individual">
