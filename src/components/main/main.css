@@ -2155,6 +2155,40 @@ button.course {
   text-align: center;
 }
 
+.board__tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.board--qna .board__head,
+.board--qna .board__row {
+  grid-template-columns: 4.4rem minmax(0, 1fr) 5.5rem 7rem;
+}
+
+.board__name {
+  overflow: hidden;
+  color: var(--note);
+  font-size: 0.86rem;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board__badge {
+  display: inline-block;
+  margin-right: 0.55rem;
+  color: var(--marvel);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  vertical-align: 0.05em;
+}
+
+.board__badge.is-wait {
+  color: var(--note);
+}
+
 .post__head {
   padding-bottom: 1.1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -2221,7 +2255,32 @@ button.course {
 .post__foot {
   display: flex;
   justify-content: center;
+  gap: 0.55rem;
   margin-top: 1.8rem;
+}
+
+.post__reply {
+  padding: 1.4rem 0 2.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.post__reply-label {
+  margin-bottom: 0.7rem;
+  color: var(--marvel);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.post__reply p {
+  margin: 0;
+  color: var(--silver);
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.post__reply .is-wait {
+  color: var(--note);
 }
 
 .wait {
@@ -2356,8 +2415,14 @@ button.course {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .board__no {
+  .board__no,
+  .board__name {
     display: none;
+  }
+
+  .board--qna .board__head,
+  .board--qna .board__row {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .board__row time {
@@ -2406,4 +2471,9 @@ button.course {
 
 .inquiry-form .btn {
   justify-self: start;
+}
+
+.inquiry-form__actions {
+  display: flex;
+  gap: 0.55rem;
 }
