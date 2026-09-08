@@ -1179,7 +1179,311 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .form {
   display: grid;
-  gap: 1.4rem;
+  gap: 2.4rem;
+}
+
+.apply-notice {
+  padding: 1.05rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--silver);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.apply-notice p + p {
+  margin-top: 0.4rem;
+}
+
+.apply-notice .is-warn {
+  color: var(--marvel);
+  font-weight: 700;
+}
+
+.form-sec__head {
+  margin-bottom: 0.2rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.form-sec__note {
+  margin: 0.75rem 0 0.15rem;
+  color: #8ec8ff;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.form-sec__body > .apply-hint {
+  margin-top: 1rem;
+}
+
+.apply-hint {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--silver);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.apply-hint p + p {
+  margin-top: 0.35rem;
+  color: var(--note);
+  font-size: 0.8rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.form-row:has(.course-pick) {
+  align-items: start;
+}
+
+.form-row__label {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.form-row__label em {
+  color: var(--marvel);
+  font-style: normal;
+}
+
+.form-row__ctrl {
+  min-width: 0;
+}
+
+.form-row input[type="text"],
+.form-row input[type="email"],
+.form-row input[type="tel"] {
+  width: min(24rem, 100%);
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.form-row input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.form-row input:focus {
+  outline: none;
+  border-color: var(--marvel);
+}
+
+.birth-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.birth-pick select {
+  min-width: 5.2rem;
+  padding: 0.65rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: #08091d;
+  color: #fff;
+  font: inherit;
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fff;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.radio-row input {
+  accent-color: var(--marvel);
+}
+
+.course-pick {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.course-pick__col + .course-pick__col {
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.course-pick__head {
+  padding: 0.5rem 0.8rem;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.course-pick__list {
+  max-height: 10.5rem;
+  overflow: auto;
+}
+
+.course-pick__list button {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.course-pick__list button.is-on {
+  background: var(--marvel);
+}
+
+.course-pick__empty {
+  display: grid;
+  place-items: center;
+  min-height: 8.5rem;
+  color: var(--note);
+  font-size: 0.82rem;
+}
+
+.fee-text {
+  color: var(--gold);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.party-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin: 1rem 0 0.8rem;
+}
+
+.party-bar p {
+  color: var(--silver);
+  font-size: 0.86rem;
+}
+
+.party-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.party {
+  width: 100%;
+  min-width: 58rem;
+  border-collapse: collapse;
+}
+
+.party th,
+.party td {
+  padding: 0.65rem 0.55rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.8rem;
+}
+
+.party th:last-child,
+.party td:last-child {
+  border-right: 0;
+}
+
+.party th {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.party td {
+  background: #08091d;
+}
+
+.party input,
+.party select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.party select {
+  background: #08091d;
+}
+
+.party .party__no {
+  width: 2.8rem;
+  color: var(--silver);
+}
+
+.party .party__fee {
+  color: var(--gold);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.party .party__del {
+  width: 3.2rem;
+}
+
+.party .party__del button {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.party .party__del button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.party-sum {
+  margin-top: 0.9rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: right;
 }
 
 .field {
@@ -1609,7 +1913,7 @@ fieldset.field {
 
 .stepper {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 0.5rem;
   margin-bottom: 2.2rem;
   padding: 0;
@@ -1657,12 +1961,14 @@ button.course {
 }
 
 .flow {
-  width: min(720px, 100%);
+  width: min(920px, 100%);
+  margin-inline: auto;
 }
 
 .flow__nav {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.7rem;
   margin-top: 1.6rem;
 }
@@ -1850,6 +2156,18 @@ button.course {
 
   .apply-terms__detail {
     padding: 0 0.9rem 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    align-items: start;
+  }
+
+  .form-row input[type="text"],
+  .form-row input[type="email"],
+  .form-row input[type="tel"] {
+    width: 100%;
   }
 
   .bulletin__body {
