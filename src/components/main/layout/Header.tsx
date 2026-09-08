@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
-import { NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 
 export function Header() {
   const pathname = usePathname();
@@ -76,9 +76,14 @@ export function Header() {
           ))}
         </nav>
 
-        <Link href={REGISTER_HREF} className="btn btn--red site-header__cta">
-          {cta}
-        </Link>
+        <div className="site-header__actions">
+          <Link href={REGISTER_HREF} className="btn btn--red site-header__cta">
+            {cta}
+          </Link>
+          <Link href={LOOKUP_HREF} className="btn btn--ghost site-header__cta">
+            신청조회
+          </Link>
+        </div>
 
         <button
           type="button"
@@ -106,6 +111,9 @@ export function Header() {
         ))}
         <Link href={REGISTER_HREF} className="btn btn--red">
           {cta}
+        </Link>
+        <Link href={LOOKUP_HREF} className="btn btn--ghost">
+          신청조회
         </Link>
       </div>
     </header>

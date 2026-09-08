@@ -241,10 +241,19 @@ html.is-live .site-header {
   background: var(--marvel);
 }
 
-.site-header__cta {
+.site-header__actions {
   position: relative;
   z-index: 1;
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.site-header__cta {
+  min-height: 2.5rem;
+  padding-inline: 1.15rem;
+  font-size: 0.78rem;
 }
 
 .site-header__burger {
@@ -2102,7 +2111,7 @@ button.course {
 
 @media (max-width: 960px) {
   .site-header__nav,
-  .site-header__cta {
+  .site-header__actions {
     display: none;
   }
 

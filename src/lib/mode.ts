@@ -13,7 +13,6 @@ export const NAV_ITEMS = [
   { href: "/directions", label: "오시는길" },
   { href: "/precautions", label: "대회유의사항" },
   { href: "/virtual", label: "버추얼런" },
-  { href: "/lookup", label: "신청조회" },
   { href: "/notices", label: "공지사항" },
   { href: "/faq", label: "FAQ" },
   { href: "/inquiry", label: "문의사항" },
@@ -21,6 +20,9 @@ export const NAV_ITEMS = [
 
 /** 참가신청 CTA */
 export const REGISTER_HREF = "/register";
+
+/** 신청조회 — 참가신청 오른쪽 */
+export const LOOKUP_HREF = "/lookup";
 
 /** 인스타 — URL 확정 후 채움 */
 export const INSTAGRAM_URL = "";
