@@ -1,29 +1,52 @@
 .coming-soon {
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--navy);
 }
 
-/* em 레이아웃 기준. 900px일 때 1em = 16px. */
+/*
+ * 단위 두 축. 900px일 때 둘 다 16px = 기존 디자인 그대로.
+ *   em(=font-size) : 로고·글자·블록. 블록이 화면을 넘기 직전까지 안 줄임.
+ *   --img          : 히어로·베일·배경 모티프. 2.4vw면 667px까지 16px 유지.
+ */
 .coming-soon .stage {
   position: relative;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
   overflow: hidden;
-  font-size: clamp(8.5px, 1.78vw, 16px);
+  --img: min(2.4vw, 16px);
+  font-size: min(16px, 3.02vw);
 }
 
-.coming-soon .hero {
+/* main.css의 전역 .hero와 겹치지 않게 별도 이름 */
+.coming-soon .characters {
   position: absolute;
-  top: -12.4em;
-  left: -6.37%;
-  right: -8.13%;
+  top: calc(-5.50 * var(--img));
+  left: 50%;
+  width: calc(64.41 * var(--img));
+  transform: translateX(calc(-50% + 0.5 * var(--img)));
 }
 
-.coming-soon .hero img {
+.coming-soon .characters img {
   display: block;
   width: 100%;
   height: auto;
+  filter: brightness(1.08) contrast(1.02);
+}
+
+/* 인물은 두고 아래만 남색에 녹게 */
+.coming-soon .characters::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    transparent 34%,
+    rgba(0, 3, 32, 0.06) 50%,
+    rgba(0, 3, 32, 0.22) 65%,
+    rgba(0, 3, 32, 0.45) 78%,
+    rgba(0, 3, 32, 0.65) 90%
+  );
+  pointer-events: none;
 }
 
 /* 히어로 위·아래 남색, 캐릭터 구간만 투명. 경계 안 보이게 다단 페이드. */
@@ -34,22 +57,22 @@
   pointer-events: none;
   background: linear-gradient(
     var(--navy) 0,
-    var(--navy) 1.6em,
-    rgba(0, 3, 32, 0.88) 2.4em,
-    rgba(0, 3, 32, 0.73) 3.2em,
-    rgba(0, 3, 32, 0.57) 4em,
-    rgba(0, 3, 32, 0.4) 4.8em,
-    rgba(0, 3, 32, 0.26) 5.6em,
-    rgba(0, 3, 32, 0.14) 6.4em,
-    rgba(0, 3, 32, 0.06) 7.2em,
-    rgba(0, 3, 32, 0.02) 8em,
-    var(--navy-0) 9.2em,
-    var(--navy-0) 12.6em,
-    rgba(0, 3, 32, 0.14) 14em,
-    rgba(0, 3, 32, 0.4) 15.2em,
-    rgba(0, 3, 32, 0.68) 17em,
-    rgba(0, 3, 32, 0.88) 18.8em,
-    var(--navy) 21.2em
+    var(--navy) calc(1.6 * var(--img)),
+    rgba(0, 3, 32, 0.88) calc(2.4 * var(--img)),
+    rgba(0, 3, 32, 0.73) calc(3.2 * var(--img)),
+    rgba(0, 3, 32, 0.57) calc(4 * var(--img)),
+    rgba(0, 3, 32, 0.4) calc(4.8 * var(--img)),
+    rgba(0, 3, 32, 0.26) calc(5.6 * var(--img)),
+    rgba(0, 3, 32, 0.14) calc(6.4 * var(--img)),
+    rgba(0, 3, 32, 0.06) calc(7.2 * var(--img)),
+    rgba(0, 3, 32, 0.02) calc(8 * var(--img)),
+    var(--navy-0) calc(9.2 * var(--img)),
+    var(--navy-0) calc(12.6 * var(--img)),
+    rgba(0, 3, 32, 0.14) calc(14 * var(--img)),
+    rgba(0, 3, 32, 0.4) calc(15.2 * var(--img)),
+    rgba(0, 3, 32, 0.68) calc(17 * var(--img)),
+    rgba(0, 3, 32, 0.88) calc(18.8 * var(--img)),
+    var(--navy) calc(21.2 * var(--img))
   );
 }
 
@@ -62,14 +85,19 @@
   user-select: none;
 }
 
-/* top / left / width / opacity */
+/* 아래 끝에 붙여 텍스처가 잘리지 않게. 높이 기준이라 RUN 크기는 폭과 무관. */
+/* max-width: tailwind preflight의 img 100% 제한 해제 */
 .coming-soon .backdrop__motif {
   position: absolute;
-  top: 25em;
-  left: -0%;
-  width: 230%;
-  height: auto;
-  opacity: 1.5;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: 62%;
+  max-width: none;
+}
+
+.coming-soon .backdrop__motif--mobile {
+  display: none;
 }
 
 .coming-soon .shell {
@@ -85,8 +113,9 @@
   align-items: center;
 }
 
+/* %가 아니라 em. 좁은 화면에서 히어로만 줄고 로고는 글자와 같이 남는다. */
 .coming-soon .title__logo {
-  width: 31.7%;
+  width: 17.83em;
   height: auto;
 }
 
@@ -126,12 +155,12 @@
 /* 폭은 위 날짜+COMING SOON 줄에 맞춤. 외곽 구분선 전체폭, 중간은 94%. */
 .coming-soon .info,
 .coming-soon .sponsors {
-  width: 52.5%;
+  width: 29.53em;
   margin-inline: auto;
 }
 
 .coming-soon .info {
-  margin-top: 6.25em;
+  margin-top: 5.6em;
   font-family: var(--font-dream), var(--font-korean), sans-serif;
 }
 
@@ -241,4 +270,54 @@
   line-height: 1;
   letter-spacing: 0.04em;
   color: var(--dim);
+}
+
+/* 모바일. 기본 규칙보다 뒤에 와야 덮인다. */
+@media (max-width: 640px) {
+  /* 데스크톱 시안의 오른쪽 치우침(+0.5)을 빼고 정중앙에 둔다 */
+  .coming-soon .characters {
+    transform: translateX(-50%);
+  }
+
+  /* 로고·안내·주최를 한 덩어리로 올린다. 2.5em = 데스크톱 대비 */
+  .coming-soon .shell {
+    padding-top: 13em;
+    padding-bottom: calc(2.9em + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 왼쪽은 화면 끝에 가깝게. top은 자기 0.58em 기준이라 다시 환산 */
+  .coming-soon .copyright {
+    top: 26.3em;
+    left: 2.6vw;
+    font-size: 0.58em;
+  }
+
+  .coming-soon .backdrop__motif--desk {
+    display: none;
+  }
+
+  .coming-soon .stage {
+    min-height: 100svh;
+  }
+
+  .coming-soon .sponsors__list {
+    width: 68%;
+  }
+
+  /* RUN 아래부터. SVG 윗 남색은 위로 밀어 패턴이 잘린 선에 오게 */
+  .coming-soon .backdrop {
+    top: 19.2em;
+  }
+
+  .coming-soon .backdrop__motif--mobile {
+    display: block;
+    top: -50%;
+    right: auto;
+    left: 0;
+    bottom: auto;
+    width: 100%;
+    height: 160%;
+    object-fit: cover;
+    object-position: left top;
+  }
 }
