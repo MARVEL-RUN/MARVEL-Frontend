@@ -41,7 +41,37 @@ export const OFFICE = {
 export const LEGAL_LINKS = [
   { href: "/terms", label: "이용약관" },
   { href: "/privacy", label: "개인정보 처리방침" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/inquiry", label: "문의사항" },
 ] as const;
+
+export const APPLY_TERMS_TITLE = "참가자 유의사항 및 동의 서약서";
+
+export const APPLY_TERMS_LEAD =
+  "참가를 원하시는 분은 아래의 참가자 유의사항과 동의 서약서를 읽고 동의해 주시기 바랍니다.";
+
+export const APPLY_ALL_AGREE = "전체동의";
+
+export const APPLY_NOTICE_POINTS = [
+  {
+    title: "1. 건강 상태 확인",
+    body: "참가자는 본인의 건강상태 및 신체능력을 충분히 고려한 후 본인의 판단과 책임으로 참가를 신청하여야 합니다. 이를 고려하지 않고 발생한 사고에 대해 주최 측은 책임을 지지 않으며, 보험 혜택이 적용되지 않을 수 있습니다.",
+  },
+  {
+    title: "2. 출전 제한",
+    body: "만 14세 미만 참가자는 법정대리인의 동의를 받은 경우에 한하여 참가할 수 있습니다. 참가권 양도, 대리참가 또는 명의도용은 금지됩니다.",
+  },
+  {
+    title: "3. 신청·입금·취소",
+    body: "참가 신청, 결제, 변경, 취소/환불은 각 마감일(선착순 조기 마감을 포함)까지만 가능합니다. 자세한 일정은 공지사항을 확인하시기 바랍니다.",
+  },
+] as const;
+
+export const APPLY_SAFETY = {
+  title: "안전한 레이스를 위한 안내 사항 (필독)",
+  body: "레이스 중 이상 증상이 느껴지면 즉시 중단하고 진행 요원이나 의료진의 도움을 받으시기 바랍니다. (예: 어지러움, 가슴 통증, 숨 가쁨, 극심한 피로, 근육 경련 등) 체력과 운동 능력을 고려해 적절한 속도 유지가 필요하며, 충분한 준비 운동과 레이스 후 휴식을 권장합니다.",
+  note: "건강 상태 미고려, 기저 질환 등으로 발생한 본인 과실 사고는 보험 적용 대상에서 제외됩니다.",
+} as const;
 
 export const PARTICIPANT_NOTICE: LegalSection[] = [
   {

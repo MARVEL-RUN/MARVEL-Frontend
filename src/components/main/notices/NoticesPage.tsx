@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { EVENT } from "@/lib/event";
+import { listAdminNotices } from "@/services/admin/notices";
+import type { AdminNotice } from "@/types/admin";
+import { useEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 
 export function NoticesPage() {
-  const [openId, setOpenId] = useState<string | null>(EVENT.notices[0]?.id ?? null);
+  const [items, setItems] = useState<AdminNotice[]>([]);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  useEffect(() => {
+    void listAdminNotices().then((rows) => {
+      setItems(rows);
+      setOpenId(rows[0]?.id ?? null);
+    });
+  }, []);
 
   return (
     <main className="page">
       <SideBanner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
       <div className="page__body wrap">
         <ul className="bulletin">
-          {EVENT.notices.map((n) => {
+          {items.map((n) => {
             const open = openId === n.id;
             return (
               <li key={n.id} className={n.pinned ? "is-pin" : undefined}>

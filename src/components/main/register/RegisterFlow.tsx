@@ -2,45 +2,68 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { EVENT } from "@/lib/event";
-import type { ConsentId } from "@/lib/legal";
 import {
-  CONSENT_FIELD,
+  EMPTY_CONSENTS,
   EMPTY_DRAFT,
-  GENDERS,
-  SHIRT_SIZES,
-  consentValues,
   courseById,
   genderLabel,
   requiredConsentsOk,
   submitEntry,
   type ApplyKind,
   type Consents,
-  type CourseId,
   type EntryDraft,
   type EntryRecord,
 } from "@/lib/register";
-import { ApplyKindPick } from "./ApplyKindPick";
-import { ConsentList } from "./ConsentList";
+import { ApplyTerms } from "./ApplyTerms";
+import {
+  ApplyNotice,
+  BirthPick,
+  CoursePick,
+  FeeText,
+  FormRow,
+  FormSec,
+  GenderPick,
+  ShirtPick,
+  birthView,
+} from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
 
-const STEPS = ["코스", "정보", "확인", "완료"] as const;
-type Step = 0 | 1 | 2 | 3;
+const STEPS = ["정보", "확인", "완료"] as const;
+type Step = 0 | 1 | 2;
+
+const NOTICE = [
+  "주문번호로 신청조회에서 접수 내역을 확인할 수 있습니다.",
+  "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
+];
 
 export function RegisterFlow() {
   const [kind, setKind] = useState<ApplyKind | "">("");
+  const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
+
   if (!kind) {
     return (
-      <ApplyKindPick heading="신청 유형을 선택하세요" onPick={setKind} />
+      <ApplyTerms
+        values={consents}
+        onChange={setConsents}
+        onPick={setKind}
+      />
     );
   }
-  if (kind === "group") return <GroupFlow onBack={() => setKind("")} />;
-  return <IndividualFlow onBack={() => setKind("")} />;
+  if (kind === "group") {
+    return <GroupFlow consents={consents} onBack={() => setKind("")} />;
+  }
+  return <IndividualFlow consents={consents} onBack={() => setKind("")} />;
 }
 
-function IndividualFlow({ onBack }: { onBack: () => void }) {
+function IndividualFlow({
+  onBack,
+  consents,
+}: {
+  onBack: () => void;
+  consents: Consents;
+}) {
   const [step, setStep] = useState<Step>(0);
-  const [draft, setDraft] = useState<EntryDraft>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState<EntryDraft>({ ...EMPTY_DRAFT, ...consents });
   const [record, setRecord] = useState<EntryRecord | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -50,22 +73,17 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
     setError("");
   }
 
-  function pickCourse(id: CourseId) {
-    patch({ courseId: id });
-    setStep(1);
-  }
-
   function onForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!draft.name.trim()) return setError("이름을 입력하세요.");
-    if (!/^\d{8}$/.test(draft.birth)) return setError("생년월일은 YYYYMMDD로 입력하세요.");
+    if (!/^\d{8}$/.test(draft.birth)) return setError("생년월일을 선택하세요.");
     if (!draft.gender) return setError("성별을 선택하세요.");
-    if (!draft.phone.trim()) return setError("연락처를 입력하세요.");
+    if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
     if (!draft.email.trim()) return setError("이메일을 입력하세요.");
-    if (!draft.emergency.trim()) return setError("비상 연락처를 입력하세요.");
-    if (!draft.shirt) return setError("티셔츠 사이즈를 선택하세요.");
+    if (!draft.courseId) return setError("참가종목을 선택하세요.");
+    if (!draft.shirt) return setError("기념품을 선택하세요.");
     if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
-    setStep(2);
+    setStep(1);
   }
 
   async function onConfirm() {
@@ -74,7 +92,7 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
     try {
       const saved = await submitEntry(draft);
       setRecord(saved);
-      setStep(3);
+      setStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : "접수를 완료하지 못했습니다.");
     } finally {
@@ -101,134 +119,96 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
       {error ? <p className="form__err">{error}</p> : null}
 
       {step === 0 ? (
-        <section className="block">
-          <h2>미션을 선택하라</h2>
-          <ul className="courses__grid courses__grid--stack">
-            {EVENT.courses.map((c) => (
-              <li key={c.id}>
-                <button
-                  type="button"
-                  className={
-                    draft.courseId === c.id
-                      ? `course course--${c.tone} is-on`
-                      : `course course--${c.tone}`
-                  }
-                  onClick={() => pickCourse(c.id)}
-                >
-                  <p className="course__code">{c.code}</p>
-                  <p className="course__dist">{c.distance}</p>
-                  <p className="course__desc">{c.desc}</p>
-                  <p className="course__desc">{c.fee}</p>
-                </button>
-              </li>
-            ))}
-          </ul>
+        <form className="form" onSubmit={onForm}>
+          <ApplyNotice lines={NOTICE} />
+
+          <FormSec title="개인정보">
+            <FormRow label="이름" required>
+              <input
+                type="text"
+                name="name"
+                placeholder="띄어쓰기 없이 입력해주세요."
+                value={draft.name}
+                onChange={(e) => patch({ name: e.target.value })}
+                autoComplete="name"
+                required
+              />
+            </FormRow>
+            <FormRow label="생년월일" required>
+              <BirthPick value={draft.birth} onChange={(birth) => patch({ birth })} />
+            </FormRow>
+            <FormRow label="성별" required>
+              <GenderPick
+                name="gender"
+                value={draft.gender}
+                onChange={(gender) => patch({ gender })}
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec title="연락처 정보">
+            <FormRow label="휴대폰번호" required>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="휴대폰번호를 입력해주세요."
+                value={draft.phone}
+                onChange={(e) => patch({ phone: e.target.value })}
+                autoComplete="tel"
+                required
+              />
+            </FormRow>
+            <FormRow label="이메일" required>
+              <input
+                type="email"
+                name="email"
+                placeholder="이메일을 입력해주세요."
+                value={draft.email}
+                onChange={(e) => patch({ email: e.target.value })}
+                autoComplete="email"
+                required
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec
+            title="보호자 정보 (선택)"
+            note="선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+          >
+            <FormRow label="보호자 연락처">
+              <input
+                type="tel"
+                name="emergency"
+                placeholder="보호자 연락처를 입력해주세요."
+                value={draft.emergency}
+                onChange={(e) => patch({ emergency: e.target.value })}
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec title="신청 정보">
+            <FormRow label="참가종목" required>
+              <CoursePick
+                value={draft.courseId}
+                onChange={(courseId) => patch({ courseId })}
+              />
+            </FormRow>
+            <FormRow label="기념품" required>
+              <ShirtPick
+                value={draft.shirt}
+                onChange={(shirt) => patch({ shirt })}
+              />
+            </FormRow>
+            {draft.courseId ? (
+              <FormRow label="참가비">
+                <FeeText courseId={draft.courseId} />
+              </FormRow>
+            ) : null}
+          </FormSec>
+
           <div className="flow__nav">
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 1 ? (
-        <form className="form" onSubmit={onForm}>
-          <h2>참가자 정보</h2>
-          {course ? (
-            <p className="form__note">
-              {course.code} · {course.distance} · {course.fee}
-            </p>
-          ) : null}
-          <label className="field">
-            <span>이름</span>
-            <input
-              name="name"
-              value={draft.name}
-              onChange={(e) => patch({ name: e.target.value })}
-              autoComplete="name"
-              required
-            />
-          </label>
-          <label className="field">
-            <span>생년월일</span>
-            <input
-              name="birth"
-              value={draft.birth}
-              onChange={(e) => patch({ birth: e.target.value.replace(/\D/g, "").slice(0, 8) })}
-              inputMode="numeric"
-              placeholder="YYYYMMDD"
-              required
-            />
-          </label>
-          <fieldset className="field">
-            <span>성별</span>
-            <div className="seg">
-              {GENDERS.map((g) => (
-                <button
-                  key={g.id}
-                  type="button"
-                  className={draft.gender === g.id ? "is-on" : undefined}
-                  onClick={() => patch({ gender: g.id })}
-                >
-                  {g.label}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-          <label className="field">
-            <span>연락처</span>
-            <input
-              name="phone"
-              value={draft.phone}
-              onChange={(e) => patch({ phone: e.target.value })}
-              autoComplete="tel"
-              required
-            />
-          </label>
-          <label className="field">
-            <span>이메일</span>
-            <input
-              name="email"
-              type="email"
-              value={draft.email}
-              onChange={(e) => patch({ email: e.target.value })}
-              autoComplete="email"
-              required
-            />
-          </label>
-          <label className="field">
-            <span>비상 연락처</span>
-            <input
-              name="emergency"
-              value={draft.emergency}
-              onChange={(e) => patch({ emergency: e.target.value })}
-              required
-            />
-          </label>
-          <fieldset className="field">
-            <span>티셔츠</span>
-            <div className="seg">
-              {SHIRT_SIZES.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={draft.shirt === size ? "is-on" : undefined}
-                  onClick={() => patch({ shirt: size })}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-          <ConsentList
-            values={consentValues(draft)}
-            onChange={(id: ConsentId, next) =>
-              patch({ [CONSENT_FIELD[id]]: next } as Partial<Consents>)
-            }
-          />
-          <div className="flow__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
-              코스 변경
             </button>
             <button type="submit" className="btn btn--red">
               확인하기
@@ -237,12 +217,12 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
         </form>
       ) : null}
 
-      {step === 2 && course ? (
+      {step === 1 && course ? (
         <section className="block">
           <h2>접수 내용을 확인하세요</h2>
           <dl className="spec">
             <div>
-              <dt>코스</dt>
+              <dt>참가종목</dt>
               <dd>
                 {course.distance} · {course.code}
                 <small>{course.fee}</small>
@@ -254,14 +234,14 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
             </div>
             <div>
               <dt>생년월일</dt>
-              <dd>{draft.birth}</dd>
+              <dd>{birthView(draft.birth)}</dd>
             </div>
             <div>
               <dt>성별</dt>
               <dd>{draft.gender ? genderLabel(draft.gender) : "—"}</dd>
             </div>
             <div>
-              <dt>연락처</dt>
+              <dt>휴대폰번호</dt>
               <dd>{draft.phone}</dd>
             </div>
             <div>
@@ -269,16 +249,16 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
               <dd>{draft.email}</dd>
             </div>
             <div>
-              <dt>비상 연락처</dt>
-              <dd>{draft.emergency}</dd>
+              <dt>보호자 연락처</dt>
+              <dd>{draft.emergency.trim() || "—"}</dd>
             </div>
             <div>
-              <dt>티셔츠</dt>
-              <dd>{draft.shirt}</dd>
+              <dt>기념품</dt>
+              <dd>티셔츠 ({draft.shirt})</dd>
             </div>
           </dl>
           <div className="flow__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(1)}>
+            <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
               수정
             </button>
             <button type="button" className="btn btn--red" onClick={onConfirm} disabled={busy}>
@@ -288,7 +268,7 @@ function IndividualFlow({ onBack }: { onBack: () => void }) {
         </section>
       ) : null}
 
-      {step === 3 && record && course ? (
+      {step === 2 && record && course ? (
         <section className="ticket">
           <p className="kicker">ENTRY CONFIRMED</p>
           <h2>접수가 완료되었습니다</h2>

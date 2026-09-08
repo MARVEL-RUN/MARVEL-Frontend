@@ -63,6 +63,7 @@ export type ParticipantDraft = {
 };
 
 export type GroupDraft = {
+  courseId: CourseId | "";
   groupName: string;
   leaderName: string;
   phone: string;
@@ -132,6 +133,7 @@ export const EMPTY_PARTICIPANT: ParticipantDraft = {
 };
 
 export const EMPTY_GROUP: GroupDraft = {
+  courseId: "",
   groupName: "",
   leaderName: "",
   phone: "",
@@ -167,6 +169,25 @@ export function requiredConsentsOk(c: Consents) {
   return c.agreeRules && c.agreePrivacy && c.agreeThirdParty && c.agreeConsign;
 }
 
+export function consentsAll(on: boolean): Consents {
+  return {
+    agreeRules: on,
+    agreePrivacy: on,
+    agreeThirdParty: on,
+    agreeConsign: on,
+    agreeMarketing: on,
+  };
+}
+
+export function consentsCheckedAll(c: Consents) {
+  return (
+    c.agreePrivacy &&
+    c.agreeThirdParty &&
+    c.agreeConsign &&
+    c.agreeMarketing
+  );
+}
+
 export function consentValues(c: Consents) {
   return {
     rules: c.agreeRules,
@@ -186,14 +207,13 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   gender: Gender;
   shirt: ShirtSize;
 } {
-  if (!draft.courseId) throw new Error("코스를 선택하세요.");
+  if (!draft.courseId) throw new Error("참가종목을 선택하세요.");
   if (!draft.name.trim()) throw new Error("이름을 입력하세요.");
-  if (!/^\d{8}$/.test(draft.birth)) throw new Error("생년월일은 YYYYMMDD로 입력하세요.");
+  if (!/^\d{8}$/.test(draft.birth)) throw new Error("생년월일을 선택하세요.");
   if (!draft.gender) throw new Error("성별을 선택하세요.");
-  if (!draft.phone.trim()) throw new Error("연락처를 입력하세요.");
+  if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (!draft.email.trim()) throw new Error("이메일을 입력하세요.");
-  if (!draft.emergency.trim()) throw new Error("비상 연락처를 입력하세요.");
-  if (!draft.shirt) throw new Error("티셔츠 사이즈를 선택하세요.");
+  if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   if (!requiredConsentsOk(draft)) {
     throw new Error("필수 약관에 동의해 주세요.");
   }
@@ -208,14 +228,14 @@ function assertParticipant(
   shirt: ShirtSize;
 } {
   const n = i + 1;
-  if (!p.courseId) throw new Error(`참가자 ${n}: 코스를 선택하세요.`);
+  if (!p.courseId) throw new Error(`참가자 ${n}: 참가종목을 선택하세요.`);
   if (!p.name.trim()) throw new Error(`참가자 ${n}: 이름을 입력하세요.`);
   if (!/^\d{8}$/.test(p.birth)) {
-    throw new Error(`참가자 ${n}: 생년월일은 YYYYMMDD로 입력하세요.`);
+    throw new Error(`참가자 ${n}: 생년월일을 입력하세요.`);
   }
   if (!p.gender) throw new Error(`참가자 ${n}: 성별을 선택하세요.`);
   if (!p.phone.trim()) throw new Error(`참가자 ${n}: 연락처를 입력하세요.`);
-  if (!p.shirt) throw new Error(`참가자 ${n}: 티셔츠 사이즈를 선택하세요.`);
+  if (!p.shirt) throw new Error(`참가자 ${n}: 기념품을 선택하세요.`);
 }
 
 function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
@@ -225,7 +245,7 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
 } {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
   if (!draft.leaderName.trim()) throw new Error("대표자 성명을 입력하세요.");
-  if (!draft.phone.trim()) throw new Error("대표 연락처를 입력하세요.");
+  if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (!draft.email.trim()) throw new Error("이메일을 입력하세요.");
   if (!draft.participants.length) throw new Error("참가자를 1명 이상 등록하세요.");
   if (draft.participants.length > MAX_GROUP_SIZE) {

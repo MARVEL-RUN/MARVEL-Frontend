@@ -15,6 +15,8 @@ export const NAV_ITEMS = [
   { href: "/virtual", label: "버추얼런" },
   { href: "/lookup", label: "신청조회" },
   { href: "/notices", label: "공지사항" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/inquiry", label: "문의사항" },
 ] as const;
 
 /** 참가신청 CTA */
