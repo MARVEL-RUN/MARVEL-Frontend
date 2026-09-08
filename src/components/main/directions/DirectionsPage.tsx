@@ -20,6 +20,10 @@ export function DirectionsPage() {
           </a>
         </section>
 
+        <div className="media-ph" role="img" aria-label="오시는길">
+          오시는길
+        </div>
+
         <section className="block">
           <h2>자가용</h2>
           <p className="sec__body">

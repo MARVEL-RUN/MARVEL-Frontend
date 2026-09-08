@@ -11,7 +11,9 @@ export const EVENT = {
   venue: "인제스피디움",
   venueEn: "INJE SPEEDIUM",
   venueAddress: "강원 인제군 기린면 상하답로 130 인제스피디움",
-  mapUrl: "https://map.naver.com/p/search/%EC%9D%B8%EC%A0%9C%EC%8A%A4%ED%94%BC%EB%94%94%EC%9B%80",
+  mapUrl:
+    "https://www.google.com/maps/search/?api=1&query=" +
+    encodeURIComponent("강원 인제군 기린면 상하답로 130 인제스피디움"),
   info: [
     {
       label: "대회일시",
