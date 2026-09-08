@@ -11,10 +11,10 @@ export const isMain = APP_MODE === "main";
 export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내" },
   { href: "/directions", label: "오시는길" },
-  { href: "/virtual", label: "버추얼런" },
-  { href: "/notices", label: "공지사항" },
   { href: "/faq", label: "FAQ" },
+  { href: "/notices", label: "공지사항" },
   { href: "/inquiry", label: "문의사항" },
+  { href: "/virtual", label: "버추얼런" },
 ] as const;
 
 /** 참가신청 CTA */
