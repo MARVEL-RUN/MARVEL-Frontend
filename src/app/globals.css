@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "../components/coming-soon/coming-soon.css";
 @import "../components/main/main.css";
+@import "../components/admin/admin.css";
 
 /* Latin만 BM Dohyeon. weight range로 faux-bold 방지. */
 @font-face {
