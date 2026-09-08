@@ -1,0 +1,12 @@
+output/
+node_modules/
+dist/
+build/
+.next/
+out/
+.DS_Store
+.cursor/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example

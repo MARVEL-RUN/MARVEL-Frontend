@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@import "../components/coming-soon/coming-soon.css";
+@import "../components/main/main.css";
+@import "../components/admin/admin.css";
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream1.otf") format("opentype");
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream2.otf") format("opentype");
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream3.otf") format("opentype");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream4.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream5.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream6.otf") format("opentype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream7.otf") format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream8.otf") format("opentype");
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream9.otf") format("opentype");
+  font-weight: 900;
+  font-display: swap;
+}
+
+:root {
+  --font-latin: "SC Dream";
+  --font-korean: "SC Dream";
+  --font-dream: "SC Dream";
+  --navy: #000320;
+  --navy-0: rgba(0, 3, 32, 0);
+  --silver: #d3d4dc;
+  --label: #eef0f6;
+  --note: #a4a5b4;
+  --rule: rgba(255, 255, 255, 0.62);
+  --dim: #b7b9c6;
+  --marvel: #ed1d24;
+  --marvel-deep: #9b1118;
+  --gold: #e0c36a;
+  --cyan: #4ec8e0;
+  --violet: #7a6bff;
+}
+
+html,
+body {
+  background: var(--navy);
+  color: #fff;
+}
+
+body {
+  font-family: var(--font-dream), sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
