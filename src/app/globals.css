@@ -3,13 +3,18 @@
 @import "../components/main/main.css";
 @import "../components/admin/admin.css";
 
-/* Latin만 BM Dohyeon. weight range로 faux-bold 방지. */
 @font-face {
-  font-family: "BM Dohyeon";
-  src: url("/fonts/bm-dohyeon.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream1.otf") format("opentype");
+  font-weight: 100;
   font-display: swap;
-  unicode-range: U+0041-005A, U+0061-007A;
+}
+
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream2.otf") format("opentype");
+  font-weight: 200;
+  font-display: swap;
 }
 
 @font-face {
@@ -35,6 +40,13 @@
 
 @font-face {
   font-family: "SC Dream";
+  src: url("/fonts/SCDream6.otf") format("opentype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SC Dream";
   src: url("/fonts/SCDream7.otf") format("opentype");
   font-weight: 700;
   font-display: swap;
@@ -47,9 +59,16 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "SC Dream";
+  src: url("/fonts/SCDream9.otf") format("opentype");
+  font-weight: 900;
+  font-display: swap;
+}
+
 :root {
-  --font-latin: "BM Dohyeon";
-  --font-korean: "Pretendard Variable", Pretendard;
+  --font-latin: "SC Dream";
+  --font-korean: "SC Dream";
   --font-dream: "SC Dream";
   --navy: #000320;
   --navy-0: rgba(0, 3, 32, 0);
@@ -72,6 +91,8 @@ body {
 }
 
 body {
-  font-family: var(--font-latin), var(--font-korean), system-ui, sans-serif;
+  font-family: var(--font-dream), sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }

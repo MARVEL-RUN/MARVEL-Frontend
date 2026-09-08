@@ -4,6 +4,19 @@ import { EVENT } from "@/lib/event";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { LEGAL_LINKS, OFFICE } from "@/lib/legal";
 
+const SPONSOR_LOGOS = {
+  주최: {
+    src: MAIN_ASSETS.footerHost,
+    width: 4786,
+    height: 1320,
+  },
+  주관: {
+    src: MAIN_ASSETS.footerOrganizer,
+    width: 1601,
+    height: 220,
+  },
+} as const;
+
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -39,12 +52,22 @@ export function Footer() {
       </div>
 
       <ul className="site-footer__sponsors">
-        {EVENT.sponsors.map((s) => (
-          <li key={s.role}>
-            <span>{s.role}</span>
-            <strong>{s.name}</strong>
-          </li>
-        ))}
+        {EVENT.sponsors.map((s) => {
+          const logo = SPONSOR_LOGOS[s.role];
+
+          return (
+            <li key={s.role}>
+              <span>{s.role}</span>
+              <Image
+                src={logo.src}
+                alt={s.name}
+                width={logo.width}
+                height={logo.height}
+                className={s.role === "주관" ? "is-organizer" : undefined}
+              />
+            </li>
+          );
+        })}
       </ul>
 
       <Link

@@ -43,10 +43,16 @@ export function GuidePage() {
               </div>
             ))}
           </div>
+          <div className="media-ph" role="img" aria-label="코스도">
+            코스도
+          </div>
         </section>
 
         <section className="block">
-          <h2>레이스 키트</h2>
+          <h2>기념품</h2>
+          <div className="media-ph" role="img" aria-label="기념품">
+            기념품
+          </div>
           <ul className="chips">
             {EVENT.kit.map((item) => (
               <li key={item}>{item}</li>
