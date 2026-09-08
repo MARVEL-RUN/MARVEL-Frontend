@@ -250,8 +250,10 @@ html.admin-mode body {
 }
 
 .admin-side-link svg,
-.admin-side-group__btn svg {
+.admin-side-group__btn svg:first-child {
   flex: none;
+  width: 16px;
+  height: 16px;
 }
 
 .admin-side-link:hover,
@@ -268,7 +270,7 @@ html.admin-mode body {
 .admin-side-link--sub {
   min-height: 36px;
   padding-left: 42px;
-  font-size: 12px;
+  font-size: 13px;
   color: #9aa2b0;
 }
 
@@ -323,8 +325,8 @@ html.admin-mode body {
   padding: 0;
 }
 
-.admin-root.is-collapsed .admin-side-group.is-on .admin-side-group__list {
-  display: block;
+.admin-root.is-collapsed .admin-side-group__list {
+  display: none;
 }
 
 .admin-frame {
@@ -531,6 +533,284 @@ html.admin-mode body {
   color: var(--admin-blue);
 }
 
+.admin-trend-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-trend {
+  background: #fff;
+  border: 1px solid var(--admin-line);
+}
+
+.admin-trend h2 {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--admin-line);
+  background: #f8fafc;
+}
+
+.admin-trend__body {
+  display: grid;
+  gap: 14px;
+  padding: 14px 16px 16px;
+}
+
+.admin-trend__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.admin-trend__filters label {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--admin-muted);
+}
+
+.admin-trend__filters input[type="date"] {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
+  color: inherit;
+}
+
+.admin-trend__presets {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-trend__presets button {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-trend__presets button.is-on {
+  background: #1a73e8;
+  border-color: #1a73e8;
+  color: #fff;
+}
+
+.admin-trend__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-trend__stats div {
+  border: 1px solid #edf0f4;
+  background: #f8fafc;
+  padding: 10px 12px;
+}
+
+.admin-trend__stats .is-accent {
+  border-color: #d6e4fb;
+  background: #f3f8ff;
+}
+
+.admin-trend__stats span {
+  display: block;
+  font-size: 11px;
+  color: var(--admin-muted);
+}
+
+.admin-trend__stats .is-accent span {
+  color: #1a73e8;
+}
+
+.admin-trend__stats strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-trend__chart {
+  position: relative;
+  border: 1px solid #dfe3ea;
+  background: #fafbfc;
+  padding: 28px 12px 10px;
+}
+
+.admin-trend__tip {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+  min-width: 120px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid var(--admin-line);
+  text-align: center;
+  pointer-events: none;
+}
+
+.admin-trend__tip p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--admin-muted);
+}
+
+.admin-trend__tip strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  color: #1a73e8;
+}
+
+.admin-trend__tip em,
+.admin-trend__list em {
+  margin-left: 2px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--admin-muted);
+}
+
+.admin-trend__plot {
+  display: flex;
+  gap: 8px;
+  height: 168px;
+}
+
+.admin-trend__y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  padding: 4px 0 22px;
+  text-align: right;
+  font-size: 10px;
+  color: #9aa2b0;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-trend__grid {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 22px;
+}
+
+.admin-trend__grid > i {
+  display: block;
+  border-top: 1px dashed #e2e6ed;
+}
+
+.admin-trend__line {
+  position: absolute;
+  inset: 0 0 22px;
+  width: 100%;
+  height: calc(100% - 22px);
+}
+
+.admin-trend__bars {
+  position: absolute;
+  inset: 8px 0 22px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.admin-trend__bars button {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border-radius: 2px 2px 0 0;
+  background: #1a73e8;
+}
+
+.admin-trend__bars button.is-on,
+.admin-trend__bars button:hover {
+  background: #1558b8;
+}
+
+.admin-trend__axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.admin-trend__axis span {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 10px;
+  color: #9aa2b0;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-trend__axis span.is-hidden {
+  visibility: hidden;
+}
+
+.admin-trend__axis.is-plot {
+  pointer-events: none;
+}
+
+.admin-trend__axis.is-plot span {
+  position: absolute;
+  flex: none;
+  transform: translateX(-50%);
+}
+
+.admin-trend__list-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px 6px;
+  font-size: 11px;
+  color: var(--admin-muted);
+}
+
+.admin-trend__list-body {
+  display: grid;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.admin-trend__list-body button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #edf0f4;
+  background: #fff;
+  text-align: left;
+}
+
+.admin-trend__list-body button.is-on,
+.admin-trend__list-body button:hover {
+  border-color: #d6e4fb;
+  background: #f7faff;
+}
+
+.admin-trend__list-body strong {
+  font-variant-numeric: tabular-nums;
+}
+
 .admin-grid {
   display: grid;
   gap: 12px;
@@ -573,6 +853,7 @@ html.admin-mode body {
 }
 
 .admin-quick__icon {
+  flex: none;
   width: 32px;
   height: 32px;
   display: grid;
@@ -581,12 +862,23 @@ html.admin-mode body {
   color: var(--admin-blue);
 }
 
-.admin-quick strong,
-.admin-quick span {
+.admin-quick__icon svg {
   display: block;
 }
 
-.admin-quick span {
+.admin-quick__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-quick__text strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--admin-ink);
+}
+
+.admin-quick__text span {
   font-size: 12px;
   color: var(--admin-muted);
 }
@@ -939,6 +1231,10 @@ html.admin-mode body {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .admin-trend-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .admin-grid {
     grid-template-columns: 1.4fr 0.8fr;
     align-items: start;
@@ -972,6 +1268,7 @@ html.admin-mode body {
 }
 
 @media (max-width: 1023px) {
+
   .admin-root,
   .admin-root.is-collapsed {
     --admin-side: 0px;

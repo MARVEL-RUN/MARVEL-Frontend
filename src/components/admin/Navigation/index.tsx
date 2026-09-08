@@ -11,12 +11,8 @@ import {
   ChevronDown,
   ClipboardList,
   FileText,
-  HelpCircle,
-  Image as ImageIcon,
   LayoutDashboard,
-  MessageSquare,
   Settings,
-  Shield,
   Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -30,18 +26,6 @@ const GROUP_ICON = {
   content: FileText,
   settings: Settings,
 } as const;
-
-const CHILD_ICON: Record<string, typeof FileText> = {
-  "/admin/applications/individual": Users,
-  "/admin/applications/group": Users,
-  "/admin/boards/notice": ClipboardList,
-  "/admin/boards/inquiry": MessageSquare,
-  "/admin/boards/faq": HelpCircle,
-  "/admin/content/sponsors": ImageIcon,
-  "/admin/legal/terms": FileText,
-  "/admin/legal/privacy": Shield,
-  "/admin/admins": Settings,
-};
 
 type Props = {
   collapsed: boolean;
@@ -116,7 +100,6 @@ export function AdminSidebar({ collapsed, mobileOpen, onClose }: Props) {
                 </button>
                 <div className={`admin-side-group__list${open ? " is-open" : ""}`}>
                   {group.children.map((child) => {
-                    const ChildIcon = CHILD_ICON[child.href] ?? FileText;
                     const active = pathname.startsWith(child.href);
                     return (
                       <Link
@@ -126,7 +109,6 @@ export function AdminSidebar({ collapsed, mobileOpen, onClose }: Props) {
                         onClick={onClose}
                         title={child.name}
                       >
-                        <ChildIcon size={15} />
                         <span>{child.name}</span>
                       </Link>
                     );

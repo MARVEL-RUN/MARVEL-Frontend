@@ -1,5 +1,6 @@
 "use client";
 
+import { TrendPanel } from "@/components/admin/dashboard/TrendPanel";
 import { getAdminDashboardStats } from "@/services/admin/stats";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, FileText, HelpCircle, MessageSquare } from "lucide-react";
@@ -70,6 +71,11 @@ export function DashboardPage() {
         </Link>
       </div>
 
+      <div className="admin-trend-grid">
+        <TrendPanel kind="visitor" title="방문자 현황" unit="명" />
+        <TrendPanel kind="applicant" title="신청자 현황" unit="건" />
+      </div>
+
       <div className="admin-grid">
         <section className="admin-card">
           <h2>바로가기</h2>
@@ -79,7 +85,7 @@ export function DashboardPage() {
                 <span className="admin-quick__icon">
                   <item.icon size={16} />
                 </span>
-                <span>
+                <span className="admin-quick__text">
                   <strong>{item.title}</strong>
                   <span>{item.description}</span>
                 </span>
@@ -92,7 +98,7 @@ export function DashboardPage() {
           <h2>처리할 업무</h2>
           <div className="admin-quick">
             <Link href="/admin/boards/inquiry">
-              <span>
+              <span className="admin-quick__text">
                 <strong>문의사항</strong>
                 <span>
                   {n(data?.inquiryCount)}건 · 미답변 {n(data?.unansweredCount)}
@@ -100,13 +106,13 @@ export function DashboardPage() {
               </span>
             </Link>
             <Link href="/admin/applications/individual">
-              <span>
+              <span className="admin-quick__text">
                 <strong>개인 접수</strong>
                 <span>{n(data?.individualCount)}건</span>
               </span>
             </Link>
             <Link href="/admin/applications/individual">
-              <span>
+              <span className="admin-quick__text">
                 <strong>결제 대기</strong>
                 <span>{n(data?.pendingCount)}건</span>
               </span>
