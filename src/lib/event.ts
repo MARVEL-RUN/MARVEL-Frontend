@@ -61,7 +61,7 @@ export const EVENT = {
     },
   ],
   stats: [
-    { value: "10", unit: "KM", label: "ASSEMBLE" },
+    { value: "10", unit: "Km", label: "ASSEMBLE" },
     { value: "10.31", unit: "SAT", label: "RACE DAY" },
     { value: "3", unit: "", label: "COURSES" },
     { value: "INJE", unit: "", label: "SPEEDIUM" },
@@ -69,7 +69,7 @@ export const EVENT = {
   courses: [
     {
       id: "2.5k",
-      distance: "2.5K",
+      distance: "2.5 Km",
       code: "ORIGIN",
       tone: "gold",
       timeLimit: "45분",
@@ -80,7 +80,7 @@ export const EVENT = {
     },
     {
       id: "5k",
-      distance: "5K",
+      distance: "5 Km",
       code: "FIRST STRIKE",
       tone: "red",
       timeLimit: "1시간",
@@ -91,7 +91,7 @@ export const EVENT = {
     },
     {
       id: "10k",
-      distance: "10K",
+      distance: "10 Km",
       code: "ASSEMBLE",
       tone: "cyan",
       timeLimit: "1시간 30분",
@@ -104,9 +104,9 @@ export const EVENT = {
   timeline: [
     { time: "06:00", title: "집결 · 웨이스트백 보관" },
     { time: "07:00", title: "워밍업 · 히어로 포토존" },
-    { time: "08:30", title: "10K 스타트" },
-    { time: "09:00", title: "5K 스타트" },
-    { time: "09:30", title: "2.5K 스타트" },
+    { time: "08:30", title: "10 Km 스타트" },
+    { time: "09:00", title: "5 Km 스타트" },
+    { time: "09:30", title: "2.5 Km 스타트" },
     { time: "15:00", title: "피니시 클로징" },
   ],
   kit: [
@@ -130,7 +130,7 @@ export const EVENT = {
       tag: "RACE",
       title: "코스별 스타트 타임 안내",
       pinned: false,
-      body: "10K 08:30, 5K 09:00, 2.5K 09:30. 스타트 30분 전까지 집결을 완료해 주세요.",
+      body: "10 Km 08:30, 5 Km 09:00, 2.5 Km 09:30. 스타트 30분 전까지 집결을 완료해 주세요.",
     },
     {
       id: "1",

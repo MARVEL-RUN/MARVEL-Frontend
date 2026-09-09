@@ -244,7 +244,7 @@ export function HomePage() {
             </Link>
           </div>
           <div className="venue__panel" aria-hidden>
-            <span>10K</span>
+            <span>10 Km</span>
             <span>START / FINISH</span>
             <span>CHECKERED</span>
           </div>
