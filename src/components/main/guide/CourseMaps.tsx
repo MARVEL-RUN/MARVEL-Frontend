@@ -40,10 +40,6 @@ export function CourseMaps() {
               <dd>{course.start}</dd>
             </div>
             <div>
-              <dt>제한</dt>
-              <dd>{course.timeLimit}</dd>
-            </div>
-            <div>
               <dt>참가비</dt>
               <dd>{course.fee}</dd>
             </div>
@@ -52,9 +48,8 @@ export function CourseMaps() {
               <dd>{"childFee" in course ? course.childFee : "참가 불가"}</dd>
             </div>
           </dl>
-          <p className="course-guide__hint">이미지를 누르면 크게 볼 수 있습니다</p>
         </div>
-        <figure className="course-guide__map">
+        <figure className="course-guide__visual">
           <button
             type="button"
             className="course-guide__open"
@@ -70,11 +65,14 @@ export function CourseMaps() {
                   src={c.map}
                   alt=""
                   fill
-                  sizes="(max-width: 860px) 100vw, 60vw"
+                  sizes="(max-width: 860px) 100vw, 70vw"
                 />
               </span>
             ))}
           </button>
+          <figcaption className="course-guide__hint">
+            이미지를 누르면 크게 볼 수 있습니다
+          </figcaption>
         </figure>
       </div>
       {preview ? (

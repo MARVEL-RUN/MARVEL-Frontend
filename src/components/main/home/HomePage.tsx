@@ -209,10 +209,6 @@ export function HomePage() {
                     <dd>{c.start}</dd>
                   </div>
                   <div>
-                    <dt>제한</dt>
-                    <dd>{c.timeLimit}</dd>
-                  </div>
-                  <div>
                     <dt>참가비</dt>
                     <dd>{c.fee}</dd>
                   </div>
