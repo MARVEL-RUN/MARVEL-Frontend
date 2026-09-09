@@ -660,14 +660,14 @@ html.is-live .hero__actions {
 }
 
 .about__stats strong b {
+  font-size: 1em;
   font-weight: 800;
 }
 
 .about__stats strong i {
   font-style: normal;
-  font-size: 0.62em;
-  font-weight: 700;
-  opacity: 0.45;
+  font-size: 1em;
+  font-weight: 800;
 }
 
 .about__stats strong span {
@@ -683,11 +683,6 @@ html.is-live .hero__actions {
   font-style: normal;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
-}
-
-.about__stats li.is-wide strong {
-  font-size: 1.28rem;
-  letter-spacing: -0.04em;
 }
 
 .courses__grid,
