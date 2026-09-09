@@ -26,7 +26,7 @@ export function GuidePage() {
         </section>
 
         <section className="block">
-          <h2>타임테이블</h2>
+          <h2>타임라인</h2>
           <TimeTable />
         </section>
 

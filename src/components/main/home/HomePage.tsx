@@ -217,7 +217,7 @@ export function HomePage() {
         <div className="wrap reveal">
           <p className="kicker">03 / RACE DAY</p>
           <h2 className="sec__title">
-            레이스 데이 <em>타임테이블</em>
+            레이스 데이 <em>타임라인</em>
           </h2>
           <TimeTable />
         </div>
