@@ -951,10 +951,6 @@ html.is-live .hero__actions {
 .venue__panel {
   position: relative;
   min-height: 280px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1.8rem;
   background:
     repeating-conic-gradient(#0a0b22 0% 25%, #15162e 0% 50%) 0 0 / 28px 28px;
   clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%, 0 28px);
@@ -965,18 +961,45 @@ html.is-live .hero__actions {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(135deg, rgba(237, 29, 36, 0.45), transparent 55%);
   pointer-events: none;
+  transition: background 0.55s ease;
 }
 
-.venue__panel span {
+.venue__panel--gold::after {
+  background: linear-gradient(135deg, rgba(224, 195, 106, 0.45), transparent 55%);
+}
+
+.venue__panel--cyan::after {
+  background: linear-gradient(135deg, rgba(78, 200, 224, 0.45), transparent 55%);
+}
+
+.venue__slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.8rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+
+.venue__slide.is-on {
+  opacity: 1;
+  visibility: visible;
+}
+
+.venue__slide span {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   font-weight: 800;
   letter-spacing: 0.12em;
 }
 
-.venue__panel span:first-child {
+.venue__dist {
   font-size: 3.4rem;
   letter-spacing: -0.04em;
   transform: skewX(-10deg);
@@ -2968,6 +2991,11 @@ button.course {
 @media (prefers-reduced-motion: reduce) {
   .ticker__track {
     animation: none;
+  }
+
+  .venue__slide,
+  .venue__panel::after {
+    transition: none;
   }
 }
 

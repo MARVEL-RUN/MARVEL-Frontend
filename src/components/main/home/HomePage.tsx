@@ -23,8 +23,10 @@ export function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLElement>(null);
   const [previewId, setPreview] = useState<CourseId | null>(null);
+  const [venueCourse, setVenueCourse] = useState(0);
   const preview = EVENT.courses.find((c) => c.id === previewId);
   const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
+  const venueSlide = EVENT.courses[venueCourse];
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -64,6 +66,13 @@ export function HomePage() {
       window.removeEventListener("scroll", onScroll);
       io.disconnect();
     };
+  }, []);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setVenueCourse((i) => (i + 1) % EVENT.courses.length);
+    }, 3500);
+    return () => window.clearInterval(id);
   }, []);
 
   return (
@@ -238,17 +247,30 @@ export function HomePage() {
             </h2>
             <p className="sec__body">{EVENT.venueAddress}</p>
             <p className="sec__body">
-              서킷 위를 달리는 국내 유일 마블 공식 러닝. 피니시 라인은
-              체크무늬 플래그 앞에서 기다린다.
+              자동차가 질주하던 인제 스피디움 서킷,
+              <br />
+              이번에는 히어로들이 두 발로 달린다.
             </p>
             <Link href="/directions" className="btn btn--ghost">
               오시는길
             </Link>
           </div>
-          <div className="venue__panel" aria-hidden>
-            <span>10 Km</span>
-            <span>START / FINISH</span>
-            <span>CHECKERED</span>
+          <div
+            className={`venue__panel venue__panel--${venueSlide.tone}`}
+            aria-hidden
+          >
+            {EVENT.courses.map((c, i) => (
+              <div
+                key={c.id}
+                className={
+                  i === venueCourse ? "venue__slide is-on" : "venue__slide"
+                }
+              >
+                <span className="venue__dist">{c.distance}</span>
+                <span>START / FINISH</span>
+                <span>CHECKERED</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
