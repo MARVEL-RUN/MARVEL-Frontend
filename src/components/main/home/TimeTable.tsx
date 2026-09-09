@@ -1,7 +1,7 @@
 import { EVENT } from "@/lib/event";
 
 const MARK_CLASS = {
-  gate: "time-mark time-mark--gate",
+  gate: "time-table__gate",
   "10k": "time-mark time-mark--cyan",
   "5k": "time-mark time-mark--red",
   "2.3k": "time-mark time-mark--gold",
@@ -35,7 +35,11 @@ export function TimeTable() {
                 <td>{row.rt}</td>
                 <td>
                   {mark ? (
-                    <mark className={mark}>{row.program}</mark>
+                    "mark" in row && row.mark === "gate" ? (
+                      <span className={mark}>{row.program}</span>
+                    ) : (
+                      <mark className={mark}>{row.program}</mark>
+                    )
                   ) : (
                     row.program
                   )}

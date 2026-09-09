@@ -893,6 +893,11 @@ html.is-live .hero__actions {
   text-align: left;
 }
 
+.time-table__gate {
+  color: var(--marvel);
+  font-weight: 800;
+}
+
 .time-mark {
   display: inline;
   padding: 0.12em 0.32em 0.16em;
@@ -900,15 +905,6 @@ html.is-live .hero__actions {
   font: inherit;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-}
-
-.time-mark--gate {
-  background: linear-gradient(
-    transparent 18%,
-    rgba(255, 214, 64, 0.52) 18%,
-    rgba(255, 214, 64, 0.52) 88%,
-    transparent 88%
-  );
 }
 
 .time-mark--red {
