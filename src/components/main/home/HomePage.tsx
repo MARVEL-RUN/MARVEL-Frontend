@@ -142,13 +142,17 @@ export function HomePage() {
               같은 출발선에 선다. 배번호를 다는 순간, 당신도 그 세계의 일원이다.
             </p>
             <p className="sec__body">
-              코스를 고르고, 미션을 완수하고, 피니시 게이트를 통과하라.
-              히어로는 태어나는 게 아니라 완주한다.
+              미션을 선택하고, 피니시 게이트를 통과하여 완수하라!
+              <br />
+              히어로는 태어나는 것이 아닌, 완주하는 것이다.
             </p>
           </div>
           <ul className="about__stats">
             {EVENT.stats.map((s) => (
-              <li key={s.label}>
+              <li
+                key={s.label}
+                className={s.value.includes("/") ? "is-wide" : undefined}
+              >
                 <strong>
                   {s.value}
                   {s.unit ? <span>{s.unit}</span> : null}

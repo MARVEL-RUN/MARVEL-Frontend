@@ -61,9 +61,9 @@ export const EVENT = {
     },
   ],
   stats: [
-    { value: "10", unit: "Km", label: "ASSEMBLE" },
-    { value: "10.31", unit: "SAT", label: "RACE DAY" },
     { value: "3", unit: "", label: "COURSES" },
+    { value: "10.31", unit: "SAT", label: "RACE DAY" },
+    { value: "10 / 5 / 2.3", unit: "Km", label: "MISSIONS" },
     { value: "INJE", unit: "", label: "SPEEDIUM" },
   ],
   courses: [
