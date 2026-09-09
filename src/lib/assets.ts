@@ -9,6 +9,7 @@ export const COMING_SOON_ASSETS = {
 
 export const MAIN_ASSETS = {
   logo: "/images/main/logo.svg",
+  headerLogo: "/images/main/header-logo.svg",
   footerLogo: "/images/main/ft_logo.svg",
   sideBanner: "/images/main/sidebanner.svg",
   footerHost: "/images/main/footer/hosted.png",
