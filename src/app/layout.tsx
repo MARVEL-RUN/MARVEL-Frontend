@@ -32,7 +32,7 @@ export default function RootLayout({
       <body>
         {children}
         <GoogleAnalytics measurementId={process.env.GA_MEASUREMENT_ID} />
-        <NaverAnalytics />
+        <NaverAnalytics waId={process.env.NAVER_ANALYTICS_ID} />
       </body>
     </html>
   );
