@@ -32,6 +32,7 @@ import {
   BirthText,
   FormRow,
   FormSec,
+  PhoneField,
   birthView,
 } from "./ApplyUi";
 
@@ -169,11 +170,10 @@ export function GroupFlow({
 
           <FormSec title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
@@ -245,11 +245,10 @@ export function GroupFlow({
                           />
                         </td>
                         <td>
-                          <input
-                            type="tel"
+                          <PhoneField
                             placeholder="연락처"
                             value={p.phone}
-                            onChange={(e) => patchMember(i, { phone: e.target.value })}
+                            onChange={(phone) => patchMember(i, { phone })}
                             required
                           />
                         </td>

@@ -25,6 +25,7 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  PhoneField,
   ShirtPick,
   birthView,
 } from "./ApplyUi";
@@ -150,12 +151,11 @@ function IndividualFlow({
 
           <FormSec title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 name="phone"
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
@@ -178,12 +178,11 @@ function IndividualFlow({
             note="선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
           >
             <FormRow label="보호자 연락처">
-              <input
-                type="tel"
+              <PhoneField
                 name="emergency"
                 placeholder="보호자 연락처를 입력해주세요."
                 value={draft.emergency}
-                onChange={(e) => patch({ emergency: e.target.value })}
+                onChange={(emergency) => patch({ emergency })}
               />
             </FormRow>
           </FormSec>

@@ -5,6 +5,7 @@ import {
   SHIRT_SIZES,
   courseAllowsChild,
   courseById,
+  formatPhone,
   ticketFee,
   ticketLabel,
   type CourseId,
@@ -267,6 +268,36 @@ export function BirthText({
       value={shown}
       onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 8))}
       aria-label="생년월일"
+    />
+  );
+}
+
+export function PhoneField({
+  value,
+  onChange,
+  name,
+  placeholder,
+  required,
+  autoComplete,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  name?: string;
+  placeholder?: string;
+  required?: boolean;
+  autoComplete?: string;
+}) {
+  return (
+    <input
+      type="tel"
+      inputMode="numeric"
+      name={name}
+      placeholder={placeholder}
+      value={formatPhone(value)}
+      onChange={(e) => onChange(formatPhone(e.target.value))}
+      autoComplete={autoComplete}
+      required={required}
+      maxLength={13}
     />
   );
 }
