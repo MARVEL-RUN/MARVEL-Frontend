@@ -266,6 +266,15 @@ export function HomePage() {
                   i === venueCourse ? "venue__slide is-on" : "venue__slide"
                 }
               >
+                <span className={`venue__hero venue__hero--${c.id}`}>
+                  <Image
+                    src={c.figure}
+                    alt=""
+                    fill
+                    sizes="(max-width: 960px) 80vw, 420px"
+                    style={{ objectFit: "contain", objectPosition: "right bottom" }}
+                  />
+                </span>
                 <span className="venue__dist">{c.distance}</span>
                 <span>START / FINISH</span>
                 <span>CHECKERED</span>
