@@ -627,8 +627,8 @@ html.is-live .hero__actions {
 
 .about .wrap {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 4rem;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
   align-items: center;
 }
 
@@ -638,21 +638,36 @@ html.is-live .hero__actions {
   gap: 1px;
   background: rgba(255, 255, 255, 0.18);
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  container-type: inline-size;
 }
 
 .about__stats li {
-  padding: 1.6rem 1.3rem 1.3rem;
+  min-width: 0;
+  padding: 1.5rem 1rem 1.2rem;
   background: #07081c;
 }
 
 .about__stats strong {
   display: flex;
   align-items: baseline;
-  gap: 0.35rem;
-  font-size: 2.1rem;
+  flex-shrink: 0;
+  gap: 0.22rem;
+  font-size: clamp(1.25rem, 6.6cqi, 2.1rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   line-height: 1;
+  white-space: nowrap;
+}
+
+.about__stats strong b {
+  font-weight: 800;
+}
+
+.about__stats strong i {
+  font-style: normal;
+  font-size: 0.62em;
+  font-weight: 700;
+  opacity: 0.45;
 }
 
 .about__stats strong span {
@@ -668,11 +683,6 @@ html.is-live .hero__actions {
   font-style: normal;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
-}
-
-.about__stats li.is-wide strong {
-  font-size: 1.28rem;
-  letter-spacing: -0.04em;
 }
 
 .courses__grid,
