@@ -24,9 +24,10 @@ export function HomePage() {
   const rootRef = useRef<HTMLElement>(null);
   const [previewId, setPreview] = useState<CourseId | null>(null);
   const [venueCourse, setVenueCourse] = useState(0);
+  const [venuePrev, setVenuePrev] = useState(0);
+  const [venueFx, setVenueFx] = useState(0);
   const preview = EVENT.courses.find((c) => c.id === previewId);
   const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
-  const venueSlide = EVENT.courses[venueCourse];
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -70,8 +71,12 @@ export function HomePage() {
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setVenueCourse((i) => (i + 1) % EVENT.courses.length);
-    }, 3500);
+      setVenueCourse((i) => {
+        setVenuePrev(i);
+        return (i + 1) % EVENT.courses.length;
+      });
+      setVenueFx((n) => n + 1);
+    }, 6500);
     return () => window.clearInterval(id);
   }, []);
 
@@ -255,16 +260,18 @@ export function HomePage() {
               오시는길
             </Link>
           </div>
-          <div
-            className={`venue__panel venue__panel--${venueSlide.tone}`}
-            aria-hidden
-          >
+          <div className="venue__panel" aria-hidden>
             {EVENT.courses.map((c, i) => (
               <div
                 key={c.id}
-                className={
-                  i === venueCourse ? "venue__slide is-on" : "venue__slide"
-                }
+                className={[
+                  "venue__slide",
+                  `venue__slide--${c.tone}`,
+                  i === venueCourse ? "is-on" : "",
+                  i === venuePrev && i !== venueCourse ? "is-under" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 <span className={`venue__hero venue__hero--${c.id}`}>
                   <Image
@@ -280,6 +287,7 @@ export function HomePage() {
                 <span>CHECKERED</span>
               </div>
             ))}
+            <span key={venueFx} className="venue__static" />
           </div>
         </div>
       </section>
