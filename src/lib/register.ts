@@ -284,7 +284,7 @@ export async function lookupEntry(query: LookupQuery): Promise<EntryRecord | nul
     return null;
   }
   const fromOrder = EVENT.courses.find((c) =>
-    orderNo.includes(c.id.toUpperCase()),
+    orderNo.includes(`-${c.id.toUpperCase()}-`),
   );
   return {
     orderNo,

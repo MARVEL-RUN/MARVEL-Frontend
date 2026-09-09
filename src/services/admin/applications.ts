@@ -15,7 +15,7 @@ export type AdminGroupRow = GroupRecord & {
 const ENTRIES: AdminEntryRow[] = [
   {
     orderNo: "MR26-A10482",
-    courseId: "full",
+    courseId: "10k",
     name: "김영웅",
     birth: "1992-04-12",
     gender: "male",
@@ -28,7 +28,7 @@ const ENTRIES: AdminEntryRow[] = [
   },
   {
     orderNo: "MR26-A10491",
-    courseId: "half",
+    courseId: "2.5k",
     name: "이서진",
     birth: "1998-11-03",
     gender: "female",
@@ -102,12 +102,12 @@ const GROUPS: AdminGroupRow[] = [
     leaderName: "찰스",
     phone: "010-4444-5555",
     email: "xmen@example.com",
-    courseId: "half",
+    courseId: "2.5k",
     status: "pending",
     appliedAt: "2026-09-22 16:12",
     participants: [
       {
-        courseId: "half",
+        courseId: "2.5k",
         name: "찰스",
         birth: "1973-01-01",
         gender: "male",
@@ -115,7 +115,7 @@ const GROUPS: AdminGroupRow[] = [
         shirt: "M",
       },
       {
-        courseId: "half",
+        courseId: "2.5k",
         name: "진",
         birth: "1990-09-09",
         gender: "female",
@@ -123,7 +123,7 @@ const GROUPS: AdminGroupRow[] = [
         shirt: "M",
       },
       {
-        courseId: "full",
+        courseId: "5k",
         name: "로건",
         birth: "1975-05-05",
         gender: "male",

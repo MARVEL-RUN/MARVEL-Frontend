@@ -1,3 +1,5 @@
+import { MAIN_ASSETS } from "./assets";
+
 export const EVENT = {
   title: "MARVEL RUN 2026 KOREA",
   kicker: "OFFICIAL MARVEL EVENT",
@@ -30,12 +32,23 @@ export const EVENT = {
     },
   ],
   stats: [
-    { value: "42.195", unit: "KM", label: "ENDGAME" },
+    { value: "10", unit: "KM", label: "ASSEMBLE" },
     { value: "10.31", unit: "SAT", label: "RACE DAY" },
-    { value: "4", unit: "", label: "COURSES" },
+    { value: "3", unit: "", label: "COURSES" },
     { value: "INJE", unit: "", label: "SPEEDIUM" },
   ],
   courses: [
+    {
+      id: "2.5k",
+      distance: "2.5K",
+      code: "ORIGIN",
+      tone: "gold",
+      timeLimit: "45분",
+      fee: "40,000원",
+      start: "09:30",
+      desc: "입문 미션. 첫 걸음을 내딛다.",
+      map: MAIN_ASSETS.course2_5k,
+    },
     {
       id: "5k",
       distance: "5K",
@@ -45,6 +58,7 @@ export const EVENT = {
       fee: "50,000원",
       start: "09:00",
       desc: "첫 미션. 히어로의 각성.",
+      map: MAIN_ASSETS.course5k,
     },
     {
       id: "10k",
@@ -55,35 +69,15 @@ export const EVENT = {
       fee: "60,000원",
       start: "08:30",
       desc: "팀을 모아 거리를 장악한다.",
-    },
-    {
-      id: "half",
-      distance: "21.1K",
-      code: "LEGEND",
-      tone: "gold",
-      timeLimit: "3시간",
-      fee: "80,000원",
-      start: "08:00",
-      desc: "전설의 절반. 망치를 들어라.",
-    },
-    {
-      id: "full",
-      distance: "42.195K",
-      code: "ENDGAME",
-      tone: "violet",
-      timeLimit: "6시간",
-      fee: "100,000원",
-      start: "07:30",
-      desc: "최후의 미션. 모든 것을 걸어라.",
+      map: MAIN_ASSETS.course10k,
     },
   ],
   timeline: [
     { time: "06:00", title: "집결 · 웨이스트백 보관" },
     { time: "07:00", title: "워밍업 · 히어로 포토존" },
-    { time: "07:30", title: "풀코스 스타트" },
-    { time: "08:00", title: "하프 스타트" },
     { time: "08:30", title: "10K 스타트" },
     { time: "09:00", title: "5K 스타트" },
+    { time: "09:30", title: "2.5K 스타트" },
     { time: "15:00", title: "피니시 클로징" },
   ],
   kit: [
@@ -107,7 +101,7 @@ export const EVENT = {
       tag: "RACE",
       title: "코스별 스타트 타임 안내",
       pinned: false,
-      body: "풀 07:30, 하프 08:00, 10K 08:30, 5K 09:00. 스타트 30분 전까지 집결을 완료해 주세요.",
+      body: "10K 08:30, 5K 09:00, 2.5K 09:30. 스타트 30분 전까지 집결을 완료해 주세요.",
     },
     {
       id: "1",

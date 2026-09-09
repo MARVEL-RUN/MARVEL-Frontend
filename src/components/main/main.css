@@ -703,7 +703,7 @@ html.is-live .hero__actions {
 
 .courses__grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-top: 2.2rem;
 }
@@ -1167,6 +1167,17 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   background: #fff;
 }
 
+.course-map__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: zoom-in;
+}
+
 .course-map img {
   display: block;
   width: 100%;
@@ -1180,6 +1191,56 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.1em;
+}
+
+.course-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 3.4rem 1.2rem 1.2rem;
+}
+
+.course-preview__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 3, 32, 0.88);
+  cursor: pointer;
+}
+
+.course-preview__frame {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 100%);
+  max-height: calc(100vh - 4.6rem);
+  overflow: auto;
+  background: #fff;
+}
+
+.course-preview__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.course-preview__close {
+  position: absolute;
+  top: 0.9rem;
+  right: 1.2rem;
+  z-index: 2;
+  min-height: 2.4rem;
+  padding: 0 1.1rem;
+  border: 0;
+  background: var(--marvel);
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
 
 .chips {

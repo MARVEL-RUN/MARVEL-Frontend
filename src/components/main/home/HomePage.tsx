@@ -223,7 +223,7 @@ export function HomePage() {
             </Link>
           </div>
           <div className="venue__panel" aria-hidden>
-            <span>42.195</span>
+            <span>10K</span>
             <span>START / FINISH</span>
             <span>CHECKERED</span>
           </div>
