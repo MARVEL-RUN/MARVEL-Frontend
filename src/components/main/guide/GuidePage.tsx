@@ -3,6 +3,7 @@ import { EVENT } from "@/lib/event";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import { SideBanner } from "../layout/SideBanner";
 import { CourseMaps } from "./CourseMaps";
+import { TimeTable } from "../home/TimeTable";
 
 export function GuidePage() {
   return (
@@ -22,6 +23,11 @@ export function GuidePage() {
               </div>
             ))}
           </dl>
+        </section>
+
+        <section className="block">
+          <h2>타임테이블</h2>
+          <TimeTable />
         </section>
 
         <section className="block">

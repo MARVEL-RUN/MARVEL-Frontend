@@ -9,6 +9,7 @@ import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
+import { TimeTable } from "./TimeTable";
 
 const TICKER = [
   "MARVEL RUN 2026",
@@ -213,19 +214,12 @@ export function HomePage() {
       ) : null}
 
       <section className="sec schedule">
-        <div className="wrap wrap--narrow reveal">
+        <div className="wrap reveal">
           <p className="kicker">03 / RACE DAY</p>
           <h2 className="sec__title">
-            레이스 데이 <em>타임라인</em>
+            레이스 데이 <em>타임테이블</em>
           </h2>
-          <ol className="timeline">
-            {EVENT.timeline.map((row) => (
-              <li key={`${row.time}-${row.title}`}>
-                <time>{row.time}</time>
-                <span>{row.title}</span>
-              </li>
-            ))}
-          </ol>
+          <TimeTable />
         </div>
       </section>
 
