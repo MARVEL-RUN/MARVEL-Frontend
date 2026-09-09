@@ -15,6 +15,8 @@ import {
   groupFee,
   requiredConsentsOk,
   submitGroup,
+  ticketFee,
+  ticketLabel,
   type Consents,
   type CourseId,
   type Gender,
@@ -22,6 +24,7 @@ import {
   type GroupRecord,
   type ParticipantDraft,
   type ShirtSize,
+  type TicketKind,
 } from "@/lib/register";
 import {
   ApplyHint,
@@ -29,6 +32,7 @@ import {
   BirthText,
   FormRow,
   FormSec,
+  PhoneField,
   birthView,
 } from "./ApplyUi";
 
@@ -166,11 +170,10 @@ export function GroupFlow({
 
           <FormSec title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
@@ -242,11 +245,10 @@ export function GroupFlow({
                           />
                         </td>
                         <td>
-                          <input
-                            type="tel"
+                          <PhoneField
                             placeholder="연락처"
                             value={p.phone}
-                            onChange={(e) => patchMember(i, { phone: e.target.value })}
+                            onChange={(phone) => patchMember(i, { phone })}
                             required
                           />
                         </td>
@@ -268,20 +270,45 @@ export function GroupFlow({
                         </td>
                         <td>
                           <select
-                            value={p.courseId}
-                            onChange={(e) =>
-                              patchMember(i, {
-                                courseId: e.target.value as CourseId,
-                              })
+                            value={
+                              p.courseId ? `${p.courseId}:${p.ticket}` : ""
                             }
+                            onChange={(e) => {
+                              if (!e.target.value) {
+                                patchMember(i, {
+                                  courseId: "",
+                                  ticket: "adult",
+                                });
+                                return;
+                              }
+                              const [courseId, ticket] = e.target.value.split(
+                                ":",
+                              ) as [CourseId, TicketKind];
+                              patchMember(i, { courseId, ticket });
+                            }}
                             required
                           >
                             <option value="">참가종목</option>
-                            {EVENT.courses.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.distance} {c.code}
-                              </option>
-                            ))}
+                            {EVENT.courses.flatMap((c) => {
+                              const adult = (
+                                <option
+                                  key={`${c.id}-adult`}
+                                  value={`${c.id}:adult`}
+                                >
+                                  {c.distance} 성인
+                                </option>
+                              );
+                              if (!("childFee" in c)) return [adult];
+                              return [
+                                adult,
+                                <option
+                                  key={`${c.id}-child`}
+                                  value={`${c.id}:child`}
+                                >
+                                  {c.distance} 어린이
+                                </option>,
+                              ];
+                            })}
                           </select>
                         </td>
                         <td>
@@ -301,7 +328,7 @@ export function GroupFlow({
                           </select>
                         </td>
                         <td className="party__fee">
-                          {course ? course.fee : "—"}
+                          {course ? ticketFee(course, p.ticket) : "—"}
                         </td>
                         <td className="party__del">
                           <button
@@ -371,8 +398,10 @@ export function GroupFlow({
                     {String(i + 1).padStart(2, "0")} {p.name}
                   </strong>
                   <span>
-                    {course ? `${course.distance} · ${course.code}` : "—"} ·{" "}
-                    {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
+                    {course
+                      ? `${course.distance} · ${ticketLabel(p.ticket)}`
+                      : "—"}{" "}
+                    · {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
                     티셔츠 ({p.shirt}) · {p.phone}
                   </span>
                 </li>

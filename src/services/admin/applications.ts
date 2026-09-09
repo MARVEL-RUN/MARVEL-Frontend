@@ -15,7 +15,8 @@ export type AdminGroupRow = GroupRecord & {
 const ENTRIES: AdminEntryRow[] = [
   {
     orderNo: "MR26-A10482",
-    courseId: "full",
+    courseId: "10k",
+    ticket: "adult",
     name: "김영웅",
     birth: "1992-04-12",
     gender: "male",
@@ -28,7 +29,8 @@ const ENTRIES: AdminEntryRow[] = [
   },
   {
     orderNo: "MR26-A10491",
-    courseId: "half",
+    courseId: "2.3k",
+    ticket: "adult",
     name: "이서진",
     birth: "1998-11-03",
     gender: "female",
@@ -42,6 +44,7 @@ const ENTRIES: AdminEntryRow[] = [
   {
     orderNo: "MR26-A10502",
     courseId: "10k",
+    ticket: "adult",
     name: "박토르",
     birth: "1988-07-21",
     gender: "male",
@@ -55,6 +58,7 @@ const ENTRIES: AdminEntryRow[] = [
   {
     orderNo: "MR26-A10511",
     courseId: "5k",
+    ticket: "adult",
     name: "최나연",
     birth: "2001-02-14",
     gender: "female",
@@ -80,6 +84,7 @@ const GROUPS: AdminGroupRow[] = [
     participants: [
       {
         courseId: "10k",
+        ticket: "adult",
         name: "스티브",
         birth: "1985-07-04",
         gender: "male",
@@ -88,6 +93,7 @@ const GROUPS: AdminGroupRow[] = [
       },
       {
         courseId: "10k",
+        ticket: "adult",
         name: "나타샤",
         birth: "1987-12-03",
         gender: "female",
@@ -102,12 +108,13 @@ const GROUPS: AdminGroupRow[] = [
     leaderName: "찰스",
     phone: "010-4444-5555",
     email: "xmen@example.com",
-    courseId: "half",
+    courseId: "2.3k",
     status: "pending",
     appliedAt: "2026-09-22 16:12",
     participants: [
       {
-        courseId: "half",
+        courseId: "2.3k",
+        ticket: "adult",
         name: "찰스",
         birth: "1973-01-01",
         gender: "male",
@@ -115,7 +122,8 @@ const GROUPS: AdminGroupRow[] = [
         shirt: "M",
       },
       {
-        courseId: "half",
+        courseId: "2.3k",
+        ticket: "adult",
         name: "진",
         birth: "1990-09-09",
         gender: "female",
@@ -123,7 +131,8 @@ const GROUPS: AdminGroupRow[] = [
         shirt: "M",
       },
       {
-        courseId: "full",
+        courseId: "5k",
+        ticket: "adult",
         name: "로건",
         birth: "1975-05-05",
         gender: "male",

@@ -5,6 +5,7 @@ export type CourseId = (typeof EVENT.courses)[number]["id"];
 export type ShirtSize = "XS" | "S" | "M" | "L" | "XL" | "2XL";
 export type Gender = "male" | "female" | "none";
 export type ApplyKind = "individual" | "group";
+export type TicketKind = "adult" | "child";
 
 export type Consents = {
   agreeRules: boolean;
@@ -32,6 +33,7 @@ export const EMPTY_CONSENTS: Consents = {
 
 export type EntryDraft = {
   courseId: CourseId | "";
+  ticket: TicketKind;
   name: string;
   birth: string;
   gender: Gender | "";
@@ -44,6 +46,7 @@ export type EntryDraft = {
 export type EntryRecord = {
   orderNo: string;
   courseId: CourseId;
+  ticket: TicketKind;
   name: string;
   birth: string;
   gender: Gender;
@@ -55,6 +58,7 @@ export type EntryRecord = {
 
 export type ParticipantDraft = {
   courseId: CourseId | "";
+  ticket: TicketKind;
   name: string;
   birth: string;
   gender: Gender | "";
@@ -73,6 +77,7 @@ export type GroupDraft = {
 
 export type SavedParticipant = {
   courseId: CourseId;
+  ticket: TicketKind;
   name: string;
   birth: string;
   gender: Gender;
@@ -113,6 +118,7 @@ export const GENDERS: { id: Gender; label: string }[] = [
 
 export const EMPTY_DRAFT: EntryDraft = {
   courseId: "",
+  ticket: "adult",
   name: "",
   birth: "",
   gender: "",
@@ -125,6 +131,7 @@ export const EMPTY_DRAFT: EntryDraft = {
 
 export const EMPTY_PARTICIPANT: ParticipantDraft = {
   courseId: "",
+  ticket: "adult",
   name: "",
   birth: "",
   gender: "",
@@ -150,6 +157,24 @@ export function genderLabel(id: Gender) {
   return GENDERS.find((g) => g.id === id)?.label ?? id;
 }
 
+export function ticketLabel(kind: TicketKind) {
+  return kind === "child" ? "어린이" : "성인";
+}
+
+export function courseAllowsChild(
+  course: NonNullable<ReturnType<typeof courseById>>,
+) {
+  return "childFee" in course;
+}
+
+export function ticketFee(
+  course: NonNullable<ReturnType<typeof courseById>>,
+  ticket: TicketKind,
+) {
+  if (ticket === "child" && "childFee" in course) return course.childFee;
+  return course.fee;
+}
+
 export function feeAmount(fee: string) {
   return Number(fee.replace(/[^\d]/g, "")) || 0;
 }
@@ -158,10 +183,25 @@ export function formatFee(n: number) {
   return `${n.toLocaleString("ko-KR")}원`;
 }
 
+export function formatPhone(raw: string) {
+  const d = raw.replace(/\D/g, "").slice(0, 11);
+  if (!d) return "";
+  if (d.startsWith("02")) {
+    if (d.length <= 2) return d;
+    if (d.length <= 5) return `${d.slice(0, 2)}-${d.slice(2)}`;
+    if (d.length <= 9) return `${d.slice(0, 2)}-${d.slice(2, 5)}-${d.slice(5)}`;
+    return `${d.slice(0, 2)}-${d.slice(2, 6)}-${d.slice(6)}`;
+  }
+  if (d.length <= 3) return d;
+  if (d.length <= 7) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+}
+
 export function groupFee(draft: GroupDraft) {
   return draft.participants.reduce((sum, p) => {
     const course = p.courseId ? courseById(p.courseId) : undefined;
-    return sum + (course ? feeAmount(course.fee) : 0);
+    if (!course) return sum;
+    return sum + feeAmount(ticketFee(course, p.ticket));
   }, 0);
 }
 
@@ -208,6 +248,11 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   shirt: ShirtSize;
 } {
   if (!draft.courseId) throw new Error("참가종목을 선택하세요.");
+  const picked = courseById(draft.courseId);
+  if (!picked) throw new Error("참가종목을 선택하세요.");
+  if (draft.ticket === "child" && !courseAllowsChild(picked)) {
+    throw new Error("이 코스는 어린이 참가가 불가합니다.");
+  }
   if (!draft.name.trim()) throw new Error("이름을 입력하세요.");
   if (!/^\d{8}$/.test(draft.birth)) throw new Error("생년월일을 선택하세요.");
   if (!draft.gender) throw new Error("성별을 선택하세요.");
@@ -229,6 +274,10 @@ function assertParticipant(
 } {
   const n = i + 1;
   if (!p.courseId) throw new Error(`참가자 ${n}: 참가종목을 선택하세요.`);
+  const picked = courseById(p.courseId);
+  if (p.ticket === "child" && picked && !courseAllowsChild(picked)) {
+    throw new Error(`참가자 ${n}: 이 코스는 어린이 참가가 불가합니다.`);
+  }
   if (!p.name.trim()) throw new Error(`참가자 ${n}: 이름을 입력하세요.`);
   if (!/^\d{8}$/.test(p.birth)) {
     throw new Error(`참가자 ${n}: 생년월일을 입력하세요.`);
@@ -265,6 +314,7 @@ export async function submitEntry(draft: EntryDraft): Promise<EntryRecord> {
   return {
     orderNo: `MR26-${draft.courseId.toUpperCase()}-${seq}`,
     courseId: draft.courseId,
+    ticket: draft.ticket,
     name: draft.name.trim(),
     birth: draft.birth,
     gender: draft.gender,
@@ -284,11 +334,12 @@ export async function lookupEntry(query: LookupQuery): Promise<EntryRecord | nul
     return null;
   }
   const fromOrder = EVENT.courses.find((c) =>
-    orderNo.includes(c.id.toUpperCase()),
+    orderNo.includes(`-${c.id.toUpperCase()}-`),
   );
   return {
     orderNo,
     courseId: fromOrder?.id ?? "10k",
+    ticket: "adult",
     name,
     birth: query.birth,
     gender: "none",
@@ -335,6 +386,7 @@ export async function lookupGroup(
     participants: [
       {
         courseId: "10k",
+        ticket: "adult",
         name: leaderName,
         birth: "19900101",
         gender: "none",

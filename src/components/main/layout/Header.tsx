@@ -50,10 +50,10 @@ export function Header() {
           onDragStart={(e) => e.preventDefault()}
         >
           <Image
-            src={MAIN_ASSETS.logo}
+            src={MAIN_ASSETS.headerLogo}
             alt=""
-            width={1257}
-            height={98}
+            width={206}
+            height={94}
             className="site-header__logo"
             priority
             draggable={false}
