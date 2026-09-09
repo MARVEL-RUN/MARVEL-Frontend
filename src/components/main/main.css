@@ -685,6 +685,11 @@ html.is-live .hero__actions {
   letter-spacing: 0.16em;
 }
 
+.about__stats li.is-wide strong {
+  font-size: 1.28rem;
+  letter-spacing: -0.04em;
+}
+
 .courses__grid,
 .about__stats,
 .timeline,

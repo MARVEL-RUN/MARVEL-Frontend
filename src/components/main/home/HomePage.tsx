@@ -163,7 +163,10 @@ export function HomePage() {
           </div>
           <ul className="about__stats">
             {EVENT.stats.map((s) => (
-              <li key={s.label}>
+              <li
+                key={s.label}
+                className={s.value.includes("/") ? "is-wide" : undefined}
+              >
                 <strong>
                   {s.value.split(" / ").flatMap((part, i) => [
                     i > 0 ? <i key={`sep-${s.label}-${i}`}>/</i> : null,
