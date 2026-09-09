@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { NaverAnalytics } from "./NaverAnalytics";
 
-const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-const naverVerification = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION;
+const googleVerification = process.env.GOOGLE_SITE_VERIFICATION;
+const naverVerification = process.env.NAVER_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   title: "MARVEL RUN 2026 KOREA",

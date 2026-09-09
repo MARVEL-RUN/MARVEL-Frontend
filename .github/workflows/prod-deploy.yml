@@ -21,6 +21,8 @@ env:
   SSM_MANAGED_NODE_ID: ${{ vars.PROD_SSM_MANAGED_NODE_ID }}
   FRONTEND_APP_MODE: ${{ vars.PROD_FRONTEND_APP_MODE }}
   FRONTEND_API_BASE_URL: ${{ vars.PROD_FRONTEND_API_BASE_URL }}
+  GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
+  NAVER_SITE_VERIFICATION: ${{ secrets.NAVER_SITE_VERIFICATION }}
 
 jobs:
   build-push-deploy:
@@ -119,7 +121,7 @@ jobs:
           set -euo pipefail
 
           CONFIG_HASH="$(
-            printf '%s' "${FRONTEND_APP_MODE}|${FRONTEND_API_BASE_URL}" \
+            printf '%s' "${FRONTEND_APP_MODE}|${FRONTEND_API_BASE_URL}|${GOOGLE_SITE_VERIFICATION}|${NAVER_SITE_VERIFICATION}" \
               | sha256sum \
               | cut -c1-12
           )"
@@ -156,6 +158,8 @@ jobs:
             docker build \
               --build-arg APP_MODE="$FRONTEND_APP_MODE" \
               --build-arg NEXT_PUBLIC_API_BASE_URL="$FRONTEND_API_BASE_URL" \
+              --build-arg GOOGLE_SITE_VERIFICATION="$GOOGLE_SITE_VERIFICATION" \
+              --build-arg NAVER_SITE_VERIFICATION="$NAVER_SITE_VERIFICATION" \
               -t "$IMAGE_URI:$IMAGE_TAG" \
               -t "$IMAGE_URI:latest" \
               .
