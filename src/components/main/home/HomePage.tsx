@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import type { CourseId } from "@/lib/register";
+import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
 
 const TICKER = [
@@ -19,6 +21,8 @@ const TICKER = [
 export function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLElement>(null);
+  const [previewId, setPreview] = useState<CourseId | null>(null);
+  const preview = EVENT.courses.find((c) => c.id === previewId);
   const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
 
   useEffect(() => {
@@ -164,6 +168,19 @@ export function HomePage() {
           <ul className="courses__grid">
             {EVENT.courses.map((c) => (
               <li key={c.id} className={`course course--${c.tone}`}>
+                <button
+                  type="button"
+                  className="course__map"
+                  onClick={() => setPreview(c.id)}
+                  aria-label={`${c.distance} 코스도 미리보기`}
+                >
+                  <Image
+                    src={c.map}
+                    alt=""
+                    fill
+                    sizes="(max-width: 960px) 100vw, 33vw"
+                  />
+                </button>
                 <p className="course__code">{c.code}</p>
                 <p className="course__dist">{c.distance}</p>
                 <p className="course__desc">{c.desc}</p>
@@ -186,6 +203,10 @@ export function HomePage() {
           </ul>
         </div>
       </section>
+
+      {preview ? (
+        <CoursePreview course={preview} onClose={() => setPreview(null)} />
+      ) : null}
 
       <section className="sec schedule">
         <div className="wrap wrap--narrow reveal">

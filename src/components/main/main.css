@@ -726,6 +726,7 @@ html.is-live .hero__actions {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
+  z-index: 1;
   width: 6px;
 }
 
@@ -759,6 +760,34 @@ html.is-live .hero__actions {
   letter-spacing: -0.04em;
   transform: skewX(-10deg);
   transform-origin: left;
+}
+
+.course__map {
+  position: relative;
+  display: block;
+  width: calc(100% + 2.4rem);
+  aspect-ratio: 2186 / 2160;
+  margin: -1.5rem -1.2rem 1rem;
+  padding: 0;
+  border: 0;
+  background: #111;
+  cursor: zoom-in;
+}
+
+.course__map img {
+  object-fit: contain;
+}
+
+.course--gold .course__map {
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+
+.course--red .course__map {
+  box-shadow: inset 0 0 0 1px var(--marvel);
+}
+
+.course--cyan .course__map {
+  box-shadow: inset 0 0 0 1px var(--cyan);
 }
 
 .course__desc {
@@ -1283,7 +1312,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .course-guide__open img {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .course-guide__shot {
