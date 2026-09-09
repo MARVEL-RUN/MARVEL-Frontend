@@ -287,7 +287,14 @@ export function HomePage() {
                 <span>CHECKERED</span>
               </div>
             ))}
-            <span key={venueFx} className="venue__static" />
+            <span key={venueFx} className="venue__glitch">
+              <span className="venue__glitch__rgb venue__glitch__rgb--red" />
+              <span className="venue__glitch__rgb venue__glitch__rgb--cyan" />
+              <span className="venue__glitch__cut venue__glitch__cut--a" />
+              <span className="venue__glitch__cut venue__glitch__cut--b" />
+              <span className="venue__glitch__cut venue__glitch__cut--c" />
+              <span className="venue__glitch__scan" />
+            </span>
           </div>
         </div>
       </section>
