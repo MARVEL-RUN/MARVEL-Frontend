@@ -10,7 +10,7 @@ export function HeroCharacters() {
         width={3791}
         height={2083}
         priority
-        sizes="(max-width: 960px) 100vw, 960px"
+        sizes="(max-width: 640px) 100vw, 1800px"
       />
     </div>
   );
