@@ -20,6 +20,7 @@ jobs:
           GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
           NAVER_SITE_VERIFICATION: ${{ secrets.NAVER_SITE_VERIFICATION }}
           GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+          NAVER_ANALYTICS_ID: ${{ secrets.NAVER_ANALYTICS_ID }}
         run: sh ./build.sh
 
       - name: Verify output contents
