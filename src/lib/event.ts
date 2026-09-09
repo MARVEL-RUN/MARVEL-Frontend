@@ -76,7 +76,7 @@ export const EVENT = {
       fee: "55,000원",
       childFee: "40,000원",
       start: "14:30",
-      desc: "입문 미션. 첫 걸음을 내딛다.",
+      desc: "어린이 히어로와 함께 달리는 패밀리 레이스",
       map: MAIN_ASSETS.course2_3k,
     },
     {
@@ -88,7 +88,7 @@ export const EVENT = {
       fee: "70,000원",
       childFee: "40,000원",
       start: "14:00",
-      desc: "첫 미션. 히어로의 각성.",
+      desc: "스피드와 재미를 함께 즐기는 액션 레이스",
       map: MAIN_ASSETS.course5k,
     },
     {
@@ -99,7 +99,7 @@ export const EVENT = {
       timeLimit: "1시간 30분",
       fee: "70,000원",
       start: "13:30",
-      desc: "팀을 모아 거리를 장악한다.",
+      desc: "한계를 넘어 서킷을 완주하는 히어로 레이스",
       map: MAIN_ASSETS.course10k,
     },
   ],
