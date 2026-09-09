@@ -1,7 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
+import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import { SideBanner } from "../layout/SideBanner";
+
+const COURSE_MAPS = [
+  { src: MAIN_ASSETS.course2_5k, label: "2.5K Course" },
+  { src: MAIN_ASSETS.course5k, label: "5K Course" },
+  { src: MAIN_ASSETS.course10k, label: "10K Course" },
+] as const;
 
 export function GuidePage() {
   return (
@@ -43,8 +51,19 @@ export function GuidePage() {
               </div>
             ))}
           </div>
-          <div className="media-ph" role="img" aria-label="코스도">
-            코스도
+          <div className="course-maps">
+            {COURSE_MAPS.map((map) => (
+              <figure key={map.src} className="course-map">
+                <Image
+                  src={map.src}
+                  alt={`${map.label} 코스도`}
+                  width={2186}
+                  height={2160}
+                  sizes="(max-width: 1120px) 100vw, 1120px"
+                />
+                <figcaption>{map.label}</figcaption>
+              </figure>
+            ))}
           </div>
         </section>
 

@@ -1156,6 +1156,32 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   letter-spacing: 0.08em;
 }
 
+.course-maps {
+  display: grid;
+  gap: 1.2rem;
+  margin-top: 1.6rem;
+}
+
+.course-map {
+  margin: 0;
+  background: #fff;
+}
+
+.course-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.course-map figcaption {
+  padding: 0.7rem 1rem;
+  background: #0c0d22;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
