@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NEXT_PUBLIC_APP_MODE=coming-soon next dev --turbopack",
+    "dev": "next dev --turbopack",
     "dev:main": "NEXT_PUBLIC_APP_MODE=main NEXT_PUBLIC_REGISTER_PREVIEW=1 next dev --turbopack",
-    "build": "NEXT_PUBLIC_APP_MODE=coming-soon next build",
+    "build": "next build",
     "build:main": "NEXT_PUBLIC_APP_MODE=main next build",
     "start": "next start",
     "lint": "eslint"

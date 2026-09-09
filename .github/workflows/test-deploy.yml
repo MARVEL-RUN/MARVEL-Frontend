@@ -21,6 +21,9 @@ env:
   EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
   FRONTEND_APP_MODE: ${{ vars.TEST_FRONTEND_APP_MODE }}
   FRONTEND_API_BASE_URL: ${{ vars.TEST_FRONTEND_API_BASE_URL }}
+  GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
+  NAVER_SITE_VERIFICATION: ${{ secrets.NAVER_SITE_VERIFICATION }}
+  GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
 
 jobs:
   build-push-deploy:
@@ -91,7 +94,9 @@ jobs:
           set -euo pipefail
 
           CONFIG_HASH="$(
-            printf '%s' "${FRONTEND_APP_MODE}|${FRONTEND_API_BASE_URL}"             | sha256sum             | cut -c1-12
+            printf '%s' "${FRONTEND_APP_MODE}|${FRONTEND_API_BASE_URL}|${GOOGLE_SITE_VERIFICATION}|${NAVER_SITE_VERIFICATION}|${GA_MEASUREMENT_ID}" \
+              | sha256sum \
+              | cut -c1-12
           )"
 
           IMAGE_TAG="${GITHUB_SHA}-${FRONTEND_APP_MODE}-${CONFIG_HASH}"
@@ -119,7 +124,15 @@ jobs:
             docker tag "$IMAGE_URI:$IMAGE_TAG" "$IMAGE_URI:latest"
             docker push "$IMAGE_URI:latest"
           else
-            docker build               --build-arg APP_MODE="$FRONTEND_APP_MODE"               --build-arg NEXT_PUBLIC_API_BASE_URL="$FRONTEND_API_BASE_URL"               -t "$IMAGE_URI:$IMAGE_TAG"               -t "$IMAGE_URI:latest"               .
+            docker build \
+              --build-arg APP_MODE="$FRONTEND_APP_MODE" \
+              --build-arg NEXT_PUBLIC_API_BASE_URL="$FRONTEND_API_BASE_URL" \
+              --build-arg GOOGLE_SITE_VERIFICATION="$GOOGLE_SITE_VERIFICATION" \
+              --build-arg NAVER_SITE_VERIFICATION="$NAVER_SITE_VERIFICATION" \
+              --build-arg GA_MEASUREMENT_ID="$GA_MEASUREMENT_ID" \
+              -t "$IMAGE_URI:$IMAGE_TAG" \
+              -t "$IMAGE_URI:latest" \
+              .
 
             docker push "$IMAGE_URI:$IMAGE_TAG"
             docker push "$IMAGE_URI:latest"
