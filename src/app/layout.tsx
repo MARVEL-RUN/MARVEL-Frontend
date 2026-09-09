@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { NaverAnalytics } from "./NaverAnalytics";
+
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+const naverVerification = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   title: "MARVEL RUN 2026 KOREA",
   description:
     "2026년 10월 31일 토요일 인제스피디움. 접수는 2026년 9월 22일 화요일 오후 2시에 시작합니다.",
+  verification: {
+    ...(googleVerification ? { google: googleVerification } : {}),
+    ...(naverVerification
+      ? { other: { "naver-site-verification": naverVerification } }
+      : {}),
+  },
 };
 
 export const viewport: Viewport = {
@@ -18,7 +28,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        <NaverAnalytics />
+      </body>
     </html>
   );
 }
