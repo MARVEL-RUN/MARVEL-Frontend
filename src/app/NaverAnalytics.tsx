@@ -3,11 +3,9 @@
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 
-const WA_ID = "1c32bbcf7d05d90";
-
-export function NaverAnalytics() {
+export function NaverAnalytics({ waId }: { waId?: string }) {
   const pathname = usePathname();
-  if (pathname.startsWith("/admin")) return null;
+  if (!waId || pathname.startsWith("/admin")) return null;
 
   return (
     <Script
@@ -20,7 +18,7 @@ export function NaverAnalytics() {
           wcs_do?: () => void;
         };
         w.wcs_add = w.wcs_add ?? {};
-        w.wcs_add.wa = WA_ID;
+        w.wcs_add.wa = waId;
         if (w.wcs) w.wcs_do?.();
       }}
     />
