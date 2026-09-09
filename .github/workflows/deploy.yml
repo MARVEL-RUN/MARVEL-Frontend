@@ -16,6 +16,10 @@ jobs:
           fetch-depth: 0
 
       - name: Run build script
+        env:
+          GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
+          NAVER_SITE_VERIFICATION: ${{ secrets.NAVER_SITE_VERIFICATION }}
+          GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
         run: sh ./build.sh
 
       - name: Verify output contents
