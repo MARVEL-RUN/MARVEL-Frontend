@@ -22,12 +22,10 @@ export const EVENT = {
       items: [
         {
           badge: "고속",
-          tone: "blue",
           text: "서울양양고속도로 인제IC | 기린면 방면 약 20분",
         },
         {
           badge: "국도",
-          tone: "green",
           text: "44번 국도 기린면 | 상하답로 진입",
         },
       ],
@@ -38,18 +36,11 @@ export const EVENT = {
       items: [
         {
           badge: "시외",
-          tone: "blue",
           text: "동서울 · 춘천 → 인제",
         },
         {
           badge: "택시",
-          tone: "green",
           text: "터미널에서 약 25분",
-        },
-        {
-          badge: "셔틀",
-          tone: "cyan",
-          text: "접수 오픈 이후 노선 공지",
         },
       ],
     },

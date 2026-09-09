@@ -1479,9 +1479,22 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .directions {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 1fr);
-  gap: 1.6rem 1.8rem;
-  align-items: start;
+  gap: 2rem;
+}
+
+.venue-head .sec__title {
+  margin-bottom: 0.7rem;
+}
+
+.venue-head .sec__body {
+  max-width: none;
+}
+
+.directions__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.95fr);
+  gap: 2.4rem 3rem;
+  align-items: stretch;
 }
 
 .kakao-map {
@@ -1490,6 +1503,8 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   min-height: 0;
   overflow: hidden;
   background: #0c0d22;
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  box-shadow: inset 0 0 0 1px var(--marvel);
 }
 
 .kakao-map--link {
@@ -1513,83 +1528,40 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   white-space: nowrap;
 }
 
-.venue-card {
+.venue-copy {
   display: flex;
   flex-direction: column;
-  gap: 1.55rem;
-  min-height: 0;
-  padding-top: 0.1rem;
+  height: 0;
+  min-height: 100%;
 }
 
-.venue-card__addr {
+.venue-copy > div {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.85rem 1.05rem;
-  border-radius: 0.7rem;
-  background: var(--marvel);
-  color: #fff;
-  font-size: 0.92rem;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.venue-copy__group {
+  margin: 0;
+  color: var(--note);
+  font-size: 0.72rem;
   font-weight: 700;
-  line-height: 1.45;
-  text-decoration: none;
+  letter-spacing: 0.16em;
 }
 
-.venue-card__addr:hover {
-  filter: brightness(1.06);
+.venue-copy .timeline {
+  margin-top: 0.35rem;
 }
 
-.venue-card__pin {
-  flex: 0 0 1.15rem;
-  width: 1.15rem;
-  height: 1.15rem;
+.venue-copy .timeline li {
+  grid-template-columns: 3.4rem 1fr;
+  padding: 0.7rem 0 0.7rem 1.2rem;
 }
 
-.venue-route h2 {
-  margin: 0 0 0.7rem;
-  font-size: 1.05rem;
-  font-weight: 800;
-}
-
-.venue-route__note {
-  font-weight: 600;
-  color: var(--silver);
-}
-
-.venue-route p {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
-  margin: 0 0 0.55rem;
-  color: var(--silver);
-  font-size: 0.92rem;
-  line-height: 1.5;
-}
-
-.venue-badge {
-  flex: 0 0 auto;
-  min-width: 2.55rem;
-  padding: 0.16rem 0.5rem;
-  border-radius: 999px;
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-  text-align: center;
-}
-
-.venue-badge--blue {
-  background: #3d7ccc;
-}
-
-.venue-badge--green {
-  background: #3cb371;
-}
-
-.venue-badge--cyan {
-  background: var(--cyan);
-  color: #08202a;
+.venue-copy .btn {
+  margin-top: auto;
+  align-self: start;
 }
 
 .form {
@@ -2738,8 +2710,14 @@ button.course {
   .about .wrap,
   .venue__grid,
   .courses__grid,
-  .directions {
+  .directions__row {
     grid-template-columns: 1fr;
+  }
+
+  .venue-copy {
+    height: auto;
+    min-height: 0;
+    gap: 1.4rem;
   }
 
   .site-footer__top {
