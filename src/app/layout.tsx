@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { GoogleAnalytics } from "./GoogleAnalytics";
 import { NaverAnalytics } from "./NaverAnalytics";
 
 const googleVerification = process.env.GOOGLE_SITE_VERIFICATION;
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         {children}
+        <GoogleAnalytics measurementId={process.env.GA_MEASUREMENT_ID} />
         <NaverAnalytics />
       </body>
     </html>
