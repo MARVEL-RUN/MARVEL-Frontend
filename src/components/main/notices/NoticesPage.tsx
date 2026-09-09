@@ -2,44 +2,52 @@
 
 import { listAdminNotices } from "@/services/admin/notices";
 import type { AdminNotice } from "@/types/admin";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
+import { noticeNo, orderNotices } from "./order";
 
 export function NoticesPage() {
   const [items, setItems] = useState<AdminNotice[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     void listAdminNotices().then((rows) => {
-      setItems(rows);
-      setOpenId(rows[0]?.id ?? null);
+      setItems(orderNotices(rows));
+      setReady(true);
     });
   }, []);
+
+  const nos = useMemo(() => noticeNo(items), [items]);
 
   return (
     <main className="page">
       <SideBanner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
       <div className="page__body wrap">
-        <ul className="bulletin">
-          {items.map((n) => {
-            const open = openId === n.id;
-            return (
-              <li key={n.id} className={n.pinned ? "is-pin" : undefined}>
-                <button
-                  type="button"
-                  className="bulletin__btn"
-                  aria-expanded={open}
-                  onClick={() => setOpenId(open ? null : n.id)}
-                >
-                  <span className="bulletin__tag">{n.tag}</span>
-                  <strong>{n.title}</strong>
-                  <time>{n.date}</time>
-                </button>
-                {open ? <p className="bulletin__body">{n.body}</p> : null}
-              </li>
-            );
-          })}
-        </ul>
+        <div className="board">
+          <div className="board__head">
+            <span>번호</span>
+            <span>제목</span>
+            <span>등록일</span>
+          </div>
+          {!ready ? (
+            <p className="board__empty">불러오는 중...</p>
+          ) : items.length === 0 ? (
+            <p className="board__empty">등록된 공지가 없습니다.</p>
+          ) : (
+            items.map((n) => (
+              <Link
+                key={n.id}
+                href={`/notices/view?id=${n.id}`}
+                className={n.pinned ? "board__row is-pin" : "board__row"}
+              >
+                <span className="board__no">{n.pinned ? "공지" : nos.get(n.id)}</span>
+                <strong className="board__title">{n.title}</strong>
+                <time dateTime={n.date.replaceAll(".", "-")}>{n.date}</time>
+              </Link>
+            ))
+          )}
+        </div>
       </div>
     </main>
   );

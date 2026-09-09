@@ -4,9 +4,10 @@
 }
 
 /*
- * 단위 두 축. 900px일 때 둘 다 16px = 기존 디자인 그대로.
+ * 단위 두 축. 모바일 시안 900px = 16px.
  *   em(=font-size) : 로고·글자·블록. 블록이 화면을 넘기 직전까지 안 줄임.
  *   --img          : 히어로·베일·배경 모티프. 2.4vw면 667px까지 16px 유지.
+ * PC는 1.75배(28px). 안내 블록이 폭을 넘기기 전(900px)까지는 같이 줄임.
  */
 .coming-soon .stage {
   position: relative;
@@ -16,6 +17,14 @@
   overflow: hidden;
   --img: min(2.4vw, 16px);
   font-size: min(16px, 3.02vw);
+}
+
+@media (min-width: 641px) {
+  .coming-soon .stage {
+    max-width: 1575px;
+    --img: min(3.11vw, 28px);
+    font-size: min(28px, 3.11vw);
+  }
 }
 
 /* main.css의 전역 .hero와 겹치지 않게 별도 이름 */
@@ -39,13 +48,11 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    transparent 34%,
-    rgba(0, 3, 32, 0.06) 50%,
-    rgba(0, 3, 32, 0.22) 65%,
-    rgba(0, 3, 32, 0.45) 78%,
-    rgba(0, 3, 32, 0.65) 90%
-  );
+  background: linear-gradient(transparent 34%,
+      rgba(0, 3, 32, 0.06) 50%,
+      rgba(0, 3, 32, 0.22) 65%,
+      rgba(0, 3, 32, 0.45) 78%,
+      rgba(0, 3, 32, 0.65) 90%);
   pointer-events: none;
 }
 
@@ -55,25 +62,23 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(
-    var(--navy) 0,
-    var(--navy) calc(1.6 * var(--img)),
-    rgba(0, 3, 32, 0.88) calc(2.4 * var(--img)),
-    rgba(0, 3, 32, 0.73) calc(3.2 * var(--img)),
-    rgba(0, 3, 32, 0.57) calc(4 * var(--img)),
-    rgba(0, 3, 32, 0.4) calc(4.8 * var(--img)),
-    rgba(0, 3, 32, 0.26) calc(5.6 * var(--img)),
-    rgba(0, 3, 32, 0.14) calc(6.4 * var(--img)),
-    rgba(0, 3, 32, 0.06) calc(7.2 * var(--img)),
-    rgba(0, 3, 32, 0.02) calc(8 * var(--img)),
-    var(--navy-0) calc(9.2 * var(--img)),
-    var(--navy-0) calc(12.6 * var(--img)),
-    rgba(0, 3, 32, 0.14) calc(14 * var(--img)),
-    rgba(0, 3, 32, 0.4) calc(15.2 * var(--img)),
-    rgba(0, 3, 32, 0.68) calc(17 * var(--img)),
-    rgba(0, 3, 32, 0.88) calc(18.8 * var(--img)),
-    var(--navy) calc(21.2 * var(--img))
-  );
+  background: linear-gradient(var(--navy) 0,
+      var(--navy) calc(1.6 * var(--img)),
+      rgba(0, 3, 32, 0.88) calc(2.4 * var(--img)),
+      rgba(0, 3, 32, 0.73) calc(3.2 * var(--img)),
+      rgba(0, 3, 32, 0.57) calc(4 * var(--img)),
+      rgba(0, 3, 32, 0.4) calc(4.8 * var(--img)),
+      rgba(0, 3, 32, 0.26) calc(5.6 * var(--img)),
+      rgba(0, 3, 32, 0.14) calc(6.4 * var(--img)),
+      rgba(0, 3, 32, 0.06) calc(7.2 * var(--img)),
+      rgba(0, 3, 32, 0.02) calc(8 * var(--img)),
+      var(--navy-0) calc(9.2 * var(--img)),
+      var(--navy-0) calc(12.6 * var(--img)),
+      rgba(0, 3, 32, 0.14) calc(14 * var(--img)),
+      rgba(0, 3, 32, 0.4) calc(15.2 * var(--img)),
+      rgba(0, 3, 32, 0.68) calc(17 * var(--img)),
+      rgba(0, 3, 32, 0.88) calc(18.8 * var(--img)),
+      var(--navy) calc(21.2 * var(--img)));
 }
 
 .coming-soon .backdrop {
@@ -183,7 +188,7 @@
   text-align: center;
 }
 
-.coming-soon .info__row + .info__row,
+.coming-soon .info__row+.info__row,
 .coming-soon .sponsors {
   background-image: linear-gradient(var(--rule), var(--rule));
   background-size: 86% 1px;
@@ -274,6 +279,7 @@
 
 /* 모바일. 기본 규칙보다 뒤에 와야 덮인다. */
 @media (max-width: 640px) {
+
   /* 데스크톱 시안의 오른쪽 치우침(+0.5)을 빼고 정중앙에 둔다 */
   .coming-soon .characters {
     transform: translateX(-50%);
