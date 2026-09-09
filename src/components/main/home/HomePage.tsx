@@ -197,6 +197,10 @@ export function HomePage() {
                     <dt>참가비</dt>
                     <dd>{c.fee}</dd>
                   </div>
+                  <div>
+                    <dt>어린이</dt>
+                    <dd>{"childFee" in c ? c.childFee : "참가 불가"}</dd>
+                  </div>
                 </dl>
               </li>
             ))}
@@ -216,7 +220,7 @@ export function HomePage() {
           </h2>
           <ol className="timeline">
             {EVENT.timeline.map((row) => (
-              <li key={row.time}>
+              <li key={`${row.time}-${row.title}`}>
                 <time>{row.time}</time>
                 <span>{row.title}</span>
               </li>

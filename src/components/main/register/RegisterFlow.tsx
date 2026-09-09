@@ -9,6 +9,8 @@ import {
   genderLabel,
   requiredConsentsOk,
   submitEntry,
+  ticketFee,
+  ticketLabel,
   type ApplyKind,
   type Consents,
   type EntryDraft,
@@ -190,7 +192,8 @@ function IndividualFlow({
             <FormRow label="참가종목" required>
               <CoursePick
                 value={draft.courseId}
-                onChange={(courseId) => patch({ courseId })}
+                ticket={draft.ticket}
+                onChange={(courseId, ticket) => patch({ courseId, ticket })}
               />
             </FormRow>
             <FormRow label="기념품" required>
@@ -201,7 +204,7 @@ function IndividualFlow({
             </FormRow>
             {draft.courseId ? (
               <FormRow label="참가비">
-                <FeeText courseId={draft.courseId} />
+                <FeeText courseId={draft.courseId} ticket={draft.ticket} />
               </FormRow>
             ) : null}
           </FormSec>
@@ -224,8 +227,8 @@ function IndividualFlow({
             <div>
               <dt>참가종목</dt>
               <dd>
-                {course.distance} · {course.code}
-                <small>{course.fee}</small>
+                {course.distance} · {ticketLabel(draft.ticket)}
+                <small>{ticketFee(course, draft.ticket)}</small>
               </dd>
             </div>
             <div>
@@ -274,7 +277,7 @@ function IndividualFlow({
           <h2>접수가 완료되었습니다</h2>
           <p className="ticket__no">{record.orderNo}</p>
           <p className="sec__body">
-            {record.name} · {course.distance} {course.code}
+            {record.name} · {course.distance} {ticketLabel(record.ticket)}
           </p>
           <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
           <div className="flow__nav">

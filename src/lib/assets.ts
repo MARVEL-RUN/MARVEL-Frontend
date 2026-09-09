@@ -21,7 +21,7 @@ export const MAIN_ASSETS = {
   introThor: "/images/main/intro/panel-thor.png",
   introPanther: "/images/main/intro/panel-panther.png",
   introDoom: "/images/main/intro/panel-doom.png",
-  course2_5k: "/images/main/guide/course-2.5k.png",
+  course2_3k: "/images/main/guide/course-2.5k.png",
   course5k: "/images/main/guide/course-5k.png",
   course10k: "/images/main/guide/course-10k.png",
 } as const;

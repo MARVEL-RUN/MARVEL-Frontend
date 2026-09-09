@@ -6,6 +6,7 @@ import {
   genderLabel,
   lookupEntry,
   lookupGroup,
+  ticketLabel,
   type ApplyKind,
   type EntryRecord,
   type GroupRecord,
@@ -86,6 +87,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             <dt>코스</dt>
             <dd>
               {course.distance} · {course.code}
+              {record.ticket === "child" ? " · 어린이" : ""}
             </dd>
           </div>
           <div>
@@ -192,8 +194,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
                   {String(i + 1).padStart(2, "0")} {p.name}
                 </strong>
                 <span>
-                  {course ? `${course.distance} · ${course.code}` : "—"} ·{" "}
-                  {genderLabel(p.gender)} · {p.shirt}
+                  {course
+                    ? `${course.distance} · ${ticketLabel(p.ticket)}`
+                    : "—"}{" "}
+                  · {genderLabel(p.gender)} · {p.shirt}
                 </span>
               </li>
             );

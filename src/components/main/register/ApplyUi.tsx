@@ -3,10 +3,14 @@ import { EVENT } from "@/lib/event";
 import {
   GENDERS,
   SHIRT_SIZES,
+  courseAllowsChild,
   courseById,
+  ticketFee,
+  ticketLabel,
   type CourseId,
   type Gender,
   type ShirtSize,
+  type TicketKind,
 } from "@/lib/register";
 
 const YEARS = Array.from({ length: 90 }, (_, i) => String(2026 - i));
@@ -168,12 +172,19 @@ export function ShirtPick({
 
 export function CoursePick({
   value,
+  ticket,
   onChange,
 }: {
   value: CourseId | "";
-  onChange: (next: CourseId) => void;
+  ticket: TicketKind;
+  onChange: (courseId: CourseId, ticket: TicketKind) => void;
 }) {
   const selected = value ? courseById(value) : undefined;
+  const tickets: TicketKind[] = selected
+    ? courseAllowsChild(selected)
+      ? ["adult", "child"]
+      : ["adult"]
+    : [];
 
   return (
     <div className="course-pick">
@@ -185,7 +196,9 @@ export function CoursePick({
               key={c.id}
               type="button"
               className={value === c.id ? "is-on" : undefined}
-              onClick={() => onChange(c.id)}
+              onClick={() =>
+                onChange(c.id, courseAllowsChild(c) ? ticket : "adult")
+              }
             >
               {c.distance}
             </button>
@@ -195,10 +208,17 @@ export function CoursePick({
       <div className="course-pick__col">
         <p className="course-pick__head">세부종목</p>
         <div className="course-pick__list">
-          {selected ? (
-            <button type="button" className="is-on">
-              {selected.code}
-            </button>
+          {tickets.length ? (
+            tickets.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className={ticket === t ? "is-on" : undefined}
+                onClick={() => value && onChange(value, t)}
+              >
+                {ticketLabel(t)}
+              </button>
+            ))
           ) : (
             <p className="course-pick__empty">거리를 선택해주세요</p>
           )}
@@ -208,10 +228,16 @@ export function CoursePick({
   );
 }
 
-export function FeeText({ courseId }: { courseId: CourseId | "" }) {
+export function FeeText({
+  courseId,
+  ticket,
+}: {
+  courseId: CourseId | "";
+  ticket: TicketKind;
+}) {
   const course = courseId ? courseById(courseId) : undefined;
   if (!course) return null;
-  return <p className="fee-text">{course.fee}</p>;
+  return <p className="fee-text">{ticketFee(course, ticket)}</p>;
 }
 
 export function birthView(value: string) {

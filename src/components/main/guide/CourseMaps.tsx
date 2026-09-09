@@ -47,6 +47,10 @@ export function CourseMaps() {
               <dt>참가비</dt>
               <dd>{course.fee}</dd>
             </div>
+            <div>
+              <dt>어린이</dt>
+              <dd>{"childFee" in course ? course.childFee : "참가 불가"}</dd>
+            </div>
           </dl>
           <p className="course-guide__hint">이미지를 누르면 크게 볼 수 있습니다</p>
         </div>
