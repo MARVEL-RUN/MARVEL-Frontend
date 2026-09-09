@@ -13,9 +13,47 @@ export const EVENT = {
   venue: "인제스피디움",
   venueEn: "INJE SPEEDIUM",
   venueAddress: "강원 인제군 기린면 상하답로 130 인제스피디움",
-  mapUrl:
-    "https://www.google.com/maps/search/?api=1&query=" +
-    encodeURIComponent("강원 인제군 기린면 상하답로 130 인제스피디움"),
+  venueLat: 38.00139,
+  venueLng: 128.29194,
+  mapUrl: "https://map.kakao.com/link/map/인제스피디움,38.00139,128.29194",
+  venueAccess: [
+    {
+      title: "자가용",
+      items: [
+        {
+          badge: "고속",
+          tone: "blue",
+          text: "서울양양고속도로 인제IC | 기린면 방면 약 20분",
+        },
+        {
+          badge: "국도",
+          tone: "green",
+          text: "44번 국도 기린면 | 상하답로 진입",
+        },
+      ],
+    },
+    {
+      title: "버스",
+      note: "인제시외버스터미널 하차",
+      items: [
+        {
+          badge: "시외",
+          tone: "blue",
+          text: "동서울 · 춘천 → 인제",
+        },
+        {
+          badge: "택시",
+          tone: "green",
+          text: "터미널에서 약 25분",
+        },
+        {
+          badge: "셔틀",
+          tone: "cyan",
+          text: "접수 오픈 이후 노선 공지",
+        },
+      ],
+    },
+  ],
   info: [
     {
       label: "대회일시",

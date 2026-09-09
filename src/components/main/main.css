@@ -1477,19 +1477,119 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   line-height: 1.65;
 }
 
+.directions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 1fr);
+  gap: 1.6rem 1.8rem;
+  align-items: start;
+}
+
+.kakao-map {
+  aspect-ratio: 1024 / 566;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #0c0d22;
+}
+
+.kakao-map--link {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.kakao-map--link:hover {
+  filter: brightness(1.12);
+}
+
+.kakao-map__pin {
+  padding: 6px 10px;
+  color: #111;
+  font: 700 13px/1.3 sans-serif;
+  white-space: nowrap;
+}
+
 .venue-card {
-  padding: 2rem 1.6rem;
-  background: #08091d;
-  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.55rem;
+  min-height: 0;
+  padding-top: 0.1rem;
 }
 
-.venue-card h2 {
-  font-size: 2rem;
+.venue-card__addr {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.05rem;
+  border-radius: 0.7rem;
+  background: var(--marvel);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-decoration: none;
 }
 
-.venue-card p {
-  margin-bottom: 1.4rem;
+.venue-card__addr:hover {
+  filter: brightness(1.06);
+}
+
+.venue-card__pin {
+  flex: 0 0 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.venue-route h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.venue-route__note {
+  font-weight: 600;
   color: var(--silver);
+}
+
+.venue-route p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 0.55rem;
+  color: var(--silver);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.venue-badge {
+  flex: 0 0 auto;
+  min-width: 2.55rem;
+  padding: 0.16rem 0.5rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.venue-badge--blue {
+  background: #3d7ccc;
+}
+
+.venue-badge--green {
+  background: #3cb371;
+}
+
+.venue-badge--cyan {
+  background: var(--cyan);
+  color: #08202a;
 }
 
 .form {
@@ -2637,7 +2737,8 @@ button.course {
 
   .about .wrap,
   .venue__grid,
-  .courses__grid {
+  .courses__grid,
+  .directions {
     grid-template-columns: 1fr;
   }
 
