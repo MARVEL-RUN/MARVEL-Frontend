@@ -4,12 +4,21 @@ import { listInquiries } from "@/services/admin/inquiries";
 import type { AdminInquiry } from "@/types/boards";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import {
+  BoardSearch,
+  byDate,
+  matchQuery,
+  type BoardSort,
+} from "../board/BoardSearch";
 import { SideBanner } from "../layout/SideBanner";
 import { inquiryNo, orderInquiries } from "./order";
 
 export function InquiryPage() {
   const [items, setItems] = useState<AdminInquiry[]>([]);
   const [ready, setReady] = useState(false);
+  const [query, setQuery] = useState("");
+  const [applied, setApplied] = useState("");
+  const [sort, setSort] = useState<BoardSort>("latest");
 
   useEffect(() => {
     void listInquiries().then((rows) => {
@@ -19,16 +28,28 @@ export function InquiryPage() {
   }, []);
 
   const nos = useMemo(() => inquiryNo(items), [items]);
+  const shown = useMemo(() => {
+    const filtered = items.filter((item) =>
+      matchQuery([item.title, item.name], applied),
+    );
+    return [...filtered].sort(byDate(sort));
+  }, [items, applied, sort]);
 
   return (
     <main className="page">
       <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
       <div className="page__body wrap">
-        <div className="board__tools">
+        <BoardSearch
+          query={query}
+          sort={sort}
+          onQueryChange={setQuery}
+          onSortChange={setSort}
+          onSearch={() => setApplied(query)}
+        >
           <Link href="/inquiry/write" className="btn btn--red">
             글쓰기
           </Link>
-        </div>
+        </BoardSearch>
         <div className="board board--qna">
           <div className="board__head">
             <span>번호</span>
@@ -38,10 +59,12 @@ export function InquiryPage() {
           </div>
           {!ready ? (
             <p className="board__empty">불러오는 중...</p>
-          ) : items.length === 0 ? (
-            <p className="board__empty">등록된 문의가 없습니다.</p>
+          ) : shown.length === 0 ? (
+            <p className="board__empty">
+              {applied.trim() ? "검색 결과가 없습니다." : "등록된 문의가 없습니다."}
+            </p>
           ) : (
-            items.map((item) => (
+            shown.map((item) => (
               <Link
                 key={item.id}
                 href={`/inquiry/view?id=${item.id}`}

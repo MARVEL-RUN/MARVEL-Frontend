@@ -21,4 +21,7 @@ export const MAIN_ASSETS = {
   introThor: "/images/main/intro/panel-thor.png",
   introPanther: "/images/main/intro/panel-panther.png",
   introDoom: "/images/main/intro/panel-doom.png",
+  virtualBlack: "/images/virtual/black.svg",
+  virtualThor: "/images/virtual/thor.svg",
+  virtualDom: "/images/virtual/dom.svg",
 } as const;

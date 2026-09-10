@@ -33,7 +33,7 @@ export const OFFICE = {
   mailOrderNo: "2010 – 서울마포 – 1496",
   ceo: "주상은",
   tel: "02-338-0344",
-  email: "@gmail.com",
+  email: "marvelrun2026@gmail.com",
   hours: "평일 10:00 ~ 17:00(점심시간 : 12:30 ~ 13:30, 주말 및 공휴일 휴무)",
   copyright: "COPYRIGHT © MARVEL RUN 사무국. ALL RIGHTS RESERVED.",
 } as const;
