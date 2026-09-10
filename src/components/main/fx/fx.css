@@ -138,7 +138,7 @@ html.is-intro .fx-letterbox span {
   top: 50%;
   width: min(108vw, 164vh);
   height: auto;
-  aspect-ratio: 1024 / 592;
+  aspect-ratio: 1896 / 1042;
   padding: 0;
   gap: 0;
   transform: translate(-50%, -50%);
@@ -162,49 +162,38 @@ html.is-intro .fx-letterbox span {
 
 /* 높이는 동일, 얼굴 라인만 맞춤. prev면 intro--overlap 없음 */
 .intro--overlap .intro__shot--cyclops {
-  left: -30%;
-  top: -8%;
+  left: -24%;
+  top: -20%;
+  height: 145%;
   z-index: 1;
 }
 
 .intro--overlap .intro__shot--thing {
-  left: -33%;
-  top: 15%;
+  left: -35%;
+  top: -11%;
+  height: 170%;
   z-index: 2;
 }
 
 .intro--overlap .intro__shot--doom {
-  left: 0%;
-  top: -10%;
+  left: -1.5%;
+  top: -30%;
+  height: 170%;
   z-index: 3;
 }
 
 .intro--overlap .intro__shot--thor {
-  left: 15%;
-  top: -3%;
+  left: 20.5%;
+  top: -25%;
+  height: 170%;
   z-index: 4;
 }
 
 .intro--overlap .intro__shot--falcon {
-  left: 40%;
-  top: -9%;
+  left: 41.5%;
+  top: -20%;
+  height: 170%;
   z-index: 5;
-}
-
-.intro--hold .intro__shot {
-  opacity: 1;
-  animation: none;
-  transform: none;
-}
-
-.intro--hold .intro__panels {
-  animation: none;
-}
-
-.intro--hold .intro__logo,
-.intro--hold .intro__flash,
-.intro--hold .intro__skip {
-  display: none;
 }
 
 .intro__shot:nth-child(1) {

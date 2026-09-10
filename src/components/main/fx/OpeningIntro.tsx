@@ -6,8 +6,6 @@ import { MAIN_ASSETS } from "@/lib/assets";
 
 /* prev면 이전 패널 5장 */
 const INTRO_PANELS = "current" as "prev" | "current";
-/* true면 캐릭터 고정. 끝나면 false */
-const INTRO_HOLD = true;
 
 const SHOTS_PREV = [
   { src: MAIN_ASSETS.introPrevCyclops, name: "cyclops", w: 684, h: 1152 },
@@ -40,7 +38,6 @@ export function OpeningIntro() {
     }
 
     document.documentElement.classList.add("is-intro");
-    if (INTRO_HOLD) return () => document.documentElement.classList.remove("is-intro");
     const out = window.setTimeout(() => closeIntro(), 4000);
     return () => {
       window.clearTimeout(out);
@@ -65,7 +62,6 @@ export function OpeningIntro() {
         "intro",
         phase === "out" ? "is-out" : "",
         INTRO_PANELS === "current" ? "intro--overlap" : "",
-        INTRO_HOLD ? "intro--hold" : "",
       ]
         .filter(Boolean)
         .join(" ")}
