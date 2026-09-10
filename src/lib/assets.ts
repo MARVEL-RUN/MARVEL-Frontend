@@ -9,6 +9,7 @@ export const COMING_SOON_ASSETS = {
 
 export const MAIN_ASSETS = {
   logo: "/images/main/logo.svg",
+  headerLogo: "/images/main/header-logo.svg",
   footerLogo: "/images/main/ft_logo.svg",
   sideBanner: "/images/main/sidebanner.svg",
   footerHost: "/images/main/footer/hosted.png",
@@ -21,6 +22,12 @@ export const MAIN_ASSETS = {
   introThor: "/images/main/intro/panel-thor.png",
   introPanther: "/images/main/intro/panel-panther.png",
   introDoom: "/images/main/intro/panel-doom.png",
+  course2_3k: "/images/main/guide/course-2.3k.svg",
+  course5k: "/images/main/guide/course-5k.svg",
+  course10k: "/images/main/guide/course-10k.svg",
+  venueThor: "/images/main/venue/2.3k-thor.png",
+  venueCyclops: "/images/main/venue/5k-cyclops.png",
+  venueDoom: "/images/main/venue/10k-doom.png",
   virtualBlack: "/images/virtual/black.svg",
   virtualThor: "/images/virtual/thor.svg",
   virtualDom: "/images/virtual/dom.svg",

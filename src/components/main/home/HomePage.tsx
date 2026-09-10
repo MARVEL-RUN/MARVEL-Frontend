@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import type { CourseId } from "@/lib/register";
+import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
+import { TimeTable } from "./TimeTable";
 
 const TICKER = [
   "MARVEL RUN 2026",
@@ -19,6 +22,11 @@ const TICKER = [
 export function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLElement>(null);
+  const [previewId, setPreview] = useState<CourseId | null>(null);
+  const [venueCourse, setVenueCourse] = useState(0);
+  const [venuePrev, setVenuePrev] = useState(0);
+  const [venueFx, setVenueFx] = useState(0);
+  const preview = EVENT.courses.find((c) => c.id === previewId);
   const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
 
   useEffect(() => {
@@ -59,6 +67,17 @@ export function HomePage() {
       window.removeEventListener("scroll", onScroll);
       io.disconnect();
     };
+  }, []);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setVenueCourse((i) => {
+        setVenuePrev(i);
+        return (i + 1) % EVENT.courses.length;
+      });
+      setVenueFx((n) => n + 1);
+    }, 6500);
+    return () => window.clearInterval(id);
   }, []);
 
   return (
@@ -137,15 +156,19 @@ export function HomePage() {
               같은 출발선에 선다. 배번호를 다는 순간, 당신도 그 세계의 일원이다.
             </p>
             <p className="sec__body">
-              코스를 고르고, 미션을 완수하고, 피니시 게이트를 통과하라.
-              히어로는 태어나는 게 아니라 완주한다.
+              미션을 선택하고, 피니시 게이트를 통과하여 완수하라!
+              <br />
+              히어로는 태어나는 것이 아닌, 완주하는 것이다.
             </p>
           </div>
           <ul className="about__stats">
             {EVENT.stats.map((s) => (
               <li key={s.label}>
                 <strong>
-                  {s.value}
+                  {s.value.split(" / ").flatMap((part, i) => [
+                    i > 0 ? <i key={`sep-${s.label}-${i}`}>/</i> : null,
+                    <b key={`num-${s.label}-${i}`}>{part}</b>,
+                  ])}
                   {s.unit ? <span>{s.unit}</span> : null}
                 </strong>
                 <em>{s.label}</em>
@@ -164,6 +187,19 @@ export function HomePage() {
           <ul className="courses__grid">
             {EVENT.courses.map((c) => (
               <li key={c.id} className={`course course--${c.tone}`}>
+                <button
+                  type="button"
+                  className="course__map"
+                  onClick={() => setPreview(c.id)}
+                  aria-label={`${c.distance} 코스도 미리보기`}
+                >
+                  <Image
+                    src={c.map}
+                    alt=""
+                    fill
+                    sizes="(max-width: 960px) 100vw, 33vw"
+                  />
+                </button>
                 <p className="course__code">{c.code}</p>
                 <p className="course__dist">{c.distance}</p>
                 <p className="course__desc">{c.desc}</p>
@@ -173,12 +209,12 @@ export function HomePage() {
                     <dd>{c.start}</dd>
                   </div>
                   <div>
-                    <dt>제한</dt>
-                    <dd>{c.timeLimit}</dd>
-                  </div>
-                  <div>
                     <dt>참가비</dt>
                     <dd>{c.fee}</dd>
+                  </div>
+                  <div>
+                    <dt>어린이</dt>
+                    <dd>{"childFee" in c ? c.childFee : "참가 불가"}</dd>
                   </div>
                 </dl>
               </li>
@@ -187,20 +223,17 @@ export function HomePage() {
         </div>
       </section>
 
+      {preview ? (
+        <CoursePreview course={preview} onClose={() => setPreview(null)} />
+      ) : null}
+
       <section className="sec schedule">
-        <div className="wrap wrap--narrow reveal">
+        <div className="wrap reveal">
           <p className="kicker">03 / RACE DAY</p>
           <h2 className="sec__title">
             레이스 데이 <em>타임라인</em>
           </h2>
-          <ol className="timeline">
-            {EVENT.timeline.map((row) => (
-              <li key={row.time}>
-                <time>{row.time}</time>
-                <span>{row.title}</span>
-              </li>
-            ))}
-          </ol>
+          <TimeTable />
         </div>
       </section>
 
@@ -215,17 +248,49 @@ export function HomePage() {
             </h2>
             <p className="sec__body">{EVENT.venueAddress}</p>
             <p className="sec__body">
-              서킷 위를 달리는 국내 유일 마블 공식 러닝. 피니시 라인은
-              체크무늬 플래그 앞에서 기다린다.
+              자동차가 질주하던 인제 스피디움 서킷,
+              <br />
+              이번에는 히어로들이 두 발로 달린다.
             </p>
             <Link href="/directions" className="btn btn--ghost">
               오시는길
             </Link>
           </div>
           <div className="venue__panel" aria-hidden>
-            <span>42.195</span>
-            <span>START / FINISH</span>
-            <span>CHECKERED</span>
+            {EVENT.courses.map((c, i) => (
+              <div
+                key={c.id}
+                className={[
+                  "venue__slide",
+                  `venue__slide--${c.tone}`,
+                  i === venueCourse ? "is-on" : "",
+                  i === venuePrev && i !== venueCourse ? "is-under" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <span className={`venue__hero venue__hero--${c.id}`}>
+                  <Image
+                    src={c.figure}
+                    alt=""
+                    fill
+                    sizes="(max-width: 960px) 80vw, 420px"
+                    style={{ objectFit: "contain", objectPosition: "right bottom" }}
+                  />
+                </span>
+                <span className="venue__dist">{c.distance}</span>
+                <span>START / FINISH</span>
+                <span>CHECKERED</span>
+              </div>
+            ))}
+            <span key={venueFx} className="venue__glitch">
+              <span className="venue__glitch__rgb venue__glitch__rgb--red" />
+              <span className="venue__glitch__rgb venue__glitch__rgb--cyan" />
+              <span className="venue__glitch__cut venue__glitch__cut--a" />
+              <span className="venue__glitch__cut venue__glitch__cut--b" />
+              <span className="venue__glitch__cut venue__glitch__cut--c" />
+              <span className="venue__glitch__scan" />
+            </span>
           </div>
         </div>
       </section>

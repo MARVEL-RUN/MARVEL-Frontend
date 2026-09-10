@@ -9,6 +9,8 @@ import {
   genderLabel,
   requiredConsentsOk,
   submitEntry,
+  ticketFee,
+  ticketLabel,
   type ApplyKind,
   type Consents,
   type EntryDraft,
@@ -23,6 +25,7 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  PhoneField,
   ShirtPick,
   birthView,
 } from "./ApplyUi";
@@ -148,12 +151,11 @@ function IndividualFlow({
 
           <FormSec title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 name="phone"
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
@@ -176,12 +178,11 @@ function IndividualFlow({
             note="선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
           >
             <FormRow label="보호자 연락처">
-              <input
-                type="tel"
+              <PhoneField
                 name="emergency"
                 placeholder="보호자 연락처를 입력해주세요."
                 value={draft.emergency}
-                onChange={(e) => patch({ emergency: e.target.value })}
+                onChange={(emergency) => patch({ emergency })}
               />
             </FormRow>
           </FormSec>
@@ -190,7 +191,8 @@ function IndividualFlow({
             <FormRow label="참가종목" required>
               <CoursePick
                 value={draft.courseId}
-                onChange={(courseId) => patch({ courseId })}
+                ticket={draft.ticket}
+                onChange={(courseId, ticket) => patch({ courseId, ticket })}
               />
             </FormRow>
             <FormRow label="기념품" required>
@@ -201,7 +203,7 @@ function IndividualFlow({
             </FormRow>
             {draft.courseId ? (
               <FormRow label="참가비">
-                <FeeText courseId={draft.courseId} />
+                <FeeText courseId={draft.courseId} ticket={draft.ticket} />
               </FormRow>
             ) : null}
           </FormSec>
@@ -224,8 +226,8 @@ function IndividualFlow({
             <div>
               <dt>참가종목</dt>
               <dd>
-                {course.distance} · {course.code}
-                <small>{course.fee}</small>
+                {course.distance} · {ticketLabel(draft.ticket)}
+                <small>{ticketFee(course, draft.ticket)}</small>
               </dd>
             </div>
             <div>
@@ -274,7 +276,7 @@ function IndividualFlow({
           <h2>접수가 완료되었습니다</h2>
           <p className="ticket__no">{record.orderNo}</p>
           <p className="sec__body">
-            {record.name} · {course.distance} {course.code}
+            {record.name} · {course.distance} {ticketLabel(record.ticket)}
           </p>
           <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
           <div className="flow__nav">
