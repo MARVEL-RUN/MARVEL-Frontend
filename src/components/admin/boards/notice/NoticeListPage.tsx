@@ -78,7 +78,10 @@ export function NoticesAdminPage() {
             <AdminSelect
               value={category}
               options={NOTICE_CATEGORY_FILTER_OPTIONS}
-              onChange={setCategory}
+              onChange={(value) => {
+                setCategory(value);
+                setApplied((prev) => ({ ...prev, category: value }));
+              }}
               ariaLabel="카테고리"
               width={112}
             />

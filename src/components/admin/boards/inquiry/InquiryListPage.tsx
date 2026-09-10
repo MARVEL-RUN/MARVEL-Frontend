@@ -117,13 +117,19 @@ export function InquiryListPage() {
             <AdminSelect
               value={field}
               options={FIELD_OPTIONS}
-              onChange={setField}
+              onChange={(value) => {
+                setField(value);
+                setApplied((prev) => ({ ...prev, field: value }));
+              }}
               ariaLabel="검색 대상"
             />
             <AdminSelect
               value={status}
               options={STATUS_OPTIONS}
-              onChange={setStatus}
+              onChange={(value) => {
+                setStatus(value);
+                setApplied((prev) => ({ ...prev, status: value }));
+              }}
               ariaLabel="답변 상태"
               width={120}
             />

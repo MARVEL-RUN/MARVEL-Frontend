@@ -468,7 +468,11 @@ export function ApplicationsListPage({ eventId }: Props) {
               <AdminSelect
                 value={kind}
                 options={KIND_OPTIONS}
-                onChange={setKind}
+                onChange={(value) => {
+                  setKind(value);
+                  setApplied((prev) => ({ ...prev, kind: value }));
+                  setPage(1);
+                }}
                 ariaLabel="신청 유형"
                 width={112}
               />
@@ -477,7 +481,11 @@ export function ApplicationsListPage({ eventId }: Props) {
               <AdminSelect
                 value={round}
                 options={ROUND_OPTIONS}
-                onChange={setRound}
+                onChange={(value) => {
+                  setRound(value);
+                  setApplied((prev) => ({ ...prev, round: value }));
+                  setPage(1);
+                }}
                 ariaLabel="차수"
                 width={112}
               />
@@ -485,7 +493,11 @@ export function ApplicationsListPage({ eventId }: Props) {
               <AdminSelect
                 value={courseId}
                 options={courseOptions}
-                onChange={setCourseId}
+                onChange={(value) => {
+                  setCourseId(value);
+                  setApplied((prev) => ({ ...prev, courseId: value }));
+                  setPage(1);
+                }}
                 ariaLabel="코스"
                 width={112}
               />
@@ -493,7 +505,11 @@ export function ApplicationsListPage({ eventId }: Props) {
             <AdminSelect
               value={status}
               options={STATUS_OPTIONS}
-              onChange={setStatus}
+              onChange={(value) => {
+                setStatus(value);
+                setApplied((prev) => ({ ...prev, status: value }));
+                setPage(1);
+              }}
               ariaLabel="상태"
               width={112}
             />
