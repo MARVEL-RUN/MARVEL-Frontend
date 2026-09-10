@@ -1849,3 +1849,438 @@ html.admin-mode body {
     border: 0;
   }
 }
+/* —— popup manage —— */
+.admin-popup-page .admin-popup-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--admin-line);
+  background: #f7f8fb;
+}
+
+.admin-popup-toolbar__tabs {
+  display: inline-flex;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.admin-root .admin-popup-toolbar__tabs button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: var(--admin-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-root .admin-popup-toolbar__tabs button.is-on {
+  background: #1a73e8;
+  color: #fff;
+}
+
+.admin-popup-toolbar__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-popup-body {
+  padding: 16px;
+}
+
+.admin-popup-empty {
+  padding: 48px 16px;
+  text-align: center;
+  border: 1px solid var(--admin-line);
+  background: #fff;
+}
+
+.admin-popup-empty p {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.admin-popup-empty span {
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-popup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-popup-notes {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.admin-popup-notes li::before {
+  content: "※ ";
+}
+
+.admin-popup-card {
+  perspective: 1000px;
+}
+
+.admin-popup-card__inner {
+  position: relative;
+  min-height: 360px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.admin-popup-card__inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.admin-popup-card__face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 1px solid var(--admin-line);
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.admin-popup-card__inner.is-flipped .admin-popup-card__face {
+  border-color: #1a73e8;
+  box-shadow: 0 8px 24px rgba(26, 115, 232, 0.12);
+}
+
+.admin-popup-card__front {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 360px;
+  padding: 14px;
+}
+
+.admin-popup-card__back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto;
+  align-content: start;
+  gap: 10px;
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 600px;
+  background: #f8fbff;
+  transform: rotateY(180deg);
+  cursor: default;
+}
+
+.admin-popup-card__order {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-popup-card__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  height: 22px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #e8edf3;
+  color: #5c6173;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-popup-card__badge.is-on {
+  background: #e8f1fd;
+  color: #1a73e8;
+}
+
+.admin-popup-card__media {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  margin-top: 28px;
+  background: #f5f7fa;
+  overflow: hidden;
+}
+
+.admin-popup-card__media img {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  background: #f5f7fa;
+}
+
+.admin-popup-card__media p {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-root .admin-popup-card__flip {
+  margin-top: 12px;
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: #eef1f5;
+  color: #4a5160;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+.admin-popup-card__tools {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.admin-root .admin-popup-card__tools button {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
+  color: #4a5160;
+  cursor: pointer;
+}
+
+.admin-root .admin-popup-card__tools button.is-danger {
+  color: #d93025;
+}
+
+.admin-root .admin-popup-card__tools button.is-close {
+  margin-left: auto;
+}
+
+.admin-popup-card__field {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a5160;
+}
+
+.admin-popup-card__field input,
+.admin-popup-card__field select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.admin-popup-card__file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-popup-card__file span {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.admin-popup-card__check {
+  margin-top: 4px;
+}
+
+.admin-popup-preview__meta {
+  margin: 0 0 12px;
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-popup-preview__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 16px;
+}
+
+.admin-popup-preview__pane {
+  border: 1px solid var(--admin-line);
+  background: #fff;
+  padding: 14px;
+}
+
+.admin-popup-preview__pane h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-popup-preview__frame {
+  position: relative;
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  background: #eef1f5;
+  padding: 20px;
+}
+
+.admin-popup-preview__frame.is-empty {
+  gap: 10px;
+  color: var(--admin-muted);
+}
+
+.admin-popup-preview__pane.is-mobile .admin-popup-preview__frame {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.admin-popup-preview__dialog {
+  position: relative;
+  width: min(100%, 420px);
+  background: #fff;
+  border: 1px solid var(--admin-line);
+  box-shadow: 0 12px 32px rgba(24, 28, 38, 0.16);
+}
+
+.admin-popup-preview__pane.is-mobile .admin-popup-preview__dialog {
+  width: 100%;
+}
+
+.admin-popup-preview__pager {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+  height: 22px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-root .admin-popup-preview__x {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+}
+
+.admin-popup-preview__image {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  background: #f5f7fa;
+}
+
+.admin-popup-preview__image img {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}
+
+.admin-popup-preview__image p {
+  margin: 0;
+  color: var(--admin-muted);
+}
+
+.admin-popup-preview__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--admin-line);
+  font-size: 12px;
+}
+
+.admin-popup-preview__bar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4a5160;
+}
+
+.admin-popup-preview__nav {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.admin-root .admin-popup-preview__nav button {
+  border: 0;
+  background: transparent;
+  color: #1a73e8;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-root .admin-popup-preview__nav button:disabled {
+  color: #a8b0bd;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1100px) {
+  .admin-popup-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-popup-preview__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-popup-grid {
+    grid-template-columns: 1fr;
+  }
+}

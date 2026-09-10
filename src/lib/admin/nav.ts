@@ -35,9 +35,9 @@ export const ADMIN_NAV: AdminNavItem[] = [
   {
     key: "content",
     name: "콘텐츠",
-    href: "/admin/content/sponsors",
+    href: "/admin/content/popups",
     children: [
-      { name: "스폰서", href: "/admin/content/sponsors" },
+      { name: "팝업", href: "/admin/content/popups" },
       { name: "이용약관", href: "/admin/legal/terms" },
       { name: "개인정보처리방침", href: "/admin/legal/privacy" },
     ],

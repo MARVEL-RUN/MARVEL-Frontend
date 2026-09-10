@@ -18,9 +18,3 @@ export type AdminNotice = {
   pinned: boolean;
   body: string;
 };
-
-export type AdminSponsor = {
-  id: string;
-  role: string;
-  name: string;
-};
