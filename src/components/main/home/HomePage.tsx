@@ -54,7 +54,7 @@ export function HomePage() {
     const root = rootRef.current;
     if (!hero || !root) return;
 
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: globalThis.MouseEvent) => {
       const r = hero.getBoundingClientRect();
       hero.style.setProperty("--mx", `${e.clientX - r.left}px`);
       hero.style.setProperty("--my", `${e.clientY - r.top}px`);
