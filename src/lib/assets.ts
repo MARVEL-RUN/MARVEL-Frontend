@@ -28,4 +28,7 @@ export const MAIN_ASSETS = {
   venueThor: "/images/main/venue/2.3k-thor.png",
   venueCyclops: "/images/main/venue/5k-cyclops.png",
   venueDoom: "/images/main/venue/10k-doom.png",
+  virtualBlack: "/images/virtual/black.svg",
+  virtualThor: "/images/virtual/thor.svg",
+  virtualDom: "/images/virtual/dom.svg",
 } as const;
