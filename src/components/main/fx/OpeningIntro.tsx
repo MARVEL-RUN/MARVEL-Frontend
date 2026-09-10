@@ -38,7 +38,10 @@ export function OpeningIntro() {
     }
 
     document.documentElement.classList.add("is-intro");
-    const out = window.setTimeout(() => closeIntro(), 4000);
+    const out = window.setTimeout(
+      () => closeIntro(),
+      INTRO_PANELS === "current" ? 4100 : 4000,
+    );
     return () => {
       window.clearTimeout(out);
       document.documentElement.classList.remove("is-intro");

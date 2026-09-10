@@ -150,6 +150,7 @@ html.is-intro .fx-letterbox span {
   display: block;
   height: 136%;
   width: auto;
+  animation-duration: 0.72s;
 }
 
 .intro--overlap .intro__shot-img {
@@ -190,10 +191,54 @@ html.is-intro .fx-letterbox span {
 }
 
 .intro--overlap .intro__shot--falcon {
-  left: 41.5%;
+  left: 41.8%;
   top: -20%;
   height: 170%;
   z-index: 5;
+}
+
+.intro--overlap .intro__shot:nth-child(1) {
+  animation-delay: 0.16s;
+}
+
+.intro--overlap .intro__shot:nth-child(2) {
+  animation-delay: 0.38s;
+}
+
+.intro--overlap .intro__shot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.intro--overlap .intro__shot:nth-child(4) {
+  animation-delay: 0.82s;
+}
+
+.intro--overlap .intro__shot:nth-child(5) {
+  animation-delay: 1.04s;
+}
+
+.intro--overlap .intro__panels {
+  animation-delay: 1.95s;
+}
+
+.intro--overlap .intro__flash {
+  animation-delay: 1.95s;
+}
+
+.intro--overlap .intro__logo {
+  animation-delay: 1.98s;
+}
+
+.intro--overlap .intro__box {
+  animation-delay: 1.95s;
+}
+
+.intro--overlap .intro__run {
+  animation-delay: 2.35s;
+}
+
+.intro--overlap .intro__sub {
+  animation-delay: 2.75s;
 }
 
 .intro__shot:nth-child(1) {
