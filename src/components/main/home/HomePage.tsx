@@ -2,20 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
-import { OpenCountdown } from "./OpenCountdown";
+import { OpenCountdown, OpenDday } from "./OpenCountdown";
 import { HomePopup } from "./HomePopup";
 import { SideDock } from "./SideDock";
 import { TimeTable } from "./TimeTable";
 
 const TICKER = [
   "MARVEL RUN 2026",
+  "9.22 14:00 OPEN",
   "INJE SPEEDIUM",
   "10.31 SAT",
   "ASSEMBLE",
@@ -31,6 +32,22 @@ export function HomePage() {
   const [venueFx, setVenueFx] = useState(0);
   const preview = EVENT.courses.find((c) => c.id === previewId);
   const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
+
+  function goAssemble(e: MouseEvent<HTMLAnchorElement>) {
+    const el = document.getElementById("assemble");
+    if (!el) return;
+    e.preventDefault();
+    let top = 0;
+    for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) {
+      top += n.offsetTop;
+    }
+    const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: Math.max(0, (top - 170) * zoom),
+      behavior: reduce ? "auto" : "smooth",
+    });
+  }
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -116,6 +133,14 @@ export function HomePage() {
             priority
             className="hero__logo"
           />
+          <a
+            href="#assemble"
+            className="hero__dday"
+            onClick={goAssemble}
+            aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
+          >
+            <OpenDday />
+          </a>
           <p className="hero__lead">{EVENT.lead}</p>
           <p className="hero__meta">
             {EVENT.dateShort}

@@ -5,6 +5,12 @@ import { EVENT } from "@/lib/event";
 
 const OPEN_AT = Date.parse(EVENT.openAt);
 
+export const OPEN_STAMP = (() => {
+  const m = EVENT.openAt.match(/^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!m) return { date: "9.22", time: "14:00" };
+  return { date: `${Number(m[1])}.${m[2]}`, time: `${m[3]}:${m[4]}` };
+})();
+
 type Left = { d: string; h: string; m: string; s: string };
 
 function parts(now: number): Left | null {
@@ -20,7 +26,7 @@ function parts(now: number): Left | null {
   };
 }
 
-export function OpenCountdown() {
+export function useOpenLeft() {
   const [left, setLeft] = useState<Left | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -34,6 +40,18 @@ export function OpenCountdown() {
     return () => window.clearInterval(id);
   }, []);
 
+  return { left, ready };
+}
+
+export function OpenDday({ className }: { className?: string }) {
+  const { left, ready } = useOpenLeft();
+  const label = !ready ? "D - --" : left ? `D - ${Number(left.d)}` : "OPEN";
+
+  return <span className={className}>{label}</span>;
+}
+
+export function OpenCountdown() {
+  const { left, ready } = useOpenLeft();
   if (ready && !left) return null;
 
   const slots = left ?? { d: "--", h: "--", m: "--", s: "--" };

@@ -357,8 +357,8 @@ html.is-live .side-dock {
 .side-dock .side-dock__open {
   flex-direction: column;
   gap: 0.18rem;
-  min-height: 6.1rem;
-  padding: 0.7rem 1.15rem 0.62rem 1.3rem;
+  min-height: 5.8rem;
+  padding: 0.65rem 1.1rem 0.55rem 1.25rem;
   background: var(--marvel);
   color: #fff;
   letter-spacing: 0;
@@ -373,26 +373,30 @@ html.is-live .side-dock {
 .side-dock .side-dock__open.is-on {
   background: var(--marvel);
   color: #fff;
-  box-shadow: -3px 3px 0 rgba(0, 0, 0, 0.28), 0 0 18px rgba(237, 29, 36, 0.45);
 }
 
-.side-dock__open-date {
-  font-size: 1.05rem;
+.side-dock__open-dday {
+  font-size: 1.28rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
 }
 
-.side-dock__open-time {
-  font-size: 1.42rem;
+.side-dock__open-when {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.7rem;
   font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
+.side-dock .side-dock__open:hover .side-dock__open-when,
+.side-dock .side-dock__open.is-on:hover .side-dock__open-when {
+  color: inherit;
+}
+
 .side-dock__open-label {
-  margin-top: 0.08rem;
+  margin-top: 0.06rem;
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.2em;
@@ -798,23 +802,48 @@ html.is-live .hero__logo {
   animation: logoHero 0.72s 0.18s cubic-bezier(0.12, 1.35, 0.2, 1) both;
 }
 
+html.is-live .hero__dday {
+  animation: fadeUp 0.5s 0.32s both;
+}
+
 html.is-live .hero__lead {
-  animation: fadeUp 0.55s 0.38s both;
+  animation: fadeUp 0.55s 0.42s both;
 }
 
 html.is-live .hero__meta {
-  animation: fadeUp 0.55s 0.48s both;
+  animation: fadeUp 0.55s 0.5s both;
 }
 
 html.is-live .hero__actions {
-  animation: fadeUp 0.55s 0.58s both;
+  animation: fadeUp 0.55s 0.6s both;
 }
 
 .hero__logo {
   display: block;
   width: min(420px, 72vw);
   height: auto;
-  margin: 0.4rem 0 1.4rem;
+  margin: 0.4rem 0 0.85rem;
+}
+
+.hero__dday {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 1.15rem;
+  padding: 0.55rem 1.45rem 0.5rem 1.55rem;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-decoration: none;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  box-shadow: 4px 4px 0 var(--marvel);
+}
+
+.hero__dday:hover {
+  background: #fff;
+  color: var(--marvel);
 }
 
 .hero__lead {
@@ -834,7 +863,7 @@ html.is-live .hero__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 2rem;
+  margin-top: 1.6rem;
 }
 
 /* ticker */
@@ -3712,16 +3741,12 @@ button.course {
   }
 
   .side-dock .side-dock__open {
-    min-height: 5.4rem;
-    padding: 0.55rem 0.9rem 0.5rem 1.05rem;
+    min-height: 5.2rem;
+    padding: 0.5rem 0.85rem 0.45rem 1rem;
   }
 
-  .side-dock__open-date {
-    font-size: 0.92rem;
-  }
-
-  .side-dock__open-time {
-    font-size: 1.18rem;
+  .side-dock__open-dday {
+    font-size: 1.08rem;
   }
 
   .site-header__drawer {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { EVENT } from "@/lib/event";
+import { OPEN_STAMP, OpenDday } from "./OpenCountdown";
 
 const SECTIONS = [
   { id: "courses", label: "코스", pad: 170 },
@@ -10,12 +11,6 @@ const SECTIONS = [
   { id: "venue", label: "장소", pad: 170 },
   { id: "assemble", label: "접수", pad: 170 },
 ] as const;
-
-const OPEN_STAMP = (() => {
-  const m = EVENT.openAt.match(/^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  if (!m) return { date: "9.22", time: "14:00" };
-  return { date: `${Number(m[1])}.${m[2]}`, time: `${m[3]}:${m[4]}` };
-})();
 
 export function SideDock() {
   const [active, setActive] = useState<string>("hero");
@@ -72,8 +67,12 @@ export function SideDock() {
         aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
         onClick={() => jump("assemble")}
       >
-        <span className="side-dock__open-date">{OPEN_STAMP.date}</span>
-        <span className="side-dock__open-time">{OPEN_STAMP.time}</span>
+        <span className="side-dock__open-dday">
+          <OpenDday />
+        </span>
+        <span className="side-dock__open-when">
+          {OPEN_STAMP.date} {OPEN_STAMP.time}
+        </span>
         <span className="side-dock__open-label">OPEN</span>
       </button>
       {SECTIONS.map((s) => (
