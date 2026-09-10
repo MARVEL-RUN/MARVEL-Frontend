@@ -10,6 +10,7 @@ import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown } from "./OpenCountdown";
+import { SideDock } from "./SideDock";
 import { TimeTable } from "./TimeTable";
 
 const TICKER = [
@@ -85,7 +86,7 @@ export function HomePage() {
     <main className="home" ref={rootRef}>
       <OpeningIntro />
 
-      <section className="hero" ref={heroRef}>
+      <section className="hero" id="hero" ref={heroRef}>
         <div className="hero__art" aria-hidden>
           <Image
             src={COMING_SOON_ASSETS.hero}
@@ -180,7 +181,7 @@ export function HomePage() {
       </section>
 
       <section className="sec courses">
-        <div className="wrap reveal">
+        <div className="wrap reveal" id="courses">
           <p className="kicker">02 / MISSIONS</p>
           <h2 className="sec__title">
             미션을 <em>선택하라</em>
@@ -229,7 +230,7 @@ export function HomePage() {
       ) : null}
 
       <section className="sec schedule">
-        <div className="wrap reveal">
+        <div className="wrap reveal" id="schedule">
           <p className="kicker">03 / RACE DAY</p>
           <h2 className="sec__title">
             레이스 데이 <em>타임라인</em>
@@ -239,7 +240,7 @@ export function HomePage() {
       </section>
 
       <section className="sec venue">
-        <div className="wrap venue__grid reveal">
+        <div className="wrap venue__grid reveal" id="venue">
           <div>
             <p className="kicker">04 / LOCATION</p>
             <h2 className="sec__title">
@@ -296,7 +297,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="assemble">
+      <section className="assemble" id="assemble">
         <p className="assemble__ghost" aria-hidden>
           ASSEMBLE
         </p>
@@ -313,6 +314,7 @@ export function HomePage() {
           </Link>
         </div>
       </section>
+      <SideDock />
     </main>
   );
 }

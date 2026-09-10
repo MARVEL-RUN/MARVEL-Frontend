@@ -297,6 +297,112 @@ html.is-live .site-header {
   display: none;
 }
 
+/* 홈 오른쪽 바로가기 */
+.side-dock {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 34;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.32rem;
+  transform: translateY(-50%);
+}
+
+html.is-intro .side-dock {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.is-live .side-dock {
+  animation: headerIn 0.55s 0.12s ease both;
+}
+
+.side-dock button,
+.side-dock a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0 1.05rem 0 1.15rem;
+  border: 0;
+  background: #07081c;
+  color: #fff;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+  box-shadow: -3px 3px 0 rgba(0, 0, 0, 0.28);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.side-dock button:hover,
+.side-dock a:hover {
+  background: #fff;
+  color: var(--navy);
+  transform: translateX(-3px);
+}
+
+.side-dock .is-on {
+  background: var(--marvel);
+  color: #fff;
+}
+
+.side-dock .is-on:hover {
+  background: #fff;
+  color: var(--marvel);
+}
+
+.side-dock .side-dock__go {
+  background: #fff;
+  color: var(--navy);
+}
+
+.side-dock .side-dock__go:hover {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+.side-dock__top {
+  width: 2.35rem;
+  min-width: 2.35rem;
+  min-height: 2.35rem;
+  margin-top: 0.35rem;
+  padding: 0;
+}
+
+.side-dock__top span {
+  display: block;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-left: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg) translateY(1px);
+}
+
+#hero,
+#assemble {
+  scroll-margin-top: calc(var(--header-h) + 0.5rem);
+}
+
+#courses,
+#schedule,
+#venue {
+  scroll-margin-top: 0.2rem;
+}
+
+body:has(.site-header__drawer.is-open) .side-dock,
+body:has(.course-preview) .side-dock {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* footer */
 .site-footer {
   background: #00010f;
@@ -335,7 +441,7 @@ html.is-live .site-header {
   gap: 0.15rem 0;
 }
 
-.site-footer__meta span + span::before {
+.site-footer__meta span+span::before {
   content: " | ";
   opacity: 0.7;
 }
@@ -387,7 +493,7 @@ html.is-live .site-header {
   width: min(9.5rem, 28vw);
 }
 
-.site-footer__sponsors > li > span:first-child {
+.site-footer__sponsors>li>span:first-child {
   color: var(--note);
   font-size: 0.72rem;
   letter-spacing: 0.14em;
@@ -3035,8 +3141,7 @@ button.course {
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 6px;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23fff' d='M1.4 1.2 6 5.8l4.6-4.6'/%3E%3C/svg%3E")
-      no-repeat right 0.75rem center / 0.7rem,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23fff' d='M1.4 1.2 6 5.8l4.6-4.6'/%3E%3C/svg%3E") no-repeat right 0.75rem center / 0.7rem,
     transparent;
   color: #fff;
   font: inherit;
@@ -3247,6 +3352,19 @@ button.course {
   .site-header__burger {
     display: block;
     margin-left: auto;
+  }
+
+  .side-dock button,
+  .side-dock a {
+    min-height: 2.1rem;
+    padding: 0 0.8rem 0 0.95rem;
+    font-size: 0.64rem;
+  }
+
+  .side-dock__top {
+    width: 2.1rem;
+    min-width: 2.1rem;
+    min-height: 2.1rem;
   }
 
   .site-header__drawer {
@@ -3535,7 +3653,7 @@ button.course {
     gap: 0.15rem;
   }
 
-  .site-footer__meta span + span::before {
+  .site-footer__meta span+span::before {
     content: none;
   }
 
@@ -3546,7 +3664,7 @@ button.course {
     width: 100%;
   }
 
-  .site-footer__nav a + a {
+  .site-footer__nav a+a {
     border-left: 0;
     padding-left: 0;
   }
@@ -3614,6 +3732,10 @@ button.course {
 
   .venue__glitch {
     display: none;
+  }
+
+  html.is-live .side-dock {
+    animation: none;
   }
 }
 
