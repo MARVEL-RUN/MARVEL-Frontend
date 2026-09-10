@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { create } from "zustand";
 import { useEffect } from "react";
 
@@ -47,15 +48,17 @@ function ToastItemView({ item }: { item: ToastItem }) {
       role="status"
       aria-live="polite"
     >
-      <span className="admin-toast__label">{item.type === "success" ? "성공" : "실패"}</span>
-      <p className="admin-toast__message">{item.message}</p>
+      <div className="admin-toast__body">
+        <span className="admin-toast__label">{item.type === "success" ? "성공" : "실패"}</span>
+        <p className="admin-toast__message">{item.message}</p>
+      </div>
       <button
         type="button"
         className="admin-toast__close"
         aria-label="닫기"
         onClick={() => dismiss(item.id)}
       >
-        ×
+        <X size={14} strokeWidth={2.25} />
       </button>
     </div>
   );

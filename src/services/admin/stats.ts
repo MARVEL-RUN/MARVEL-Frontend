@@ -1,9 +1,6 @@
 import { listFaqs } from "./faqs";
 import { listInquiries } from "./inquiries";
-import {
-  listGroupApplications,
-  listIndividualApplications,
-} from "./applications";
+import { listAllApplications } from "./applications";
 import { listAdminNotices } from "./notices";
 
 export type AdminDashboardStats = {
@@ -18,23 +15,22 @@ export type AdminDashboardStats = {
 };
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const [entries, groups, notices, faqs, inquiries] = await Promise.all([
-    listIndividualApplications(),
-    listGroupApplications(),
+  const [applications, notices, faqs, inquiries] = await Promise.all([
+    listAllApplications(),
     listAdminNotices(),
     listFaqs(),
     listInquiries(),
   ]);
 
-  const pendingCount =
-    entries.filter((row) => row.status === "pending").length +
-    groups.filter((row) => row.status === "pending").length;
+  const individuals = applications.filter((row) => row.kind === "individual");
+  const groups = applications.filter((row) => row.kind === "group");
 
   return {
-    individualCount: entries.length,
+    individualCount: individuals.length,
     groupCount: groups.length,
-    participantCount: groups.reduce((sum, row) => sum + row.participants.length, 0),
-    pendingCount,
+    participantCount:
+      individuals.length + groups.reduce((sum, row) => sum + (row.memberCount ?? 0), 0),
+    pendingCount: applications.filter((row) => row.status === "pending").length,
     noticeCount: notices.length,
     faqCount: faqs.length,
     inquiryCount: inquiries.length,
