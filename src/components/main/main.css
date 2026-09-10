@@ -1330,14 +1330,35 @@ html.is-live .hero__actions {
 
 .assemble__count {
   display: flex;
+  align-items: stretch;
   justify-content: center;
-  gap: clamp(0.9rem, 3.6vw, 2rem);
-  margin: 0 0 1.7rem;
+  gap: 0.28rem;
+  width: min(26rem, 100%);
+  margin: 0 auto 1.8rem;
+}
+
+.assemble__tick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.72rem 0.2rem 0.55rem;
+  background: var(--navy);
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.assemble__count i {
+  flex: none;
+  align-self: center;
+  padding-bottom: 0.85rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1.1rem, 3.2vw, 1.55rem);
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .assemble__count strong {
   display: block;
-  font-size: clamp(1.7rem, 4.8vw, 2.7rem);
+  font-size: clamp(1.45rem, 4.6vw, 2.25rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.04em;
@@ -1346,9 +1367,9 @@ html.is-live .hero__actions {
 
 .assemble__count em {
   display: block;
-  margin-top: 0.38em;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.68rem;
+  margin-top: 0.4em;
+  color: var(--gold);
+  font-size: 0.58rem;
   font-style: normal;
   font-weight: 700;
   letter-spacing: 0.16em;

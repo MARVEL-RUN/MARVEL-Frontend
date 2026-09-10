@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { EVENT } from "@/lib/event";
 
 const OPEN_AT = Date.parse(EVENT.openAt);
@@ -38,19 +38,22 @@ export function OpenCountdown() {
 
   const slots = left ?? { d: "--", h: "--", m: "--", s: "--" };
   const units = [
-    [slots.d, "일"],
-    [slots.h, "시간"],
-    [slots.m, "분"],
-    [slots.s, "초"],
+    [slots.d, "DAY"],
+    [slots.h, "HR"],
+    [slots.m, "MIN"],
+    [slots.s, "SEC"],
   ] as const;
 
   return (
     <div className="assemble__count" aria-hidden={!left}>
-      {units.map(([n, u]) => (
-        <div key={u}>
-          <strong>{n}</strong>
-          <em>{u}</em>
-        </div>
+      {units.map(([n, u], i) => (
+        <Fragment key={u}>
+          {i > 0 ? <i aria-hidden>:</i> : null}
+          <span className="assemble__tick">
+            <strong>{n}</strong>
+            <em>{u}</em>
+          </span>
+        </Fragment>
       ))}
     </div>
   );
