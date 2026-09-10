@@ -20,8 +20,11 @@ export function todayStamp() {
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
 }
 
+let idSeq = 0;
+
 export function nextId(prefix: string) {
-  return `${prefix}-${Date.now().toString(36)}`;
+  idSeq += 1;
+  return `${prefix}-${Date.now().toString(36)}-${idSeq.toString(36)}`;
 }
 
 const wait = () => new Promise((r) => setTimeout(r, 80));

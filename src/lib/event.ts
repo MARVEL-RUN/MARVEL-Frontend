@@ -201,7 +201,7 @@ export const EVENT = {
     {
       id: "3",
       date: "2026.09.10",
-      tag: "NOTICE",
+      tag: "필독",
       title: "MARVEL RUN 2026 KOREA 공식 홈페이지 오픈",
       pinned: true,
       body: "대회안내, 코스, 오시는길을 공식 홈페이지에서 확인할 수 있습니다. 참가 접수는 9월 22일 오후 2시에 시작됩니다.",
@@ -209,7 +209,7 @@ export const EVENT = {
     {
       id: "2",
       date: "2026.09.10",
-      tag: "RACE",
+      tag: "이벤트",
       title: "코스별 스타트 타임 안내",
       pinned: false,
       body: "10 Km 13:30, 5 Km 14:00, 2.3 Km 14:30. 스타트 30분 전까지 집결을 완료해 주세요.",
@@ -217,7 +217,7 @@ export const EVENT = {
     {
       id: "1",
       date: "2026.09.10",
-      tag: "ENTRY",
+      tag: "일반",
       title: "참가 접수 9월 22일 오후 2시 오픈",
       pinned: false,
       body: "코스 선택 후 참가자 정보를 입력하면 주문번호가 발급됩니다. 접수 내역은 신청조회에서 확인합니다.",

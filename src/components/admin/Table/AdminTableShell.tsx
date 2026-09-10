@@ -1,5 +1,7 @@
 "use client";
 
+import { AdminPagination } from "@/components/admin/Pagination";
+
 type Column<T> = {
   key: string;
   header: string;
@@ -17,7 +19,10 @@ type Props<T> = {
   actions?: React.ReactNode;
   page?: number;
   pageCount?: number;
+  totalCount?: number;
   onPage?: (page: number) => void;
+  pageUnit?: string;
+  onRowClick?: (row: T) => void;
 };
 
 export function AdminTableShell<T>({
@@ -31,8 +36,14 @@ export function AdminTableShell<T>({
   actions,
   page = 1,
   pageCount = 1,
+  totalCount,
   onPage,
+  pageUnit,
+  onRowClick,
 }: Props<T>) {
+  const count = totalCount ?? rows.length;
+  const showPager = Boolean(onPage) && !loading && count > 0;
+
   return (
     <section className="admin-table-shell">
       <div className="admin-table-shell__head">
@@ -41,7 +52,7 @@ export function AdminTableShell<T>({
       </div>
       <div className="admin-toolbar">
         <p className="admin-toolbar__count">
-          검색 결과 총 <strong>{loading ? "…" : rows.length}</strong>개
+          검색 결과 총 <strong>{loading ? "…" : count}</strong>개
         </p>
         {tools ? <div className="admin-toolbar__fields">{tools}</div> : null}
       </div>
@@ -51,7 +62,7 @@ export function AdminTableShell<T>({
         ) : rows.length === 0 ? (
           <p className="admin-empty">{empty}</p>
         ) : (
-          <table className="admin-table">
+          <table className={`admin-table${onRowClick ? " is-clickable" : ""}`}>
             <thead>
               <tr>
                 {columns.map((col) => (
@@ -61,7 +72,10 @@ export function AdminTableShell<T>({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={rowKey(row)}>
+                <tr
+                  key={rowKey(row)}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                >
                   {columns.map((col) => (
                     <td key={col.key}>{col.render(row)}</td>
                   ))}
@@ -71,19 +85,14 @@ export function AdminTableShell<T>({
           </table>
         )}
       </div>
-      {onPage && pageCount > 1 ? (
-        <div className="admin-pager">
-          {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
-            <button
-              key={n}
-              type="button"
-              className={n === page ? "is-on" : undefined}
-              onClick={() => onPage(n)}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+      {showPager && onPage ? (
+        <AdminPagination
+          total={count}
+          page={page}
+          pageCount={Math.max(1, pageCount)}
+          onPage={onPage}
+          unit={pageUnit}
+        />
       ) : null}
     </section>
   );
