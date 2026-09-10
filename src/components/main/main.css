@@ -369,21 +369,29 @@ html.is-live .side-dock {
   color: var(--navy);
 }
 
-.side-dock__top {
+.side-dock .side-dock__top {
   width: 2.35rem;
   min-width: 2.35rem;
   min-height: 2.35rem;
   margin-top: 0.35rem;
   padding: 0;
+  background: #fff;
+  color: var(--marvel);
+}
+
+.side-dock .side-dock__top:hover {
+  background: var(--marvel);
+  color: #fff;
 }
 
 .side-dock__top span {
   display: block;
-  width: 0.42rem;
-  height: 0.42rem;
-  border-left: 2px solid currentColor;
-  border-top: 2px solid currentColor;
-  transform: rotate(45deg) translateY(1px);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0.38rem 0.5rem;
+  border-color: transparent transparent currentColor;
+  transform: none;
 }
 
 #hero,
