@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
+import { APP_MODE } from "@/lib/mode";
+import { SiteZoom } from "@/components/main/layout/SiteZoom";
 import "./globals.css";
 import { GoogleAnalytics } from "./GoogleAnalytics";
 import { NaverAnalytics } from "./NaverAnalytics";
@@ -28,8 +31,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body>
+        <Script id="site-zoom-guard" strategy="beforeInteractive">
+          {`(function(){var p=location.pathname;if(p.indexOf("/admin")===0)return;if(${JSON.stringify(APP_MODE)}!=="main")return;document.documentElement.classList.add("is-main");if((p==="/"||p==="")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("is-intro");}})();`}
+        </Script>
+        <SiteZoom />
         {children}
         <GoogleAnalytics measurementId={process.env.GA_MEASUREMENT_ID} />
         <NaverAnalytics waId={process.env.NAVER_ANALYTICS_ID} />

@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import {
+  CHILD_AGE_NOTE,
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
+  GUARDIAN_AGE_NOTE,
+  applyCourseForBirth,
+  ageBand,
   courseById,
+  emailOk,
   genderLabel,
+  needsGuardian,
   requiredConsentsOk,
   submitEntry,
   ticketFee,
@@ -21,6 +27,7 @@ import {
   ApplyNotice,
   BirthPick,
   CoursePick,
+  EmailField,
   FeeText,
   FormRow,
   FormSec,
@@ -80,10 +87,16 @@ function IndividualFlow({
     e.preventDefault();
     if (!draft.name.trim()) return setError("이름을 입력하세요.");
     if (!/^\d{8}$/.test(draft.birth)) return setError("생년월일을 선택하세요.");
+    if (ageBand(draft.birth) === "tooYoung") {
+      return setError("만 6세 미만은 참가할 수 없습니다.");
+    }
     if (!draft.gender) return setError("성별을 선택하세요.");
     if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!draft.email.trim()) return setError("이메일을 입력하세요.");
+    if (!emailOk(draft.email)) return setError("이메일을 입력하세요.");
     if (!draft.courseId) return setError("참가종목을 선택하세요.");
+    if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
+      return setError("만 14세 미만은 보호자 연락처를 입력하세요.");
+    }
     if (!draft.shirt) return setError("기념품을 선택하세요.");
     if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
     setStep(1);
@@ -138,7 +151,19 @@ function IndividualFlow({
               />
             </FormRow>
             <FormRow label="생년월일" required>
-              <BirthPick value={draft.birth} onChange={(birth) => patch({ birth })} />
+              <div>
+                <BirthPick
+                  value={draft.birth}
+                  onChange={(birth) =>
+                    patch({ birth, ...applyCourseForBirth(draft.courseId, birth) })
+                  }
+                />
+                <p className="form-row__hint">
+                  {CHILD_AGE_NOTE}
+                  <br />
+                  {GUARDIAN_AGE_NOTE}
+                </p>
+              </div>
             </FormRow>
             <FormRow label="성별" required>
               <GenderPick
@@ -161,28 +186,29 @@ function IndividualFlow({
               />
             </FormRow>
             <FormRow label="이메일" required>
-              <input
-                type="email"
-                name="email"
-                placeholder="이메일을 입력해주세요."
+              <EmailField
                 value={draft.email}
-                onChange={(e) => patch({ email: e.target.value })}
-                autoComplete="email"
+                onChange={(email) => patch({ email })}
                 required
               />
             </FormRow>
           </FormSec>
 
           <FormSec
-            title="보호자 정보 (선택)"
-            note="선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+            title={needsGuardian(draft.birth) ? "보호자 정보" : "보호자 정보 (선택)"}
+            note={
+              needsGuardian(draft.birth)
+                ? `${GUARDIAN_AGE_NOTE}. 보호자 연락처를 입력해 주세요.`
+                : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+            }
           >
-            <FormRow label="보호자 연락처">
+            <FormRow label="보호자 연락처" required={needsGuardian(draft.birth)}>
               <PhoneField
                 name="emergency"
                 placeholder="보호자 연락처를 입력해주세요."
                 value={draft.emergency}
                 onChange={(emergency) => patch({ emergency })}
+                required={needsGuardian(draft.birth)}
               />
             </FormRow>
           </FormSec>
@@ -191,7 +217,7 @@ function IndividualFlow({
             <FormRow label="참가종목" required>
               <CoursePick
                 value={draft.courseId}
-                ticket={draft.ticket}
+                birth={draft.birth}
                 onChange={(courseId, ticket) => patch({ courseId, ticket })}
               />
             </FormRow>
@@ -201,11 +227,13 @@ function IndividualFlow({
                 onChange={(shirt) => patch({ shirt })}
               />
             </FormRow>
-            {draft.courseId ? (
-              <FormRow label="참가비">
+            <FormRow label="참가비">
+              {draft.courseId ? (
                 <FeeText courseId={draft.courseId} ticket={draft.ticket} />
-              </FormRow>
-            ) : null}
+              ) : (
+                <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
+              )}
+            </FormRow>
           </FormSec>
 
           <div className="flow__nav">

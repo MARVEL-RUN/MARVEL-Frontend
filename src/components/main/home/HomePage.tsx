@@ -2,17 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
+import { OpenCountdown, OpenDday } from "./OpenCountdown";
+import { HomePopup } from "./HomePopup";
+import { SideDock } from "./SideDock";
 import { TimeTable } from "./TimeTable";
 
 const TICKER = [
   "MARVEL RUN 2026",
+  "9.22 14:00 OPEN",
   "INJE SPEEDIUM",
   "10.31 SAT",
   "ASSEMBLE",
@@ -29,12 +33,28 @@ export function HomePage() {
   const preview = EVENT.courses.find((c) => c.id === previewId);
   const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
 
+  function goAssemble(e: MouseEvent<HTMLAnchorElement>) {
+    const el = document.getElementById("assemble");
+    if (!el) return;
+    e.preventDefault();
+    let top = 0;
+    for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) {
+      top += n.offsetTop;
+    }
+    const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: Math.max(0, (top - 170) * zoom),
+      behavior: reduce ? "auto" : "smooth",
+    });
+  }
+
   useEffect(() => {
     const hero = heroRef.current;
     const root = rootRef.current;
     if (!hero || !root) return;
 
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: globalThis.MouseEvent) => {
       const r = hero.getBoundingClientRect();
       hero.style.setProperty("--mx", `${e.clientX - r.left}px`);
       hero.style.setProperty("--my", `${e.clientY - r.top}px`);
@@ -84,7 +104,7 @@ export function HomePage() {
     <main className="home" ref={rootRef}>
       <OpeningIntro />
 
-      <section className="hero" ref={heroRef}>
+      <section className="hero" id="hero" ref={heroRef}>
         <div className="hero__art" aria-hidden>
           <Image
             src={COMING_SOON_ASSETS.hero}
@@ -113,6 +133,14 @@ export function HomePage() {
             priority
             className="hero__logo"
           />
+          <a
+            href="#assemble"
+            className="hero__dday"
+            onClick={goAssemble}
+            aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
+          >
+            <OpenDday />
+          </a>
           <p className="hero__lead">{EVENT.lead}</p>
           <p className="hero__meta">
             {EVENT.dateShort}
@@ -179,7 +207,7 @@ export function HomePage() {
       </section>
 
       <section className="sec courses">
-        <div className="wrap reveal">
+        <div className="wrap reveal" id="courses">
           <p className="kicker">02 / MISSIONS</p>
           <h2 className="sec__title">
             미션을 <em>선택하라</em>
@@ -214,7 +242,7 @@ export function HomePage() {
                   </div>
                   <div>
                     <dt>어린이</dt>
-                    <dd>{"childFee" in c ? c.childFee : "참가 불가"}</dd>
+                    <dd>{"childFee" in c ? c.childFee : "어린이 참가 불가"}</dd>
                   </div>
                 </dl>
               </li>
@@ -228,7 +256,7 @@ export function HomePage() {
       ) : null}
 
       <section className="sec schedule">
-        <div className="wrap reveal">
+        <div className="wrap reveal" id="schedule">
           <p className="kicker">03 / RACE DAY</p>
           <h2 className="sec__title">
             레이스 데이 <em>타임라인</em>
@@ -238,7 +266,7 @@ export function HomePage() {
       </section>
 
       <section className="sec venue">
-        <div className="wrap venue__grid reveal">
+        <div className="wrap venue__grid reveal" id="venue">
           <div>
             <p className="kicker">04 / LOCATION</p>
             <h2 className="sec__title">
@@ -295,22 +323,25 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="assemble">
+      <section className="assemble" id="assemble">
         <p className="assemble__ghost" aria-hidden>
           ASSEMBLE
         </p>
         <div className="assemble__inner reveal">
-          <p className="kicker kicker--on-red">05 / CALL</p>
+          <p className="kicker kicker--on-red">OPEN</p>
           <h2>
             {EVENT.openNoticeDate}
             <br />
             {EVENT.openNoticeTime} {EVENT.openNoticeAction}
           </h2>
+          <OpenCountdown />
           <Link href={REGISTER_HREF} className="btn btn--on-red">
             {cta}
           </Link>
         </div>
       </section>
+      <SideDock />
+      <HomePopup />
     </main>
   );
 }

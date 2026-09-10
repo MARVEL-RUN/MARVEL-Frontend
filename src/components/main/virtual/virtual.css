@@ -4,12 +4,36 @@
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  background: var(--navy);
+  background:
+    radial-gradient(
+      ellipse 88% 58% at 50% -8%,
+      color-mix(in srgb, var(--virtual-accent) 34%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(ellipse 70% 38% at 50% 6%, rgba(237, 29, 36, 0.12), transparent 58%),
+    radial-gradient(ellipse 90% 35% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 70%),
+    radial-gradient(1.2px 1.2px at 14% 4%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 72% 3%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.1px 1.1px at 38% 9%, rgba(255, 255, 255, 0.28), transparent),
+    radial-gradient(1px 1px at 86% 7%, rgba(255, 255, 255, 0.32), transparent),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--navy) 42%, var(--virtual-panel)) 0%,
+      color-mix(in srgb, var(--navy) 22%, var(--virtual-panel)) 18%,
+      var(--virtual-panel) 38%,
+      var(--virtual-panel) 68%,
+      color-mix(in srgb, var(--virtual-panel) 55%, var(--navy)) 88%,
+      var(--navy) 100%
+    );
+  transition: background 0.35s ease;
 }
 
 .virtual-header {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
   padding: 1.5rem 1.5rem 1.1rem;
+  background: transparent;
 }
 
 .virtual-header__brand {
@@ -32,26 +56,6 @@
   justify-content: flex-start;
   min-height: 0;
   padding-top: clamp(1.4rem, 4vh, 3.2rem);
-  background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(237, 29, 36, 0.16), transparent 62%),
-    radial-gradient(ellipse 90% 35% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 70%),
-    radial-gradient(1.2px 1.2px at 14% 8%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 72% 6%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1.1px 1.1px at 38% 18%, rgba(255, 255, 255, 0.28), transparent),
-    radial-gradient(1px 1px at 86% 14%, rgba(255, 255, 255, 0.32), transparent),
-    linear-gradient(
-      180deg,
-      var(--navy) 0%,
-      var(--navy) 12%,
-      color-mix(in srgb, var(--navy) 78%, var(--virtual-panel)) 24%,
-      color-mix(in srgb, var(--navy) 42%, var(--virtual-panel)) 36%,
-      color-mix(in srgb, var(--navy) 16%, var(--virtual-panel)) 46%,
-      var(--virtual-panel) 56%,
-      var(--virtual-panel) 72%,
-      color-mix(in srgb, var(--virtual-panel) 55%, var(--navy)) 88%,
-      var(--navy) 100%
-    );
-  transition: background 0.35s ease;
 }
 
 .virtual-hero {
