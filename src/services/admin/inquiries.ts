@@ -1,7 +1,7 @@
 import { nextId, readStore, todayStamp, wait, writeStore } from "@/lib/admin/store";
 import type { AdminInquiry } from "@/types/boards";
 
-const KEY = "mr-admin-inquiries";
+const KEY = "mr-admin-inquiries-v2";
 
 const SEED: AdminInquiry[] = [
   {
@@ -19,6 +19,10 @@ const SEED: AdminInquiry[] = [
     date: "2026.09.13",
     answer: "접수 마감 전까지 신청조회에서 문의 주시면 변경을 도와 드립니다. 제작 들어간 이후에는 어렵습니다.",
     answeredAt: "2026.09.13",
+    attachments: [
+      { id: "a-1", name: "신청확인서.pdf", size: 245760 },
+      { id: "a-2", name: "사이즈표.png", size: 102400 },
+    ],
   },
   {
     id: "q-3",
@@ -47,7 +51,11 @@ export async function getInquiry(id: string) {
   return load().find((row) => row.id === id) ?? null;
 }
 
-export async function createInquiry(input: Pick<AdminInquiry, "name" | "title" | "body">) {
+export async function createInquiry(
+  input: Pick<AdminInquiry, "name" | "title" | "body"> & {
+    attachments?: AdminInquiry["attachments"];
+  },
+) {
   await wait();
   const row: AdminInquiry = {
     id: nextId("q"),
@@ -55,6 +63,7 @@ export async function createInquiry(input: Pick<AdminInquiry, "name" | "title" |
     title: input.title.trim(),
     body: input.body.trim(),
     date: todayStamp(),
+    attachments: input.attachments?.length ? input.attachments : undefined,
   };
   save([row, ...load()]);
   return row;

@@ -76,7 +76,12 @@ export function InquiryWritePage() {
             }
             setSaving(true);
             try {
-              const row = await createInquiry({ name, title, body });
+              const row = await createInquiry({
+                name,
+                title,
+                body,
+                attachments: files.map(({ id, name, size }) => ({ id, name, size })),
+              });
               router.replace(`/inquiry/view?id=${row.id}`);
             } finally {
               setSaving(false);
