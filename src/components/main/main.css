@@ -4,7 +4,17 @@
 
 html {
   --header-h: 4.5rem;
+  --site-zoom: 1.1;
   scroll-padding-top: 5.5rem;
+}
+
+html.is-main {
+  /* 공개 페이지 110%. 인트로는 1배 */
+  zoom: var(--site-zoom);
+}
+
+html.is-intro {
+  zoom: 1;
 }
 
 .site {

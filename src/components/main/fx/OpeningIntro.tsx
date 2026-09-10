@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 
 /* prev면 이전 패널 5장 */
@@ -29,7 +29,7 @@ export function OpeningIntro() {
   const [phase, setPhase] = useState<"play" | "out" | "gone">("play");
   const done = useRef(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       document.documentElement.classList.add("is-live");
