@@ -1935,6 +1935,7 @@ html.admin-mode body {
 
 .admin-popup-card {
   perspective: 1000px;
+  min-width: 0;
 }
 
 .admin-popup-card__inner {
@@ -1955,6 +1956,12 @@ html.admin-mode body {
   border: 1px solid var(--admin-line);
   background: #fff;
   box-sizing: border-box;
+  pointer-events: none;
+}
+
+.admin-popup-card__inner:not(.is-flipped) .admin-popup-card__front,
+.admin-popup-card__inner.is-flipped .admin-popup-card__back {
+  pointer-events: auto;
 }
 
 .admin-popup-card__inner.is-flipped .admin-popup-card__face {
@@ -1982,7 +1989,6 @@ html.admin-mode body {
   max-height: 600px;
   background: #f8fbff;
   transform: rotateY(180deg);
-  cursor: default;
 }
 
 .admin-popup-card__order {
@@ -1999,27 +2005,6 @@ html.admin-mode body {
   color: #fff;
   font-size: 12px;
   font-weight: 700;
-}
-
-.admin-popup-card__badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 2;
-  height: 22px;
-  padding: 0 8px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  background: #e8edf3;
-  color: #5c6173;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.admin-popup-card__badge.is-on {
-  background: #e8f1fd;
-  color: #1a73e8;
 }
 
 .admin-popup-card__media {
@@ -2081,13 +2066,10 @@ html.admin-mode body {
   color: #d93025;
 }
 
-.admin-root .admin-popup-card__tools button.is-close {
-  margin-left: auto;
-}
-
 .admin-popup-card__field {
   display: grid;
   gap: 6px;
+  min-width: 0;
   font-size: 12px;
   font-weight: 700;
   color: #4a5160;
@@ -2110,19 +2092,69 @@ html.admin-mode body {
 
 .admin-popup-card__file {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  width: 100%;
 }
 
-.admin-popup-card__file span {
+.admin-popup-card__file-hint {
   color: var(--admin-muted);
   font-size: 12px;
   font-weight: 400;
 }
 
-.admin-popup-card__check {
-  margin-top: 4px;
+.admin-popup-card__file-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 4px 0 10px;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.admin-popup-card__file-name {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--admin-ink);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.admin-root .admin-popup-card__file-clear {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+}
+
+.admin-root .admin-popup-card__file-clear:hover {
+  background: #eef1f5;
+  color: #d93025;
+}
+
+.admin-popup-card__field .admin-select {
+  width: 100%;
+}
+
+.admin-popup-card__back .admin-select__menu {
+  z-index: 5;
 }
 
 .admin-popup-preview__meta {

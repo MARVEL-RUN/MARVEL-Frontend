@@ -100,11 +100,11 @@ function PreviewPane({
 
 export function PopupPreview({ rows }: Props) {
   const desktop = useMemo(
-    () => rows.filter((row) => row.visible && (row.device === "BOTH" || row.device === "PC")),
+    () => rows.filter((row) => row.device === "BOTH" || row.device === "PC"),
     [rows],
   );
   const mobile = useMemo(
-    () => rows.filter((row) => row.visible && (row.device === "BOTH" || row.device === "MOBILE")),
+    () => rows.filter((row) => row.device === "BOTH" || row.device === "MOBILE"),
     [rows],
   );
 

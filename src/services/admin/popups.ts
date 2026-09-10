@@ -1,7 +1,7 @@
 import { nextId, readStore, wait, writeStore } from "@/lib/admin/store";
 import type { AdminPopup } from "@/types/popup";
 
-const KEY = "mr-admin-popups";
+const KEY = "mr-admin-popups-v2";
 
 const SEED: AdminPopup[] = [
   {
@@ -12,7 +12,7 @@ const SEED: AdminPopup[] = [
     device: "BOTH",
     orderNo: 1,
     imageUrl: "/images/coming-soon/marvel-run-logo.png",
-    visible: true,
+    imageName: "marvel-run-logo.png",
   },
   {
     id: "p-2",
@@ -22,12 +22,35 @@ const SEED: AdminPopup[] = [
     device: "MOBILE",
     orderNo: 2,
     imageUrl: "/images/main/sidebanner.svg",
-    visible: true,
+    imageName: "sidebanner.svg",
   },
 ];
 
+function ensureUniqueIds(rows: AdminPopup[]) {
+  const seen = new Set<string>();
+  let changed = false;
+  const next = rows.map((row, index) => {
+    let id = row.id;
+    if (!id || seen.has(id)) {
+      id = nextId("p");
+      changed = true;
+    }
+    seen.add(id);
+    return {
+      ...row,
+      id,
+      orderNo: index + 1,
+      draft: false,
+    };
+  });
+  return { rows: next, changed };
+}
+
 function load() {
-  return readStore<AdminPopup[]>(KEY, SEED);
+  const raw = readStore<AdminPopup[]>(KEY, SEED);
+  const { rows, changed } = ensureUniqueIds(raw);
+  if (changed) writeStore(KEY, rows);
+  return rows;
 }
 
 function save(rows: AdminPopup[]) {
@@ -41,12 +64,13 @@ export async function listPopups() {
 
 export async function savePopups(rows: AdminPopup[]) {
   await wait();
-  const next = rows.map((row, index) => ({
+  const prepared = rows.map((row, index) => ({
     ...row,
     orderNo: index + 1,
     draft: false,
-    id: row.draft ? nextId("p") : row.id,
+    id: row.draft || !row.id ? nextId("p") : row.id,
   }));
-  save(next);
-  return next;
+  const { rows: unique } = ensureUniqueIds(prepared);
+  save(unique);
+  return unique;
 }

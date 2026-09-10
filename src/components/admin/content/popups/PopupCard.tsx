@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminSelect } from "@/components/admin/Select";
 import type { AdminPopup, PopupDevice } from "@/types/popup";
 import { ChevronDown, ChevronUp, Minus, Plus, X } from "lucide-react";
 import { useRef, type ChangeEvent, type MouseEvent } from "react";
@@ -42,12 +43,18 @@ export function PopupCard({
       return;
     }
     const url = URL.createObjectURL(file);
-    onChange({ imageUrl: url });
+    onChange({ imageUrl: url, imageName: file.name });
+  };
+
+  const clearImage = () => {
+    onChange({ imageUrl: "", imageName: "" });
   };
 
   const stop = (event: MouseEvent) => {
     event.stopPropagation();
   };
+
+  const fileLabel = row.imageName || (row.imageUrl ? row.imageUrl.split("/").pop() : "");
 
   return (
     <article className="admin-popup-card">
@@ -57,9 +64,6 @@ export function PopupCard({
       >
         <div className="admin-popup-card__face admin-popup-card__front">
           <span className="admin-popup-card__order">{index + 1}</span>
-          <span className={`admin-popup-card__badge${row.visible ? " is-on" : ""}`}>
-            {row.visible ? "공개" : "비공개"}
-          </span>
           <div className="admin-popup-card__media">
             {row.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -73,8 +77,8 @@ export function PopupCard({
           </button>
         </div>
 
-        <div className="admin-popup-card__face admin-popup-card__back" onClick={stop}>
-          <div className="admin-popup-card__tools">
+        <div className="admin-popup-card__face admin-popup-card__back">
+          <div className="admin-popup-card__tools" onClick={stop}>
             <button type="button" aria-label="위로" onClick={() => onMove(-1)}>
               <ChevronUp size={16} />
             </button>
@@ -87,22 +91,37 @@ export function PopupCard({
             <button type="button" className="is-danger" aria-label="삭제" onClick={onRemove}>
               <Minus size={16} />
             </button>
-            <button type="button" className="is-close" aria-label="접기" onClick={onFlip}>
-              <X size={16} />
-            </button>
           </div>
 
-          <label className="admin-popup-card__field">
+          <label className="admin-popup-card__field" onClick={stop}>
             이미지 변경
             <span className="admin-popup-card__file">
-              <button
-                type="button"
-                className="admin-btn admin-btn--ghost"
-                onClick={() => fileRef.current?.click()}
-              >
-                이미지 선택
-              </button>
-              <span>{row.imageUrl ? "선택됨 / 20MB 이하" : "파일 없음 / 20MB 이하"}</span>
+              {fileLabel ? (
+                <span className="admin-popup-card__file-chip">
+                  <span className="admin-popup-card__file-name" title={fileLabel}>
+                    {fileLabel}
+                  </span>
+                  <button
+                    type="button"
+                    className="admin-popup-card__file-clear"
+                    aria-label="이미지 제거"
+                    onClick={clearImage}
+                  >
+                    <X size={14} />
+                  </button>
+                </span>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--ghost"
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    이미지 선택
+                  </button>
+                  <span className="admin-popup-card__file-hint">20MB 이하</span>
+                </>
+              )}
             </span>
             <input
               ref={fileRef}
@@ -113,7 +132,7 @@ export function PopupCard({
             />
           </label>
 
-          <label className="admin-popup-card__field">
+          <label className="admin-popup-card__field" onClick={stop}>
             링크 URL
             <input
               value={row.url}
@@ -122,21 +141,18 @@ export function PopupCard({
             />
           </label>
 
-          <label className="admin-popup-card__field">
+          <label className="admin-popup-card__field" onClick={stop}>
             디바이스
-            <select
+            <AdminSelect
               value={row.device}
-              onChange={(e) => onChange({ device: e.target.value as PopupDevice })}
-            >
-              {DEVICE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              options={DEVICE_OPTIONS}
+              onChange={(device) => onChange({ device })}
+              ariaLabel="디바이스"
+              width="100%"
+            />
           </label>
 
-          <label className="admin-popup-card__field">
+          <label className="admin-popup-card__field" onClick={stop}>
             시작일시
             <input
               type="datetime-local"
@@ -145,7 +161,7 @@ export function PopupCard({
             />
           </label>
 
-          <label className="admin-popup-card__field">
+          <label className="admin-popup-card__field" onClick={stop}>
             종료일시
             <input
               type="datetime-local"
@@ -154,14 +170,9 @@ export function PopupCard({
             />
           </label>
 
-          <label className="admin-form__check admin-popup-card__check">
-            <input
-              type="checkbox"
-              checked={row.visible}
-              onChange={(e) => onChange({ visible: e.target.checked })}
-            />
-            공개
-          </label>
+          <button type="button" className="admin-popup-card__flip">
+            클릭하여 뒤집기
+          </button>
         </div>
       </div>
     </article>

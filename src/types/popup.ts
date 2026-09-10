@@ -8,6 +8,6 @@ export type AdminPopup = {
   device: PopupDevice;
   orderNo: number;
   imageUrl?: string;
-  visible: boolean;
+  imageName?: string;
   draft?: boolean;
 };

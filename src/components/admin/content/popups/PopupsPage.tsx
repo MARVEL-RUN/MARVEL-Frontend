@@ -4,7 +4,6 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { adminToast } from "@/components/admin/Toast";
 import { listPopups, savePopups } from "@/services/admin/popups";
 import type { AdminPopup } from "@/types/popup";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { PopupCard } from "./PopupCard";
 import { PopupPreview } from "./PopupPreview";
@@ -14,44 +13,51 @@ function blankPopup(orderNo: number): AdminPopup {
   const pad = (n: number) => String(n).padStart(2, "0");
   const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T00:00`;
   return {
-    id: `draft-${Date.now()}-${orderNo}`,
+    id: `draft-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
     url: "",
     startAt: stamp,
     endAt: `${now.getFullYear() + 1}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T23:59`,
     device: "BOTH",
     orderNo,
     imageUrl: "",
-    visible: true,
     draft: true,
   };
 }
 
 export function PopupsPage() {
-  const queryClient = useQueryClient();
-  const { data = [], isLoading } = useQuery({
-    queryKey: ["admin", "popups"],
-    queryFn: listPopups,
-  });
   const { confirm, modal } = useAdminConfirm();
   const [mode, setMode] = useState<"manage" | "preview">("manage");
   const [rows, setRows] = useState<AdminPopup[]>([]);
   const [flipped, setFlipped] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setRows(data);
-  }, [data]);
+    let alive = true;
+    void listPopups().then((data) => {
+      if (!alive) return;
+      setRows(data);
+      setLoading(false);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  const save = useMutation({
-    mutationFn: () => savePopups(rows),
-    onSuccess: (next) => {
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const next = await savePopups(rows);
       setRows(next);
-      void queryClient.invalidateQueries({ queryKey: ["admin", "popups"] });
-      adminToast.success("팝업이 저장되었습니다.");
-      setMode("preview");
       setFlipped(new Set());
-    },
-    onError: () => adminToast.error("팝업 저장에 실패했습니다."),
-  });
+      setMode("preview");
+      adminToast.success("팝업이 저장되었습니다.");
+    } catch {
+      adminToast.error("팝업 저장에 실패했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const updateRow = (id: string, patch: Partial<AdminPopup>) => {
     setRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)));
@@ -136,16 +142,16 @@ export function PopupsPage() {
             <button
               type="button"
               className="admin-btn admin-btn--primary"
-              onClick={() => save.mutate()}
-              disabled={save.isPending || isLoading}
+              onClick={() => void handleSave()}
+              disabled={saving || loading}
             >
-              {save.isPending ? "저장 중..." : "저장하기"}
+              {saving ? "저장 중..." : "저장하기"}
             </button>
           </div>
         </div>
 
         <div className="admin-popup-body">
-          {isLoading ? (
+          {loading ? (
             <p className="admin-empty">불러오는 중…</p>
           ) : mode === "preview" ? (
             <PopupPreview rows={rows} />
@@ -159,7 +165,7 @@ export function PopupsPage() {
               <div className="admin-popup-grid">
                 {rows.map((row, index) => (
                   <PopupCard
-                    key={row.id}
+                    key={`${row.id}-${index}`}
                     row={row}
                     index={index}
                     flipped={flipped.has(row.id)}
