@@ -56,6 +56,19 @@ export function InquiryViewPage() {
               </p>
             </header>
             <div className="post__body">{post.body}</div>
+            {post.attachments?.length ? (
+              <section className="post__files" aria-label="첨부파일">
+                <p className="post__files-label">첨부파일</p>
+                <ul className="post__files-list">
+                  {post.attachments.map((file) => (
+                    <li key={file.id}>
+                      <span className="post__files-name">{file.name}</span>
+                      <span className="post__files-size">{formatFileSize(file.size)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
             <section className="post__reply">
               <p className="post__reply-label">답변</p>
               {post.answer ? <p>{post.answer}</p> : <p className="is-wait">답변 준비 중입니다.</p>}
@@ -77,6 +90,12 @@ export function InquiryViewPage() {
       </div>
     </main>
   );
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function NavRow({

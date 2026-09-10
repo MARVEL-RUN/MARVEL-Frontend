@@ -8,7 +8,11 @@ export type AdminUser = {
   roles?: string[];
 };
 
-export type AdminPayStatus = "paid" | "pending" | "cancelled";
+export type AdminPayStatus =
+  | "paid"
+  | "pending"
+  | "refund_requested"
+  | "refunded";
 
 export type AdminNotice = {
   id: string;
@@ -17,10 +21,4 @@ export type AdminNotice = {
   title: string;
   pinned: boolean;
   body: string;
-};
-
-export type AdminSponsor = {
-  id: string;
-  role: string;
-  name: string;
 };

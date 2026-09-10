@@ -5,6 +5,12 @@ export type AdminFaq = {
   date: string;
 };
 
+export type InquiryAttachment = {
+  id: string;
+  name: string;
+  size: number;
+};
+
 export type AdminInquiry = {
   id: string;
   name: string;
@@ -13,4 +19,5 @@ export type AdminInquiry = {
   date: string;
   answer?: string;
   answeredAt?: string;
+  attachments?: InquiryAttachment[];
 };
