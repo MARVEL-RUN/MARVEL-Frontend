@@ -47,7 +47,7 @@ export function NoticesPage() {
           onSortChange={setSort}
           onSearch={() => setApplied(query)}
         />
-        <div className="board">
+        <div className="board board--notice">
           <div className="board__head">
             <span>번호</span>
             <span>제목</span>

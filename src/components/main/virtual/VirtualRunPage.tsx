@@ -129,15 +129,21 @@ export function VirtualRunPage() {
         <section className="virtual-sheet" aria-labelledby="virtual-round-title">
           <article className="virtual-card">
             <div className="virtual-card__visual">
-              <Image
-                key={round.id}
-                src={round.image}
-                alt={round.alt}
-                width={582}
-                height={328}
-                className="virtual-card__img"
-                priority
-              />
+              {ROUNDS.map((item) => (
+                <Image
+                  key={item.id}
+                  src={item.image}
+                  alt={item.alt}
+                  width={582}
+                  height={328}
+                  className={
+                    roundId === item.id
+                      ? "virtual-card__img is-on"
+                      : "virtual-card__img"
+                  }
+                  priority
+                />
+              ))}
             </div>
             <div className="virtual-card__body">
               <h2 id="virtual-round-title" className="virtual-card__title">

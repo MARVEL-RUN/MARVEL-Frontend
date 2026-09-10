@@ -71,12 +71,16 @@ export function InquiryPage() {
                 className="board__row"
               >
                 <span className="board__no">{nos.get(item.id)}</span>
-                <strong className="board__title">
-                  <span className={item.answer ? "board__badge" : "board__badge is-wait"}>
+                <span className="board__subject">
+                  <span
+                    className={
+                      item.answer ? "board__badge" : "board__badge is-wait"
+                    }
+                  >
                     {item.answer ? "답변" : "대기"}
                   </span>
-                  {item.title}
-                </strong>
+                  <strong className="board__title">{item.title}</strong>
+                </span>
                 <span className="board__name">{item.name}</span>
                 <time dateTime={item.date.replaceAll(".", "-")}>{item.date}</time>
               </Link>

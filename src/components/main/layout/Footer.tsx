@@ -25,17 +25,14 @@ export function Footer() {
           <p className="site-footer__office-name">{OFFICE.name}</p>
           <address className="site-footer__office">
             <p>{OFFICE.address}</p>
-            <p>
-              대표자 : {OFFICE.ceo}
-              <span aria-hidden> | </span>
-              Tel : {OFFICE.tel}
-              <span aria-hidden> | </span>
-              Email: {OFFICE.email}
+            <p className="site-footer__meta">
+              <span>대표자 : {OFFICE.ceo}</span>
+              <span>Tel : {OFFICE.tel}</span>
+              <span>Email: {OFFICE.email}</span>
             </p>
-            <p>
-              사업자번호: {OFFICE.bizNo}
-              <span aria-hidden> | </span>
-              통신판매번호: {OFFICE.mailOrderNo}
+            <p className="site-footer__meta">
+              <span>사업자번호: {OFFICE.bizNo}</span>
+              <span>통신판매번호: {OFFICE.mailOrderNo}</span>
             </p>
             <p>※ 사무국 운영시간 : {OFFICE.hours}</p>
           </address>
@@ -58,13 +55,14 @@ export function Footer() {
           return (
             <li key={s.role}>
               <span>{s.role}</span>
-              <Image
-                src={logo.src}
-                alt={s.name}
-                width={logo.width}
-                height={logo.height}
-                className={s.role === "주관" ? "is-organizer" : undefined}
-              />
+              <span className="site-footer__sponsor-logo">
+                <Image
+                  src={logo.src}
+                  alt={s.name}
+                  width={logo.width}
+                  height={logo.height}
+                />
+              </span>
             </li>
           );
         })}
