@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useState } from "react";
 
 type Props = {
   open: boolean;
+  title?: string;
   message: string;
   cancelLabel?: string;
   confirmLabel?: string;
@@ -13,6 +14,7 @@ type Props = {
 
 export function AdminConfirmModal({
   open,
+  title,
   message,
   cancelLabel = "취소",
   confirmLabel = "확인",
@@ -41,6 +43,7 @@ export function AdminConfirmModal({
         aria-labelledby={labelId}
         onClick={(event) => event.stopPropagation()}
       >
+        {title ? <h2 className="admin-confirm__title">{title}</h2> : null}
         <p id={labelId} className="admin-confirm__message">
           {message}
         </p>
@@ -62,10 +65,13 @@ export function AdminConfirmModal({
   );
 }
 
-type ConfirmArg = string | { message: string; cancelLabel?: string; confirmLabel?: string };
+type ConfirmArg =
+  | string
+  | { title?: string; message: string; cancelLabel?: string; confirmLabel?: string };
 
 export function useAdminConfirm() {
   const [state, setState] = useState<{
+    title?: string;
     message: string;
     cancelLabel?: string;
     confirmLabel?: string;
@@ -89,6 +95,7 @@ export function useAdminConfirm() {
     modal: (
       <AdminConfirmModal
         open={Boolean(state)}
+        title={state?.title}
         message={state?.message ?? ""}
         cancelLabel={state?.cancelLabel}
         confirmLabel={state?.confirmLabel}

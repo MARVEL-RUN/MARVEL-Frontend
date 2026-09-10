@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminAttachFiles, type AdminAttachFile } from "@/components/admin/AttachFiles";
 import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { adminToast } from "@/components/admin/Toast";
 import { answerInquiry, deleteAnswer, getInquiry } from "@/services/admin/inquiries";
@@ -17,6 +18,7 @@ export function InquiryDetailPage() {
     enabled: Boolean(id),
   });
   const [answer, setAnswer] = useState("");
+  const [files, setFiles] = useState<AdminAttachFile[]>([]);
   const { confirm, modal } = useAdminConfirm();
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export function InquiryDetailPage() {
     mutationFn: () => deleteAnswer(id),
     onSuccess: () => {
       setAnswer("");
+      setFiles([]);
       queryClient.invalidateQueries({ queryKey: ["admin", "inquiries"] });
       adminToast.success("답변이 삭제되었습니다.");
     },
@@ -85,6 +88,7 @@ export function InquiryDetailPage() {
                 placeholder="답변을 입력하세요"
               />
             </label>
+            <AdminAttachFiles files={files} onChange={setFiles} />
             <div className="admin-form__actions">
               {data?.answer ? (
                 <button

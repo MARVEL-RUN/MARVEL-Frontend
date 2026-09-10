@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminAttachFiles, type AdminAttachFile } from "@/components/admin/AttachFiles";
 import { AdminSelect } from "@/components/admin/Select";
 import { adminToast } from "@/components/admin/Toast";
 import {
@@ -30,6 +31,7 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
   const [tag, setTag] = useState<NoticeCategory>("공지");
   const [body, setBody] = useState("");
   const [pinned, setPinned] = useState(false);
+  const [files, setFiles] = useState<AdminAttachFile[]>([]);
 
   useEffect(() => {
     if (!data) return;
@@ -104,6 +106,7 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
               placeholder="공지 내용"
             />
           </label>
+          <AdminAttachFiles files={files} onChange={setFiles} />
           <div className="admin-form__actions">
             <button
               type="button"

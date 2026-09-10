@@ -76,6 +76,16 @@ export async function deleteInquiry(id: string) {
   save(load().filter((row) => row.id !== id));
 }
 
+export async function resetInquiryPassword(id: string, password: string) {
+  await wait();
+  if (!load().some((row) => row.id === id)) {
+    throw new Error("문의를 찾을 수 없습니다.");
+  }
+  if (password.trim().length < 4) {
+    throw new Error("비밀번호는 4자 이상이어야 합니다.");
+  }
+}
+
 export async function deleteAnswer(id: string) {
   await wait();
   const rows = load().map((row) => {
