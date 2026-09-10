@@ -1322,10 +1322,36 @@ html.is-live .hero__actions {
 }
 
 .assemble h2 {
-  margin: 0.4rem 0 1.6rem;
+  margin: 0.4rem 0 1.15rem;
   font-size: clamp(1.6rem, 4vw, 2.6rem);
   font-weight: 800;
   line-height: 1.2;
+}
+
+.assemble__count {
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.9rem, 3.6vw, 2rem);
+  margin: 0 0 1.7rem;
+}
+
+.assemble__count strong {
+  display: block;
+  font-size: clamp(1.7rem, 4.8vw, 2.7rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.assemble__count em {
+  display: block;
+  margin-top: 0.38em;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
 
 /* inner pages */

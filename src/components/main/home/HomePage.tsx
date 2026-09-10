@@ -9,6 +9,7 @@ import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
+import { OpenCountdown } from "./OpenCountdown";
 import { TimeTable } from "./TimeTable";
 
 const TICKER = [
@@ -300,12 +301,13 @@ export function HomePage() {
           ASSEMBLE
         </p>
         <div className="assemble__inner reveal">
-          <p className="kicker kicker--on-red">05 / CALL</p>
+          <p className="kicker kicker--on-red">OPEN</p>
           <h2>
             {EVENT.openNoticeDate}
             <br />
             {EVENT.openNoticeTime} {EVENT.openNoticeAction}
           </h2>
+          <OpenCountdown />
           <Link href={REGISTER_HREF} className="btn btn--on-red">
             {cta}
           </Link>

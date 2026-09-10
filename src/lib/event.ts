@@ -8,6 +8,8 @@ export const EVENT = {
   openNoticeDate: "2026. 09. 22. 화요일",
   openNoticeTime: "오후 2시",
   openNoticeAction: "접수 OPEN",
+  /* 접수 오픈 — 카운트다운 */
+  openAt: "2026-09-22T14:00:00+09:00",
   dateShort: "2026.10.31 SAT",
   dateLong: "2026년 10월 31일 토요일",
   venue: "인제스피디움",
