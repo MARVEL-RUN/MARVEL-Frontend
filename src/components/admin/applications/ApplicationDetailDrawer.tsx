@@ -229,6 +229,14 @@ export function ApplicationDetailDrawer({ row, onClose, onDelete, onSave }: Prop
       ),
     },
     {
+      label: "이메일",
+      value: locked ? (
+        dash(view.email)
+      ) : (
+        <FieldInput value={view.email} onChange={(v) => patch({ email: v })} type="email" />
+      ),
+    },
+    {
       label: "보호자 연락처",
       value: locked ? (
         dash(view.guardianPhone)

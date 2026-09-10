@@ -27,6 +27,7 @@ export type AdminApplicationRow = {
   souvenir: string;
   size: string;
   phone: string;
+  email: string;
   guardianPhone: string;
   guardianRelation: string;
   gender?: "male" | "female";
@@ -55,6 +56,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "티셔츠",
     size: "L",
     phone: "010-1234-5678",
+    email: "hero.kim@example.com",
     guardianPhone: "",
     guardianRelation: "",
     gender: "male",
@@ -80,6 +82,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "티셔츠",
     size: "M",
     phone: "010-5555-1212",
+    email: "seo.lee@example.com",
     guardianPhone: "",
     guardianRelation: "",
     gender: "female",
@@ -105,6 +108,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "티셔츠",
     size: "XL",
     phone: "010-8800-4400",
+    email: "thor.park@example.com",
     guardianPhone: "",
     guardianRelation: "",
     gender: "male",
@@ -130,6 +134,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "티셔츠",
     size: "S",
     phone: "010-3000-9000",
+    email: "nayeon.choi@example.com",
     guardianPhone: "010-3000-9001",
     guardianRelation: "모",
     gender: "female",
@@ -156,6 +161,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "티셔츠",
     size: "L",
     phone: "010-1111-2222",
+    email: "steve@avengers.crew",
     guardianPhone: "",
     guardianRelation: "",
     gender: "male",
@@ -183,6 +189,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "티셔츠",
     size: "M",
     phone: "010-4444-5555",
+    email: "natasha@shield.run",
     guardianPhone: "",
     guardianRelation: "",
     gender: "male",
@@ -209,6 +216,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "블랙팬서 패키지",
     size: "-",
     phone: "010-7000-1001",
+    email: "virtual.one@example.com",
     guardianPhone: "",
     guardianRelation: "",
     gender: "male",
@@ -234,6 +242,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "닥터둠 패키지",
     size: "-",
     phone: "010-7000-2002",
+    email: "virtual.two@example.com",
     guardianPhone: "",
     guardianRelation: "",
     gender: "female",
@@ -259,6 +268,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "토르 패키지",
     size: "-",
     phone: "010-7000-3003",
+    email: "virtual.three@example.com",
     guardianPhone: "",
     guardianRelation: "",
     gender: "male",
@@ -284,6 +294,7 @@ const ROWS: AdminApplicationRow[] = [
     souvenir: "블랙팬서 패키지",
     size: "-",
     phone: "010-7000-1018",
+    email: "wakanda.kim@example.com",
     guardianPhone: "010-7000-1019",
     guardianRelation: "부",
     gender: "female",
