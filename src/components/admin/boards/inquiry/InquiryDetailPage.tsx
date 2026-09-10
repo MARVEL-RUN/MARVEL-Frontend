@@ -1,5 +1,7 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
+import { adminToast } from "@/components/admin/Toast";
 import { answerInquiry, deleteAnswer, getInquiry } from "@/services/admin/inquiries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +17,7 @@ export function InquiryDetailPage() {
     enabled: Boolean(id),
   });
   const [answer, setAnswer] = useState("");
+  const { confirm, modal } = useAdminConfirm();
 
   useEffect(() => {
     if (data?.answer) setAnswer(data.answer);
@@ -24,8 +27,10 @@ export function InquiryDetailPage() {
     mutationFn: () => answerInquiry(id, answer),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "inquiries"] });
+      adminToast.success("답변이 등록되었습니다.");
       router.replace("/admin/boards/inquiry");
     },
+    onError: () => adminToast.error("답변 등록에 실패했습니다."),
   });
 
   const clear = useMutation({
@@ -33,7 +38,9 @@ export function InquiryDetailPage() {
     onSuccess: () => {
       setAnswer("");
       queryClient.invalidateQueries({ queryKey: ["admin", "inquiries"] });
+      adminToast.success("답변이 삭제되었습니다.");
     },
+    onError: () => adminToast.error("답변 삭제에 실패했습니다."),
   });
 
   if (!id || (!isLoading && !data)) {
@@ -83,8 +90,8 @@ export function InquiryDetailPage() {
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
-                  onClick={() => {
-                    if (confirm("답변을 삭제할까요?")) clear.mutate();
+                  onClick={async () => {
+                    if (await confirm("답변을 삭제할까요?")) clear.mutate();
                   }}
                 >
                   답변 삭제
@@ -104,6 +111,7 @@ export function InquiryDetailPage() {
           </form>
         </div>
       </section>
+      {modal}
     </div>
   );
 }

@@ -1,5 +1,12 @@
 "use client";
 
+import { AdminSelect } from "@/components/admin/Select";
+import { adminToast } from "@/components/admin/Toast";
+import {
+  isNoticeCategory,
+  NOTICE_CATEGORY_OPTIONS,
+  type NoticeCategory,
+} from "@/lib/admin/noticeCategories";
 import {
   createAdminNotice,
   getAdminNotice,
@@ -20,14 +27,14 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
     enabled: editing && Boolean(id),
   });
   const [title, setTitle] = useState("");
-  const [tag, setTag] = useState("NOTICE");
+  const [tag, setTag] = useState<NoticeCategory>("공지");
   const [body, setBody] = useState("");
   const [pinned, setPinned] = useState(false);
 
   useEffect(() => {
     if (!data) return;
     setTitle(data.title);
-    setTag(data.tag);
+    setTag(isNoticeCategory(data.tag) ? data.tag : "공지");
     setBody(data.body);
     setPinned(data.pinned);
   }, [data]);
@@ -39,7 +46,11 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "notices"] });
+      adminToast.success(editing ? "공지가 수정되었습니다." : "공지가 등록되었습니다.");
       router.replace("/admin/boards/notice");
+    },
+    onError: () => {
+      adminToast.error(editing ? "공지 수정에 실패했습니다." : "공지 등록에 실패했습니다.");
     },
   });
 
@@ -60,13 +71,29 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
             save.mutate();
           }}
         >
-          <label>
-            구분
-            <input value={tag} onChange={(e) => setTag(e.target.value)} placeholder="NOTICE" />
-          </label>
+          <div className="admin-form__row">
+            <label className="admin-form__category">
+              카테고리
+              <AdminSelect
+                value={tag}
+                options={NOTICE_CATEGORY_OPTIONS}
+                onChange={setTag}
+                ariaLabel="카테고리"
+                width={140}
+              />
+            </label>
+            <label className="admin-form__check">
+              <input
+                type="checkbox"
+                checked={pinned}
+                onChange={(e) => setPinned(e.target.checked)}
+              />
+              상단 고정
+            </label>
+          </div>
           <label>
             제목
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목" />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" />
           </label>
           <label>
             본문
@@ -76,14 +103,6 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
               onChange={(e) => setBody(e.target.value)}
               placeholder="공지 내용"
             />
-          </label>
-          <label className="admin-form__check">
-            <input
-              type="checkbox"
-              checked={pinned}
-              onChange={(e) => setPinned(e.target.checked)}
-            />
-            상단 고정
           </label>
           <div className="admin-form__actions">
             <button

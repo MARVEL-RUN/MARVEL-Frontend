@@ -1,11 +1,28 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
+import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
+import { adminToast } from "@/components/admin/Toast";
+import {
+  NOTICE_CATEGORY_FILTER_OPTIONS,
+  type NoticeCategory,
+} from "@/lib/admin/noticeCategories";
 import { deleteAdminNotice, listAdminNotices } from "@/services/admin/notices";
 import type { AdminNotice } from "@/types/admin";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+
+type CategoryFilter = "all" | NoticeCategory;
+
+type Applied = {
+  q: string;
+  category: CategoryFilter;
+};
+
+const INITIAL: Applied = { q: "", category: "all" };
 
 export function NoticesAdminPage() {
   const queryClient = useQueryClient();
@@ -14,18 +31,34 @@ export function NoticesAdminPage() {
     queryFn: listAdminNotices,
   });
   const [q, setQ] = useState("");
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [applied, setApplied] = useState<Applied>(INITIAL);
+  const { confirm, modal } = useAdminConfirm();
   const remove = useMutation({
     mutationFn: deleteAdminNotice,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "notices"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "notices"] });
+      adminToast.success("공지가 삭제되었습니다.");
+    },
+    onError: () => adminToast.error("공지 삭제에 실패했습니다."),
   });
 
   const rows = useMemo(() => {
-    const keyword = q.trim().toLowerCase();
-    if (!keyword) return data;
-    return data.filter((row) =>
-      [row.title, row.tag, row.body].join(" ").toLowerCase().includes(keyword),
-    );
-  }, [data, q]);
+    const keyword = applied.q.trim().toLowerCase();
+    return data.filter((row) => {
+      if (applied.category !== "all" && row.tag !== applied.category) return false;
+      if (!keyword) return true;
+      return [row.title, row.tag, row.body].join(" ").toLowerCase().includes(keyword);
+    });
+  }, [data, applied]);
+
+  const runSearch = () => setApplied({ q, category });
+
+  const resetSearch = () => {
+    setQ("");
+    setCategory("all");
+    setApplied(INITIAL);
+  };
 
   return (
     <div className="admin-page">
@@ -41,14 +74,39 @@ export function NoticesAdminPage() {
           </Link>
         }
         tools={
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="제목 · 태그 검색"
-          />
+          <>
+            <AdminSelect
+              value={category}
+              options={NOTICE_CATEGORY_FILTER_OPTIONS}
+              onChange={setCategory}
+              ariaLabel="카테고리"
+              width={112}
+            />
+            <input
+              className="admin-toolbar__search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") runSearch();
+              }}
+              placeholder="제목 · 내용 검색"
+            />
+            <button type="button" className="admin-btn admin-btn--primary admin-toolbar__btn" onClick={runSearch}>
+              검색
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost admin-toolbar__iconbtn"
+              aria-label="검색 초기화"
+              title="초기화"
+              onClick={resetSearch}
+            >
+              <RotateCcw size={24} strokeWidth={2.5} />
+            </button>
+          </>
         }
         columns={[
-          { key: "tag", header: "구분", render: (row) => row.tag },
+          { key: "tag", header: "카테고리", render: (row) => row.tag },
           {
             key: "title",
             header: "제목",
@@ -65,8 +123,8 @@ export function NoticesAdminPage() {
               <button
                 type="button"
                 className="admin-btn admin-btn--text"
-                onClick={() => {
-                  if (confirm("이 공지를 삭제할까요?")) remove.mutate(row.id);
+                onClick={async () => {
+                  if (await confirm("이 공지를 삭제할까요?")) remove.mutate(row.id);
                 }}
               >
                 삭제
@@ -75,6 +133,7 @@ export function NoticesAdminPage() {
           },
         ]}
       />
+      {modal}
     </div>
   );
 }
