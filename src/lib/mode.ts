@@ -26,8 +26,8 @@ export const LOOKUP_HREF = "/lookup";
 /** 인스타 — URL 확정 후 채움 */
 export const INSTAGRAM_URL = "";
 
-/** 9/22 접수 오픈 전까지 false */
-export const registrationOpen = false;
+/** 참가신청 UI 오픈. 공식 일정은 9/22 */
+export const registrationOpen = true;
 
 /** 퍼블리싱에서 신청 화면을 열어 봄. 배포 빌드에는 넣지 않음. */
 export const registerPreview =
