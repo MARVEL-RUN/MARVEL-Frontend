@@ -354,9 +354,49 @@ html.is-live .side-dock {
   color: #fff;
 }
 
-.side-dock .is-on:hover {
+.side-dock .side-dock__open {
+  flex-direction: column;
+  gap: 0.18rem;
+  min-height: 6.1rem;
+  padding: 0.7rem 1.15rem 0.62rem 1.3rem;
+  background: var(--marvel);
+  color: #fff;
+  letter-spacing: 0;
+}
+
+.side-dock .side-dock__open:hover,
+.side-dock .side-dock__open.is-on:hover {
   background: #fff;
   color: var(--marvel);
+}
+
+.side-dock .side-dock__open.is-on {
+  background: var(--marvel);
+  color: #fff;
+  box-shadow: -3px 3px 0 rgba(0, 0, 0, 0.28), 0 0 18px rgba(237, 29, 36, 0.45);
+}
+
+.side-dock__open-date {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.side-dock__open-time {
+  font-size: 1.42rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.side-dock__open-label {
+  margin-top: 0.08rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  line-height: 1;
 }
 
 .side-dock .side-dock__go {
@@ -444,11 +484,9 @@ body:has(.course-preview) .side-dock {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   background: #eef0f6;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0 10px,
-    rgba(20, 22, 40, 0.06) 10px 20px
-  );
+  background-image: repeating-linear-gradient(-45deg,
+      transparent 0 10px,
+      rgba(20, 22, 40, 0.06) 10px 20px);
   color: #6a6e86;
   font-size: 0.78rem;
   font-weight: 800;
@@ -653,7 +691,7 @@ body:has(.course-preview) .side-dock {
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  padding: 7.5rem 0 6.5rem;
+  padding: 7rem 0 12.5rem;
 }
 
 .hero__art {
@@ -3673,10 +3711,17 @@ button.course {
     font-size: 0.64rem;
   }
 
-  .side-dock__top {
-    width: 2.1rem;
-    min-width: 2.1rem;
-    min-height: 2.1rem;
+  .side-dock .side-dock__open {
+    min-height: 5.4rem;
+    padding: 0.55rem 0.9rem 0.5rem 1.05rem;
+  }
+
+  .side-dock__open-date {
+    font-size: 0.92rem;
+  }
+
+  .side-dock__open-time {
+    font-size: 1.18rem;
   }
 
   .site-header__drawer {
@@ -3750,7 +3795,7 @@ button.course {
 @media (max-width: 720px) {
   .hero {
     align-items: flex-end;
-    padding-bottom: 5rem;
+    padding-bottom: 8.5rem;
   }
 
   .hero__img {
