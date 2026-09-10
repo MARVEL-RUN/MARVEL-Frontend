@@ -10,16 +10,12 @@ export const EVENT = {
   openNoticeAction: "접수 OPEN",
   /* 접수 오픈 — 카운트다운 */
   openAt: "2026-09-22T14:00:00+09:00",
-  /* 홈 팝업 — 끄려면 enabled: false */
+  /* 홈 팝업 — 끄려면 enabled: false. image에 경로 넣으면 본문에 표시 */
   popup: {
     enabled: true,
     id: "home-open",
-    title: "공식 홈페이지 오픈",
-    body: [
-      "MARVEL RUN 2026 KOREA 공식 홈페이지가 오픈되었습니다.",
-      "대회안내, 코스, 오시는길을 홈페이지에서 확인할 수 있습니다.",
-      "참가 접수는 2026년 9월 22일 화요일 오후 2시에 시작됩니다.",
-    ],
+    title: "안내",
+    image: "",
   },
   dateShort: "2026.10.31 SAT",
   dateLong: "2026년 10월 31일 토요일",

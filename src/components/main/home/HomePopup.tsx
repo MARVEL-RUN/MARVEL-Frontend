@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 
 const POP = EVENT.popup;
@@ -140,24 +139,15 @@ export function HomePopup() {
       ref={box}
       className={dragging ? "home-pop is-drag" : "home-pop"}
       role="dialog"
-      aria-labelledby="home-pop-title"
+      aria-label={POP.title}
       style={pos ? { left: pos.left, top: pos.top } : undefined}
     >
-      <div className="home-pop__brand">
-        <p className="home-pop__tag">NOTICE</p>
-        <Image
-          src={MAIN_ASSETS.headerLogo}
-          alt=""
-          width={206}
-          height={94}
-          draggable={false}
-        />
-      </div>
-      <div className="home-pop__body">
-        <h2 id="home-pop-title">{POP.title}</h2>
-        {POP.body.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
+      <div className={POP.image ? "home-pop__shot has-img" : "home-pop__shot"}>
+        {POP.image ? (
+          <Image src={POP.image} alt={POP.title} fill sizes="26.5rem" draggable={false} />
+        ) : (
+          <span>이미지 영역</span>
+        )}
       </div>
       <div className="home-pop__bar">
         <label htmlFor={muteId}>
