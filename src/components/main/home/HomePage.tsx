@@ -10,6 +10,7 @@ import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown } from "./OpenCountdown";
+import { HomePopup } from "./HomePopup";
 import { SideDock } from "./SideDock";
 import { TimeTable } from "./TimeTable";
 
@@ -315,6 +316,7 @@ export function HomePage() {
         </div>
       </section>
       <SideDock />
+      <HomePopup />
     </main>
   );
 }

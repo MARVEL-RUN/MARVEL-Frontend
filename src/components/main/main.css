@@ -407,8 +407,144 @@ html.is-live .side-dock {
 
 body:has(.site-header__drawer.is-open) .side-dock,
 body:has(.course-preview) .side-dock {
-  opacity: 0;
-  pointer-events: none;
+  display: none;
+  animation: none;
+}
+
+.home-pop {
+  position: fixed;
+  top: calc(var(--header-h) + 0.55rem);
+  left: 1.15rem;
+  z-index: 36;
+  display: flex;
+  flex-direction: column;
+  width: min(26.5rem, calc(100vw - 2.3rem));
+  height: max-content;
+  max-height: calc(100dvh - var(--header-h) - 1.4rem);
+  overflow: hidden;
+  background: #fff;
+  box-shadow:
+    0 0 0 2px #fff,
+    7px 7px 0 0 var(--marvel),
+    0 22px 48px rgba(0, 0, 0, 0.42);
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.home-pop.is-drag {
+  cursor: grabbing;
+  z-index: 45;
+}
+
+.home-pop__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  flex: none;
+  padding: 0.95rem 1rem 0.9rem;
+  background: var(--navy);
+  border-bottom: 3px solid var(--marvel);
+}
+
+.home-pop__tag {
+  margin: 0;
+  padding: 0.28em 0.55em 0.2em;
+  background: var(--marvel);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1;
+}
+
+.home-pop__brand img {
+  height: 2.15rem;
+  width: auto;
+}
+
+.home-pop__body {
+  flex: 0 1 auto;
+  padding: 2.1rem 1.7rem 1.8rem;
+  overflow: auto;
+  color: #141628;
+  text-align: center;
+  cursor: inherit;
+}
+
+.home-pop__body h2 {
+  margin: 0 0 1.15rem;
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+}
+
+.home-pop__body p {
+  margin: 0 0 0.7rem;
+  color: #2a2d45;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+.home-pop__body p:last-child {
+  margin-bottom: 0;
+}
+
+.home-pop__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  flex: none;
+  min-height: 2.35rem;
+  padding: 0.35rem 0.7rem 0.35rem 0.85rem;
+  background: #07070d;
+  cursor: default;
+}
+
+.home-pop__bar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.home-pop__bar input {
+  width: 0.82rem;
+  height: 0.82rem;
+  accent-color: var(--marvel);
+}
+
+.home-pop__close {
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+}
+
+.home-pop__close:hover {
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .home-pop {
+    left: 0.7rem;
+    width: min(26.5rem, calc(100vw - 1.4rem));
+  }
+
+  .home-pop__body {
+    padding: 1.6rem 1.2rem 1.4rem;
+  }
 }
 
 /* footer */
