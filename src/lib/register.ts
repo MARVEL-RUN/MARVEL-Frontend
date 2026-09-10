@@ -167,6 +167,95 @@ export function courseAllowsChild(
   return "childFee" in course;
 }
 
+function shiftYmd(ymd: string, years: number) {
+  return `${Number(ymd.slice(0, 4)) + years}${ymd.slice(4)}`;
+}
+
+function nextYmd(ymd: string) {
+  const y = Number(ymd.slice(0, 4));
+  const m = Number(ymd.slice(4, 6));
+  const d = Number(ymd.slice(6, 8));
+  const dt = new Date(y, m - 1, d + 1);
+  return `${dt.getFullYear()}${String(dt.getMonth() + 1).padStart(2, "0")}${String(dt.getDate()).padStart(2, "0")}`;
+}
+
+export function ymdKo(ymd: string) {
+  return `${Number(ymd.slice(0, 4))}년 ${Number(ymd.slice(4, 6))}월 ${Number(ymd.slice(6, 8))}일`;
+}
+
+/* 만 N세 미만 = 대회일-N년 다음날 이후 출생(당일 포함) */
+export const CHILD_BIRTH_FROM = nextYmd(shiftYmd(EVENT.raceYmd, -13));
+export const CHILD_BIRTH_UNTIL = shiftYmd(EVENT.raceYmd, -6);
+export const GUARDIAN_BIRTH_FROM = nextYmd(shiftYmd(EVENT.raceYmd, -14));
+
+export const CHILD_AGE_NOTE = `어린이 나이: 만 6세 ~ 만 12세 (${ymdKo(CHILD_BIRTH_FROM)} 이후 출생자)`;
+export const GUARDIAN_AGE_NOTE = `법정대리인 동의: 만 14세 미만 (${ymdKo(GUARDIAN_BIRTH_FROM)} 이후 출생자)`;
+
+export type AgeBand = "tooYoung" | "child" | "teen" | "adult";
+
+export function ageBand(birth: string): AgeBand | null {
+  if (!/^\d{8}$/.test(birth)) return null;
+  if (birth > EVENT.raceYmd) return "tooYoung";
+  if (birth > CHILD_BIRTH_UNTIL) return "tooYoung";
+  if (birth >= CHILD_BIRTH_FROM) return "child";
+  if (birth >= GUARDIAN_BIRTH_FROM) return "teen";
+  return "adult";
+}
+
+export function ticketForBirth(birth: string): TicketKind {
+  return ageBand(birth) === "child" ? "child" : "adult";
+}
+
+export function needsGuardian(birth: string) {
+  const band = ageBand(birth);
+  return band === "child" || band === "teen";
+}
+
+export function courseOpenForBirth(
+  course: NonNullable<ReturnType<typeof courseById>>,
+  birth: string,
+) {
+  const band = ageBand(birth);
+  if (!band) return true;
+  if (band === "tooYoung") return false;
+  if (band === "child") return courseAllowsChild(course);
+  return true;
+}
+
+export function applyCourseForBirth(
+  courseId: CourseId | "",
+  birth: string,
+): { courseId: CourseId | ""; ticket: TicketKind } {
+  const ticket = ticketForBirth(birth);
+  if (!courseId) return { courseId: "", ticket };
+  const course = courseById(courseId);
+  if (!course || !courseOpenForBirth(course, birth)) {
+    return { courseId: "", ticket };
+  }
+  return {
+    courseId,
+    ticket: courseAllowsChild(course) ? ticket : "adult",
+  };
+}
+
+export function courseClosedReason(birth: string) {
+  const band = ageBand(birth);
+  if (band === "tooYoung") return "만 6세 미만은 참가할 수 없습니다.";
+  if (band === "child") return "어린이 참가 불가";
+  return "";
+}
+
+export function courseNote(
+  course: NonNullable<ReturnType<typeof courseById>>,
+) {
+  if ("childFee" in course) return `어린이 ${course.childFee.replace("원", "")}`;
+  return "어린이 참가 불가";
+}
+
+export function feeDigits(fee: string) {
+  return fee.replace(/원/g, "");
+}
+
 export function ticketFee(
   course: NonNullable<ReturnType<typeof courseById>>,
   ticket: TicketKind,
@@ -274,6 +363,27 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function assertAgeTicket(
+  birth: string,
+  ticket: TicketKind,
+  course: NonNullable<ReturnType<typeof courseById>>,
+  prefix = "",
+) {
+  const band = ageBand(birth);
+  if (band === "tooYoung") {
+    throw new Error(`${prefix}만 6세 미만은 참가할 수 없습니다.`);
+  }
+  if (!courseOpenForBirth(course, birth)) {
+    throw new Error(`${prefix}이 코스는 어린이 참가가 불가합니다.`);
+  }
+  const expected = courseAllowsChild(course) ? ticketForBirth(birth) : "adult";
+  if (ticket !== expected) {
+    throw new Error(
+      `${prefix}생년월일에 맞는 종목(${ticketLabel(expected)})을 선택하세요.`,
+    );
+  }
+}
+
 function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   courseId: CourseId;
   gender: Gender;
@@ -282,14 +392,15 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   if (!draft.courseId) throw new Error("참가종목을 선택하세요.");
   const picked = courseById(draft.courseId);
   if (!picked) throw new Error("참가종목을 선택하세요.");
-  if (draft.ticket === "child" && !courseAllowsChild(picked)) {
-    throw new Error("이 코스는 어린이 참가가 불가합니다.");
-  }
   if (!draft.name.trim()) throw new Error("이름을 입력하세요.");
   if (!/^\d{8}$/.test(draft.birth)) throw new Error("생년월일을 선택하세요.");
+  assertAgeTicket(draft.birth, draft.ticket, picked);
   if (!draft.gender) throw new Error("성별을 선택하세요.");
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
+    throw new Error("만 14세 미만은 보호자 연락처를 입력하세요.");
+  }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   if (!requiredConsentsOk(draft)) {
     throw new Error("필수 약관에 동의해 주세요.");
@@ -305,18 +416,18 @@ function assertParticipant(
   shirt: ShirtSize;
 } {
   const n = i + 1;
-  if (!p.courseId) throw new Error(`참가자 ${n}: 참가종목을 선택하세요.`);
+  const prefix = `참가자 ${n}: `;
+  if (!p.courseId) throw new Error(`${prefix}참가종목을 선택하세요.`);
   const picked = courseById(p.courseId);
-  if (p.ticket === "child" && picked && !courseAllowsChild(picked)) {
-    throw new Error(`참가자 ${n}: 이 코스는 어린이 참가가 불가합니다.`);
-  }
-  if (!p.name.trim()) throw new Error(`참가자 ${n}: 이름을 입력하세요.`);
+  if (!picked) throw new Error(`${prefix}참가종목을 선택하세요.`);
+  if (!p.name.trim()) throw new Error(`${prefix}이름을 입력하세요.`);
   if (!/^\d{8}$/.test(p.birth)) {
-    throw new Error(`참가자 ${n}: 생년월일을 입력하세요.`);
+    throw new Error(`${prefix}생년월일을 입력하세요.`);
   }
-  if (!p.gender) throw new Error(`참가자 ${n}: 성별을 선택하세요.`);
-  if (!p.phone.trim()) throw new Error(`참가자 ${n}: 연락처를 입력하세요.`);
-  if (!p.shirt) throw new Error(`참가자 ${n}: 기념품을 선택하세요.`);
+  assertAgeTicket(p.birth, p.ticket, picked, prefix);
+  if (!p.gender) throw new Error(`${prefix}성별을 선택하세요.`);
+  if (!p.phone.trim()) throw new Error(`${prefix}연락처를 입력하세요.`);
+  if (!p.shirt) throw new Error(`${prefix}기념품을 선택하세요.`);
 }
 
 function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {

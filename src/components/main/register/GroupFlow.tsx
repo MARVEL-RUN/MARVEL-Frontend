@@ -4,11 +4,16 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { EVENT } from "@/lib/event";
 import {
+  CHILD_AGE_NOTE,
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
+  GUARDIAN_AGE_NOTE,
   GENDERS,
   MAX_GROUP_SIZE,
   SHIRT_SIZES,
+  applyCourseForBirth,
+  ageBand,
+  courseAllowsChild,
   courseById,
   formatFee,
   genderLabel,
@@ -195,6 +200,8 @@ export function GroupFlow({
               <p>
                 {`*(한번에 최대 ${MAX_GROUP_SIZE}명까지만 신청 가능하며, 초과 인원은 별도의 단체로 신청 해주시기 바랍니다.)`}
               </p>
+              <p>{CHILD_AGE_NOTE}</p>
+              <p>{GUARDIAN_AGE_NOTE}</p>
             </ApplyHint>
             <div className="party-bar">
               <p>{draft.participants.length}명 등록</p>
@@ -240,7 +247,12 @@ export function GroupFlow({
                         <td>
                           <BirthText
                             value={p.birth}
-                            onChange={(birth) => patchMember(i, { birth })}
+                            onChange={(birth) =>
+                              patchMember(i, {
+                                birth,
+                                ...applyCourseForBirth(p.courseId, birth),
+                              })
+                            }
                           />
                         </td>
                         <td>
@@ -289,20 +301,33 @@ export function GroupFlow({
                           >
                             <option value="">참가종목</option>
                             {EVENT.courses.flatMap((c) => {
+                              const band = ageBand(p.birth);
+                              const adultOff =
+                                band === "tooYoung" || band === "child";
+                              const childOff =
+                                band === "tooYoung" ||
+                                (band !== null && band !== "child");
                               const adult = (
                                 <option
                                   key={`${c.id}-adult`}
                                   value={`${c.id}:adult`}
+                                  disabled={adultOff}
                                 >
                                   {c.distance} 성인
+                                  {adultOff && band === "child"
+                                    ? " (어린이 참가 불가)"
+                                    : adultOff && band === "tooYoung"
+                                      ? " (만 6세 미만)"
+                                      : ""}
                                 </option>
                               );
-                              if (!("childFee" in c)) return [adult];
+                              if (!courseAllowsChild(c)) return [adult];
                               return [
                                 adult,
                                 <option
                                   key={`${c.id}-child`}
                                   value={`${c.id}:child`}
+                                  disabled={childOff}
                                 >
                                   {c.distance} 어린이
                                 </option>,

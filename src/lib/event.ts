@@ -19,6 +19,8 @@ export const EVENT = {
   },
   dateShort: "2026.10.31 SAT",
   dateLong: "2026년 10월 31일 토요일",
+  /* 대회일 YYYYMMDD — 만 나이 컷 */
+  raceYmd: "20261031",
   venue: "인제스피디움",
   venueEn: "INJE SPEEDIUM",
   venueAddress: "강원 인제군 기린면 상하답로 130 인제스피디움",

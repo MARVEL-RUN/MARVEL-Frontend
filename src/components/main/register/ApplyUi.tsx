@@ -7,11 +7,15 @@ import {
   SHIRT_SIZES,
   courseAllowsChild,
   courseById,
+  courseClosedReason,
+  courseNote,
+  courseOpenForBirth,
+  feeDigits,
   formatPhone,
   joinEmail,
   splitEmail,
   ticketFee,
-  ticketLabel,
+  ticketForBirth,
   type CourseId,
   type Gender,
   type ShirtSize,
@@ -177,56 +181,79 @@ export function ShirtPick({
 
 export function CoursePick({
   value,
-  ticket,
+  birth,
   onChange,
 }: {
   value: CourseId | "";
-  ticket: TicketKind;
+  birth: string;
   onChange: (courseId: CourseId, ticket: TicketKind) => void;
 }) {
   const selected = value ? courseById(value) : undefined;
-  const tickets: TicketKind[] = selected
-    ? courseAllowsChild(selected)
-      ? ["adult", "child"]
-      : ["adult"]
-    : [];
 
   return (
     <div className="course-pick">
-      <div className="course-pick__col">
-        <p className="course-pick__head">거리</p>
-        <div className="course-pick__list">
-          {EVENT.courses.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              className={value === c.id ? "is-on" : undefined}
-              onClick={() =>
-                onChange(c.id, courseAllowsChild(c) ? ticket : "adult")
-              }
-            >
-              {c.distance}
-            </button>
-          ))}
+      <div className="course-pick__box">
+        <div className="course-pick__col">
+          <p className="course-pick__head">거리</p>
+          <div className="course-pick__list">
+            {EVENT.courses.map((c) => {
+              const open = courseOpenForBirth(c, birth);
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={value === c.id ? "is-on" : undefined}
+                  disabled={!open}
+                  title={open ? undefined : courseClosedReason(birth)}
+                  onClick={() => {
+                    if (!open) return;
+                    onChange(
+                      c.id,
+                      courseAllowsChild(c) ? ticketForBirth(birth) : "adult",
+                    );
+                  }}
+                >
+                  {c.distance}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="course-pick__col">
+          <p className="course-pick__head">세부종목</p>
+          <div className="course-pick__list">
+            {selected ? (
+              <button
+                type="button"
+                className={`is-on course-pick__code--${selected.tone}`}
+              >
+                {selected.code}
+              </button>
+            ) : (
+              <p className="course-pick__empty">거리를 선택해주세요</p>
+            )}
+          </div>
         </div>
       </div>
-      <div className="course-pick__col">
-        <p className="course-pick__head">세부종목</p>
-        <div className="course-pick__list">
-          {tickets.length ? (
-            tickets.map((t) => (
-              <button
-                key={t}
-                type="button"
-                className={ticket === t ? "is-on" : undefined}
-                onClick={() => value && onChange(value, t)}
-              >
-                {ticketLabel(t)}
-              </button>
-            ))
-          ) : (
-            <p className="course-pick__empty">거리를 선택해주세요</p>
-          )}
+      <div className="course-pick__fees">
+        <div className="course-pick__fees-head">
+          <span>종목</span>
+          <span>세부종목</span>
+          <span>단가</span>
+          <span>비고</span>
+        </div>
+        <div className="course-pick__fees-body">
+          {EVENT.courses.map((c) => (
+            <div
+              key={c.id}
+              className={value === c.id ? "course-pick__fees-row is-on" : "course-pick__fees-row"}
+            >
+              <span>{c.distance}</span>
+              <span className={`course-pick__code--${c.tone}`}>{c.code}</span>
+              <span>{feeDigits(c.fee)}</span>
+              <span>{courseNote(c)}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
