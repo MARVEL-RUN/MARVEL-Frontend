@@ -13,6 +13,7 @@ import {
   formatFee,
   genderLabel,
   groupFee,
+  emailOk,
   requiredConsentsOk,
   submitGroup,
   ticketFee,
@@ -30,6 +31,7 @@ import {
   ApplyHint,
   ApplyNotice,
   BirthText,
+  EmailField,
   FormRow,
   FormSec,
   PhoneField,
@@ -92,7 +94,7 @@ export function GroupFlow({
     if (!draft.groupName.trim()) return setError("단체명을 입력하세요.");
     if (!draft.leaderName.trim()) return setError("대표자 성명을 입력하세요.");
     if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!draft.email.trim()) return setError("이메일을 입력하세요.");
+    if (!emailOk(draft.email)) return setError("이메일을 입력하세요.");
     try {
       draft.participants.forEach((p, i) => {
         const n = i + 1;
@@ -179,12 +181,9 @@ export function GroupFlow({
               />
             </FormRow>
             <FormRow label="이메일" required>
-              <input
-                type="email"
-                placeholder="이메일을 입력해주세요."
+              <EmailField
                 value={draft.email}
-                onChange={(e) => patch({ email: e.target.value })}
-                autoComplete="email"
+                onChange={(email) => patch({ email })}
                 required
               />
             </FormRow>

@@ -2391,6 +2391,52 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font: inherit;
 }
 
+.email-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.email-pick span {
+  flex: none;
+  color: #fff;
+  font-weight: 800;
+}
+
+.email-pick input,
+.email-pick select {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: #08091d;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.form-row .email-pick input.email-pick__local {
+  width: 12.5rem;
+  max-width: 100%;
+}
+
+.form-row .email-pick input.email-pick__host,
+.email-pick__pick {
+  width: 9.5rem;
+  max-width: 100%;
+  flex: none;
+}
+
+.email-pick input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.email-pick input:focus,
+.email-pick select:focus {
+  outline: none;
+  border-color: var(--marvel);
+}
+
 .radio-row {
   display: flex;
   flex-wrap: wrap;
@@ -3612,6 +3658,15 @@ button.course {
   .form-row input[type="tel"],
   .form-row textarea {
     width: 100%;
+  }
+
+  .form-row .email-pick input.email-pick__local {
+    width: min(12.5rem, 100%);
+  }
+
+  .form-row .email-pick input.email-pick__host,
+  .email-pick__pick {
+    width: min(9.5rem, 100%);
   }
 
   .board-write__actions {

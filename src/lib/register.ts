@@ -197,6 +197,38 @@ export function formatPhone(raw: string) {
   return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
 }
 
+export const EMAIL_DOMAINS = [
+  "naver.com",
+  "gmail.com",
+  "daum.net",
+  "hanmail.net",
+  "nate.com",
+  "kakao.com",
+  "hotmail.com",
+  "icloud.com",
+] as const;
+
+export const EMAIL_CUSTOM = "custom";
+
+export function joinEmail(local: string, domain: string) {
+  const a = local.trim();
+  const b = domain.trim().replace(/^@+/, "");
+  if (!a) return "";
+  if (!b) return a;
+  return `${a}@${b}`;
+}
+
+export function splitEmail(email: string) {
+  const raw = email.trim();
+  const at = raw.indexOf("@");
+  if (at < 0) return { local: raw, domain: "" };
+  return { local: raw.slice(0, at), domain: raw.slice(at + 1) };
+}
+
+export function emailOk(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+}
+
 export function groupFee(draft: GroupDraft) {
   return draft.participants.reduce((sum, p) => {
     const course = p.courseId ? courseById(p.courseId) : undefined;
@@ -257,7 +289,7 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   if (!/^\d{8}$/.test(draft.birth)) throw new Error("생년월일을 선택하세요.");
   if (!draft.gender) throw new Error("성별을 선택하세요.");
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
-  if (!draft.email.trim()) throw new Error("이메일을 입력하세요.");
+  if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   if (!requiredConsentsOk(draft)) {
     throw new Error("필수 약관에 동의해 주세요.");
@@ -295,7 +327,7 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
   if (!draft.leaderName.trim()) throw new Error("대표자 성명을 입력하세요.");
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
-  if (!draft.email.trim()) throw new Error("이메일을 입력하세요.");
+  if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
   if (!draft.participants.length) throw new Error("참가자를 1명 이상 등록하세요.");
   if (draft.participants.length > MAX_GROUP_SIZE) {
     throw new Error(`한 번에 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다.`);

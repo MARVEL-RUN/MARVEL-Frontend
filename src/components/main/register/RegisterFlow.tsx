@@ -6,6 +6,7 @@ import {
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
   courseById,
+  emailOk,
   genderLabel,
   requiredConsentsOk,
   submitEntry,
@@ -21,6 +22,7 @@ import {
   ApplyNotice,
   BirthPick,
   CoursePick,
+  EmailField,
   FeeText,
   FormRow,
   FormSec,
@@ -82,7 +84,7 @@ function IndividualFlow({
     if (!/^\d{8}$/.test(draft.birth)) return setError("생년월일을 선택하세요.");
     if (!draft.gender) return setError("성별을 선택하세요.");
     if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!draft.email.trim()) return setError("이메일을 입력하세요.");
+    if (!emailOk(draft.email)) return setError("이메일을 입력하세요.");
     if (!draft.courseId) return setError("참가종목을 선택하세요.");
     if (!draft.shirt) return setError("기념품을 선택하세요.");
     if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
@@ -161,13 +163,9 @@ function IndividualFlow({
               />
             </FormRow>
             <FormRow label="이메일" required>
-              <input
-                type="email"
-                name="email"
-                placeholder="이메일을 입력해주세요."
+              <EmailField
                 value={draft.email}
-                onChange={(e) => patch({ email: e.target.value })}
-                autoComplete="email"
+                onChange={(email) => patch({ email })}
                 required
               />
             </FormRow>

@@ -1,11 +1,15 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { EVENT } from "@/lib/event";
 import {
+  EMAIL_CUSTOM,
+  EMAIL_DOMAINS,
   GENDERS,
   SHIRT_SIZES,
   courseAllowsChild,
   courseById,
   formatPhone,
+  joinEmail,
+  splitEmail,
   ticketFee,
   ticketLabel,
   type CourseId,
@@ -299,5 +303,84 @@ export function PhoneField({
       required={required}
       maxLength={13}
     />
+  );
+}
+
+const EMAIL_SET = new Set<string>(EMAIL_DOMAINS);
+
+export function EmailField({
+  value,
+  onChange,
+  required,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  required?: boolean;
+}) {
+  const { local, domain } = splitEmail(value);
+  const [pick, setPick] = useState(() =>
+    EMAIL_SET.has(domain) ? domain : domain ? EMAIL_CUSTOM : "",
+  );
+  const custom = pick === EMAIL_CUSTOM;
+
+  function setLocal(next: string) {
+    onChange(joinEmail(next.replace(/\s/g, ""), domain));
+  }
+
+  function setDomain(next: string) {
+    onChange(joinEmail(local, next.replace(/\s/g, "").replace(/^@+/, "")));
+  }
+
+  function onPick(next: string) {
+    setPick(next);
+    if (next === EMAIL_CUSTOM) {
+      onChange(joinEmail(local, EMAIL_SET.has(domain) ? "" : domain));
+      return;
+    }
+    onChange(joinEmail(local, next));
+  }
+
+  return (
+    <div className="email-pick">
+      <input
+        type="text"
+        className="email-pick__local"
+        inputMode="email"
+        autoComplete="username"
+        placeholder="아이디"
+        value={local}
+        onChange={(e) => setLocal(e.target.value)}
+        required={required}
+        aria-label="이메일 아이디"
+      />
+      <span aria-hidden>@</span>
+      {custom ? (
+        <input
+          type="text"
+          className="email-pick__host"
+          inputMode="url"
+          placeholder="직접입력"
+          value={domain}
+          onChange={(e) => setDomain(e.target.value)}
+          required={required}
+          aria-label="이메일 도메인"
+        />
+      ) : null}
+      <select
+        className="email-pick__pick"
+        value={pick}
+        onChange={(e) => onPick(e.target.value)}
+        required={required && !custom}
+        aria-label="이메일 도메인 선택"
+      >
+        <option value="">선택</option>
+        {EMAIL_DOMAINS.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+        <option value={EMAIL_CUSTOM}>직접입력</option>
+      </select>
+    </div>
   );
 }
