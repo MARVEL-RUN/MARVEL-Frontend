@@ -1,8 +1,9 @@
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 type ModelViewerProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & {
-  src: string;
+  src?: string;
   alt?: string;
+  poster?: string;
   loading?: "auto" | "lazy" | "eager";
   "camera-controls"?: boolean;
   "camera-orbit"?: string;
@@ -10,6 +11,8 @@ type ModelViewerProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLEleme
   "min-field-of-view"?: string;
   "max-field-of-view"?: string;
   "touch-action"?: string;
+  "disable-zoom"?: boolean;
+  "disable-tap"?: boolean;
   "shadow-intensity"?: number | string;
   exposure?: number | string;
   "auto-rotate"?: boolean;

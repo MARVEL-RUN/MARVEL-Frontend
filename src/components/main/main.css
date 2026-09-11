@@ -2173,18 +2173,175 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   padding: 0.4rem;
 }
 
+.kit-gallery__frame--3d {
+  isolation: isolate;
+}
+
 .kit-gallery__viewer {
   position: absolute;
   inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
   cursor: grab;
   --poster-color: transparent;
   --progress-bar-color: var(--marvel);
+  --progress-bar-height: 0px;
 }
 
 .kit-gallery__viewer:active {
   cursor: grabbing;
+}
+
+.medal-3d__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.medal-3d__hint {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0.8rem;
+  border: 0;
+  background: rgba(5, 6, 20, 0.38);
+  color: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  cursor: pointer;
+}
+
+.medal-3d__hint p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-align: center;
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
+  animation: medal-3d-hint 2.4s ease-in-out infinite;
+}
+
+@keyframes medal-3d-hint {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.medal-3d__load {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  background: rgba(5, 6, 20, 0.78);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.medal-3d__load p {
+  margin: 0;
+}
+
+.medal-3d__spin {
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--marvel);
+  border-radius: 50%;
+  animation: medal-3d-spin 0.7s linear infinite;
+}
+
+.medal-3d__bar {
+  display: block;
+  width: min(9.5rem, 58%);
+  height: 3px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.medal-3d__bar i {
+  display: block;
+  height: 100%;
+  background: var(--marvel);
+  transition: width 0.2s linear;
+}
+
+.medal-3d__bar.is-wait i {
+  width: 36%;
+  transition: none;
+  animation: medal-3d-wait 1s ease-in-out infinite;
+}
+
+.medal-3d__expand {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0;
+  border: 0;
+  background: rgba(8, 9, 29, 0.88);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.medal-3d__expand:hover {
+  background: var(--marvel);
+}
+
+.medal-3d-preview .course-preview__sheet {
+  width: min(52rem, 100%);
+  height: min(92dvh, calc(100dvh - 2rem));
+  max-height: none;
+  grid-template-rows: auto 1fr auto;
+}
+
+.medal-3d-preview__stage {
+  position: relative;
+  display: grid;
+  min-height: 0;
+  padding: 0;
+  background: #050614;
+}
+
+.medal-3d-preview__stage > * {
+  grid-area: 1 / 1;
+}
+
+.medal-3d-preview__stage .medal-3d__stage,
+.medal-3d-preview__stage .kit-gallery__viewer,
+.medal-3d-preview__stage .medal-3d__load {
+  position: absolute;
+  inset: 0;
+}
+
+@keyframes medal-3d-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes medal-3d-wait {
+  0%,
+  100% {
+    transform: translateX(-120%);
+  }
+  50% {
+    transform: translateX(180%);
+  }
 }
 
 .kit-gallery__frame--bib {

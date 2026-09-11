@@ -41,6 +41,7 @@ export function KitGallery() {
                   <MedalViewer
                     key={course.medal3d}
                     src={course.medal3d}
+                    poster={course.medalTurn}
                     alt={`${course.distance} 피니셔 메달 3D`}
                   />
                 </span>
