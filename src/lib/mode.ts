@@ -20,7 +20,7 @@ export const NAV_ITEMS = [
 /** 참가신청 CTA */
 export const REGISTER_HREF = "/register";
 
-/** 신청조회 — 참가신청 오른쪽 */
+/** 신청조회 — 참가신청 오른쪽. 협찬문의는 그 오른쪽 mailto */
 export const LOOKUP_HREF = "/lookup";
 
 /** 인스타 — URL 확정 후 채움 */

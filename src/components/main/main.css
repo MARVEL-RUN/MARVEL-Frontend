@@ -262,6 +262,35 @@ html.is-live .site-header {
   font-size: 0.78rem;
 }
 
+.site-header__spon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0 0.2rem 0 0.15rem;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__spon:hover {
+  color: #fff;
+  opacity: 0.82;
+}
+
+.site-header__spon-icon {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: var(--marvel);
+  color: #fff;
+}
+
 .site-header__burger {
   display: none;
   width: 2.4rem;
@@ -3906,6 +3935,12 @@ button.course {
     font-size: 1.2rem;
     font-weight: 700;
     text-decoration: none;
+  }
+
+  .site-header__drawer .site-header__spon {
+    align-self: flex-start;
+    min-height: 2.8rem;
+    font-size: 1.05rem;
   }
 
   .about .wrap,

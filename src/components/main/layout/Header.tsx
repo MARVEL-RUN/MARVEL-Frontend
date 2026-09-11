@@ -5,7 +5,30 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
+import { SPONSOR_MAILTO } from "@/lib/legal";
 import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+
+function SponsorInquiry({ className }: { className?: string }) {
+  return (
+    <a
+      href={SPONSOR_MAILTO}
+      className={className}
+      target="_blank"
+      rel="noreferrer"
+      title="협찬문의"
+    >
+      <span className="site-header__spon-icon" aria-hidden>
+        <svg viewBox="0 0 24 24" width="13" height="13">
+          <path
+            fill="currentColor"
+            d="M6.62 10.79a15.15 15.15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.58.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.58 1 1 0 0 1-.25 1.02z"
+          />
+        </svg>
+      </span>
+      협찬문의
+    </a>
+  );
+}
 
 export function Header() {
   const pathname = usePathname();
@@ -83,6 +106,7 @@ export function Header() {
           <Link href={LOOKUP_HREF} className="btn btn--ghost site-header__cta">
             신청조회
           </Link>
+          <SponsorInquiry className="site-header__spon" />
         </div>
 
         <button
@@ -115,6 +139,7 @@ export function Header() {
         <Link href={LOOKUP_HREF} className="btn btn--ghost">
           신청조회
         </Link>
+        <SponsorInquiry className="site-header__spon" />
       </div>
     </header>
   );
