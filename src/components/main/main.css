@@ -672,7 +672,7 @@ body:has(.course-preview) .side-dock {
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  padding: 7rem 0 12.5rem;
+  padding: 7rem 0 10.5rem;
 }
 
 .hero__art {
@@ -771,10 +771,6 @@ html.is-intro .hero__copy {
   opacity: 0;
 }
 
-html.is-live .hero__copy .kicker {
-  animation: kickIn 0.5s 0.08s both;
-}
-
 html.is-live .hero__logo {
   animation: logoHero 0.72s 0.18s cubic-bezier(0.12, 1.35, 0.2, 1) both;
 }
@@ -799,7 +795,7 @@ html.is-live .hero__actions {
   display: block;
   width: min(420px, 72vw);
   height: auto;
-  margin: 0.4rem 0 0.85rem;
+  margin: 0 0 0.85rem;
 }
 
 .hero__dday {
@@ -3859,7 +3855,7 @@ button.course {
 @media (max-width: 720px) {
   .hero {
     align-items: flex-end;
-    padding-bottom: 8.5rem;
+    padding-bottom: 7rem;
   }
 
   .hero__img {

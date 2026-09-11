@@ -123,7 +123,6 @@ export function HomePage() {
         <span className="hero__slash" aria-hidden />
 
         <div className="hero__copy">
-          <p className="kicker">{EVENT.kicker}</p>
           <Image
             src={COMING_SOON_ASSETS.logo}
             alt={EVENT.title}
