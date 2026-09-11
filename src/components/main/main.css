@@ -804,10 +804,10 @@ html.is-live .hero__actions {
 
 .hero__dday {
   display: inline-flex;
-  align-items: center;
-  gap: 0.85em;
+  align-items: baseline;
+  gap: 0.7em;
   margin: 0 0 1.15rem;
-  padding: 0.5rem 1.4rem 0.45rem 1.35rem;
+  padding: 0.62rem 1.45rem 0.62rem 1.5rem;
   background: var(--gold);
   color: var(--navy);
   font-size: clamp(1.35rem, 2.6vw, 1.9rem);
@@ -821,10 +821,20 @@ html.is-live .hero__actions {
 
 .hero__open {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.4em;
-  padding-right: 0.85em;
-  border-right: 2px solid color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.hero__open span:first-child {
+  letter-spacing: 0;
+}
+
+.hero__dday > i {
+  align-self: center;
+  width: 2px;
+  height: 0.72em;
+  background: currentColor;
+  opacity: 0.45;
 }
 
 .hero__dday:hover {

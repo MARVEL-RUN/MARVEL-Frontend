@@ -142,6 +142,7 @@ export function HomePage() {
               <span>접수</span>
               <span>OPEN</span>
             </span>
+            <i aria-hidden />
             <OpenDday />
           </a>
           <p className="hero__lead">{EVENT.lead}</p>
