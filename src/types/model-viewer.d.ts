@@ -7,6 +7,8 @@ type ModelViewerProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLEleme
   "camera-controls"?: boolean;
   "camera-orbit"?: string;
   "field-of-view"?: string;
+  "min-field-of-view"?: string;
+  "max-field-of-view"?: string;
   "touch-action"?: string;
   "shadow-intensity"?: number | string;
   exposure?: number | string;

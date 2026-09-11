@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { MAIN_ASSETS } from "@/lib/assets";
 
-export function MedalViewer() {
+export function MedalViewer({ src, alt }: { src: string; alt: string }) {
   useEffect(() => {
     void import("@google/model-viewer");
   }, []);
@@ -11,16 +10,18 @@ export function MedalViewer() {
   return (
     <model-viewer
       className="kit-gallery__viewer"
-      src={MAIN_ASSETS.medal3d}
-      alt="피니셔 메달 3D 미리보기"
+      src={src}
+      alt={alt}
       camera-controls
-      camera-orbit="0deg 75deg auto"
-      field-of-view="30deg"
+      camera-orbit="18deg 80deg auto"
+      field-of-view="32deg"
+      min-field-of-view="18deg"
+      max-field-of-view="45deg"
       touch-action="pan-y"
-      shadow-intensity="0.85"
+      shadow-intensity="1"
       exposure="1.05"
       environment-image="neutral"
-      interaction-prompt="auto"
+      interaction-prompt="when-focused"
       suppressHydrationWarning
     />
   );

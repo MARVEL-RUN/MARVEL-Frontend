@@ -29,7 +29,25 @@ export function KitGallery() {
             </button>
           ))}
         </div>
-        <ul className="kit-gallery__medals">
+        <ul
+          className={
+            course.medal3d ? "kit-gallery__medals kit-gallery__medals--3d" : "kit-gallery__medals"
+          }
+        >
+          {course.medal3d ? (
+            <li>
+              <figure>
+                <span className="kit-gallery__frame kit-gallery__frame--3d">
+                  <MedalViewer
+                    key={course.medal3d}
+                    src={course.medal3d}
+                    alt={`${course.distance} 피니셔 메달 3D`}
+                  />
+                </span>
+                <figcaption>3D</figcaption>
+              </figure>
+            </li>
+          ) : null}
           <li>
             <figure>
               <span className="kit-gallery__frame">
@@ -54,14 +72,6 @@ export function KitGallery() {
                 />
               </span>
               <figcaption>후면</figcaption>
-            </figure>
-          </li>
-          <li>
-            <figure>
-              <span className="kit-gallery__frame kit-gallery__frame--3d">
-                <MedalViewer />
-              </span>
-              <figcaption>3D</figcaption>
             </figure>
           </li>
         </ul>

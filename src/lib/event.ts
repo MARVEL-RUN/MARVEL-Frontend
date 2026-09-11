@@ -89,6 +89,7 @@ export const EVENT = {
       map: MAIN_ASSETS.course10k,
       medalTurn: MAIN_ASSETS.medal10kTurn,
       medalBack: MAIN_ASSETS.medal10kBack,
+      medal3d: MAIN_ASSETS.medal10k3d,
       figure: MAIN_ASSETS.venueDoom,
     },
     {
@@ -117,6 +118,7 @@ export const EVENT = {
       map: MAIN_ASSETS.course2_3k,
       medalTurn: MAIN_ASSETS.medal2_3kTurn,
       medalBack: MAIN_ASSETS.medal2_3kBack,
+      medal3d: MAIN_ASSETS.medal2_3k3d,
       figure: MAIN_ASSETS.venueThor,
     },
   ],

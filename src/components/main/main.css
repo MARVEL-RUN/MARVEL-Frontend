@@ -2137,9 +2137,13 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .kit-gallery__medals {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 0.65rem;
   flex: 1;
+}
+
+.kit-gallery__medals--3d {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .kit-gallery__medals figure {
@@ -4054,7 +4058,7 @@ button.course {
     grid-template-columns: 1fr 1fr;
   }
 
-  .kit-gallery__medals > li:last-child {
+  .kit-gallery__medals--3d > li:first-child {
     grid-column: 1 / -1;
   }
 
