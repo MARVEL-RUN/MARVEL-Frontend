@@ -1003,6 +1003,7 @@ html.is-live .hero__actions {
 .about__stats,
 .timeline,
 .chips,
+.kit-gallery__medals,
 .proto,
 .bulletin,
 .site-footer__sponsors,
@@ -1906,23 +1907,6 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   letter-spacing: 0.12em;
 }
 
-.page__body>.media-ph {
-  margin-bottom: 3rem;
-}
-
-.media-ph {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  min-height: 22rem;
-  margin-top: 1.6rem;
-  background: #8a8a8a;
-  color: #fff;
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
 .course-guide {
   display: grid;
   grid-template-columns: minmax(16.5rem, 22rem) minmax(0, 1fr);
@@ -2068,6 +2052,116 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .course-guide__shot.is-on {
   opacity: 1;
+}
+
+.kit-gallery {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.2rem;
+}
+
+.kit-gallery__pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 0.95rem 1rem 1.05rem;
+  background: #08091d;
+}
+
+.kit-gallery__pane h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.kit-gallery__picks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kit-gallery__picks button {
+  min-height: 2.1rem;
+  padding: 0 0.4rem;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--note);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.kit-gallery__picks button:last-child {
+  border-right: 0;
+}
+
+.kit-gallery__picks button.is-on {
+  background: var(--marvel);
+  color: #fff;
+}
+
+.kit-gallery__medals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.kit-gallery__medals figure {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.kit-gallery__bib {
+  margin: 0;
+}
+
+.kit-gallery__frame {
+  position: relative;
+  display: block;
+  flex: 1;
+  aspect-ratio: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #050614;
+}
+
+.kit-gallery__frame img {
+  object-fit: contain;
+  padding: 0.4rem;
+}
+
+.kit-gallery__frame--bib {
+  flex: none;
+  width: min(40rem, 100%);
+  height: 20rem;
+  min-height: 20rem;
+  margin-inline: auto;
+  overflow: hidden;
+  aspect-ratio: auto;
+}
+
+.kit-gallery__frame--bib img {
+  padding: 0;
+  object-fit: contain;
+  transform: scale(2.05);
+}
+
+.kit-gallery__medals figcaption {
+  margin-top: 0.4rem;
+  color: var(--note);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .course-preview {
@@ -3900,6 +3994,11 @@ button.course {
 
   .course-guide__hint {
     position: static;
+  }
+
+  .kit-gallery__frame--bib {
+    height: 14rem;
+    min-height: 14rem;
   }
 
 

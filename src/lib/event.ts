@@ -87,6 +87,8 @@ export const EVENT = {
       start: "13:30",
       desc: "한계를 넘어 서킷을 완주하는 히어로 레이스",
       map: MAIN_ASSETS.course10k,
+      medalTurn: MAIN_ASSETS.medal10kTurn,
+      medalBack: MAIN_ASSETS.medal10kBack,
       figure: MAIN_ASSETS.venueDoom,
     },
     {
@@ -99,6 +101,8 @@ export const EVENT = {
       start: "14:00",
       desc: "스피드와 재미를 함께 즐기는 액션 레이스",
       map: MAIN_ASSETS.course5k,
+      medalTurn: MAIN_ASSETS.medal5kTurn,
+      medalBack: MAIN_ASSETS.medal5kBack,
       figure: MAIN_ASSETS.venueCyclops,
     },
     {
@@ -111,6 +115,8 @@ export const EVENT = {
       start: "14:30",
       desc: "어린이 히어로와 함께 달리는 패밀리 레이스",
       map: MAIN_ASSETS.course2_3k,
+      medalTurn: MAIN_ASSETS.medal2_3kTurn,
+      medalBack: MAIN_ASSETS.medal2_3kBack,
       figure: MAIN_ASSETS.venueThor,
     },
   ],
