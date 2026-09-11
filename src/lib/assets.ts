@@ -36,6 +36,7 @@ export const MAIN_ASSETS = {
   medal5kBack: "/images/main/guide/medal-5k-back.svg",
   medal10kTurn: "/images/main/guide/medal-10k-turn.svg",
   medal10kBack: "/images/main/guide/medal-10k-back.svg",
+  medal3d: "/models/main/guide/medal.glb",
   kitBib: "/images/main/guide/kit-bib.svg",
   venueThor: "/images/main/venue/2.3k-thor.png",
   venueCyclops: "/images/main/venue/5k-cyclops.png",

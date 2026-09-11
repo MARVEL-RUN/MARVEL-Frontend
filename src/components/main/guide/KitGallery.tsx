@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import type { CourseId } from "@/lib/register";
+import { MedalViewer } from "./MedalViewer";
 
 export function KitGallery() {
   const [selectedId, setSelected] = useState<CourseId>(EVENT.courses[0].id);
@@ -36,7 +37,7 @@ export function KitGallery() {
                   src={course.medalTurn}
                   alt={`${course.distance} 피니셔 메달 회전`}
                   fill
-                  sizes="(max-width: 860px) 50vw, 420px"
+                  sizes="(max-width: 860px) 50vw, 280px"
                 />
               </span>
               <figcaption>회전</figcaption>
@@ -49,10 +50,18 @@ export function KitGallery() {
                   src={course.medalBack}
                   alt={`${course.distance} 피니셔 메달 후면`}
                   fill
-                  sizes="(max-width: 860px) 50vw, 420px"
+                  sizes="(max-width: 860px) 50vw, 280px"
                 />
               </span>
               <figcaption>후면</figcaption>
+            </figure>
+          </li>
+          <li>
+            <figure>
+              <span className="kit-gallery__frame kit-gallery__frame--3d">
+                <MedalViewer />
+              </span>
+              <figcaption>3D</figcaption>
             </figure>
           </li>
         </ul>

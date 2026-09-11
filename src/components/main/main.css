@@ -216,7 +216,7 @@ html.is-live .site-header {
   position: absolute;
   left: 50%;
   display: flex;
-  gap: 1.65rem;
+  gap: 1.75rem;
   transform: translateX(-50%);
   white-space: nowrap;
 }
@@ -225,8 +225,8 @@ html.is-live .site-header {
   position: relative;
   flex-shrink: 0;
   color: var(--silver);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
   letter-spacing: 0;
   text-decoration: none;
   white-space: nowrap;
@@ -259,7 +259,7 @@ html.is-live .site-header {
 .site-header__cta {
   min-height: 2.5rem;
   padding-inline: 1.15rem;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
 }
 
 .site-header__spon {
@@ -269,7 +269,7 @@ html.is-live .site-header {
   min-height: 2.5rem;
   padding: 0 0.2rem 0 0.15rem;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0;
   text-decoration: none;
@@ -2137,7 +2137,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .kit-gallery__medals {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.65rem;
   flex: 1;
 }
@@ -2167,6 +2167,20 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .kit-gallery__frame img {
   object-fit: contain;
   padding: 0.4rem;
+}
+
+.kit-gallery__viewer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  --poster-color: transparent;
+  --progress-bar-color: var(--marvel);
+}
+
+.kit-gallery__viewer:active {
+  cursor: grabbing;
 }
 
 .kit-gallery__frame--bib {
@@ -4034,6 +4048,14 @@ button.course {
   .kit-gallery__frame--bib {
     height: 14rem;
     min-height: 14rem;
+  }
+
+  .kit-gallery__medals {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .kit-gallery__medals > li:last-child {
+    grid-column: 1 / -1;
   }
 
 
