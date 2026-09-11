@@ -5,12 +5,6 @@ import { EVENT } from "@/lib/event";
 
 const OPEN_AT = Date.parse(EVENT.openAt);
 
-export const OPEN_STAMP = (() => {
-  const m = EVENT.openAt.match(/^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  if (!m) return { date: "9.22", time: "14:00" };
-  return { date: `${Number(m[1])}.${m[2]}`, time: `${m[3]}:${m[4]}` };
-})();
-
 type Left = { d: string; h: string; m: string; s: string };
 
 function parts(now: number): Left | null {

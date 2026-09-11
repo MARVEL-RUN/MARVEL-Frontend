@@ -12,7 +12,6 @@ import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown, OpenDday } from "./OpenCountdown";
 import { HomePopup } from "./HomePopup";
 import { SideDock } from "./SideDock";
-import { TimeTable } from "./TimeTable";
 
 const TICKER = [
   "MARVEL RUN 2026",
@@ -124,7 +123,6 @@ export function HomePage() {
         <span className="hero__slash" aria-hidden />
 
         <div className="hero__copy">
-          <p className="kicker">{EVENT.kicker}</p>
           <Image
             src={COMING_SOON_ASSETS.logo}
             alt={EVENT.title}
@@ -139,6 +137,11 @@ export function HomePage() {
             onClick={goAssemble}
             aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
           >
+            <span className="hero__open">
+              <span>접수</span>
+              <span>OPEN</span>
+            </span>
+            <i aria-hidden />
             <OpenDday />
           </a>
           <p className="hero__lead">{EVENT.lead}</p>
@@ -255,20 +258,10 @@ export function HomePage() {
         <CoursePreview course={preview} onClose={() => setPreview(null)} />
       ) : null}
 
-      <section className="sec schedule">
-        <div className="wrap reveal" id="schedule">
-          <p className="kicker">03 / RACE DAY</p>
-          <h2 className="sec__title">
-            레이스 데이 <em>타임라인</em>
-          </h2>
-          <TimeTable />
-        </div>
-      </section>
-
       <section className="sec venue">
         <div className="wrap venue__grid reveal" id="venue">
           <div>
-            <p className="kicker">04 / LOCATION</p>
+            <p className="kicker">03 / LOCATION</p>
             <h2 className="sec__title">
               {EVENT.venue}
               <br />

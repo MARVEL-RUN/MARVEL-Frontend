@@ -488,18 +488,6 @@ html.is-intro .fx-letterbox span {
   }
 }
 
-@keyframes kickIn {
-  from {
-    opacity: 0;
-    transform: translateX(-16px) skewX(-8deg);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @keyframes logoHero {
   from {
     opacity: 0;

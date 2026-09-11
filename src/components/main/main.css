@@ -355,13 +355,19 @@ html.is-live .side-dock {
 }
 
 .side-dock .side-dock__open {
-  flex-direction: column;
-  gap: 0.18rem;
-  min-height: 5.8rem;
-  padding: 0.65rem 1.1rem 0.55rem 1.25rem;
+  gap: 0.4em;
+  min-height: 2.35rem;
+  padding: 0 1.05rem 0 1.15rem;
   background: var(--marvel);
   color: #fff;
-  letter-spacing: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.side-dock .side-dock__open i {
+  font-style: normal;
+  font-weight: 400;
+  opacity: 0.55;
 }
 
 .side-dock .side-dock__open:hover,
@@ -373,34 +379,6 @@ html.is-live .side-dock {
 .side-dock .side-dock__open.is-on {
   background: var(--marvel);
   color: #fff;
-}
-
-.side-dock__open-dday {
-  font-size: 1.28rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
-}
-
-.side-dock__open-when {
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  line-height: 1;
-}
-
-.side-dock .side-dock__open:hover .side-dock__open-when,
-.side-dock .side-dock__open.is-on:hover .side-dock__open-when {
-  color: inherit;
-}
-
-.side-dock__open-label {
-  margin-top: 0.06rem;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  line-height: 1;
 }
 
 .side-dock .side-dock__go {
@@ -444,7 +422,6 @@ html.is-live .side-dock {
 }
 
 #courses,
-#schedule,
 #venue {
   scroll-margin-top: 0.2rem;
 }
@@ -695,7 +672,7 @@ body:has(.course-preview) .side-dock {
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  padding: 7rem 0 12.5rem;
+  padding: 7rem 0 10.5rem;
 }
 
 .hero__art {
@@ -794,10 +771,6 @@ html.is-intro .hero__copy {
   opacity: 0;
 }
 
-html.is-live .hero__copy .kicker {
-  animation: kickIn 0.5s 0.08s both;
-}
-
 html.is-live .hero__logo {
   animation: logoHero 0.72s 0.18s cubic-bezier(0.12, 1.35, 0.2, 1) both;
 }
@@ -822,14 +795,15 @@ html.is-live .hero__actions {
   display: block;
   width: min(420px, 72vw);
   height: auto;
-  margin: 0.4rem 0 0.85rem;
+  margin: 0 0 0.85rem;
 }
 
 .hero__dday {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
+  gap: 0.7em;
   margin: 0 0 1.15rem;
-  padding: 0.55rem 1.45rem 0.5rem 1.55rem;
+  padding: 0.62rem 1.45rem 0.62rem 1.5rem;
   background: var(--gold);
   color: var(--navy);
   font-size: clamp(1.35rem, 2.6vw, 1.9rem);
@@ -839,6 +813,24 @@ html.is-live .hero__actions {
   text-decoration: none;
   clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
   box-shadow: 4px 4px 0 var(--marvel);
+}
+
+.hero__open {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
+}
+
+.hero__open span:first-child {
+  letter-spacing: 0;
+}
+
+.hero__dday > i {
+  align-self: center;
+  width: 2px;
+  height: 0.72em;
+  background: currentColor;
+  opacity: 0.45;
 }
 
 .hero__dday:hover {
@@ -3787,12 +3779,9 @@ button.course {
   }
 
   .side-dock .side-dock__open {
-    min-height: 5.2rem;
-    padding: 0.5rem 0.85rem 0.45rem 1rem;
-  }
-
-  .side-dock__open-dday {
-    font-size: 1.08rem;
+    min-height: 2.1rem;
+    padding: 0 0.8rem 0 0.95rem;
+    font-size: 0.7rem;
   }
 
   .site-header__drawer {
@@ -3866,7 +3855,7 @@ button.course {
 @media (max-width: 720px) {
   .hero {
     align-items: flex-end;
-    padding-bottom: 8.5rem;
+    padding-bottom: 7rem;
   }
 
   .hero__img {
