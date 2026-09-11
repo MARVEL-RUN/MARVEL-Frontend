@@ -197,10 +197,10 @@ function ModelStage({
         poster={poster}
         loading="eager"
         camera-controls
-        camera-orbit={ORBIT}
-        field-of-view={wide ? "42deg" : "32deg"}
-        min-field-of-view={wide ? "10deg" : "32deg"}
-        max-field-of-view={wide ? "58deg" : "32deg"}
+        camera-orbit={wide ? "18deg 78deg 110%" : ORBIT}
+        field-of-view={wide ? "45deg" : "32deg"}
+        min-field-of-view={wide ? "12deg" : "32deg"}
+        max-field-of-view={wide ? "60deg" : "32deg"}
         touch-action={wide ? "none" : "pan-y"}
         {...(wide ? {} : { "disable-zoom": true, "disable-tap": true })}
         shadow-intensity="1"

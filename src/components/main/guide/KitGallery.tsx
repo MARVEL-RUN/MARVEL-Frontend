@@ -14,7 +14,7 @@ export function KitGallery() {
   return (
     <div className="kit-gallery">
       <section className="kit-gallery__pane">
-        <h3>피니셔 메달</h3>
+        <h3>메달</h3>
         <div className="kit-gallery__picks" role="tablist" aria-label="코스별 메달">
           {EVENT.courses.map((c) => (
             <button
@@ -54,12 +54,12 @@ export function KitGallery() {
               <span className="kit-gallery__frame">
                 <Image
                   src={course.medalTurn}
-                  alt={`${course.distance} 피니셔 메달 회전`}
-                  fill
-                  sizes="(max-width: 860px) 50vw, 280px"
-                />
-              </span>
-              <figcaption>회전</figcaption>
+                    alt={`${course.distance} 피니셔 메달 화살표 방향 회전`}
+                    fill
+                    sizes="(max-width: 860px) 50vw, 280px"
+                  />
+                </span>
+                <figcaption>화살표 방향 회전</figcaption>
             </figure>
           </li>
           <li>
@@ -76,6 +76,11 @@ export function KitGallery() {
             </figure>
           </li>
         </ul>
+        {course.medal3d ? (
+          <p className="kit-gallery__note">
+            ※ 3D 이미지는 연출용이며, 실제 지급 메달과 다를 수 있습니다.
+          </p>
+        ) : null}
       </section>
       <section className="kit-gallery__pane kit-gallery__pane--bib">
         <h3>배번호</h3>
