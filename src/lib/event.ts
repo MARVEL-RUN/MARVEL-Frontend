@@ -104,6 +104,7 @@ export const EVENT = {
       map: MAIN_ASSETS.course5k,
       medalTurn: MAIN_ASSETS.medal5kTurn,
       medalBack: MAIN_ASSETS.medal5kBack,
+      medal3d: MAIN_ASSETS.medal5k3d,
       figure: MAIN_ASSETS.venueCyclops,
     },
     {
