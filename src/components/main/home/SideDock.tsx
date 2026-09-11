@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { EVENT } from "@/lib/event";
-import { OPEN_STAMP, OpenDday } from "./OpenCountdown";
+import { useOpenLeft } from "./OpenCountdown";
 
 const SECTIONS = [
   { id: "courses", label: "코스", pad: 170 },
@@ -14,6 +14,8 @@ const SECTIONS = [
 export function SideDock() {
   const [active, setActive] = useState<string>("hero");
   const jumping = useRef(false);
+  const { left, ready } = useOpenLeft();
+  const dday = !ready ? "D--" : left ? `D-${Number(left.d)}` : null;
 
   useEffect(() => {
     const onScroll = () => {
@@ -66,13 +68,13 @@ export function SideDock() {
         aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
         onClick={() => jump("assemble")}
       >
-        <span className="side-dock__open-dday">
-          <OpenDday />
-        </span>
-        <span className="side-dock__open-when">
-          {OPEN_STAMP.date} {OPEN_STAMP.time}
-        </span>
-        <span className="side-dock__open-label">OPEN</span>
+        <span>OPEN</span>
+        {dday ? (
+          <>
+            <i aria-hidden>|</i>
+            <span>{dday}</span>
+          </>
+        ) : null}
       </button>
       {SECTIONS.map((s) => (
         <button
