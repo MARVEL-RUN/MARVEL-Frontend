@@ -2355,7 +2355,8 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .kit-gallery__frame--bib img {
   padding: 0;
   object-fit: contain;
-  object-position: center;
+  /* 원본에서 배번호가 왼쪽(46.6%)이라 확대 기준을 맞춤 */
+  object-position: 54% center;
   transform-origin: center center;
   transform: scale(2.4);
 }
