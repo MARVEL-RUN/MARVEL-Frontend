@@ -3149,7 +3149,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   color: var(--gold);
 }
 
-.course-pick__fees-row.is-on {
+.course-pick__fees-row span.is-on {
   background: rgba(255, 255, 255, 0.08);
 }
 
