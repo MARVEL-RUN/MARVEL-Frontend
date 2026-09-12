@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useLayoutEffect, useState } from "react";
+import { scrollPageTop } from "@/lib/scroll-page";
 import { EVENT } from "@/lib/event";
 import {
   CHILD_AGE_NOTE,
@@ -118,6 +119,10 @@ export function GroupFlow({
     if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
     setStep(1);
   }
+
+  useLayoutEffect(() => {
+    if (step !== 0) scrollPageTop();
+  }, [step]);
 
   async function onConfirm() {
     setBusy(true);

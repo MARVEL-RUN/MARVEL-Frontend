@@ -4006,6 +4006,45 @@ button.course {
   min-height: 1px;
 }
 
+.sheet-modal .course-preview__dim {
+  background: rgba(0, 3, 32, 0.55);
+}
+
+.sheet-modal__sheet {
+  width: min(560px, 100%);
+  max-height: calc(100dvh - 2rem);
+}
+
+.sheet-modal__body {
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem 1rem 1.2rem;
+  background: #fff;
+  color: #191919;
+}
+
+.sheet-modal__body .payment-panel {
+  padding: 0;
+}
+
+.sheet-modal__body .payment-panel h2,
+.sheet-modal__body .sec__body,
+.sheet-modal__body .form__note {
+  color: #191919;
+}
+
+.sheet-modal__body .form__err {
+  color: #c00;
+}
+
+.sheet-modal__frame {
+  display: block;
+  width: 100%;
+  height: min(70dvh, 720px);
+  border: 0;
+  background: #fff;
+}
+
 .bulletin {
   --bulletin-tag: 6.5rem;
   --bulletin-gap: 1rem;

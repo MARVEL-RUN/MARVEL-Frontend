@@ -10,6 +10,7 @@ import { formatFee } from "@/lib/register";
 import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
+import { SheetModal } from "@/components/main/SheetModal";
 
 type Phase = "loading" | "done" | "error";
 
@@ -20,6 +21,7 @@ export function PaymentSuccessPage() {
   const [result, setResult] = useState<PaymentConfirmResponse | null>(null);
   const [orderName, setOrderName] = useState("");
   const [copied, setCopied] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   useEffect(() => {
     const paymentKey = params.get("paymentKey");
@@ -135,14 +137,13 @@ export function PaymentSuccessPage() {
             <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
             <div className="flow__nav">
               {receiptUrl ? (
-                <a
-                  href={receiptUrl}
+                <button
+                  type="button"
                   className="btn btn--ghost"
-                  target="_blank"
-                  rel="noreferrer"
+                  onClick={() => setReceiptOpen(true)}
                 >
                   영수증
-                </a>
+                </button>
               ) : null}
               <Link href="/lookup" className="btn btn--ghost">
                 신청조회
@@ -152,6 +153,20 @@ export function PaymentSuccessPage() {
               </Link>
             </div>
           </section>
+        ) : null}
+
+        {receiptOpen && receiptUrl ? (
+          <SheetModal
+            kicker="RECEIPT"
+            title="영수증"
+            onClose={() => setReceiptOpen(false)}
+          >
+            <iframe
+              className="sheet-modal__frame"
+              src={receiptUrl}
+              title="결제 영수증"
+            />
+          </SheetModal>
         ) : null}
 
         {phase === "error" ? (
