@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import {
   CHILD_AGE_NOTE,
   EMPTY_CONSENTS,
@@ -9,9 +8,13 @@ import {
   GUARDIAN_AGE_NOTE,
   applyCourseForBirth,
   ageBand,
+  courseById,
   emailOk,
+  genderLabel,
   needsGuardian,
   requiredConsentsOk,
+  ticketFee,
+  ticketLabel,
   type ApplyKind,
   type Consents,
   type EntryDraft,
@@ -25,9 +28,11 @@ import {
 } from "@/lib/payment/map";
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import { savePendingPayment } from "@/lib/payment/session";
+import { scrollPageTop } from "@/lib/scroll-page";
 import { createRegistration } from "@/services/main/registrations";
 import type { RegistrationCreateResponse } from "@/services/main/types";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
+import { SheetModal } from "@/components/main/SheetModal";
 import { ApplyTerms } from "./ApplyTerms";
 import {
   AddressField,
@@ -42,10 +47,11 @@ import {
   PasswordField,
   PhoneField,
   ShirtPick,
+  birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
 
-const STEPS = ["정보", "결제"] as const;
+const STEPS = ["정보", "확인"] as const;
 type Step = 0 | 1;
 
 const NOTICE = [
@@ -59,9 +65,7 @@ export function RegisterFlow() {
 
   function pickKind(next: ApplyKind) {
     setKind(next);
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    });
+    requestAnimationFrame(scrollPageTop);
   }
 
   if (!kind) {
@@ -93,9 +97,14 @@ function IndividualFlow({
   }));
   const [registration, setRegistration] =
     useState<RegistrationCreateResponse | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useLayoutEffect(() => {
+    if (step === 1) scrollPageTop();
+  }, [step]);
 
   function patch(next: Partial<EntryDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
