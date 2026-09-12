@@ -4079,8 +4079,7 @@ button.course {
   gap: 0.45rem;
 }
 
-.sheet-modal__close,
-.sheet-modal__dl {
+.sheet-modal__close {
   min-height: 2.2rem;
   padding: 0 1rem;
   border: 0;
@@ -4091,15 +4090,7 @@ button.course {
   letter-spacing: 0.1em;
   cursor: pointer;
   clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-}
-
-.sheet-modal__close {
   background: var(--marvel);
-}
-
-.sheet-modal__dl {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
 .sheet-modal__body {
@@ -4149,8 +4140,7 @@ button.course {
   gap: 0.45rem;
 }
 
-.sheet-modal--left .sheet-modal__close,
-.sheet-modal--left .sheet-modal__dl {
+.sheet-modal--left .sheet-modal__close {
   padding: 0 0.7rem;
   font-size: 0.72rem;
 }
@@ -4168,6 +4158,23 @@ button.course {
   display: flex;
   flex-direction: column;
   padding: 0;
+}
+
+.sheet-modal__receipt {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sheet-modal__hint {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  background: #f4f4f6;
+  color: #555;
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
 .sheet-modal__frame {
