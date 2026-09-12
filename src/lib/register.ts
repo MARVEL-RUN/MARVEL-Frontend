@@ -41,6 +41,10 @@ export type EntryDraft = {
   email: string;
   emergency: string;
   shirt: ShirtSize | "";
+  password: string;
+  zonecode: string;
+  address: string;
+  addressDetail: string;
 } & Consents;
 
 export type EntryRecord = {
@@ -110,10 +114,9 @@ export const MAX_GROUP_SIZE = 20;
 
 export const SHIRT_SIZES: ShirtSize[] = ["XS", "S", "M", "L", "XL", "2XL"];
 
-export const GENDERS: { id: Gender; label: string }[] = [
+export const GENDERS: { id: Exclude<Gender, "none">; label: string }[] = [
   { id: "male", label: "남성" },
   { id: "female", label: "여성" },
-  { id: "none", label: "선택 안 함" },
 ];
 
 export const EMPTY_DRAFT: EntryDraft = {
@@ -126,6 +129,10 @@ export const EMPTY_DRAFT: EntryDraft = {
   email: "",
   emergency: "",
   shirt: "",
+  password: "",
+  zonecode: "",
+  address: "",
+  addressDetail: "",
   ...EMPTY_CONSENTS,
 };
 
@@ -154,7 +161,9 @@ export function courseById(id: CourseId) {
 }
 
 export function genderLabel(id: Gender) {
-  return GENDERS.find((g) => g.id === id)?.label ?? id;
+  if (id === "male") return "남성";
+  if (id === "female") return "여성";
+  return "—";
 }
 
 export function ticketLabel(kind: TicketKind) {
@@ -402,6 +411,13 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
     throw new Error("만 14세 미만은 보호자 연락처를 입력하세요.");
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
+  if (draft.password.trim().length < 4) {
+    throw new Error("신청 비밀번호를 4자 이상 입력하세요.");
+  }
+  if (!draft.zonecode.trim() || !draft.address.trim()) {
+    throw new Error("우편번호 찾기로 주소를 선택하세요.");
+  }
+  if (!draft.addressDetail.trim()) throw new Error("상세주소를 입력하세요.");
   if (!requiredConsentsOk(draft)) {
     throw new Error("필수 약관에 동의해 주세요.");
   }
