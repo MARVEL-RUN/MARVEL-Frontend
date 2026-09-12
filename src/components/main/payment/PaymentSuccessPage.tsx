@@ -11,6 +11,7 @@ import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
+import { isMobileView } from "@/lib/viewport";
 
 type Phase = "loading" | "done" | "error";
 
@@ -140,7 +141,13 @@ export function PaymentSuccessPage() {
                 <button
                   type="button"
                   className="btn btn--ghost"
-                  onClick={() => setReceiptOpen(true)}
+                  onClick={() => {
+                    if (isMobileView()) {
+                      window.location.assign(receiptUrl);
+                      return;
+                    }
+                    setReceiptOpen(true);
+                  }}
                 >
                   영수증
                 </button>

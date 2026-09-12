@@ -456,7 +456,8 @@ html.is-live .side-dock {
 }
 
 body:has(.site-header__drawer.is-open) .side-dock,
-body:has(.course-preview) .side-dock {
+body:has(.course-preview) .side-dock,
+body:has(.sheet-modal) .side-dock {
   display: none;
   animation: none;
 }
@@ -4006,18 +4007,91 @@ button.course {
   min-height: 1px;
 }
 
-.sheet-modal .course-preview__dim {
+/* zoom 1.1이면 100dvh가 화면보다 커져서, 보이는 높이로 나눈다 */
+.sheet-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  width: calc(100dvw / var(--site-zoom, 1));
+  height: calc(100dvh / var(--site-zoom, 1));
+  max-width: calc(100dvw / var(--site-zoom, 1));
+  max-height: calc(100dvh / var(--site-zoom, 1));
+  padding: 1.2rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sheet-modal__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
   background: rgba(0, 3, 32, 0.55);
+  cursor: pointer;
 }
 
 .sheet-modal__sheet {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
   width: min(560px, 100%);
-  max-height: calc(100dvh - 2rem);
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #070814;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+.sheet-modal__bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 0 0 auto;
+  padding: 0.7rem 0.8rem 0.7rem 1rem;
+  background: #0c0d22;
+  border-bottom: 3px solid var(--marvel);
+}
+
+.sheet-modal__kicker {
+  margin: 0;
+  padding: 0.22em 0.5em 0.16em;
+  background: var(--marvel);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.sheet-modal__bar h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.sheet-modal__close {
+  min-height: 2.2rem;
+  padding: 0 1rem;
+  border: 0;
+  background: var(--marvel);
+  color: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
 
 .sheet-modal__body {
+  flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 1rem 1rem 1.2rem;
   background: #fff;
   color: #191919;
@@ -4040,7 +4114,8 @@ button.course {
 .sheet-modal__frame {
   display: block;
   width: 100%;
-  height: min(70dvh, 720px);
+  min-height: 24rem;
+  height: 100%;
   border: 0;
   background: #fff;
 }

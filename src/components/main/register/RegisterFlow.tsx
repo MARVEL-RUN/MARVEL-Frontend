@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import {
   CHILD_AGE_NOTE,
@@ -29,6 +30,7 @@ import {
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import { savePendingPayment } from "@/lib/payment/session";
 import { scrollPageTop } from "@/lib/scroll-page";
+import { isMobileView } from "@/lib/viewport";
 import { createRegistration } from "@/services/main/registrations";
 import type { RegistrationCreateResponse } from "@/services/main/types";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
@@ -97,10 +99,19 @@ function IndividualFlow({
   }));
   const [registration, setRegistration] =
     useState<RegistrationCreateResponse | null>(null);
+  const router = useRouter();
   const [payOpen, setPayOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
+
+  function openPay() {
+    if (isMobileView()) {
+      router.push("/payment");
+      return;
+    }
+    setPayOpen(true);
+  }
 
   useLayoutEffect(() => {
     if (step === 1) scrollPageTop();
@@ -149,7 +160,7 @@ function IndividualFlow({
 
   async function onPay() {
     if (registration) {
-      setPayOpen(true);
+      openPay();
       return;
     }
     if (!hasMainApi || !hasTossClientKey) {
@@ -187,7 +198,7 @@ function IndividualFlow({
         savedAt: Date.now(),
       });
       setRegistration(created);
-      setPayOpen(true);
+      openPay();
     } catch (err) {
       const message =
         err instanceof MainHttpError

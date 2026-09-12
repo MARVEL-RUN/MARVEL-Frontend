@@ -27,18 +27,18 @@ export function SheetModal({
   }, [onClose]);
 
   return (
-    <div className="course-preview sheet-modal" role="dialog" aria-modal="true">
+    <div className="sheet-modal" role="dialog" aria-modal="true">
       <button
         type="button"
-        className="course-preview__dim"
+        className="sheet-modal__dim"
         onClick={onClose}
         aria-label="닫기"
       />
-      <div className="course-preview__sheet sheet-modal__sheet">
-        <header className="course-preview__bar">
-          <p className="course-preview__kicker">{kicker}</p>
+      <div className="sheet-modal__sheet">
+        <header className="sheet-modal__bar">
+          <p className="sheet-modal__kicker">{kicker}</p>
           <h3>{title}</h3>
-          <button type="button" className="course-preview__close" onClick={onClose}>
+          <button type="button" className="sheet-modal__close" onClick={onClose}>
             닫기
           </button>
         </header>
