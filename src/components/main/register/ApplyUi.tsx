@@ -431,6 +431,7 @@ export function PasswordField({
   onChange,
   required,
   name = "password",
+  label = "신청 비밀번호",
   placeholder = "신청조회용 비밀번호 (4자 이상)",
   minLength = 4,
 }: {
@@ -438,6 +439,7 @@ export function PasswordField({
   onChange: (next: string) => void;
   required?: boolean;
   name?: string;
+  label?: string;
   placeholder?: string;
   minLength?: number;
 }) {
@@ -454,7 +456,7 @@ export function PasswordField({
         autoComplete="new-password"
         minLength={minLength}
         required={required}
-        aria-label="신청 비밀번호"
+        aria-label={label}
       />
       <button
         type="button"

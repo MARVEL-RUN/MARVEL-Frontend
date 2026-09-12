@@ -42,6 +42,7 @@ export type EntryDraft = {
   emergency: string;
   shirt: ShirtSize | "";
   password: string;
+  passwordConfirm: string;
   zonecode: string;
   address: string;
   addressDetail: string;
@@ -130,6 +131,7 @@ export const EMPTY_DRAFT: EntryDraft = {
   emergency: "",
   shirt: "",
   password: "",
+  passwordConfirm: "",
   zonecode: "",
   address: "",
   addressDetail: "",
@@ -413,6 +415,9 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   if (draft.password.trim().length < 4) {
     throw new Error("신청 비밀번호를 4자 이상 입력하세요.");
+  }
+  if (draft.password !== draft.passwordConfirm) {
+    throw new Error("신청 비밀번호가 일치하지 않습니다.");
   }
   if (!draft.zonecode.trim() || !draft.address.trim()) {
     throw new Error("우편번호 찾기로 주소를 선택하세요.");

@@ -149,6 +149,9 @@ function IndividualFlow({
     if ((draft.password ?? "").trim().length < 4) {
       return fail("신청 비밀번호를 4자 이상 입력하세요.");
     }
+    if ((draft.password ?? "") !== (draft.passwordConfirm ?? "")) {
+      return fail("신청 비밀번호가 일치하지 않습니다.");
+    }
     if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
       return fail("우편번호 찾기로 주소를 선택하세요.");
     }
@@ -337,6 +340,16 @@ function IndividualFlow({
               <PasswordField
                 value={draft.password ?? ""}
                 onChange={(password) => patch({ password })}
+                required
+              />
+            </FormRow>
+            <FormRow label="신청 비밀번호 확인" required>
+              <PasswordField
+                name="passwordConfirm"
+                label="신청 비밀번호 확인"
+                placeholder="신청 비밀번호를 다시 입력하세요."
+                value={draft.passwordConfirm ?? ""}
+                onChange={(passwordConfirm) => patch({ passwordConfirm })}
                 required
               />
             </FormRow>
