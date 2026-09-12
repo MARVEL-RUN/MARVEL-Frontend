@@ -451,7 +451,7 @@ export function GroupFlow({
           <p className="sec__body">
             {record.groupName} · {record.participants.length}명 · {formatFee(total)}
           </p>
-          <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
+          <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
           <div className="flow__nav">
             <Link href="/lookup" className="btn btn--ghost">
               신청조회

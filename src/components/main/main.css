@@ -2715,10 +2715,11 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   padding: 0.75rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 6px;
-  background: transparent;
+  background: #08091d;
   color: #fff;
   font: inherit;
   font-size: 0.95rem;
+  color-scheme: dark;
 }
 
 .form-row input.is-wide,
@@ -2731,12 +2732,13 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   padding: 0.85rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 6px;
-  background: transparent;
+  background: #08091d;
   color: #fff;
   font: inherit;
   font-size: 0.95rem;
   line-height: 1.65;
   resize: vertical;
+  color-scheme: dark;
 }
 
 .form-row.is-top {
@@ -2746,6 +2748,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .form-row textarea:focus {
   outline: none;
   border-color: var(--marvel);
+  background: #08091d;
 }
 
 .form-row input::placeholder {
@@ -2754,6 +2757,27 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .form-row input:focus {
   outline: none;
+  border-color: var(--marvel);
+  background: #08091d;
+}
+
+/* Chrome 자동완성 흰 배경 차단 */
+.form-row input:-webkit-autofill,
+.form-row input:-webkit-autofill:hover,
+.form-row input:-webkit-autofill:focus,
+.form-row input:-webkit-autofill:active,
+.form-row textarea:-webkit-autofill,
+.form-row textarea:-webkit-autofill:hover,
+.form-row textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 1000px #08091d inset;
+  transition: background-color 99999s ease-out;
+}
+
+.form-row input:-webkit-autofill:focus,
+.form-row textarea:-webkit-autofill:focus {
   border-color: var(--marvel);
 }
 
@@ -2818,6 +2842,15 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .email-pick select:focus {
   outline: none;
   border-color: var(--marvel);
+}
+
+.email-pick input:-webkit-autofill,
+.email-pick input:-webkit-autofill:hover,
+.email-pick input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  box-shadow: 0 0 0 1000px #08091d inset;
+  transition: background-color 99999s ease-out;
 }
 
 .address-pick {
@@ -3261,10 +3294,27 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   color: #fff;
   font: inherit;
   font-size: 1.05rem;
+  color-scheme: dark;
 }
 
 .field input:focus {
   outline: none;
+  border-bottom-color: var(--marvel);
+}
+
+/* Chrome 자동완성 흰 배경 차단 */
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus,
+.field input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  border-bottom-color: var(--rule);
+  box-shadow: 0 0 0 1000px #08091d inset;
+  transition: background-color 99999s ease-out;
+}
+
+.field input:-webkit-autofill:focus {
   border-bottom-color: var(--marvel);
 }
 
@@ -3742,6 +3792,79 @@ button.course {
 .ticket h2 {
   margin-bottom: 0.8rem;
   font-size: clamp(1.5rem, 4vw, 2.2rem);
+}
+
+.ticket--done h2 {
+  margin-bottom: 1rem;
+}
+
+.ticket__summary {
+  margin: 0 auto 1.15rem;
+  max-width: 28rem;
+  color: #fff;
+  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.ticket__summary span {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--gold);
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+  letter-spacing: -0.02em;
+}
+
+.ticket__order {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem 0.65rem;
+  max-width: min(36rem, 100%);
+  margin: 0 auto;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(8, 9, 29, 0.65);
+}
+
+.ticket__order-label {
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ticket__order-id {
+  max-width: 100%;
+  color: rgba(255, 255, 255, 0.82);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: break-all;
+  text-align: left;
+}
+
+.ticket__order-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 1.9rem;
+  padding: 0 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ticket__order-copy:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .ticket__no {

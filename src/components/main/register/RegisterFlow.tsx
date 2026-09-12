@@ -49,7 +49,7 @@ const STEPS = ["정보", "결제"] as const;
 type Step = 0 | 1;
 
 const NOTICE = [
-  "주문번호로 신청조회에서 접수 내역을 확인할 수 있습니다.",
+  "신청조회에 필요하니 주문번호를 저장해 두세요.",
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
 
@@ -57,12 +57,19 @@ export function RegisterFlow() {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
 
+  function pickKind(next: ApplyKind) {
+    setKind(next);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }
+
   if (!kind) {
     return (
       <ApplyTerms
         values={consents}
         onChange={setConsents}
-        onPick={setKind}
+        onPick={pickKind}
       />
     );
   }
@@ -159,6 +166,9 @@ function IndividualFlow({
       });
       setRegistration(created);
       setStep(1);
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      });
     } catch (err) {
       const message =
         err instanceof MainHttpError
@@ -252,7 +262,7 @@ function IndividualFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="주소" note="결제·접수에 사용됩니다.">
+          <FormSec title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
             <FormRow label="주소" required>
               <AddressField
                 zonecode={draft.zonecode ?? ""}

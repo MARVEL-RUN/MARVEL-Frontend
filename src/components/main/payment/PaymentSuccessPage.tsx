@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Check, Copy } from "lucide-react";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { formatFee } from "@/lib/register";
@@ -18,6 +19,7 @@ export function PaymentSuccessPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<PaymentConfirmResponse | null>(null);
   const [orderName, setOrderName] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const paymentKey = params.get("paymentKey");
@@ -69,6 +71,20 @@ export function PaymentSuccessPage() {
     "";
   const receiptUrl =
     typeof result?.receiptUrl === "string" ? result.receiptUrl : "";
+  const title =
+    orderName ||
+    (typeof result?.orderName === "string" ? result.orderName : "");
+
+  async function copyOrderId() {
+    if (!orderId) return;
+    try {
+      await navigator.clipboard.writeText(orderId);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   return (
     <main className="page">
@@ -94,16 +110,29 @@ export function PaymentSuccessPage() {
         ) : null}
 
         {phase === "done" ? (
-          <section className="ticket">
+          <section className="ticket ticket--done">
             <p className="kicker">PAYMENT COMPLETE</p>
             <h2>결제가 완료되었습니다</h2>
-            <p className="ticket__no">{orderId}</p>
-            <p className="ticket__meta">
-              {orderName ||
-                (typeof result?.orderName === "string" ? result.orderName : "")}
-              {paid ? ` · ${formatFee(paid)}` : ""}
+            <p className="ticket__summary">
+              {title}
+              {paid ? <span>{formatFee(paid)}</span> : null}
             </p>
-            <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
+            {orderId ? (
+              <div className="ticket__order">
+                <span className="ticket__order-label">주문번호</span>
+                <code className="ticket__order-id">{orderId}</code>
+                <button
+                  type="button"
+                  className="ticket__order-copy"
+                  onClick={copyOrderId}
+                  aria-label="주문번호 복사"
+                >
+                  {copied ? <Check size={15} /> : <Copy size={15} />}
+                  {copied ? "복사됨" : "복사"}
+                </button>
+              </div>
+            ) : null}
+            <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
             <div className="flow__nav">
               {receiptUrl ? (
                 <a
