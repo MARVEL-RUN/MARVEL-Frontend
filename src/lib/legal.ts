@@ -38,6 +38,9 @@ export const OFFICE = {
   copyright: "COPYRIGHT © MARVEL RUN 사무국. ALL RIGHTS RESERVED.",
 } as const;
 
+/** 헤더 협찬문의 — 메일 앱에서 바로 작성 */
+export const SPONSOR_MAILTO = `mailto:${OFFICE.email}?subject=${encodeURIComponent("MARVEL RUN 2026 협찬문의")}`;
+
 export const LEGAL_LINKS = [
   { href: "/terms", label: "이용약관" },
   { href: "/privacy", label: "개인정보 처리방침" },
