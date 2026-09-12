@@ -44,7 +44,7 @@ function loadMedalBlob(src: string, onProgress: (n: number) => void) {
         if (total > 0) notify.forEach((fn) => fn(received / total));
       }
 
-      const url = URL.createObjectURL(new Blob(chunks));
+      const url = URL.createObjectURL(new Blob(chunks as BlobPart[]));
       blobUrls.set(src, url);
       notify.forEach((fn) => fn(1));
       return url;

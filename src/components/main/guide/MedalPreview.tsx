@@ -78,7 +78,7 @@ export function MedalPreview({
             <div className="kit-gallery__flip-inner">
               <span className="kit-gallery__face kit-gallery__face--front">
                 <Image
-                  src={course.medalFront}
+                  src={course.medalTurn}
                   alt={`${course.distance} 피니셔 메달 앞면`}
                   fill
                   sizes="80vw"
