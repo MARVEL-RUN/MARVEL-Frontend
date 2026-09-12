@@ -90,7 +90,7 @@ export function KitGallery() {
               src={MAIN_ASSETS.kitBib}
               alt="배번호"
               fill
-              sizes="(max-width: 860px) 100vw, 720px"
+              sizes="(max-width: 860px) 100vw, 1100px"
             />
           </span>
         </figure>

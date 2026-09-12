@@ -2155,6 +2155,8 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .kit-gallery__bib {
+  display: flex;
+  justify-content: center;
   margin: 0;
 }
 
@@ -2350,18 +2352,19 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .kit-gallery__frame--bib {
   flex: none;
-  width: min(40rem, 100%);
-  height: 20rem;
-  min-height: 20rem;
-  margin-inline: auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 2.05 / 1;
   overflow: hidden;
-  aspect-ratio: auto;
 }
 
 .kit-gallery__frame--bib img {
   padding: 0;
   object-fit: contain;
-  transform: scale(2.05);
+  object-position: center;
+  transform-origin: center center;
+  transform: scale(2.4);
 }
 
 .kit-gallery__medals figcaption {
@@ -4225,8 +4228,9 @@ button.course {
   }
 
   .kit-gallery__frame--bib {
-    height: 14rem;
-    min-height: 14rem;
+    aspect-ratio: 1.7 / 1;
+    height: auto;
+    min-height: 0;
   }
 
   .kit-gallery__medals {
