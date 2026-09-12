@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { EVENT } from "@/lib/event";
+import { formatDaumBaseAddress, openDaumPostcode } from "@/lib/daumPostcode";
 import {
   EMAIL_CUSTOM,
   EMAIL_DOMAINS,
@@ -408,6 +410,137 @@ export function EmailField({
         ))}
         <option value={EMAIL_CUSTOM}>직접입력</option>
       </select>
+    </div>
+  );
+}
+
+export function PasswordField({
+  value,
+  onChange,
+  required,
+  name = "password",
+  placeholder = "신청조회용 비밀번호 (4자 이상)",
+  minLength = 4,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  required?: boolean;
+  name?: string;
+  placeholder?: string;
+  minLength?: number;
+}) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="password-pick">
+      <input
+        type={show ? "text" : "password"}
+        name={name}
+        placeholder={placeholder}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete="new-password"
+        minLength={minLength}
+        required={required}
+        aria-label="신청 비밀번호"
+      />
+      <button
+        type="button"
+        className="password-pick__eye"
+        onClick={() => setShow((v) => !v)}
+        aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
+      >
+        {show ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
+  );
+}
+
+export function AddressField({
+  zonecode,
+  address,
+  addressDetail,
+  onChange,
+  required,
+}: {
+  zonecode: string;
+  address: string;
+  addressDetail: string;
+  onChange: (next: {
+    zonecode?: string;
+    address?: string;
+    addressDetail?: string;
+  }) => void;
+  required?: boolean;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function search() {
+    setBusy(true);
+    setError("");
+    try {
+      await openDaumPostcode((data) => {
+        onChange({
+          zonecode: data.zonecode,
+          address: formatDaumBaseAddress(data),
+        });
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "주소 검색을 열지 못했습니다.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="address-pick">
+      <div className="address-pick__row">
+        <input
+          type="text"
+          name="zonecode"
+          className="address-pick__zip"
+          placeholder="우편번호"
+          value={zonecode ?? ""}
+          readOnly
+          required={required}
+          onClick={search}
+          aria-label="우편번호"
+        />
+        <button
+          type="button"
+          className="address-pick__btn"
+          onClick={search}
+          disabled={busy}
+        >
+          {busy ? "여는 중..." : "우편번호 찾기"}
+        </button>
+      </div>
+      <input
+        type="text"
+        name="address"
+        className="address-pick__base"
+        placeholder="기본주소"
+        value={address ?? ""}
+        readOnly
+        required={required}
+        onClick={search}
+        aria-label="기본주소"
+      />
+      <input
+        type="text"
+        name="addressDetail"
+        className="address-pick__detail"
+        placeholder="동·호수·건물명 등"
+        value={addressDetail ?? ""}
+        onChange={(e) => onChange({ addressDetail: e.target.value })}
+        autoComplete="address-line2"
+        required={required}
+        aria-label="상세주소"
+      />
+      {error ? <p className="form__err">{error}</p> : null}
     </div>
   );
 }
