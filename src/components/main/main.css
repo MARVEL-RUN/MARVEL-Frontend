@@ -4073,11 +4073,17 @@ button.course {
   letter-spacing: 0.06em;
 }
 
-.sheet-modal__close {
+.sheet-modal__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sheet-modal__close,
+.sheet-modal__dl {
   min-height: 2.2rem;
   padding: 0 1rem;
   border: 0;
-  background: var(--marvel);
   color: #fff;
   font: inherit;
   font-size: 0.78rem;
@@ -4085,6 +4091,15 @@ button.course {
   letter-spacing: 0.1em;
   cursor: pointer;
   clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.sheet-modal__close {
+  background: var(--marvel);
+}
+
+.sheet-modal__dl {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
 .sheet-modal__body {
@@ -4111,11 +4126,55 @@ button.course {
   color: #c00;
 }
 
+.sheet-modal--tall .sheet-modal__sheet {
+  width: min(820px, 100%);
+  height: 100%;
+}
+
+.sheet-modal--left {
+  place-items: stretch start;
+  padding: 0;
+}
+
+.sheet-modal--left .sheet-modal__sheet,
+.sheet-modal--left.sheet-modal--tall .sheet-modal__sheet {
+  width: min(400px, 100%);
+  height: 100%;
+  max-height: 100%;
+  animation: sheet-drawer-in 0.28s ease;
+}
+
+.sheet-modal--left .sheet-modal__bar {
+  padding: 0.6rem 0.55rem 0.6rem 0.7rem;
+  gap: 0.45rem;
+}
+
+.sheet-modal--left .sheet-modal__close,
+.sheet-modal--left .sheet-modal__dl {
+  padding: 0 0.7rem;
+  font-size: 0.72rem;
+}
+
+@keyframes sheet-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.sheet-modal--tall .sheet-modal__body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
 .sheet-modal__frame {
   display: block;
   width: 100%;
-  min-height: 24rem;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   border: 0;
   background: #fff;
 }

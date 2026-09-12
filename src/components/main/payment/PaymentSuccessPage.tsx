@@ -10,6 +10,7 @@ import { formatFee } from "@/lib/register";
 import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
+import { downloadReceipt } from "@/lib/payment/receipt";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
 
@@ -78,6 +79,20 @@ export function PaymentSuccessPage() {
     orderName ||
     (typeof result?.orderName === "string" ? result.orderName : "");
 
+  async function onDownloadReceipt() {
+    try {
+      await downloadReceipt({
+        orderId,
+        orderName: title,
+        paidAmount: paid,
+        approvedAt:
+          typeof result?.approvedAt === "string" ? result.approvedAt : undefined,
+      });
+    } catch {
+      window.alert("영수증 PDF를 만들지 못했습니다. 다시 시도해 주세요.");
+    }
+  }
+
   async function copyOrderId() {
     if (!orderId) return;
     try {
@@ -138,19 +153,28 @@ export function PaymentSuccessPage() {
             <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
             <div className="flow__nav">
               {receiptUrl ? (
-                <button
-                  type="button"
-                  className="btn btn--ghost"
-                  onClick={() => {
-                    if (isMobileView()) {
-                      window.location.assign(receiptUrl);
-                      return;
-                    }
-                    setReceiptOpen(true);
-                  }}
-                >
-                  영수증
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={() => {
+                      if (isMobileView()) {
+                        window.location.assign(receiptUrl);
+                        return;
+                      }
+                      setReceiptOpen(true);
+                    }}
+                  >
+                    영수증
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={onDownloadReceipt}
+                  >
+                    영수증 다운로드
+                  </button>
+                </>
               ) : null}
               <Link href="/lookup" className="btn btn--ghost">
                 신청조회
@@ -166,6 +190,17 @@ export function PaymentSuccessPage() {
           <SheetModal
             kicker="RECEIPT"
             title="영수증"
+            tall
+            side="left"
+            actions={
+              <button
+                type="button"
+                className="sheet-modal__dl"
+                onClick={onDownloadReceipt}
+              >
+                다운로드
+              </button>
+            }
             onClose={() => setReceiptOpen(false)}
           >
             <iframe
