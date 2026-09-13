@@ -34,12 +34,15 @@ import {
   type TicketKind,
 } from "@/lib/register";
 import {
+  AddressField,
   ApplyHint,
   ApplyNotice,
+  BirthPick,
   BirthText,
   EmailField,
   FormRow,
   FormSec,
+  PasswordField,
   PhoneField,
   birthView,
 } from "./ApplyUi";
@@ -98,9 +101,27 @@ export function GroupFlow({
   function onForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!draft.groupName.trim()) return setError("단체명을 입력하세요.");
+    if (!draft.organizationAccount.trim()) {
+      return setError("단체 계정을 입력하세요.");
+    }
+    if ((draft.organizationPassword ?? "").trim().length < 4) {
+      return setError("단체 비밀번호를 4자 이상 입력하세요.");
+    }
+    if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
+      return setError("단체 비밀번호가 일치하지 않습니다.");
+    }
     if (!draft.leaderName.trim()) return setError("대표자 성명을 입력하세요.");
+    if (!/^\d{8}$/.test(draft.leaderBirth)) {
+      return setError("대표자 생년월일을 선택하세요.");
+    }
     if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
     if (!emailOk(draft.email)) return setError("이메일을 입력하세요.");
+    if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
+      return setError("우편번호 찾기로 주소를 선택하세요.");
+    }
+    if (!(draft.addressDetail ?? "").trim()) {
+      return setError("상세주소를 입력하세요.");
+    }
     try {
       draft.participants.forEach((p, i) => {
         const n = i + 1;
@@ -156,7 +177,7 @@ export function GroupFlow({
       {error ? <p className="form__err">{error}</p> : null}
 
       {step === 0 ? (
-        <form className="form" onSubmit={onForm}>
+        <form className="form" onSubmit={onForm} noValidate>
           <ApplyNotice lines={NOTICE} />
 
           <FormSec title="단체 정보">
@@ -169,6 +190,38 @@ export function GroupFlow({
                 required
               />
             </FormRow>
+            <FormRow label="단체 계정" required>
+              <input
+                type="text"
+                placeholder="조회·로그인에 사용할 단체 계정"
+                value={draft.organizationAccount}
+                onChange={(e) => patch({ organizationAccount: e.target.value })}
+                autoComplete="username"
+                required
+              />
+            </FormRow>
+            <FormRow label="단체 비밀번호" required>
+              <PasswordField
+                value={draft.organizationPassword}
+                onChange={(organizationPassword) => patch({ organizationPassword })}
+                label="단체 비밀번호"
+                placeholder="조회용 비밀번호 (4자 이상)"
+                required
+              />
+            </FormRow>
+            <FormRow label="단체 비밀번호 확인" required>
+              <PasswordField
+                name="passwordConfirm"
+                label="단체 비밀번호 확인"
+                placeholder="단체 비밀번호를 다시 입력하세요."
+                value={draft.passwordConfirm}
+                onChange={(passwordConfirm) => patch({ passwordConfirm })}
+                required
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec title="대표자 정보">
             <FormRow label="대표자 성명" required>
               <input
                 type="text"
@@ -176,6 +229,12 @@ export function GroupFlow({
                 value={draft.leaderName}
                 onChange={(e) => patch({ leaderName: e.target.value })}
                 required
+              />
+            </FormRow>
+            <FormRow label="대표자 생년월일" required>
+              <BirthPick
+                value={draft.leaderBirth}
+                onChange={(leaderBirth) => patch({ leaderBirth })}
               />
             </FormRow>
           </FormSec>
@@ -194,6 +253,18 @@ export function GroupFlow({
               <EmailField
                 value={draft.email}
                 onChange={(email) => patch({ email })}
+                required
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+            <FormRow label="주소" required>
+              <AddressField
+                zonecode={draft.zonecode}
+                address={draft.address}
+                addressDetail={draft.addressDetail}
+                onChange={patch}
                 required
               />
             </FormRow>
@@ -398,8 +469,16 @@ export function GroupFlow({
               <dd>{draft.groupName}</dd>
             </div>
             <div>
+              <dt>단체 계정</dt>
+              <dd>{draft.organizationAccount}</dd>
+            </div>
+            <div>
               <dt>대표자</dt>
               <dd>{draft.leaderName}</dd>
+            </div>
+            <div>
+              <dt>대표자 생년월일</dt>
+              <dd>{birthView(draft.leaderBirth)}</dd>
             </div>
             <div>
               <dt>휴대폰번호</dt>
@@ -408,6 +487,12 @@ export function GroupFlow({
             <div>
               <dt>이메일</dt>
               <dd>{draft.email}</dd>
+            </div>
+            <div>
+              <dt>주소</dt>
+              <dd>
+                ({draft.zonecode}) {draft.address} {draft.addressDetail}
+              </dd>
             </div>
             <div>
               <dt>인원</dt>

@@ -74,9 +74,16 @@ export type ParticipantDraft = {
 export type GroupDraft = {
   courseId: CourseId | "";
   groupName: string;
+  organizationAccount: string;
+  organizationPassword: string;
+  passwordConfirm: string;
   leaderName: string;
+  leaderBirth: string;
   phone: string;
   email: string;
+  zonecode: string;
+  address: string;
+  addressDetail: string;
   participants: ParticipantDraft[];
 } & Consents;
 
@@ -151,9 +158,16 @@ export const EMPTY_PARTICIPANT: ParticipantDraft = {
 export const EMPTY_GROUP: GroupDraft = {
   courseId: "",
   groupName: "",
+  organizationAccount: "",
+  organizationPassword: "",
+  passwordConfirm: "",
   leaderName: "",
+  leaderBirth: "",
   phone: "",
   email: "",
+  zonecode: "",
+  address: "",
+  addressDetail: "",
   participants: [{ ...EMPTY_PARTICIPANT }],
   ...EMPTY_CONSENTS,
 };
@@ -457,9 +471,25 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   >;
 } {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
+  if (!draft.organizationAccount.trim()) {
+    throw new Error("단체 계정을 입력하세요.");
+  }
+  if (draft.organizationPassword.trim().length < 4) {
+    throw new Error("단체 비밀번호를 4자 이상 입력하세요.");
+  }
+  if (draft.organizationPassword !== draft.passwordConfirm) {
+    throw new Error("단체 비밀번호가 일치하지 않습니다.");
+  }
   if (!draft.leaderName.trim()) throw new Error("대표자 성명을 입력하세요.");
+  if (!/^\d{8}$/.test(draft.leaderBirth)) {
+    throw new Error("대표자 생년월일을 선택하세요.");
+  }
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (!draft.zonecode.trim() || !draft.address.trim()) {
+    throw new Error("우편번호 찾기로 주소를 선택하세요.");
+  }
+  if (!draft.addressDetail.trim()) throw new Error("상세주소를 입력하세요.");
   if (!draft.participants.length) throw new Error("참가자를 1명 이상 등록하세요.");
   if (draft.participants.length > MAX_GROUP_SIZE) {
     throw new Error(`한 번에 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다.`);
