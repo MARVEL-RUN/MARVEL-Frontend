@@ -2695,39 +2695,78 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .venue-copy {
-  display: flex;
-  flex-direction: column;
-  height: 0;
+  display: grid;
+  gap: 1.5rem;
   min-height: 100%;
 }
 
-.venue-copy>div {
-  flex: 1;
+.venue-access__head {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.7rem;
+  margin-bottom: 0.2rem;
 }
 
-.venue-copy__group {
+.venue-access__title {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.venue-access__note {
   margin: 0;
   color: var(--note);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
-.venue-copy .timeline {
-  margin-top: 0.35rem;
+.venue-access__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.venue-copy .timeline li {
-  grid-template-columns: 3.4rem 1fr;
-  padding: 0.7rem 0 0.7rem 1.2rem;
+.venue-access__row {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.venue-copy .btn {
-  margin-top: auto;
-  align-self: start;
+.venue-access__row:last-child {
+  border-bottom: 0;
+}
+
+.venue-access__badge {
+  color: var(--gold);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.venue-access__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.venue-access__sub {
+  color: var(--silver);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .form {
@@ -4911,9 +4950,7 @@ button.course {
   }
 
   .venue-copy {
-    height: auto;
     min-height: 0;
-    gap: 1.4rem;
   }
 
   .site-footer__top {
@@ -5569,13 +5606,52 @@ button.course {
     clip-path: none;
   }
 
-  .venue-copy>div {
-    justify-content: flex-start;
+  .directions {
+    gap: 1.35rem;
   }
 
-  .venue-copy .timeline li {
-    grid-template-columns: 3.2rem 1fr;
-    padding: 0.75rem 0;
+  .venue-copy {
+    gap: 1.55rem;
+  }
+
+  .venue-access__head {
+    gap: 0.15rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .venue-access__title {
+    font-size: 0.95rem;
+  }
+
+  .venue-access__note {
+    width: 100%;
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .venue-access__list {
+    border-left: 2px solid var(--marvel);
+    padding-left: 0.95rem;
+  }
+
+  .venue-access__row {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: start;
+    padding: 0.7rem 0;
+  }
+
+  .venue-access__badge {
+    font-size: 0.82rem;
+  }
+
+  .venue-access__text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .venue-access__sub {
+    font-size: 0.82rem;
   }
 
   .venue-actions {

@@ -24,22 +24,37 @@ export function DirectionsPage() {
           <div className="directions__row">
             <KakaoVenueMap />
             <section className="venue-copy">
-              {EVENT.venueAccess.map((group) => (
-                <div key={group.title}>
-                  <h3 className="venue-copy__group">
-                    {group.title}
-                    {"note" in group ? ` · ${group.note}` : ""}
-                  </h3>
-                  <ol className="timeline">
-                    {group.items.map((item) => (
-                      <li key={item.text}>
-                        <time>{item.badge}</time>
-                        <span>{item.text}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
+              {EVENT.venueAccess.map((group) => {
+                const note = "note" in group ? group.note : undefined;
+
+                return (
+                  <article key={group.title} className="venue-access">
+                    <header className="venue-access__head">
+                      <h3 className="venue-access__title">{group.title}</h3>
+                      {note ? <p className="venue-access__note">{note}</p> : null}
+                    </header>
+                    <ul className="venue-access__list">
+                      {group.items.map((item) => {
+                        const [lead, ...rest] = item.text.split(" | ");
+
+                        return (
+                          <li key={item.text} className="venue-access__row">
+                            <span className="venue-access__badge">{item.badge}</span>
+                            <span className="venue-access__text">
+                              <span>{lead}</span>
+                              {rest.map((line) => (
+                                <span key={line} className="venue-access__sub">
+                                  {line}
+                                </span>
+                              ))}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </article>
+                );
+              })}
             </section>
           </div>
         </div>
