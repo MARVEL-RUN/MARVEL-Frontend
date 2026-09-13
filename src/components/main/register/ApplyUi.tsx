@@ -161,18 +161,20 @@ export function GenderPick({
 export function ShirtPick({
   value,
   onChange,
+  sizes = SHIRT_SIZES,
 }: {
-  value: ShirtSize | "";
+  value: string;
   onChange: (next: ShirtSize) => void;
+  sizes?: readonly string[];
 }) {
   return (
     <div className="seg">
-      {SHIRT_SIZES.map((size) => (
+      {sizes.map((size) => (
         <button
           key={size}
           type="button"
           className={value === size ? "is-on" : undefined}
-          onClick={() => onChange(size)}
+          onClick={() => onChange(size as ShirtSize)}
         >
           {size}
         </button>

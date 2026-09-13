@@ -9,6 +9,7 @@ import {
   feeAmount,
   ticketFee,
   ticketForBirth,
+  type CourseId,
   type GroupDraft,
 } from "./register";
 
@@ -56,6 +57,28 @@ function categoryText(category: RegistrationCategory) {
 export function courseForCategory(category: RegistrationCategory) {
   const key = compactDistance(category.distance || category.categoryName || "");
   return EVENT.courses.find((c) => compactDistance(c.distance) === key);
+}
+
+export function categoryForCourse(
+  categories: RegistrationCategory[],
+  courseId: CourseId,
+  birth: string,
+) {
+  return sortedCategories(categories).find((category) => {
+    const course = courseForCategory(category);
+    if (!course || course.id !== courseId) return false;
+    if (category.isActive === false) return false;
+    return categoryOpenForBirth(category, birth);
+  });
+}
+
+export function shirtSouvenir(category: RegistrationCategory | undefined) {
+  const souvenirs = sortedSouvenirs(category);
+  return (
+    souvenirs.find((item) => /티셔츠|t-?shirt/i.test(item.name)) ??
+    souvenirs.find((item) => /tshirt/i.test(item.souvenirId)) ??
+    souvenirs[0]
+  );
 }
 
 export function categoryOpenForBirth(

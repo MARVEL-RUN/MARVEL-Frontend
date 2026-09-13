@@ -19,8 +19,14 @@ export type RegistrationOptionsResponse = {
   categories: RegistrationCategory[];
 };
 
+export type SelectedSouvenir = {
+  souvenirId: string;
+  selectedSize: string;
+};
+
 export type RegistrationCreateRequest = {
   eventCategoryId: string;
+  selectedSouvenirList: SelectedSouvenir[];
   password: string;
   name: string;
   phNum: string;
@@ -38,11 +44,6 @@ export type RegistrationCreateResponse = {
   orderId: string;
   orderName: string;
   paymentAmount: number;
-};
-
-export type SelectedSouvenir = {
-  souvenirId: string;
-  selectedSize: string;
 };
 
 export type OrganizationAccount = {
