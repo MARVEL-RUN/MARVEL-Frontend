@@ -65,7 +65,7 @@ export function CourseMaps() {
                   src={c.map}
                   alt=""
                   fill
-                  sizes="(max-width: 860px) 100vw, 70vw"
+                  sizes="(max-width: 720px) 100vw, (max-width: 960px) 100vw, 70vw"
                 />
               </span>
             ))}

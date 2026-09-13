@@ -56,7 +56,7 @@ export function KitGallery() {
                   src={course.medalTurn}
                     alt={`${course.distance} 피니셔 메달 화살표 방향 회전`}
                     fill
-                    sizes="(max-width: 860px) 50vw, 280px"
+                    sizes="(max-width: 720px) 50vw, 280px"
                   />
                 </span>
                 <figcaption>화살표 방향 회전</figcaption>
@@ -69,7 +69,7 @@ export function KitGallery() {
                   src={course.medalBack}
                   alt={`${course.distance} 피니셔 메달 후면`}
                   fill
-                  sizes="(max-width: 860px) 50vw, 280px"
+                  sizes="(max-width: 720px) 50vw, 280px"
                 />
               </span>
               <figcaption>후면</figcaption>
@@ -90,7 +90,7 @@ export function KitGallery() {
               src={MAIN_ASSETS.kitBib}
               alt="배번호"
               fill
-              sizes="(max-width: 860px) 100vw, 1100px"
+              sizes="(max-width: 720px) 100vw, 1100px"
             />
           </span>
         </figure>

@@ -2278,6 +2278,11 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   inset: 0;
 }
 
+.medal-3d__still {
+  object-fit: contain;
+  padding: 0.4rem;
+}
+
 .medal-3d__hint {
   position: absolute;
   inset: 0;
@@ -2302,6 +2307,10 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   text-align: center;
   text-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
   animation: medal-3d-hint 2.4s ease-in-out infinite;
+}
+
+.medal-3d__hint-mob {
+  display: none;
 }
 
 @keyframes medal-3d-hint {
@@ -2380,6 +2389,10 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .medal-3d__expand:hover {
   background: var(--marvel);
+}
+
+.kit-gallery__frame--3d:has(.medal-3d__stage--still) .medal-3d__expand {
+  display: none;
 }
 
 .medal-3d-preview {
@@ -5477,15 +5490,41 @@ button.course {
     grid-template-columns: 1fr;
     height: auto;
     padding-bottom: 0;
+    gap: 1.1rem;
+  }
+
+  .course-guide__picks button {
+    min-height: var(--tap);
+    font-size: 0.9rem;
+  }
+
+  .course-guide__dist {
+    font-size: clamp(1.85rem, 9vw, 2.4rem);
   }
 
   .course-guide__open {
-    aspect-ratio: 2.1 / 1;
+    aspect-ratio: 16 / 10;
     height: auto;
+  }
+
+  .course-guide__open img {
+    object-fit: contain;
+    object-position: center;
   }
 
   .course-guide__hint {
     position: static;
+    margin-top: 0.55rem;
+    text-align: left;
+  }
+
+  .kit-gallery__pane {
+    padding: 0.85rem 0.85rem 0.95rem;
+  }
+
+  .kit-gallery__picks button {
+    min-height: var(--tap);
+    font-size: 0.86rem;
   }
 
   .kit-gallery__frame--bib {
@@ -5500,6 +5539,29 @@ button.course {
 
   .kit-gallery__medals--3d > li:first-child {
     grid-column: 1 / -1;
+  }
+
+  .medal-3d__expand {
+    width: var(--tap);
+    height: var(--tap);
+  }
+
+  .medal-3d-preview .course-preview__sheet {
+    height: calc(100dvh - 1.4rem);
+    max-height: calc(100dvh - 1.4rem);
+  }
+
+  .medal-3d__hint-desk {
+    display: none;
+  }
+
+  .medal-3d__hint-mob {
+    display: inline;
+  }
+
+  .page__body > .btn {
+    width: 100%;
+    min-height: var(--tap);
   }
 
 
