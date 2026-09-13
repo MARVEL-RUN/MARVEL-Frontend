@@ -4987,7 +4987,7 @@ button.course {
   html.is-main {
     --site-zoom: 1;
     --header-h: calc(3.4rem + env(safe-area-inset-top, 0px));
-    --gutter: 1.25rem;
+    --gutter: 1rem;
     --tap: 2.75rem;
     scroll-padding-top: calc(var(--header-h) + 0.75rem);
     -webkit-text-size-adjust: 100%;
