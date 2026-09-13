@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import { MOBILE_MAX } from "@/lib/viewport";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
@@ -42,8 +43,9 @@ export function HomePage() {
     }
     const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const pad = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`).matches ? 88 : 170;
     window.scrollTo({
-      top: Math.max(0, (top - 170) * zoom),
+      top: Math.max(0, (top - pad) * zoom),
       behavior: reduce ? "auto" : "smooth",
     });
   }
@@ -228,7 +230,7 @@ export function HomePage() {
                     src={c.map}
                     alt=""
                     fill
-                    sizes="(max-width: 960px) 100vw, 33vw"
+                    sizes="(max-width: 720px) 100vw, (max-width: 960px) 100vw, 33vw"
                   />
                 </button>
                 <p className="course__code">{c.code}</p>
@@ -295,7 +297,7 @@ export function HomePage() {
                     src={c.figure}
                     alt=""
                     fill
-                    sizes="(max-width: 960px) 80vw, 420px"
+                    sizes="(max-width: 720px) 100vw, (max-width: 960px) 80vw, 420px"
                     style={{ objectFit: "contain", objectPosition: "right bottom" }}
                   />
                 </span>
