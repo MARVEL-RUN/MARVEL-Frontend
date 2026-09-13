@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { EVENT } from "@/lib/event";
+import { isMobileView } from "@/lib/viewport";
 
 const APP_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
 
@@ -10,6 +11,8 @@ type KakaoLatLng = object;
 type KakaoMap = {
   relayout: () => void;
   setCenter: (latlng: KakaoLatLng) => void;
+  setDraggable: (on: boolean) => void;
+  setZoomable: (on: boolean) => void;
 };
 
 type KakaoMaps = {
@@ -65,9 +68,15 @@ export function KakaoVenueMap() {
 
     let cancelled = false;
     let map: KakaoMap | undefined;
+    const applyTouch = (next: KakaoMap) => {
+      const mobile = isMobileView();
+      next.setDraggable(!mobile);
+      next.setZoomable(!mobile);
+    };
     const onResize = () => {
       if (!map) return;
       map.relayout();
+      applyTouch(map);
       map.setCenter(new window.kakao!.maps.LatLng(EVENT.venueLat, EVENT.venueLng));
     };
     const ro = new ResizeObserver(onResize);
@@ -90,6 +99,7 @@ export function KakaoVenueMap() {
         });
         info.open(map, marker);
         map.relayout();
+        applyTouch(map);
         map.setCenter(center);
         ro.observe(el);
         window.addEventListener("resize", onResize);

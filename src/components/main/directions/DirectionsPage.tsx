@@ -1,6 +1,7 @@
 import { EVENT } from "@/lib/event";
 import { SideBanner } from "../layout/SideBanner";
 import { KakaoVenueMap } from "./KakaoVenueMap";
+import { VenueActions } from "./VenueActions";
 
 export function DirectionsPage() {
   return (
@@ -18,6 +19,7 @@ export function DirectionsPage() {
             <p className="sec__body">
               {EVENT.venueAddress.replace(` ${EVENT.venue}`, "")}
             </p>
+            <VenueActions />
           </header>
           <div className="directions__row">
             <KakaoVenueMap />
@@ -38,14 +40,6 @@ export function DirectionsPage() {
                   </ol>
                 </div>
               ))}
-              <a
-                className="btn btn--ghost"
-                href={EVENT.mapUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                카카오맵에서 보기
-              </a>
             </section>
           </div>
         </div>

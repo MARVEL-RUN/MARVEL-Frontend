@@ -2649,6 +2649,13 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   max-width: none;
 }
 
+.venue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.1rem;
+}
+
 .directions__row {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.95fr);
@@ -5554,6 +5561,33 @@ button.course {
   .page__body > .btn {
     width: 100%;
     min-height: var(--tap);
+  }
+
+  .kakao-map {
+    aspect-ratio: 16 / 10;
+    min-height: 12.5rem;
+    clip-path: none;
+  }
+
+  .venue-copy>div {
+    justify-content: flex-start;
+  }
+
+  .venue-copy .timeline li {
+    grid-template-columns: 3.2rem 1fr;
+    padding: 0.75rem 0;
+  }
+
+  .venue-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .venue-actions .btn {
+    width: 100%;
+    min-height: var(--tap);
+    justify-content: center;
   }
 
 
