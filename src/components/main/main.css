@@ -5356,21 +5356,15 @@ button.course {
   }
 
   .course-preview {
-    padding: 0;
-    place-items: end center;
+    padding: 0.7rem;
+    place-items: center;
   }
 
   .course-preview__sheet {
     width: 100%;
-    height: min(92dvh, 100dvh);
-    max-height: 100dvh;
-    border-radius: 1.15rem 1.15rem 0 0;
-  }
-
-  .medal-3d-preview .course-preview__sheet {
-    height: min(92dvh, 100dvh);
-    max-height: 100dvh;
-    width: 100%;
+    height: auto;
+    max-height: calc(100dvh - 1.4rem);
+    border-radius: 0;
   }
 
   .course-preview__close {
