@@ -512,6 +512,16 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes ken-m {
+  from {
+    transform: scale(1.05) translate(0, 0);
+  }
+
+  to {
+    transform: scale(1.18) translate(-1.8%, -1.2%);
+  }
+}
+
 @keyframes sweep {
   0% {
     transform: translateX(-60%) skewX(-18deg);
@@ -570,6 +580,18 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes assemblePulse-m {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) skewX(-12deg) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) skewX(-12deg) scale(1.16);
+  }
+}
+
 @keyframes markShine {
   0% {
     transform: translateX(-120%);
@@ -589,6 +611,10 @@ html.is-intro .fx-letterbox span {
 
   .intro--overlap .intro__assemble {
     padding: 0;
+  }
+
+  .assemble__ghost {
+    animation: assemblePulse-m 4.2s ease-in-out infinite;
   }
 }
 

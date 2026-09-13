@@ -57,7 +57,10 @@ export function CoursePreview({
             />
           </div>
         </div>
-        <p className="course-preview__foot">바깥을 누르거나 Esc로 닫기</p>
+        <p className="course-preview__foot">
+          <span className="course-preview__hint-desk">바깥을 누르거나 Esc로 닫기</span>
+          <span className="course-preview__hint-mob">바깥을 눌러 닫기</span>
+        </p>
       </div>
     </div>
   );
