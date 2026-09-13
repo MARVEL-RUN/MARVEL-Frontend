@@ -1775,6 +1775,12 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   -webkit-user-drag: none;
 }
 
+.side-banner picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
 .side-banner img {
   pointer-events: none;
   user-select: none;
@@ -4718,6 +4724,51 @@ button.course {
     background:
       linear-gradient(180deg, rgba(0, 3, 32, 0.2) 0%, rgba(0, 3, 32, 0.75) 48%, var(--navy) 88%),
       linear-gradient(90deg, rgba(0, 3, 32, 0.55), transparent 70%);
+  }
+
+  .side-banner {
+    min-height: 0;
+    aspect-ratio: 2 / 0.8;
+  }
+
+  .side-banner::before {
+    height: 1rem;
+  }
+
+  .side-banner::after {
+    width: 38%;
+    background: linear-gradient(90deg,
+        #00042e 6%,
+        rgba(0, 4, 46, 0.48) 38%,
+        transparent);
+  }
+
+  .side-banner__art {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .side-banner__copy {
+    max-width: min(16rem, 52%);
+    padding: 0.95rem 0;
+  }
+
+  .side-banner__copy .kicker {
+    margin-bottom: 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .side-banner__title {
+    font-size: clamp(1.35rem, 6.2vw, 1.75rem);
+    line-height: 1.15;
+    word-break: keep-all;
+  }
+
+  .side-banner__en {
+    margin-top: 0.32rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
   }
 
   .table__row,

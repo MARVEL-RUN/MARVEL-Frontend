@@ -13,6 +13,7 @@ export const MAIN_ASSETS = {
   footerLogo: "/images/main/ft_logo.svg",
   loadingLogo: "/images/main/loading-logo.png",
   sideBanner: "/images/main/sidebanner.svg",
+  sideBannerMobile: "/images/main/sidebanner-mobile.svg",
   footerHost: "/images/main/footer/hosted.png",
   footerOrganizer: "/images/main/footer/organizer.png",
   introMarvel: "/images/main/intro-marvel.svg",

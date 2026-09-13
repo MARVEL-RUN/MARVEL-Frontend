@@ -11,15 +11,22 @@ export function SideBanner({
 }) {
   return (
     <section className="side-banner">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={MAIN_ASSETS.sideBanner}
-        alt=""
-        width={1920}
-        height={270}
-        draggable={false}
-        className="side-banner__art"
-      />
+      <picture>
+        <source
+          media="(max-width: 720px)"
+          srcSet={MAIN_ASSETS.sideBannerMobile}
+          type="image/svg+xml"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={MAIN_ASSETS.sideBanner}
+          alt=""
+          width={1920}
+          height={270}
+          draggable={false}
+          className="side-banner__art"
+        />
+      </picture>
       <div className="side-banner__copy">
         <p className="kicker">{kicker}</p>
         <h1 className="side-banner__title">{title}</h1>
