@@ -41,6 +41,10 @@
   font: inherit;
 }
 
+html.admin-mode {
+  zoom: 1;
+}
+
 html.admin-mode,
 html.admin-mode body {
   background: var(--admin-bg, #eef1f5);
