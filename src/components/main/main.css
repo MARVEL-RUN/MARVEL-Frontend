@@ -5469,8 +5469,9 @@ button.course {
   }
 
   .course-guide__open {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 1676 / 664;
     height: auto;
+    background: none;
   }
 
   .course-guide__open img {
