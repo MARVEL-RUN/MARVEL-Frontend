@@ -27,8 +27,12 @@ export function Footer() {
             <p>{OFFICE.address}</p>
             <p className="site-footer__meta">
               <span>대표자 : {OFFICE.ceo}</span>
-              <span>Tel : {OFFICE.tel}</span>
-              <span>Email: {OFFICE.email}</span>
+              <span>
+                Tel : <a href={`tel:${OFFICE.tel}`}>{OFFICE.tel}</a>
+              </span>
+              <span>
+                Email: <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>
+              </span>
             </p>
             <p className="site-footer__meta">
               <span>사업자번호: {OFFICE.bizNo}</span>

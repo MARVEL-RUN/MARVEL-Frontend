@@ -664,6 +664,11 @@ body:has(.sheet-modal) .side-dock {
   line-height: 1.75;
 }
 
+.site-footer__office a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .site-footer__meta {
   display: flex;
   flex-wrap: wrap;
