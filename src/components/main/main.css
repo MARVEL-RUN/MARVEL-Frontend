@@ -5744,9 +5744,56 @@ button.course {
     gap: 0.45rem 0.75rem;
   }
 
+  .bulletin li {
+    padding: 0;
+  }
+
+  .bulletin__btn {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "tag title"
+      "tag time";
+    gap: 0.2rem 0.7rem;
+    min-height: var(--tap);
+    padding: 1rem 0.2rem;
+    align-items: start;
+  }
+
+  .bulletin__tag {
+    grid-area: tag;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.55rem;
+    min-height: 1.45rem;
+    margin-top: 0.12rem;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(237, 29, 36, 0.18);
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+
+  .bulletin__btn strong {
+    grid-area: title;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .bulletin time {
+    grid-area: time;
+    justify-self: start;
+    font-size: 0.78rem;
+  }
+
   .bulletin__body {
     grid-column: 1;
-    margin-left: 0;
+    margin: 0;
+    padding: 0 0.2rem 1rem;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   .board__head {
@@ -5805,6 +5852,8 @@ button.course {
     text-overflow: unset;
     font-size: 0.95rem;
     line-height: 1.45;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   .board--notice .board__row time {
@@ -5862,6 +5911,8 @@ button.course {
     text-overflow: unset;
     font-size: 0.95rem;
     line-height: 1.45;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   .board--qna .board__row time {
@@ -5869,6 +5920,134 @@ button.course {
     justify-self: start;
     text-align: left;
     font-size: 0.78rem;
+  }
+
+  .post__title {
+    font-size: 1.2rem;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .post__meta {
+    flex-wrap: wrap;
+    gap: 0.35rem 0.85rem;
+  }
+
+  .post__body,
+  .post__reply p {
+    overflow-x: auto;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .post__body img,
+  .post__reply img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .post__body table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .post__nav-row {
+    min-height: var(--tap);
+    align-items: start;
+    padding: 0.85rem 0.1rem;
+    grid-template-columns: 3.4rem minmax(0, 1fr);
+  }
+
+  .post__nav-row strong {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.4;
+    word-break: keep-all;
+  }
+
+  .post__foot {
+    flex-wrap: wrap;
+  }
+
+  .post__foot .btn {
+    flex: 1 1 8rem;
+    min-height: var(--tap);
+    justify-content: center;
+  }
+
+  .post__files-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-all;
+  }
+
+  .board-write__head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .board-write__head .btn {
+    min-height: var(--tap);
+  }
+
+  .board-write__agree {
+    min-height: var(--tap);
+    align-items: center;
+  }
+
+  .board-write__agree input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+
+  .board-write__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .board-write__actions-end {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .board-write__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .board-attach__upload {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .board-attach__list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem 0.7rem;
+  }
+
+  .board-attach__name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-all;
+  }
+
+  .board-attach__size {
+    grid-column: 1;
+  }
+
+  .board-attach__remove {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-height: var(--tap);
+    min-width: var(--tap);
   }
 
   .site-footer {
@@ -5923,13 +6102,30 @@ button.course {
     font-size: 0.78rem;
   }
 
+  .board-search {
+    gap: 0.5rem;
+  }
+
   .board-search__find {
     flex: 1 1 100%;
     max-width: none;
   }
 
+  .board-search__input,
+  .board-search__btn,
+  .board-search__sort,
+  .board-search .btn {
+    min-height: var(--tap);
+    height: var(--tap);
+  }
+
   .board-search__sort {
-    flex: 1 1 8rem;
+    flex: 1 1 7rem;
+  }
+
+  .board-search .btn {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 
   .courses__grid,
@@ -6147,4 +6343,62 @@ button.course {
 
 .board-attach__notes li::before {
   content: "• ";
+}
+
+@media (max-width: 720px) {
+  .board-write__head .btn,
+  .board-write__actions .btn,
+  .board-attach__upload,
+  .board-attach__remove {
+    min-height: var(--tap);
+  }
+
+  .board-write__agree input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0;
+  }
+
+  .board-write__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .board-write__actions-end {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .board-write__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .board-attach__upload {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .board-attach__list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem 0.7rem;
+  }
+
+  .board-attach__name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-all;
+  }
+
+  .board-attach__size {
+    grid-column: 1;
+  }
+
+  .board-attach__remove {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: var(--tap);
+  }
 }
