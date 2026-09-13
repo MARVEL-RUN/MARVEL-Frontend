@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useLayoutEffect, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { MainHttpError } from "@/lib/main/fetch";
 import {
@@ -88,7 +88,15 @@ export function GroupFlow({
   const [optionsError, setOptionsError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
+
+  function fail(message: string) {
+    setError(message);
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
 
   function openPay() {
     if (isMobileView()) {
@@ -163,27 +171,30 @@ export function GroupFlow({
 
   function onForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!draft.groupName.trim()) return setError("단체명을 입력하세요.");
+    if (!optionsReady) {
+      return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
+    }
+    if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
     if (!draft.organizationAccount.trim()) {
-      return setError("단체 계정을 입력하세요.");
+      return fail("단체 계정을 입력하세요.");
     }
     if ((draft.organizationPassword ?? "").trim().length < 4) {
-      return setError("단체 비밀번호를 4자 이상 입력하세요.");
+      return fail("단체 비밀번호를 4자 이상 입력하세요.");
     }
     if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
-      return setError("단체 비밀번호가 일치하지 않습니다.");
+      return fail("단체 비밀번호가 일치하지 않습니다.");
     }
-    if (!draft.leaderName.trim()) return setError("대표자 성명을 입력하세요.");
+    if (!draft.leaderName.trim()) return fail("대표자 성명을 입력하세요.");
     if (!/^\d{8}$/.test(draft.leaderBirth)) {
-      return setError("대표자 생년월일을 선택하세요.");
+      return fail("대표자 생년월일을 선택하세요.");
     }
-    if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!emailOk(draft.email)) return setError("이메일을 입력하세요.");
+    if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
+    if (!emailOk(draft.email)) return fail("이메일을 입력하세요.");
     if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
-      return setError("우편번호 찾기로 주소를 선택하세요.");
+      return fail("우편번호 찾기로 주소를 선택하세요.");
     }
     if (!(draft.addressDetail ?? "").trim()) {
-      return setError("상세주소를 입력하세요.");
+      return fail("상세주소를 입력하세요.");
     }
     try {
       draft.participants.forEach((p, i) => {
@@ -214,9 +225,10 @@ export function GroupFlow({
         }
       });
     } catch (err) {
-      return setError(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
+      return fail(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
     }
-    if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
+    if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
+    setError("");
     setStep(1);
   }
 
@@ -230,7 +242,7 @@ export function GroupFlow({
       return;
     }
     if (!hasMainApi || !hasTossClientKey) {
-      return setError(
+      return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
       );
     }
@@ -252,7 +264,7 @@ export function GroupFlow({
       setPayment(order);
       openPay();
     } catch (err) {
-      setError(
+      fail(
         err instanceof MainHttpError
           ? err.message
           : err instanceof Error
@@ -280,8 +292,6 @@ export function GroupFlow({
           </li>
         ))}
       </ol>
-
-      {error ? <p className="form__err">{error}</p> : null}
 
       {step === 0 ? (
         <form className="form" onSubmit={onForm} noValidate>
@@ -586,14 +596,15 @@ export function GroupFlow({
           </FormSec>
 
           <div className="flow__nav">
+            {error ? (
+              <p ref={errorRef} className="form__err flow__err" role="alert">
+                {error}
+              </p>
+            ) : null}
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
-            <button
-              type="submit"
-              className="btn btn--red"
-              disabled={!optionsReady}
-            >
+            <button type="submit" className="btn btn--red">
               확인하기
             </button>
           </div>
@@ -663,6 +674,11 @@ export function GroupFlow({
             })}
           </ul>
           <div className="flow__nav">
+            {error ? (
+              <p ref={errorRef} className="form__err flow__err" role="alert">
+                {error}
+              </p>
+            ) : null}
             <button
               type="button"
               className="btn btn--ghost"
