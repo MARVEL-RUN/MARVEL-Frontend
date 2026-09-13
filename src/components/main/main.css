@@ -3082,12 +3082,28 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .course-pick__fees {
+  --course-row: 2.2rem;
+  --course-head: 2.05rem;
+  --course-rows: 3;
   display: grid;
   grid-template-rows: var(--course-head) 1fr;
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
+}
+
+.apply-hint .course-pick__fees {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 0.85rem;
+  border: 0;
+  border-radius: 0;
+}
+
+.apply-hint .course-pick__fees-head,
+.apply-hint .course-pick__fees-row {
+  grid-template-columns: 4.4rem 7.2rem 4.2rem 8.8rem;
 }
 
 .course-pick__fees-head,

@@ -241,34 +241,46 @@ export function CoursePick({
           </div>
         </div>
       </div>
-      <div className="course-pick__fees">
-        <div className="course-pick__fees-head">
-          <span>종목</span>
-          <span>세부종목</span>
-          <span>단가</span>
-          <span>비고</span>
-        </div>
-        <div className="course-pick__fees-body">
-          {EVENT.courses.map((c) => {
-            const on = value === c.id;
-            return (
-              <div key={c.id} className="course-pick__fees-row">
-                <span className={on ? "is-on" : undefined}>{c.distance}</span>
-                <span
-                  className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
-                >
-                  {c.code}
-                </span>
-                <span className={on && ticket !== "child" ? "is-on" : undefined}>
-                  {feeDigits(c.fee)}
-                </span>
-                <span className={on && ticket === "child" ? "is-on" : undefined}>
-                  {courseNote(c)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+      <CourseFeeTable value={value} ticket={ticket} />
+    </div>
+  );
+}
+
+export function CourseFeeTable({
+  value,
+  ticket,
+}: {
+  value?: CourseId | "";
+  ticket?: TicketKind;
+}) {
+  return (
+    <div className="course-pick__fees">
+      <div className="course-pick__fees-head">
+        <span>종목</span>
+        <span>세부종목</span>
+        <span>단가</span>
+        <span>비고</span>
+      </div>
+      <div className="course-pick__fees-body">
+        {EVENT.courses.map((c) => {
+          const on = value === c.id;
+          return (
+            <div key={c.id} className="course-pick__fees-row">
+              <span className={on ? "is-on" : undefined}>{c.distance}</span>
+              <span
+                className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
+              >
+                {c.code}
+              </span>
+              <span className={on && ticket !== "child" ? "is-on" : undefined}>
+                {feeDigits(c.fee)}
+              </span>
+              <span className={on && ticket === "child" ? "is-on" : undefined}>
+                {courseNote(c)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

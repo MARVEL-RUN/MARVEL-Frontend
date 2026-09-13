@@ -15,10 +15,12 @@ import {
 } from "@/lib/payment/session";
 import {
   categoryClosedReason,
+  categoryFeeAmount,
   categoryLabel,
   categoryOpenForBirth,
   findCategory,
   findSouvenir,
+  groupOptionsFee,
   souvenirSizes,
   sortedCategories,
   sortedSouvenirs,
@@ -35,7 +37,6 @@ import {
   ageBand,
   formatFee,
   genderLabel,
-  groupFee,
   emailOk,
   requiredConsentsOk,
   type Consents,
@@ -52,6 +53,7 @@ import {
   AddressField,
   ApplyHint,
   ApplyNotice,
+  CourseFeeTable,
   BirthPick,
   BirthText,
   EmailField,
@@ -262,7 +264,7 @@ export function GroupFlow({
     }
   }
 
-  const total = payment?.paymentAmount ?? groupFee(draft, categories);
+  const total = payment?.paymentAmount ?? groupOptionsFee(draft, categories);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
 
   return (
@@ -383,6 +385,8 @@ export function GroupFlow({
               </p>
               <p>{CHILD_AGE_NOTE}</p>
               <p>{GUARDIAN_AGE_NOTE}</p>
+              <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
+              <CourseFeeTable />
             </ApplyHint>
             <div className="party-bar">
               <p>{draft.participants.length}명 등록</p>
@@ -558,7 +562,9 @@ export function GroupFlow({
                           </select>
                         </td>
                         <td className="party__fee">
-                          {category ? formatFee(category.amount) : "—"}
+                          {category
+                            ? formatFee(categoryFeeAmount(category, p.birth))
+                            : "—"}
                         </td>
                         <td className="party__del">
                           <button

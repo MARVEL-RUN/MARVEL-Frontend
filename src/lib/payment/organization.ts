@@ -1,5 +1,6 @@
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import {
+  categoryFeeAmount,
   categoryLabel,
   findCategory,
   findSouvenir,
@@ -99,7 +100,7 @@ export function toGroupPaymentReceipt(
       return {
         name: p.name.trim(),
         detail,
-        amount: category?.amount ?? 0,
+        amount: category ? categoryFeeAmount(category, p.birth) : 0,
       };
     }),
   };

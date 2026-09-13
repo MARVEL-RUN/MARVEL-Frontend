@@ -3,7 +3,14 @@ import type {
   RegistrationSouvenir,
 } from "@/services/main/types";
 import { EVENT } from "./event";
-import { ageBand, courseAllowsChild } from "./register";
+import {
+  ageBand,
+  courseAllowsChild,
+  feeAmount,
+  ticketFee,
+  ticketForBirth,
+  type GroupDraft,
+} from "./register";
 
 export function sortedCategories(categories: RegistrationCategory[]) {
   return [...categories].sort((a, b) => a.order - b.order);
@@ -78,4 +85,25 @@ export function categoryClosedReason(
   if (band === "child") return "어린이 참가 불가";
   if (band && /어린이/.test(categoryText(category))) return "성인 참가 불가";
   return "";
+}
+
+export function categoryFeeAmount(
+  category: RegistrationCategory,
+  birth: string,
+) {
+  const course = courseForCategory(category);
+  if (course && ticketForBirth(birth) === "child" && courseAllowsChild(course)) {
+    return feeAmount(ticketFee(course, "child"));
+  }
+  return category.amount;
+}
+
+export function groupOptionsFee(
+  draft: GroupDraft,
+  categories: RegistrationCategory[],
+) {
+  return draft.participants.reduce((sum, p) => {
+    const category = findCategory(categories, p.categoryId);
+    return sum + (category ? categoryFeeAmount(category, p.birth) : 0);
+  }, 0);
 }
