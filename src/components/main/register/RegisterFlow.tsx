@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { FormEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import {
   CHILD_AGE_NOTE,
   EMPTY_CONSENTS,
@@ -9,9 +9,13 @@ import {
   GUARDIAN_AGE_NOTE,
   applyCourseForBirth,
   ageBand,
+  courseById,
   emailOk,
+  genderLabel,
   needsGuardian,
   requiredConsentsOk,
+  ticketFee,
+  ticketLabel,
   type ApplyKind,
   type Consents,
   type EntryDraft,
@@ -25,9 +29,12 @@ import {
 } from "@/lib/payment/map";
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import { savePendingPayment } from "@/lib/payment/session";
+import { scrollPageTop } from "@/lib/scroll-page";
+import { isMobileView } from "@/lib/viewport";
 import { createRegistration } from "@/services/main/registrations";
 import type { RegistrationCreateResponse } from "@/services/main/types";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
+import { SheetModal } from "@/components/main/SheetModal";
 import { ApplyTerms } from "./ApplyTerms";
 import {
   AddressField,
@@ -42,10 +49,11 @@ import {
   PasswordField,
   PhoneField,
   ShirtPick,
+  birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
 
-const STEPS = ["정보", "결제"] as const;
+const STEPS = ["정보", "확인"] as const;
 type Step = 0 | 1;
 
 const NOTICE = [
@@ -59,9 +67,7 @@ export function RegisterFlow() {
 
   function pickKind(next: ApplyKind) {
     setKind(next);
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    });
+    requestAnimationFrame(scrollPageTop);
   }
 
   if (!kind) {
@@ -93,9 +99,23 @@ function IndividualFlow({
   }));
   const [registration, setRegistration] =
     useState<RegistrationCreateResponse | null>(null);
+  const router = useRouter();
+  const [payOpen, setPayOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
+
+  function openPay() {
+    if (isMobileView()) {
+      router.push("/payment");
+      return;
+    }
+    setPayOpen(true);
+  }
+
+  useLayoutEffect(() => {
+    if (step === 1) scrollPageTop();
+  }, [step]);
 
   function patch(next: Partial<EntryDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
@@ -109,13 +129,8 @@ function IndividualFlow({
     });
   }
 
-  async function onPay(e: FormEvent<HTMLFormElement>) {
+  function onReview(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const password = (draft.password ?? "").trim();
-    const zonecode = (draft.zonecode ?? "").trim();
-    const address = (draft.address ?? "").trim();
-    const addressDetail = (draft.addressDetail ?? "").trim();
-
     if (!draft.name.trim()) return fail("이름을 입력하세요.");
     if (!/^\d{8}$/.test(draft.birth)) return fail("생년월일을 선택하세요.");
     if (ageBand(draft.birth) === "tooYoung") {
@@ -131,33 +146,54 @@ function IndividualFlow({
       return fail("만 14세 미만은 보호자 연락처를 입력하세요.");
     }
     if (!draft.shirt) return fail("기념품을 선택하세요.");
-    if (password.length < 4) {
+    if ((draft.password ?? "").trim().length < 4) {
       return fail("신청 비밀번호를 4자 이상 입력하세요.");
     }
-    if (!zonecode || !address) {
+    if ((draft.password ?? "") !== (draft.passwordConfirm ?? "")) {
+      return fail("신청 비밀번호가 일치하지 않습니다.");
+    }
+    if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
       return fail("우편번호 찾기로 주소를 선택하세요.");
     }
-    if (!addressDetail) return fail("상세주소를 입력하세요.");
+    if (!(draft.addressDetail ?? "").trim()) return fail("상세주소를 입력하세요.");
     if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
+    setError("");
+    setStep(1);
+  }
 
+  async function onPay() {
+    if (registration) {
+      openPay();
+      return;
+    }
     if (!hasMainApi || !hasTossClientKey) {
       return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
       );
     }
 
+    const courseId = draft.courseId;
+    const gender = draft.gender;
+    if (!courseId) return fail("참가종목을 선택하세요.");
+    if (gender !== "male" && gender !== "female") {
+      return fail("성별을 선택하세요.");
+    }
+
     setBusy(true);
     setError("");
     try {
       const created = await createRegistration(DEFAULT_EVENT_ID, {
-        eventCategoryId: eventCategoryIdForCourse(draft.courseId),
-        password,
+        eventCategoryId: eventCategoryIdForCourse(courseId),
+        password: (draft.password ?? "").trim(),
         name: draft.name.trim(),
         phNum: phoneDigits(draft.phone),
         birth: draft.birth,
-        gender: genderToApi(draft.gender),
-        address: formatAddressForApi(zonecode, address),
-        addressDetail,
+        gender: genderToApi(gender),
+        address: formatAddressForApi(
+          (draft.zonecode ?? "").trim(),
+          (draft.address ?? "").trim(),
+        ),
+        addressDetail: (draft.addressDetail ?? "").trim(),
       });
       savePendingPayment({
         registration: created,
@@ -165,10 +201,7 @@ function IndividualFlow({
         savedAt: Date.now(),
       });
       setRegistration(created);
-      setStep(1);
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-      });
+      openPay();
     } catch (err) {
       const message =
         err instanceof MainHttpError
@@ -181,6 +214,8 @@ function IndividualFlow({
       setBusy(false);
     }
   }
+
+  const course = draft.courseId ? courseById(draft.courseId) : undefined;
 
   return (
     <div className="flow">
@@ -196,14 +231,8 @@ function IndividualFlow({
         ))}
       </ol>
 
-      {step === 0 || !error ? null : (
-        <p className="form__err" role="alert">
-          {error}
-        </p>
-      )}
-
       {step === 0 ? (
-        <form className="form" onSubmit={onPay} noValidate>
+        <form className="form" onSubmit={onReview} noValidate>
           <ApplyNotice lines={NOTICE} />
 
           <FormSec title="개인정보">
@@ -314,6 +343,16 @@ function IndividualFlow({
                 required
               />
             </FormRow>
+            <FormRow label="신청 비밀번호 확인" required>
+              <PasswordField
+                name="passwordConfirm"
+                label="신청 비밀번호 확인"
+                placeholder="신청 비밀번호를 다시 입력하세요."
+                value={draft.passwordConfirm ?? ""}
+                onChange={(passwordConfirm) => patch({ passwordConfirm })}
+                required
+              />
+            </FormRow>
             <FormRow label="참가비">
               {draft.courseId ? (
                 <FeeText courseId={draft.courseId} ticket={draft.ticket} />
@@ -332,30 +371,100 @@ function IndividualFlow({
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
-            <button type="submit" className="btn btn--red" disabled={busy}>
-              {busy ? "결제 준비 중..." : "결제하기"}
+            <button type="submit" className="btn btn--red">
+              확인하기
             </button>
           </div>
         </form>
       ) : null}
 
-      {step === 1 && registration ? (
-        <PaymentWidget
-          registration={registration}
-          customerName={draft.name.trim()}
-          onError={setError}
-        />
-      ) : null}
-
-      {step === 1 && !registration ? (
+      {step === 1 && course ? (
         <section className="block">
-          <p className="form__err">결제 정보가 없습니다. 다시 신청해 주세요.</p>
+          <h2>접수 내용을 확인하세요</h2>
+          <dl className="spec">
+            <div>
+              <dt>참가종목</dt>
+              <dd>
+                {course.distance} · {ticketLabel(draft.ticket)}
+                <small>{ticketFee(course, draft.ticket)}</small>
+              </dd>
+            </div>
+            <div>
+              <dt>이름</dt>
+              <dd>{draft.name}</dd>
+            </div>
+            <div>
+              <dt>생년월일</dt>
+              <dd>{birthView(draft.birth)}</dd>
+            </div>
+            <div>
+              <dt>성별</dt>
+              <dd>{draft.gender ? genderLabel(draft.gender) : "—"}</dd>
+            </div>
+            <div>
+              <dt>휴대폰번호</dt>
+              <dd>{draft.phone}</dd>
+            </div>
+            <div>
+              <dt>이메일</dt>
+              <dd>{draft.email}</dd>
+            </div>
+            <div>
+              <dt>주소</dt>
+              <dd>
+                ({draft.zonecode}) {draft.address} {draft.addressDetail}
+              </dd>
+            </div>
+            <div>
+              <dt>보호자 연락처</dt>
+              <dd>{draft.emergency.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>기념품</dt>
+              <dd>티셔츠 ({draft.shirt})</dd>
+            </div>
+          </dl>
+          {error ? (
+            <p ref={errorRef} className="form__err" role="alert">
+              {error}
+            </p>
+          ) : null}
           <div className="flow__nav">
-            <Link href="/register" className="btn btn--red">
-              신청으로
-            </Link>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => {
+                setPayOpen(false);
+                setStep(0);
+                requestAnimationFrame(scrollPageTop);
+              }}
+            >
+              수정
+            </button>
+            <button
+              type="button"
+              className="btn btn--red"
+              onClick={onPay}
+              disabled={busy}
+            >
+              {busy ? "결제 준비 중..." : "결제하기"}
+            </button>
           </div>
         </section>
+      ) : null}
+
+      {payOpen && registration ? (
+        <SheetModal
+          kicker="PAY"
+          title="결제하기"
+          onClose={() => setPayOpen(false)}
+        >
+          <PaymentWidget
+            registration={registration}
+            customerName={draft.name.trim()}
+            onError={setError}
+          />
+        </SheetModal>
       ) : null}
     </div>
   );

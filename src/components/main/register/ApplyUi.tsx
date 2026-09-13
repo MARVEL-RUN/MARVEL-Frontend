@@ -191,6 +191,10 @@ export function CoursePick({
   onChange: (courseId: CourseId, ticket: TicketKind) => void;
 }) {
   const selected = value ? courseById(value) : undefined;
+  const ticket =
+    selected && !courseAllowsChild(selected)
+      ? "adult"
+      : ticketForBirth(birth);
 
   return (
     <div className="course-pick">
@@ -245,17 +249,25 @@ export function CoursePick({
           <span>비고</span>
         </div>
         <div className="course-pick__fees-body">
-          {EVENT.courses.map((c) => (
-            <div
-              key={c.id}
-              className={value === c.id ? "course-pick__fees-row is-on" : "course-pick__fees-row"}
-            >
-              <span>{c.distance}</span>
-              <span className={`course-pick__code--${c.tone}`}>{c.code}</span>
-              <span>{feeDigits(c.fee)}</span>
-              <span>{courseNote(c)}</span>
-            </div>
-          ))}
+          {EVENT.courses.map((c) => {
+            const on = value === c.id;
+            return (
+              <div key={c.id} className="course-pick__fees-row">
+                <span className={on ? "is-on" : undefined}>{c.distance}</span>
+                <span
+                  className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
+                >
+                  {c.code}
+                </span>
+                <span className={on && ticket !== "child" ? "is-on" : undefined}>
+                  {feeDigits(c.fee)}
+                </span>
+                <span className={on && ticket === "child" ? "is-on" : undefined}>
+                  {courseNote(c)}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -419,6 +431,7 @@ export function PasswordField({
   onChange,
   required,
   name = "password",
+  label = "신청 비밀번호",
   placeholder = "신청조회용 비밀번호 (4자 이상)",
   minLength = 4,
 }: {
@@ -426,6 +439,7 @@ export function PasswordField({
   onChange: (next: string) => void;
   required?: boolean;
   name?: string;
+  label?: string;
   placeholder?: string;
   minLength?: number;
 }) {
@@ -442,7 +456,7 @@ export function PasswordField({
         autoComplete="new-password"
         minLength={minLength}
         required={required}
-        aria-label="신청 비밀번호"
+        aria-label={label}
       />
       <button
         type="button"

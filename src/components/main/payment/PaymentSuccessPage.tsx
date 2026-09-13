@@ -10,6 +10,8 @@ import { formatFee } from "@/lib/register";
 import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
+import { SheetModal } from "@/components/main/SheetModal";
+import { isMobileView } from "@/lib/viewport";
 
 type Phase = "loading" | "done" | "error";
 
@@ -20,6 +22,7 @@ export function PaymentSuccessPage() {
   const [result, setResult] = useState<PaymentConfirmResponse | null>(null);
   const [orderName, setOrderName] = useState("");
   const [copied, setCopied] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   useEffect(() => {
     const paymentKey = params.get("paymentKey");
@@ -133,16 +136,27 @@ export function PaymentSuccessPage() {
               </div>
             ) : null}
             <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
+            {receiptUrl ? (
+              <p className="form__note">
+                영수증은 토스 매출전표입니다. 전표 위 인쇄 아이콘을 누른 뒤 PDF로
+                저장하세요.
+              </p>
+            ) : null}
             <div className="flow__nav">
               {receiptUrl ? (
-                <a
-                  href={receiptUrl}
+                <button
+                  type="button"
                   className="btn btn--ghost"
-                  target="_blank"
-                  rel="noreferrer"
+                  onClick={() => {
+                    if (isMobileView()) {
+                      window.location.assign(receiptUrl);
+                      return;
+                    }
+                    setReceiptOpen(true);
+                  }}
                 >
                   영수증
-                </a>
+                </button>
               ) : null}
               <Link href="/lookup" className="btn btn--ghost">
                 신청조회
@@ -152,6 +166,27 @@ export function PaymentSuccessPage() {
               </Link>
             </div>
           </section>
+        ) : null}
+
+        {receiptOpen && receiptUrl ? (
+          <SheetModal
+            kicker="RECEIPT"
+            title="영수증"
+            tall
+            side="left"
+            onClose={() => setReceiptOpen(false)}
+          >
+            <div className="sheet-modal__receipt">
+              <p className="sheet-modal__hint">
+                전표 위 인쇄 아이콘을 누른 뒤 PDF로 저장할 수 있습니다.
+              </p>
+              <iframe
+                className="sheet-modal__frame"
+                src={receiptUrl}
+                title="결제 영수증"
+              />
+            </div>
+          </SheetModal>
         ) : null}
 
         {phase === "error" ? (
