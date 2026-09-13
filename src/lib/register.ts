@@ -41,6 +41,8 @@ export type EntryDraft = {
   email: string;
   emergency: string;
   shirt: ShirtSize | "";
+  souvenirId: string;
+  selectedSize: string;
   password: string;
   passwordConfirm: string;
   zonecode: string;
@@ -137,6 +139,8 @@ export const EMPTY_DRAFT: EntryDraft = {
   email: "",
   emergency: "",
   shirt: "",
+  souvenirId: "",
+  selectedSize: "",
   password: "",
   passwordConfirm: "",
   zonecode: "",

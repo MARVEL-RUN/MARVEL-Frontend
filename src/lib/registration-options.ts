@@ -72,15 +72,6 @@ export function categoryForCourse(
   });
 }
 
-export function shirtSouvenir(category: RegistrationCategory | undefined) {
-  const souvenirs = sortedSouvenirs(category);
-  return (
-    souvenirs.find((item) => /티셔츠|t-?shirt/i.test(item.name)) ??
-    souvenirs.find((item) => /tshirt/i.test(item.souvenirId)) ??
-    souvenirs[0]
-  );
-}
-
 export function categoryOpenForBirth(
   category: RegistrationCategory,
   birth: string,

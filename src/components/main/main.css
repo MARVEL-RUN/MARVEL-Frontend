@@ -2713,7 +2713,8 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .form-row input[type="text"],
 .form-row input[type="email"],
 .form-row input[type="tel"],
-.form-row input[type="password"] {
+.form-row input[type="password"],
+.form-row select {
   width: min(24rem, 100%);
   padding: 0.75rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -2758,6 +2759,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   color: rgba(255, 255, 255, 0.38);
 }
 
+.form-row select:focus,
 .form-row input:focus {
   outline: none;
   border-color: var(--marvel);
@@ -4859,6 +4861,7 @@ button.course {
   .form-row input[type="email"],
   .form-row input[type="tel"],
   .form-row input[type="password"],
+  .form-row select,
   .form-row textarea {
     width: 100%;
   }

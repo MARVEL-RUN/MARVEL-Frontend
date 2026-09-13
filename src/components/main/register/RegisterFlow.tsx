@@ -16,7 +16,6 @@ import {
   requiredConsentsOk,
   ticketFee,
   ticketLabel,
-  SHIRT_SIZES,
   type ApplyKind,
   type Consents,
   type EntryDraft,
@@ -27,9 +26,10 @@ import { toRegistrationCreateRequest } from "@/lib/payment/individual";
 import { savePendingPayment } from "@/lib/payment/session";
 import {
   categoryForCourse,
-  shirtSouvenir,
+  findSouvenir,
   souvenirSizes,
   sortedCategories,
+  sortedSouvenirs,
 } from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
@@ -54,7 +54,6 @@ import {
   GenderPick,
   PasswordField,
   PhoneField,
-  ShirtPick,
   birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
@@ -196,7 +195,8 @@ function IndividualFlow({
     if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
       return fail("만 14세 미만은 보호자 연락처를 입력하세요.");
     }
-    if (!draft.shirt) return fail("기념품을 선택하세요.");
+    if (!draft.souvenirId) return fail("기념품을 선택하세요.");
+    if (!draft.selectedSize) return fail("기념품 사이즈를 선택하세요.");
     if ((draft.password ?? "").trim().length < 4) {
       return fail("신청 비밀번호를 4자 이상 입력하세요.");
     }
@@ -254,11 +254,9 @@ function IndividualFlow({
   const selectedCategory = draft.courseId
     ? categoryForCourse(categories, draft.courseId, draft.birth)
     : undefined;
-  const souvenir = shirtSouvenir(selectedCategory);
-  const shirtSizes =
-    draft.courseId && souvenir
-      ? souvenirSizes(souvenir)
-      : SHIRT_SIZES.filter((size) => size !== "XS");
+  const souvenir = findSouvenir(selectedCategory, draft.souvenirId);
+  const sizes = souvenirSizes(souvenir);
+  const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
 
   return (
     <div className="flow">
@@ -296,17 +294,13 @@ function IndividualFlow({
                   value={draft.birth}
                   onChange={(birth) => {
                     const next = applyCourseForBirth(draft.courseId, birth);
-                    const category = next.courseId
-                      ? categoryForCourse(categories, next.courseId, birth)
-                      : undefined;
-                    const sizes = souvenirSizes(shirtSouvenir(category));
+                    const keepCourse = next.courseId === draft.courseId;
                     patch({
                       birth,
                       ...next,
-                      shirt:
-                        draft.shirt && sizes.includes(draft.shirt)
-                          ? draft.shirt
-                          : "",
+                      ...(keepCourse
+                        ? {}
+                        : { souvenirId: "", selectedSize: "" }),
                     });
                   }}
                 />
@@ -382,30 +376,64 @@ function IndividualFlow({
               <CoursePick
                 value={draft.courseId}
                 birth={draft.birth}
-                onChange={(courseId, ticket) => {
-                  const category = categoryForCourse(
-                    categories,
-                    courseId,
-                    draft.birth,
-                  );
-                  const sizes = souvenirSizes(shirtSouvenir(category));
+                onChange={(courseId, ticket) =>
                   patch({
                     courseId,
                     ticket,
-                    shirt:
-                      draft.shirt && sizes.includes(draft.shirt)
-                        ? draft.shirt
-                        : "",
-                  });
-                }}
+                    souvenirId: "",
+                    selectedSize: "",
+                  })
+                }
               />
             </FormRow>
+            {optionsError ? (
+              <p className="form__err">{optionsError}</p>
+            ) : null}
             <FormRow label="기념품" required>
-              <ShirtPick
-                value={draft.shirt}
-                sizes={shirtSizes}
-                onChange={(shirt) => patch({ shirt })}
-              />
+              <select
+                value={draft.souvenirId}
+                onChange={(e) => {
+                  const souvenirId = e.target.value;
+                  const next = findSouvenir(selectedCategory, souvenirId);
+                  const nextSizes = souvenirSizes(next);
+                  patch({
+                    souvenirId,
+                    selectedSize: nextSizes.length === 1 ? nextSizes[0] : "",
+                  });
+                }}
+                disabled={!draft.courseId || !optionsReady}
+                required
+              >
+                <option value="">
+                  {optionsLoading
+                    ? "불러오는 중"
+                    : draft.courseId
+                      ? "기념품"
+                      : "종목을 먼저 선택하세요"}
+                </option>
+                {sortedSouvenirs(selectedCategory).map((item) => (
+                  <option key={item.souvenirId} value={item.souvenirId}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </FormRow>
+            <FormRow label="사이즈" required>
+              <select
+                value={draft.selectedSize}
+                onChange={(e) => patch({ selectedSize: e.target.value })}
+                disabled={!draft.souvenirId}
+                required
+              >
+                <option value="">사이즈</option>
+                {draft.souvenirId
+                  ? sizes.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))
+                  : null}
+              </select>
             </FormRow>
             <FormRow label="신청 비밀번호" required>
               <PasswordField
@@ -493,7 +521,7 @@ function IndividualFlow({
             <div>
               <dt>기념품</dt>
               <dd>
-                {souvenir?.name ?? "티셔츠"} ({draft.shirt})
+                {souvenir?.name ?? "—"} ({draft.selectedSize || "—"})
               </dd>
             </div>
           </dl>
