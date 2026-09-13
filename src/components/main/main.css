@@ -2451,6 +2451,10 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .kit-gallery__frame--bib img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   padding: 0;
   object-fit: contain;
   /* 원본에서 배번호가 왼쪽(46.6%)이라 확대 기준을 맞춤 */
@@ -5481,7 +5485,8 @@ button.course {
   }
 
   .kit-gallery__pane {
-    padding: 0.85rem 0.85rem 0.95rem;
+    padding: 0;
+    background: none;
   }
 
   .kit-gallery__picks button {
@@ -5489,10 +5494,34 @@ button.course {
     font-size: 0.86rem;
   }
 
+  .kit-gallery__frame,
   .kit-gallery__frame--bib {
-    aspect-ratio: 1.7 / 1;
+    background: none;
+  }
+
+  .kit-gallery__frame img,
+  .medal-3d__still {
+    padding: 0;
+  }
+
+  .kit-gallery__frame--bib {
+    /* SVG viewBox 안 배번호 사각형 323.11,390.69–861.45,788.67 */
+    aspect-ratio: 538.34 / 397.98;
     height: auto;
     min-height: 0;
+    overflow: hidden;
+  }
+
+  .kit-gallery__frame--bib img {
+    inset: auto;
+    width: calc(100% * 1271.71 / 538.34);
+    height: calc(100% * 1141.59 / 397.98);
+    left: calc(-100% * 323.11 / 538.34);
+    top: calc(-100% * 390.69 / 397.98);
+    max-width: none;
+    object-fit: fill;
+    object-position: 0 0;
+    transform: none;
   }
 
   .kit-gallery__medals {

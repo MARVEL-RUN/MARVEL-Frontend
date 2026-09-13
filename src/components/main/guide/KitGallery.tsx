@@ -89,7 +89,8 @@ export function KitGallery() {
             <Image
               src={MAIN_ASSETS.kitBib}
               alt="배번호"
-              fill
+              width={1272}
+              height={1142}
               sizes="(max-width: 720px) 100vw, 1100px"
             />
           </span>
