@@ -5395,44 +5395,6 @@ button.course {
     min-width: 0;
   }
 
-  .time-table thead {
-    display: none;
-  }
-
-  .time-table,
-  .time-table tbody,
-  .time-table tr,
-  .time-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .time-table tr {
-    padding: 0.95rem 0 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-  }
-
-  .time-table td {
-    padding: 0.15rem 0;
-    border-bottom: 0;
-    font-size: 0.95rem;
-  }
-
-  .time-table td+td {
-    border-left: 0;
-  }
-
-  .time-table td:nth-child(2) {
-    color: var(--note);
-    font-size: 0.8rem;
-  }
-
-  .time-table td:nth-child(2)::before {
-    content: "RT ";
-    font-weight: 700;
-    letter-spacing: 0.06em;
-  }
-
   .side-banner {
     min-height: 0;
     aspect-ratio: 2 / 0.8;
@@ -5840,13 +5802,18 @@ button.course {
   }
 
   .time-table {
-    min-width: 34rem;
+    min-width: 0;
     font-size: 0.82rem;
   }
 
   .time-table th,
   .time-table td {
     padding: 0.7rem 0.55rem;
+  }
+
+  .time-table__rt,
+  .time-table__note {
+    display: none;
   }
 }
 

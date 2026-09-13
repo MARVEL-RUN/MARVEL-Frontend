@@ -14,9 +14,9 @@ export function TimeTable() {
         <thead>
           <tr>
             <th>시간</th>
-            <th>RT</th>
+            <th className="time-table__rt">RT</th>
             <th>프로그램</th>
-            <th>비고</th>
+            <th className="time-table__note">비고</th>
           </tr>
         </thead>
         <tbody>
@@ -32,7 +32,7 @@ export function TimeTable() {
                     <span className="time-table__to">{row.to}</span>
                   </span>
                 </td>
-                <td>{row.rt}</td>
+                <td className="time-table__rt">{row.rt}</td>
                 <td>
                   {mark ? (
                     "mark" in row && row.mark === "gate" ? (
@@ -44,7 +44,7 @@ export function TimeTable() {
                     row.program
                   )}
                 </td>
-                <td>{row.note}</td>
+                <td className="time-table__note">{row.note}</td>
               </tr>
             );
           })}
