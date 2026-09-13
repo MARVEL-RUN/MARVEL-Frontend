@@ -2726,7 +2726,8 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .form-row input[type="text"],
 .form-row input[type="email"],
 .form-row input[type="tel"],
-.form-row input[type="password"] {
+.form-row input[type="password"],
+.form-row__ctrl > select {
   width: min(24rem, 100%);
   padding: 0.75rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -2771,6 +2772,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   color: rgba(255, 255, 255, 0.38);
 }
 
+.form-row__ctrl > select:focus,
 .form-row input:focus {
   outline: none;
   border-color: var(--marvel);
@@ -2799,14 +2801,15 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .birth-pick {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.35rem;
 }
 
 .birth-pick select {
-  min-width: 5.2rem;
-  padding: 0.65rem 0.55rem;
+  width: 4.6rem;
+  min-width: 0;
+  padding: 0.65rem 0.4rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 6px;
   background: #08091d;
@@ -2814,11 +2817,16 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font: inherit;
 }
 
+.birth-pick select:first-of-type {
+  width: 6rem;
+}
+
 .email-pick {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.4rem;
+  width: min(24rem, 100%);
 }
 
 .email-pick span {
@@ -2839,15 +2847,21 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .form-row .email-pick input.email-pick__local {
-  width: 12.5rem;
+  width: 10.5rem;
   max-width: 100%;
+  flex: none;
 }
 
 .form-row .email-pick input.email-pick__host,
-.email-pick__pick {
-  width: 9.5rem;
-  max-width: 100%;
-  flex: none;
+.form-row .email-pick select.email-pick__pick {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}
+
+.form-row .email-pick select.email-pick__pick {
+  padding: 0.75rem 0.55rem;
 }
 
 .email-pick input::placeholder {
@@ -3095,12 +3109,28 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .course-pick__fees {
+  --course-row: 2.2rem;
+  --course-head: 2.05rem;
+  --course-rows: 3;
   display: grid;
   grid-template-rows: var(--course-head) 1fr;
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
+}
+
+.apply-hint .course-pick__fees {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 0.85rem;
+  border: 0;
+  border-radius: 0;
+}
+
+.apply-hint .course-pick__fees-head,
+.apply-hint .course-pick__fees-row {
+  grid-template-columns: 4.4rem 7.2rem 4.2rem 8.8rem;
 }
 
 .course-pick__fees-head,
@@ -3201,7 +3231,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .party {
   width: 100%;
-  min-width: 58rem;
+  min-width: 64rem;
   border-collapse: collapse;
 }
 
@@ -4182,6 +4212,58 @@ button.course {
   min-height: 0;
 }
 
+.sheet-modal__receipt-body {
+  flex: 0 0 auto;
+  padding: 1rem 1.1rem 1.15rem;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.sheet-modal__receipt-body h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.sheet-modal__receipt-body p {
+  margin: 0 0 0.75rem;
+  color: #666;
+  font-size: 0.82rem;
+}
+
+.sheet-modal__receipt-body ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sheet-modal__receipt-body li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ececec;
+  font-size: 0.84rem;
+}
+
+.sheet-modal__receipt-body li span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.sheet-modal__receipt-body li em {
+  font-style: normal;
+  color: #666;
+  font-size: 0.76rem;
+}
+
+.sheet-modal__receipt-body li.is-sum {
+  border-bottom: 0;
+  font-weight: 800;
+}
+
 .sheet-modal__hint {
   flex: 0 0 auto;
   margin: 0;
@@ -5022,17 +5104,24 @@ button.course {
   .form-row input[type="email"],
   .form-row input[type="tel"],
   .form-row input[type="password"],
+  .form-row__ctrl > select,
   .form-row textarea {
     width: 100%;
   }
 
+  .email-pick {
+    width: 100%;
+  }
+
   .form-row .email-pick input.email-pick__local {
-    width: min(12.5rem, 100%);
+    width: min(10.5rem, 42%);
   }
 
   .form-row .email-pick input.email-pick__host,
-  .email-pick__pick {
-    width: min(9.5rem, 100%);
+  .form-row .email-pick select.email-pick__pick {
+    flex: 1 1 0;
+    width: auto;
+    max-width: none;
   }
 
   .board-write__actions {

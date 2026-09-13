@@ -41,6 +41,8 @@ export type EntryDraft = {
   email: string;
   emergency: string;
   shirt: ShirtSize | "";
+  souvenirId: string;
+  selectedSize: string;
   password: string;
   passwordConfirm: string;
   zonecode: string;
@@ -62,32 +64,39 @@ export type EntryRecord = {
 };
 
 export type ParticipantDraft = {
-  courseId: CourseId | "";
-  ticket: TicketKind;
+  categoryId: string;
+  souvenirId: string;
+  selectedSize: string;
   name: string;
   birth: string;
   gender: Gender | "";
   phone: string;
-  shirt: ShirtSize | "";
 };
 
 export type GroupDraft = {
   courseId: CourseId | "";
   groupName: string;
+  organizationAccount: string;
+  organizationPassword: string;
+  passwordConfirm: string;
   leaderName: string;
+  leaderBirth: string;
   phone: string;
   email: string;
+  zonecode: string;
+  address: string;
+  addressDetail: string;
   participants: ParticipantDraft[];
 } & Consents;
 
 export type SavedParticipant = {
-  courseId: CourseId;
-  ticket: TicketKind;
+  categoryId: string;
+  souvenirId: string;
+  selectedSize: string;
   name: string;
   birth: string;
   gender: Gender;
   phone: string;
-  shirt: ShirtSize;
 };
 
 export type GroupRecord = {
@@ -130,6 +139,8 @@ export const EMPTY_DRAFT: EntryDraft = {
   email: "",
   emergency: "",
   shirt: "",
+  souvenirId: "",
+  selectedSize: "",
   password: "",
   passwordConfirm: "",
   zonecode: "",
@@ -139,21 +150,28 @@ export const EMPTY_DRAFT: EntryDraft = {
 };
 
 export const EMPTY_PARTICIPANT: ParticipantDraft = {
-  courseId: "",
-  ticket: "adult",
+  categoryId: "",
+  souvenirId: "",
+  selectedSize: "",
   name: "",
   birth: "",
   gender: "",
   phone: "",
-  shirt: "",
 };
 
 export const EMPTY_GROUP: GroupDraft = {
   courseId: "",
   groupName: "",
+  organizationAccount: "",
+  organizationPassword: "",
+  passwordConfirm: "",
   leaderName: "",
+  leaderBirth: "",
   phone: "",
   email: "",
+  zonecode: "",
+  address: "",
+  addressDetail: "",
   participants: [{ ...EMPTY_PARTICIPANT }],
   ...EMPTY_CONSENTS,
 };
@@ -329,11 +347,13 @@ export function emailOk(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 }
 
-export function groupFee(draft: GroupDraft) {
+export function groupFee(
+  draft: GroupDraft,
+  categories: { categoryId: string; amount: number }[] = [],
+) {
   return draft.participants.reduce((sum, p) => {
-    const course = p.courseId ? courseById(p.courseId) : undefined;
-    if (!course) return sum;
-    return sum + feeAmount(ticketFee(course, p.ticket));
+    const category = categories.find((item) => item.categoryId === p.categoryId);
+    return sum + (category?.amount ?? 0);
   }, 0);
 }
 
@@ -432,34 +452,57 @@ function assertParticipant(
   p: ParticipantDraft,
   i: number,
 ): asserts p is ParticipantDraft & {
-  courseId: CourseId;
+  categoryId: string;
+  souvenirId: string;
+  selectedSize: string;
   gender: Gender;
-  shirt: ShirtSize;
 } {
   const n = i + 1;
   const prefix = `참가자 ${n}: `;
-  if (!p.courseId) throw new Error(`${prefix}참가종목을 선택하세요.`);
-  const picked = courseById(p.courseId);
-  if (!picked) throw new Error(`${prefix}참가종목을 선택하세요.`);
   if (!p.name.trim()) throw new Error(`${prefix}이름을 입력하세요.`);
   if (!/^\d{8}$/.test(p.birth)) {
     throw new Error(`${prefix}생년월일을 입력하세요.`);
   }
-  assertAgeTicket(p.birth, p.ticket, picked, prefix);
+  if (ageBand(p.birth) === "tooYoung") {
+    throw new Error(`${prefix}만 6세 미만은 참가할 수 없습니다.`);
+  }
   if (!p.gender) throw new Error(`${prefix}성별을 선택하세요.`);
   if (!p.phone.trim()) throw new Error(`${prefix}연락처를 입력하세요.`);
-  if (!p.shirt) throw new Error(`${prefix}기념품을 선택하세요.`);
+  if (!p.categoryId) throw new Error(`${prefix}참가종목을 선택하세요.`);
+  if (!p.souvenirId) throw new Error(`${prefix}기념품을 선택하세요.`);
+  if (!p.selectedSize) throw new Error(`${prefix}기념품 사이즈를 선택하세요.`);
 }
 
 function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   participants: Array<
-    ParticipantDraft & { courseId: CourseId; gender: Gender; shirt: ShirtSize }
+    ParticipantDraft & {
+      categoryId: string;
+      souvenirId: string;
+      selectedSize: string;
+      gender: Gender;
+    }
   >;
 } {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
+  if (!draft.organizationAccount.trim()) {
+    throw new Error("단체 계정을 입력하세요.");
+  }
+  if (draft.organizationPassword.trim().length < 4) {
+    throw new Error("단체 비밀번호를 4자 이상 입력하세요.");
+  }
+  if (draft.organizationPassword !== draft.passwordConfirm) {
+    throw new Error("단체 비밀번호가 일치하지 않습니다.");
+  }
   if (!draft.leaderName.trim()) throw new Error("대표자 성명을 입력하세요.");
+  if (!/^\d{8}$/.test(draft.leaderBirth)) {
+    throw new Error("대표자 생년월일을 선택하세요.");
+  }
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (!draft.zonecode.trim() || !draft.address.trim()) {
+    throw new Error("우편번호 찾기로 주소를 선택하세요.");
+  }
+  if (!draft.addressDetail.trim()) throw new Error("상세주소를 입력하세요.");
   if (!draft.participants.length) throw new Error("참가자를 1명 이상 등록하세요.");
   if (draft.participants.length > MAX_GROUP_SIZE) {
     throw new Error(`한 번에 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다.`);
@@ -549,13 +592,13 @@ export async function lookupGroup(
     email: "group@marvelrun.kr",
     participants: [
       {
-        courseId: "10k",
-        ticket: "adult",
+        categoryId: "",
+        souvenirId: "",
+        selectedSize: "",
         name: leaderName,
         birth: "19900101",
         gender: "none",
         phone: "010-0000-0000",
-        shirt: "M",
       },
     ],
   };

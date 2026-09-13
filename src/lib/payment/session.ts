@@ -1,9 +1,13 @@
-import type { RegistrationCreateResponse } from "@/services/main/types";
-
 const STORAGE_KEY = "marvelrun_payment_pending";
 
+export type PaymentOrder = {
+  orderId: string;
+  orderName: string;
+  paymentAmount: number;
+};
+
 export type PendingPayment = {
-  registration: RegistrationCreateResponse;
+  registration: PaymentOrder;
   customerName: string;
   savedAt: number;
 };

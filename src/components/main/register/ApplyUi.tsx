@@ -161,18 +161,20 @@ export function GenderPick({
 export function ShirtPick({
   value,
   onChange,
+  sizes = SHIRT_SIZES,
 }: {
-  value: ShirtSize | "";
+  value: string;
   onChange: (next: ShirtSize) => void;
+  sizes?: readonly string[];
 }) {
   return (
     <div className="seg">
-      {SHIRT_SIZES.map((size) => (
+      {sizes.map((size) => (
         <button
           key={size}
           type="button"
           className={value === size ? "is-on" : undefined}
-          onClick={() => onChange(size)}
+          onClick={() => onChange(size as ShirtSize)}
         >
           {size}
         </button>
@@ -241,34 +243,46 @@ export function CoursePick({
           </div>
         </div>
       </div>
-      <div className="course-pick__fees">
-        <div className="course-pick__fees-head">
-          <span>종목</span>
-          <span>세부종목</span>
-          <span>단가</span>
-          <span>비고</span>
-        </div>
-        <div className="course-pick__fees-body">
-          {EVENT.courses.map((c) => {
-            const on = value === c.id;
-            return (
-              <div key={c.id} className="course-pick__fees-row">
-                <span className={on ? "is-on" : undefined}>{c.distance}</span>
-                <span
-                  className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
-                >
-                  {c.code}
-                </span>
-                <span className={on && ticket !== "child" ? "is-on" : undefined}>
-                  {feeDigits(c.fee)}
-                </span>
-                <span className={on && ticket === "child" ? "is-on" : undefined}>
-                  {courseNote(c)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+      <CourseFeeTable value={value} ticket={ticket} />
+    </div>
+  );
+}
+
+export function CourseFeeTable({
+  value,
+  ticket,
+}: {
+  value?: CourseId | "";
+  ticket?: TicketKind;
+}) {
+  return (
+    <div className="course-pick__fees">
+      <div className="course-pick__fees-head">
+        <span>종목</span>
+        <span>세부종목</span>
+        <span>단가</span>
+        <span>비고</span>
+      </div>
+      <div className="course-pick__fees-body">
+        {EVENT.courses.map((c) => {
+          const on = value === c.id;
+          return (
+            <div key={c.id} className="course-pick__fees-row">
+              <span className={on ? "is-on" : undefined}>{c.distance}</span>
+              <span
+                className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
+              >
+                {c.code}
+              </span>
+              <span className={on && ticket !== "child" ? "is-on" : undefined}>
+                {feeDigits(c.fee)}
+              </span>
+              <span className={on && ticket === "child" ? "is-on" : undefined}>
+                {courseNote(c)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -387,12 +401,12 @@ export function EmailField({
         type="text"
         className="email-pick__local"
         inputMode="email"
-        autoComplete="username"
-        placeholder="아이디"
+        autoComplete="email"
+        placeholder="이메일"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         required={required}
-        aria-label="이메일 아이디"
+        aria-label="이메일"
       />
       <span aria-hidden>@</span>
       {custom ? (

@@ -6,7 +6,6 @@ import {
   genderLabel,
   lookupEntry,
   lookupGroup,
-  ticketLabel,
   type ApplyKind,
   type EntryRecord,
   type GroupRecord,
@@ -186,22 +185,16 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           </div>
         </dl>
         <ul className="member-list">
-          {record.participants.map((p, i) => {
-            const course = courseById(p.courseId);
-            return (
+          {record.participants.map((p, i) => (
               <li key={`${p.name}-${i}`}>
                 <strong>
                   {String(i + 1).padStart(2, "0")} {p.name}
                 </strong>
                 <span>
-                  {course
-                    ? `${course.distance} · ${ticketLabel(p.ticket)}`
-                    : "—"}{" "}
-                  · {genderLabel(p.gender)} · {p.shirt}
+                  {p.selectedSize || "—"} · {genderLabel(p.gender)}
                 </span>
               </li>
-            );
-          })}
+          ))}
         </ul>
         <button type="button" className="btn btn--ghost" onClick={() => setView("form")}>
           다른 접수건

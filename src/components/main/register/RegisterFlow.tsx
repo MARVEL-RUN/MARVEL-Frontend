@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useLayoutEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   CHILD_AGE_NOTE,
   EMPTY_CONSENTS,
@@ -22,17 +22,23 @@ import {
 } from "@/lib/register";
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { MainHttpError } from "@/lib/main/fetch";
-import {
-  eventCategoryIdForCourse,
-  genderToApi,
-  phoneDigits,
-} from "@/lib/payment/map";
-import { formatAddressForApi } from "@/lib/daumPostcode";
+import { toRegistrationCreateRequest } from "@/lib/payment/individual";
 import { savePendingPayment } from "@/lib/payment/session";
+import {
+  categoryForCourse,
+  findSouvenir,
+  souvenirSizes,
+  sortedCategories,
+  sortedSouvenirs,
+} from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
 import { createRegistration } from "@/services/main/registrations";
-import type { RegistrationCreateResponse } from "@/services/main/types";
+import { fetchRegistrationOptions } from "@/services/main/registration-options";
+import type {
+  RegistrationCategory,
+  RegistrationCreateResponse,
+} from "@/services/main/types";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "@/components/main/SheetModal";
 import { ApplyTerms } from "./ApplyTerms";
@@ -48,7 +54,6 @@ import {
   GenderPick,
   PasswordField,
   PhoneField,
-  ShirtPick,
   birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
@@ -101,9 +106,45 @@ function IndividualFlow({
     useState<RegistrationCreateResponse | null>(null);
   const router = useRouter();
   const [payOpen, setPayOpen] = useState(false);
+  const [categories, setCategories] = useState<RegistrationCategory[]>([]);
+  const [optionsLoading, setOptionsLoading] = useState(true);
+  const [optionsError, setOptionsError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (!hasMainApi) {
+      setOptionsLoading(false);
+      setOptionsError("API 주소가 설정되지 않았습니다.");
+      return;
+    }
+
+    let cancelled = false;
+    setOptionsLoading(true);
+    setOptionsError("");
+
+    fetchRegistrationOptions(DEFAULT_EVENT_ID)
+      .then((data) => {
+        if (cancelled) return;
+        setCategories(sortedCategories(data.categories ?? []));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setOptionsError(
+          err instanceof MainHttpError
+            ? err.message
+            : "신청 옵션을 불러오지 못했습니다.",
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setOptionsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function openPay() {
     if (isMobileView()) {
@@ -142,10 +183,20 @@ function IndividualFlow({
     if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
     if (!emailOk(draft.email)) return fail("이메일을 입력하세요.");
     if (!draft.courseId) return fail("참가종목을 선택하세요.");
+    if (optionsLoading) return fail("신청 옵션을 불러오는 중입니다.");
+    if (optionsError || !categories.length) {
+      return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
+    }
+    try {
+      toRegistrationCreateRequest(draft, categories);
+    } catch (err) {
+      return fail(err instanceof Error ? err.message : "입력 내용을 확인하세요.");
+    }
     if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
       return fail("만 14세 미만은 보호자 연락처를 입력하세요.");
     }
-    if (!draft.shirt) return fail("기념품을 선택하세요.");
+    if (!draft.souvenirId) return fail("기념품을 선택하세요.");
+    if (!draft.selectedSize) return fail("기념품 사이즈를 선택하세요.");
     if ((draft.password ?? "").trim().length < 4) {
       return fail("신청 비밀번호를 4자 이상 입력하세요.");
     }
@@ -172,29 +223,13 @@ function IndividualFlow({
       );
     }
 
-    const courseId = draft.courseId;
-    const gender = draft.gender;
-    if (!courseId) return fail("참가종목을 선택하세요.");
-    if (gender !== "male" && gender !== "female") {
-      return fail("성별을 선택하세요.");
-    }
-
     setBusy(true);
     setError("");
     try {
-      const created = await createRegistration(DEFAULT_EVENT_ID, {
-        eventCategoryId: eventCategoryIdForCourse(courseId),
-        password: (draft.password ?? "").trim(),
-        name: draft.name.trim(),
-        phNum: phoneDigits(draft.phone),
-        birth: draft.birth,
-        gender: genderToApi(gender),
-        address: formatAddressForApi(
-          (draft.zonecode ?? "").trim(),
-          (draft.address ?? "").trim(),
-        ),
-        addressDetail: (draft.addressDetail ?? "").trim(),
-      });
+      const created = await createRegistration(
+        DEFAULT_EVENT_ID,
+        toRegistrationCreateRequest(draft, categories),
+      );
       savePendingPayment({
         registration: created,
         customerName: draft.name.trim(),
@@ -216,6 +251,12 @@ function IndividualFlow({
   }
 
   const course = draft.courseId ? courseById(draft.courseId) : undefined;
+  const selectedCategory = draft.courseId
+    ? categoryForCourse(categories, draft.courseId, draft.birth)
+    : undefined;
+  const souvenir = findSouvenir(selectedCategory, draft.souvenirId);
+  const sizes = souvenirSizes(souvenir);
+  const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
 
   return (
     <div className="flow">
@@ -251,9 +292,17 @@ function IndividualFlow({
               <div>
                 <BirthPick
                   value={draft.birth}
-                  onChange={(birth) =>
-                    patch({ birth, ...applyCourseForBirth(draft.courseId, birth) })
-                  }
+                  onChange={(birth) => {
+                    const next = applyCourseForBirth(draft.courseId, birth);
+                    const keepCourse = next.courseId === draft.courseId;
+                    patch({
+                      birth,
+                      ...next,
+                      ...(keepCourse
+                        ? {}
+                        : { souvenirId: "", selectedSize: "" }),
+                    });
+                  }}
                 />
                 <p className="form-row__hint">
                   {CHILD_AGE_NOTE}
@@ -327,14 +376,64 @@ function IndividualFlow({
               <CoursePick
                 value={draft.courseId}
                 birth={draft.birth}
-                onChange={(courseId, ticket) => patch({ courseId, ticket })}
+                onChange={(courseId, ticket) =>
+                  patch({
+                    courseId,
+                    ticket,
+                    souvenirId: "",
+                    selectedSize: "",
+                  })
+                }
               />
             </FormRow>
+            {optionsError ? (
+              <p className="form__err">{optionsError}</p>
+            ) : null}
             <FormRow label="기념품" required>
-              <ShirtPick
-                value={draft.shirt}
-                onChange={(shirt) => patch({ shirt })}
-              />
+              <select
+                value={draft.souvenirId}
+                onChange={(e) => {
+                  const souvenirId = e.target.value;
+                  const next = findSouvenir(selectedCategory, souvenirId);
+                  const nextSizes = souvenirSizes(next);
+                  patch({
+                    souvenirId,
+                    selectedSize: nextSizes.length === 1 ? nextSizes[0] : "",
+                  });
+                }}
+                disabled={!draft.courseId || !optionsReady}
+                required
+              >
+                <option value="">
+                  {optionsLoading
+                    ? "불러오는 중"
+                    : draft.courseId
+                      ? "기념품"
+                      : "종목을 먼저 선택하세요"}
+                </option>
+                {sortedSouvenirs(selectedCategory).map((item) => (
+                  <option key={item.souvenirId} value={item.souvenirId}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </FormRow>
+            <FormRow label="사이즈" required>
+              <select
+                value={draft.selectedSize}
+                onChange={(e) => patch({ selectedSize: e.target.value })}
+                disabled={!draft.souvenirId}
+                required
+              >
+                <option value="">사이즈</option>
+                {draft.souvenirId
+                  ? sizes.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))
+                  : null}
+              </select>
             </FormRow>
             <FormRow label="신청 비밀번호" required>
               <PasswordField
@@ -421,15 +520,17 @@ function IndividualFlow({
             </div>
             <div>
               <dt>기념품</dt>
-              <dd>티셔츠 ({draft.shirt})</dd>
+              <dd>
+                {souvenir?.name ?? "—"} ({draft.selectedSize || "—"})
+              </dd>
             </div>
           </dl>
-          {error ? (
-            <p ref={errorRef} className="form__err" role="alert">
-              {error}
-            </p>
-          ) : null}
           <div className="flow__nav">
+            {error ? (
+              <p ref={errorRef} className="form__err flow__err" role="alert">
+                {error}
+              </p>
+            ) : null}
             <button
               type="button"
               className="btn btn--ghost"
