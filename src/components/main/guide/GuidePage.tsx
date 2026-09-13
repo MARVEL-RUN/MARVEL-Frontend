@@ -2,6 +2,9 @@ import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import { SideBanner } from "../layout/SideBanner";
+import { CourseMaps } from "./CourseMaps";
+import { KitGallery } from "./KitGallery";
+import { TimeTable } from "../home/TimeTable";
 
 export function GuidePage() {
   return (
@@ -24,35 +27,18 @@ export function GuidePage() {
         </section>
 
         <section className="block">
+          <h2>타임라인</h2>
+          <TimeTable />
+        </section>
+
+        <section className="block">
           <h2>코스</h2>
-          <div className="table">
-            <div className="table__row table__row--head">
-              <span>코스</span>
-              <span>코드</span>
-              <span>스타트</span>
-              <span>제한</span>
-              <span>참가비</span>
-            </div>
-            {EVENT.courses.map((c) => (
-              <div key={c.id} className="table__row">
-                <span>{c.distance}</span>
-                <span>{c.code}</span>
-                <span>{c.start}</span>
-                <span>{c.timeLimit}</span>
-                <span>{c.fee}</span>
-              </div>
-            ))}
-          </div>
-          <div className="media-ph" role="img" aria-label="코스도">
-            코스도
-          </div>
+          <CourseMaps />
         </section>
 
         <section className="block">
           <h2>기념품</h2>
-          <div className="media-ph" role="img" aria-label="기념품">
-            기념품
-          </div>
+          <KitGallery />
           <ul className="chips">
             {EVENT.kit.map((item) => (
               <li key={item}>{item}</li>

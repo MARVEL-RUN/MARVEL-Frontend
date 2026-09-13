@@ -1,20 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useLayoutEffect, useState } from "react";
+import { scrollPageTop } from "@/lib/scroll-page";
 import { EVENT } from "@/lib/event";
 import {
+  CHILD_AGE_NOTE,
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
+  GUARDIAN_AGE_NOTE,
   GENDERS,
   MAX_GROUP_SIZE,
   SHIRT_SIZES,
+  applyCourseForBirth,
+  ageBand,
+  courseAllowsChild,
   courseById,
   formatFee,
   genderLabel,
   groupFee,
+  emailOk,
   requiredConsentsOk,
   submitGroup,
+  ticketFee,
+  ticketLabel,
   type Consents,
   type CourseId,
   type Gender,
@@ -22,13 +31,16 @@ import {
   type GroupRecord,
   type ParticipantDraft,
   type ShirtSize,
+  type TicketKind,
 } from "@/lib/register";
 import {
   ApplyHint,
   ApplyNotice,
   BirthText,
+  EmailField,
   FormRow,
   FormSec,
+  PhoneField,
   birthView,
 } from "./ApplyUi";
 
@@ -88,7 +100,7 @@ export function GroupFlow({
     if (!draft.groupName.trim()) return setError("단체명을 입력하세요.");
     if (!draft.leaderName.trim()) return setError("대표자 성명을 입력하세요.");
     if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!draft.email.trim()) return setError("이메일을 입력하세요.");
+    if (!emailOk(draft.email)) return setError("이메일을 입력하세요.");
     try {
       draft.participants.forEach((p, i) => {
         const n = i + 1;
@@ -107,6 +119,10 @@ export function GroupFlow({
     if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
     setStep(1);
   }
+
+  useLayoutEffect(() => {
+    if (step !== 0) scrollPageTop();
+  }, [step]);
 
   async function onConfirm() {
     setBusy(true);
@@ -166,22 +182,18 @@ export function GroupFlow({
 
           <FormSec title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
             </FormRow>
             <FormRow label="이메일" required>
-              <input
-                type="email"
-                placeholder="이메일을 입력해주세요."
+              <EmailField
                 value={draft.email}
-                onChange={(e) => patch({ email: e.target.value })}
-                autoComplete="email"
+                onChange={(email) => patch({ email })}
                 required
               />
             </FormRow>
@@ -193,6 +205,8 @@ export function GroupFlow({
               <p>
                 {`*(한번에 최대 ${MAX_GROUP_SIZE}명까지만 신청 가능하며, 초과 인원은 별도의 단체로 신청 해주시기 바랍니다.)`}
               </p>
+              <p>{CHILD_AGE_NOTE}</p>
+              <p>{GUARDIAN_AGE_NOTE}</p>
             </ApplyHint>
             <div className="party-bar">
               <p>{draft.participants.length}명 등록</p>
@@ -238,15 +252,19 @@ export function GroupFlow({
                         <td>
                           <BirthText
                             value={p.birth}
-                            onChange={(birth) => patchMember(i, { birth })}
+                            onChange={(birth) =>
+                              patchMember(i, {
+                                birth,
+                                ...applyCourseForBirth(p.courseId, birth),
+                              })
+                            }
                           />
                         </td>
                         <td>
-                          <input
-                            type="tel"
+                          <PhoneField
                             placeholder="연락처"
                             value={p.phone}
-                            onChange={(e) => patchMember(i, { phone: e.target.value })}
+                            onChange={(phone) => patchMember(i, { phone })}
                             required
                           />
                         </td>
@@ -268,20 +286,58 @@ export function GroupFlow({
                         </td>
                         <td>
                           <select
-                            value={p.courseId}
-                            onChange={(e) =>
-                              patchMember(i, {
-                                courseId: e.target.value as CourseId,
-                              })
+                            value={
+                              p.courseId ? `${p.courseId}:${p.ticket}` : ""
                             }
+                            onChange={(e) => {
+                              if (!e.target.value) {
+                                patchMember(i, {
+                                  courseId: "",
+                                  ticket: "adult",
+                                });
+                                return;
+                              }
+                              const [courseId, ticket] = e.target.value.split(
+                                ":",
+                              ) as [CourseId, TicketKind];
+                              patchMember(i, { courseId, ticket });
+                            }}
                             required
                           >
                             <option value="">참가종목</option>
-                            {EVENT.courses.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.distance} {c.code}
-                              </option>
-                            ))}
+                            {EVENT.courses.flatMap((c) => {
+                              const band = ageBand(p.birth);
+                              const adultOff =
+                                band === "tooYoung" || band === "child";
+                              const childOff =
+                                band === "tooYoung" ||
+                                (band !== null && band !== "child");
+                              const adult = (
+                                <option
+                                  key={`${c.id}-adult`}
+                                  value={`${c.id}:adult`}
+                                  disabled={adultOff}
+                                >
+                                  {c.distance} 성인
+                                  {adultOff && band === "child"
+                                    ? " (어린이 참가 불가)"
+                                    : adultOff && band === "tooYoung"
+                                      ? " (만 6세 미만)"
+                                      : ""}
+                                </option>
+                              );
+                              if (!courseAllowsChild(c)) return [adult];
+                              return [
+                                adult,
+                                <option
+                                  key={`${c.id}-child`}
+                                  value={`${c.id}:child`}
+                                  disabled={childOff}
+                                >
+                                  {c.distance} 어린이
+                                </option>,
+                              ];
+                            })}
                           </select>
                         </td>
                         <td>
@@ -301,7 +357,7 @@ export function GroupFlow({
                           </select>
                         </td>
                         <td className="party__fee">
-                          {course ? course.fee : "—"}
+                          {course ? ticketFee(course, p.ticket) : "—"}
                         </td>
                         <td className="party__del">
                           <button
@@ -371,8 +427,10 @@ export function GroupFlow({
                     {String(i + 1).padStart(2, "0")} {p.name}
                   </strong>
                   <span>
-                    {course ? `${course.distance} · ${course.code}` : "—"} ·{" "}
-                    {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
+                    {course
+                      ? `${course.distance} · ${ticketLabel(p.ticket)}`
+                      : "—"}{" "}
+                    · {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
                     티셔츠 ({p.shirt}) · {p.phone}
                   </span>
                 </li>
@@ -398,7 +456,7 @@ export function GroupFlow({
           <p className="sec__body">
             {record.groupName} · {record.participants.length}명 · {formatFee(total)}
           </p>
-          <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
+          <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
           <div className="flow__nav">
             <Link href="/lookup" className="btn btn--ghost">
               신청조회

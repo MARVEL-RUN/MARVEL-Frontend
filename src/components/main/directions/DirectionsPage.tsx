@@ -1,44 +1,54 @@
 import { EVENT } from "@/lib/event";
 import { SideBanner } from "../layout/SideBanner";
+import { KakaoVenueMap } from "./KakaoVenueMap";
 
 export function DirectionsPage() {
   return (
     <main className="page">
       <SideBanner kicker="LOCATION" title="오시는길" en="GET TO THE START LINE" />
       <div className="page__body wrap">
-        <section className="block venue-card">
-          <p className="kicker">VENUE</p>
-          <h2>{EVENT.venue}</h2>
-          <p>{EVENT.venueAddress}</p>
-          <a
-            className="btn btn--red"
-            href={EVENT.mapUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            지도에서 보기
-          </a>
-        </section>
-
-        <div className="media-ph" role="img" aria-label="오시는길">
-          오시는길
+        <div className="directions">
+          <header className="venue-head">
+            <p className="kicker">VENUE</p>
+            <h2 className="sec__title">
+              {EVENT.venue}
+              <br />
+              <em>{EVENT.venueEn}</em>
+            </h2>
+            <p className="sec__body">
+              {EVENT.venueAddress.replace(` ${EVENT.venue}`, "")}
+            </p>
+          </header>
+          <div className="directions__row">
+            <KakaoVenueMap />
+            <section className="venue-copy">
+              {EVENT.venueAccess.map((group) => (
+                <div key={group.title}>
+                  <h3 className="venue-copy__group">
+                    {group.title}
+                    {"note" in group ? ` · ${group.note}` : ""}
+                  </h3>
+                  <ol className="timeline">
+                    {group.items.map((item) => (
+                      <li key={item.text}>
+                        <time>{item.badge}</time>
+                        <span>{item.text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
+              <a
+                className="btn btn--ghost"
+                href={EVENT.mapUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                카카오맵에서 보기
+              </a>
+            </section>
+          </div>
         </div>
-
-        <section className="block">
-          <h2>자가용</h2>
-          <p className="sec__body">
-            서울춘천고속도로 · 서울양양고속도로를 이용해 인제스피디움으로
-            진입합니다. 대회 당일 지정 주차장만 운영합니다.
-          </p>
-        </section>
-
-        <section className="block">
-          <h2>버스 · 셔틀</h2>
-          <p className="sec__body">
-            접수 오픈 이후 수도권 셔틀 노선이 공지됩니다. 현장 주정차는 통제될
-            수 있습니다.
-          </p>
-        </section>
       </div>
     </main>
   );

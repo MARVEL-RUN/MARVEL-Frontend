@@ -1,5 +1,6 @@
 "use client";
 
+import { adminToast } from "@/components/admin/Toast";
 import { createFaq, getFaq, updateFaq } from "@/services/admin/faqs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -31,7 +32,11 @@ export function FaqWritePage({ mode }: { mode: "write" | "edit" }) {
       editing ? updateFaq(id, { question, answer }) : createFaq({ question, answer }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "faqs"] });
+      adminToast.success(editing ? "FAQ가 수정되었습니다." : "FAQ가 등록되었습니다.");
       router.replace("/admin/boards/faq");
+    },
+    onError: () => {
+      adminToast.error(editing ? "FAQ 수정에 실패했습니다." : "FAQ 등록에 실패했습니다.");
     },
   });
 

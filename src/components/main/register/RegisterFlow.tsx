@@ -1,38 +1,63 @@
 "use client";
 
-import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import {
+  CHILD_AGE_NOTE,
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
+  GUARDIAN_AGE_NOTE,
+  applyCourseForBirth,
+  ageBand,
   courseById,
+  emailOk,
   genderLabel,
+  needsGuardian,
   requiredConsentsOk,
-  submitEntry,
+  ticketFee,
+  ticketLabel,
   type ApplyKind,
   type Consents,
   type EntryDraft,
-  type EntryRecord,
 } from "@/lib/register";
+import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
+import { MainHttpError } from "@/lib/main/fetch";
+import {
+  eventCategoryIdForCourse,
+  genderToApi,
+  phoneDigits,
+} from "@/lib/payment/map";
+import { formatAddressForApi } from "@/lib/daumPostcode";
+import { savePendingPayment } from "@/lib/payment/session";
+import { scrollPageTop } from "@/lib/scroll-page";
+import { isMobileView } from "@/lib/viewport";
+import { createRegistration } from "@/services/main/registrations";
+import type { RegistrationCreateResponse } from "@/services/main/types";
+import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
+import { SheetModal } from "@/components/main/SheetModal";
 import { ApplyTerms } from "./ApplyTerms";
 import {
+  AddressField,
   ApplyNotice,
   BirthPick,
   CoursePick,
+  EmailField,
   FeeText,
   FormRow,
   FormSec,
   GenderPick,
+  PasswordField,
+  PhoneField,
   ShirtPick,
   birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
 
-const STEPS = ["정보", "확인", "완료"] as const;
-type Step = 0 | 1 | 2;
+const STEPS = ["정보", "확인"] as const;
+type Step = 0 | 1;
 
 const NOTICE = [
-  "주문번호로 신청조회에서 접수 내역을 확인할 수 있습니다.",
+  "신청조회에 필요하니 주문번호를 저장해 두세요.",
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
 
@@ -40,12 +65,17 @@ export function RegisterFlow() {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
 
+  function pickKind(next: ApplyKind) {
+    setKind(next);
+    requestAnimationFrame(scrollPageTop);
+  }
+
   if (!kind) {
     return (
       <ApplyTerms
         values={consents}
         onChange={setConsents}
-        onPick={setKind}
+        onPick={pickKind}
       />
     );
   }
@@ -63,38 +93,123 @@ function IndividualFlow({
   consents: Consents;
 }) {
   const [step, setStep] = useState<Step>(0);
-  const [draft, setDraft] = useState<EntryDraft>({ ...EMPTY_DRAFT, ...consents });
-  const [record, setRecord] = useState<EntryRecord | null>(null);
+  const [draft, setDraft] = useState<EntryDraft>(() => ({
+    ...EMPTY_DRAFT,
+    ...consents,
+  }));
+  const [registration, setRegistration] =
+    useState<RegistrationCreateResponse | null>(null);
+  const router = useRouter();
+  const [payOpen, setPayOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  function openPay() {
+    if (isMobileView()) {
+      router.push("/payment");
+      return;
+    }
+    setPayOpen(true);
+  }
+
+  useLayoutEffect(() => {
+    if (step === 1) scrollPageTop();
+  }, [step]);
 
   function patch(next: Partial<EntryDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
     setError("");
   }
 
-  function onForm(e: FormEvent<HTMLFormElement>) {
+  function fail(message: string) {
+    setError(message);
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  function onReview(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!draft.name.trim()) return setError("이름을 입력하세요.");
-    if (!/^\d{8}$/.test(draft.birth)) return setError("생년월일을 선택하세요.");
-    if (!draft.gender) return setError("성별을 선택하세요.");
-    if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!draft.email.trim()) return setError("이메일을 입력하세요.");
-    if (!draft.courseId) return setError("참가종목을 선택하세요.");
-    if (!draft.shirt) return setError("기념품을 선택하세요.");
-    if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
+    if (!draft.name.trim()) return fail("이름을 입력하세요.");
+    if (!/^\d{8}$/.test(draft.birth)) return fail("생년월일을 선택하세요.");
+    if (ageBand(draft.birth) === "tooYoung") {
+      return fail("만 6세 미만은 참가할 수 없습니다.");
+    }
+    if (draft.gender !== "male" && draft.gender !== "female") {
+      return fail("성별을 선택하세요.");
+    }
+    if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
+    if (!emailOk(draft.email)) return fail("이메일을 입력하세요.");
+    if (!draft.courseId) return fail("참가종목을 선택하세요.");
+    if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
+      return fail("만 14세 미만은 보호자 연락처를 입력하세요.");
+    }
+    if (!draft.shirt) return fail("기념품을 선택하세요.");
+    if ((draft.password ?? "").trim().length < 4) {
+      return fail("신청 비밀번호를 4자 이상 입력하세요.");
+    }
+    if ((draft.password ?? "") !== (draft.passwordConfirm ?? "")) {
+      return fail("신청 비밀번호가 일치하지 않습니다.");
+    }
+    if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
+      return fail("우편번호 찾기로 주소를 선택하세요.");
+    }
+    if (!(draft.addressDetail ?? "").trim()) return fail("상세주소를 입력하세요.");
+    if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
+    setError("");
     setStep(1);
   }
 
-  async function onConfirm() {
+  async function onPay() {
+    if (registration) {
+      openPay();
+      return;
+    }
+    if (!hasMainApi || !hasTossClientKey) {
+      return fail(
+        "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
+      );
+    }
+
+    const courseId = draft.courseId;
+    const gender = draft.gender;
+    if (!courseId) return fail("참가종목을 선택하세요.");
+    if (gender !== "male" && gender !== "female") {
+      return fail("성별을 선택하세요.");
+    }
+
     setBusy(true);
     setError("");
     try {
-      const saved = await submitEntry(draft);
-      setRecord(saved);
-      setStep(2);
+      const created = await createRegistration(DEFAULT_EVENT_ID, {
+        eventCategoryId: eventCategoryIdForCourse(courseId),
+        password: (draft.password ?? "").trim(),
+        name: draft.name.trim(),
+        phNum: phoneDigits(draft.phone),
+        birth: draft.birth,
+        gender: genderToApi(gender),
+        address: formatAddressForApi(
+          (draft.zonecode ?? "").trim(),
+          (draft.address ?? "").trim(),
+        ),
+        addressDetail: (draft.addressDetail ?? "").trim(),
+      });
+      savePendingPayment({
+        registration: created,
+        customerName: draft.name.trim(),
+        savedAt: Date.now(),
+      });
+      setRegistration(created);
+      openPay();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "접수를 완료하지 못했습니다.");
+      const message =
+        err instanceof MainHttpError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "결제를 시작하지 못했습니다.";
+      fail(message);
     } finally {
       setBusy(false);
     }
@@ -116,10 +231,8 @@ function IndividualFlow({
         ))}
       </ol>
 
-      {error ? <p className="form__err">{error}</p> : null}
-
       {step === 0 ? (
-        <form className="form" onSubmit={onForm}>
+        <form className="form" onSubmit={onReview} noValidate>
           <ApplyNotice lines={NOTICE} />
 
           <FormSec title="개인정보">
@@ -135,7 +248,19 @@ function IndividualFlow({
               />
             </FormRow>
             <FormRow label="생년월일" required>
-              <BirthPick value={draft.birth} onChange={(birth) => patch({ birth })} />
+              <div>
+                <BirthPick
+                  value={draft.birth}
+                  onChange={(birth) =>
+                    patch({ birth, ...applyCourseForBirth(draft.courseId, birth) })
+                  }
+                />
+                <p className="form-row__hint">
+                  {CHILD_AGE_NOTE}
+                  <br />
+                  {GUARDIAN_AGE_NOTE}
+                </p>
+              </div>
             </FormRow>
             <FormRow label="성별" required>
               <GenderPick
@@ -148,40 +273,51 @@ function IndividualFlow({
 
           <FormSec title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 name="phone"
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
             </FormRow>
             <FormRow label="이메일" required>
-              <input
-                type="email"
-                name="email"
-                placeholder="이메일을 입력해주세요."
+              <EmailField
                 value={draft.email}
-                onChange={(e) => patch({ email: e.target.value })}
-                autoComplete="email"
+                onChange={(email) => patch({ email })}
+                required
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+            <FormRow label="주소" required>
+              <AddressField
+                zonecode={draft.zonecode ?? ""}
+                address={draft.address ?? ""}
+                addressDetail={draft.addressDetail ?? ""}
+                onChange={patch}
                 required
               />
             </FormRow>
           </FormSec>
 
           <FormSec
-            title="보호자 정보 (선택)"
-            note="선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+            title={needsGuardian(draft.birth) ? "보호자 정보" : "보호자 정보 (선택)"}
+            note={
+              needsGuardian(draft.birth)
+                ? `${GUARDIAN_AGE_NOTE}. 보호자 연락처를 입력해 주세요.`
+                : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+            }
           >
-            <FormRow label="보호자 연락처">
-              <input
-                type="tel"
+            <FormRow label="보호자 연락처" required={needsGuardian(draft.birth)}>
+              <PhoneField
                 name="emergency"
                 placeholder="보호자 연락처를 입력해주세요."
                 value={draft.emergency}
-                onChange={(e) => patch({ emergency: e.target.value })}
+                onChange={(emergency) => patch({ emergency })}
+                required={needsGuardian(draft.birth)}
               />
             </FormRow>
           </FormSec>
@@ -190,7 +326,8 @@ function IndividualFlow({
             <FormRow label="참가종목" required>
               <CoursePick
                 value={draft.courseId}
-                onChange={(courseId) => patch({ courseId })}
+                birth={draft.birth}
+                onChange={(courseId, ticket) => patch({ courseId, ticket })}
               />
             </FormRow>
             <FormRow label="기념품" required>
@@ -199,14 +336,38 @@ function IndividualFlow({
                 onChange={(shirt) => patch({ shirt })}
               />
             </FormRow>
-            {draft.courseId ? (
-              <FormRow label="참가비">
-                <FeeText courseId={draft.courseId} />
-              </FormRow>
-            ) : null}
+            <FormRow label="신청 비밀번호" required>
+              <PasswordField
+                value={draft.password ?? ""}
+                onChange={(password) => patch({ password })}
+                required
+              />
+            </FormRow>
+            <FormRow label="신청 비밀번호 확인" required>
+              <PasswordField
+                name="passwordConfirm"
+                label="신청 비밀번호 확인"
+                placeholder="신청 비밀번호를 다시 입력하세요."
+                value={draft.passwordConfirm ?? ""}
+                onChange={(passwordConfirm) => patch({ passwordConfirm })}
+                required
+              />
+            </FormRow>
+            <FormRow label="참가비">
+              {draft.courseId ? (
+                <FeeText courseId={draft.courseId} ticket={draft.ticket} />
+              ) : (
+                <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
+              )}
+            </FormRow>
           </FormSec>
 
           <div className="flow__nav">
+            {error ? (
+              <p ref={errorRef} className="form__err flow__err" role="alert">
+                {error}
+              </p>
+            ) : null}
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
@@ -224,8 +385,8 @@ function IndividualFlow({
             <div>
               <dt>참가종목</dt>
               <dd>
-                {course.distance} · {course.code}
-                <small>{course.fee}</small>
+                {course.distance} · {ticketLabel(draft.ticket)}
+                <small>{ticketFee(course, draft.ticket)}</small>
               </dd>
             </div>
             <div>
@@ -249,6 +410,12 @@ function IndividualFlow({
               <dd>{draft.email}</dd>
             </div>
             <div>
+              <dt>주소</dt>
+              <dd>
+                ({draft.zonecode}) {draft.address} {draft.addressDetail}
+              </dd>
+            </div>
+            <div>
               <dt>보호자 연락처</dt>
               <dd>{draft.emergency.trim() || "—"}</dd>
             </div>
@@ -257,35 +424,47 @@ function IndividualFlow({
               <dd>티셔츠 ({draft.shirt})</dd>
             </div>
           </dl>
+          {error ? (
+            <p ref={errorRef} className="form__err" role="alert">
+              {error}
+            </p>
+          ) : null}
           <div className="flow__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => {
+                setPayOpen(false);
+                setStep(0);
+                requestAnimationFrame(scrollPageTop);
+              }}
+            >
               수정
             </button>
-            <button type="button" className="btn btn--red" onClick={onConfirm} disabled={busy}>
-              {busy ? "접수 중..." : "접수하기"}
+            <button
+              type="button"
+              className="btn btn--red"
+              onClick={onPay}
+              disabled={busy}
+            >
+              {busy ? "결제 준비 중..." : "결제하기"}
             </button>
           </div>
         </section>
       ) : null}
 
-      {step === 2 && record && course ? (
-        <section className="ticket">
-          <p className="kicker">ENTRY CONFIRMED</p>
-          <h2>접수가 완료되었습니다</h2>
-          <p className="ticket__no">{record.orderNo}</p>
-          <p className="sec__body">
-            {record.name} · {course.distance} {course.code}
-          </p>
-          <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
-          <div className="flow__nav">
-            <Link href="/lookup" className="btn btn--ghost">
-              신청조회
-            </Link>
-            <Link href="/" className="btn btn--red">
-              홈으로
-            </Link>
-          </div>
-        </section>
+      {payOpen && registration ? (
+        <SheetModal
+          kicker="PAY"
+          title="결제하기"
+          onClose={() => setPayOpen(false)}
+        >
+          <PaymentWidget
+            registration={registration}
+            customerName={draft.name.trim()}
+            onError={setError}
+          />
+        </SheetModal>
       ) : null}
     </div>
   );
