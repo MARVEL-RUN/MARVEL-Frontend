@@ -512,6 +512,16 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes ken-m {
+  from {
+    transform: scale(1.05) translate(0, 0);
+  }
+
+  to {
+    transform: scale(1.18) translate(-1.8%, -1.2%);
+  }
+}
+
 @keyframes sweep {
   0% {
     transform: translateX(-60%) skewX(-18deg);

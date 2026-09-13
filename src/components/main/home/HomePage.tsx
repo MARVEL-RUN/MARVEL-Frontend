@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { EVENT } from "@/lib/event";
-import { COMING_SOON_ASSETS } from "@/lib/assets";
+import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
@@ -106,7 +106,7 @@ export function HomePage() {
       <section className="hero" id="hero" ref={heroRef}>
         <div className="hero__art" aria-hidden>
           <Image
-            src={COMING_SOON_ASSETS.hero}
+            src={MAIN_ASSETS.hero}
             alt=""
             fill
             priority
