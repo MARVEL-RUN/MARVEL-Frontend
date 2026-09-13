@@ -1,9 +1,17 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useLayoutEffect, useState } from "react";
-import { DEFAULT_EVENT_ID, hasMainApi } from "@/lib/main/config";
+import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { MainHttpError } from "@/lib/main/fetch";
+import {
+  organizationPaymentOrder,
+  toOrganizationRegistrationRequest,
+} from "@/lib/payment/organization";
+import {
+  savePendingPayment,
+  type PaymentOrder,
+} from "@/lib/payment/session";
 import {
   categoryLabel,
   findCategory,
@@ -13,6 +21,7 @@ import {
   sortedSouvenirs,
 } from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
+import { isMobileView } from "@/lib/viewport";
 import {
   CHILD_AGE_NOTE,
   EMPTY_GROUP,
@@ -26,15 +35,16 @@ import {
   groupFee,
   emailOk,
   requiredConsentsOk,
-  submitGroup,
   type Consents,
   type Gender,
   type GroupDraft,
-  type GroupRecord,
   type ParticipantDraft,
 } from "@/lib/register";
+import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
+import { createOrganizationRegistration } from "@/services/main/registrations";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
+import { SheetModal } from "../SheetModal";
 import {
   AddressField,
   ApplyHint,
@@ -49,8 +59,8 @@ import {
   birthView,
 } from "./ApplyUi";
 
-const STEPS = ["정보", "확인", "완료"] as const;
-type Step = 0 | 1 | 2;
+const STEPS = ["정보", "확인"] as const;
+type Step = 0 | 1;
 
 const NOTICE = [
   `한 번에 최대 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다. 초과 인원은 별도 단체로 신청하세요.`,
@@ -66,12 +76,22 @@ export function GroupFlow({
 }) {
   const [step, setStep] = useState<Step>(0);
   const [draft, setDraft] = useState<GroupDraft>({ ...EMPTY_GROUP, ...consents });
-  const [record, setRecord] = useState<GroupRecord | null>(null);
+  const [payment, setPayment] = useState<PaymentOrder | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [optionsError, setOptionsError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
+
+  function openPay() {
+    if (isMobileView()) {
+      router.push("/payment");
+      return;
+    }
+    setPayOpen(true);
+  }
 
   useEffect(() => {
     if (!hasMainApi) {
@@ -194,20 +214,46 @@ export function GroupFlow({
     if (step !== 0) scrollPageTop();
   }, [step]);
 
-  async function onConfirm() {
+  async function onPay() {
+    if (payment) {
+      openPay();
+      return;
+    }
+    if (!hasMainApi || !hasTossClientKey) {
+      return setError(
+        "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
+      );
+    }
+
     setBusy(true);
     setError("");
     try {
-      setRecord(await submitGroup(draft));
-      setStep(2);
+      const created = await createOrganizationRegistration(
+        DEFAULT_EVENT_ID,
+        toOrganizationRegistrationRequest(draft),
+      );
+      const order = organizationPaymentOrder(created);
+      savePendingPayment({
+        registration: order,
+        customerName: draft.leaderName.trim(),
+        savedAt: Date.now(),
+      });
+      setPayment(order);
+      openPay();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "접수를 완료하지 못했습니다.");
+      setError(
+        err instanceof MainHttpError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "결제를 시작하지 못했습니다.",
+      );
     } finally {
       setBusy(false);
     }
   }
 
-  const total = groupFee(draft, categories);
+  const total = payment?.paymentAmount ?? groupFee(draft, categories);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
 
   return (
@@ -578,34 +624,41 @@ export function GroupFlow({
             })}
           </ul>
           <div className="flow__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => {
+                setPayOpen(false);
+                setStep(0);
+                requestAnimationFrame(scrollPageTop);
+              }}
+            >
               수정
             </button>
-            <button type="button" className="btn btn--red" onClick={onConfirm} disabled={busy}>
-              {busy ? "접수 중..." : "접수하기"}
+            <button
+              type="button"
+              className="btn btn--red"
+              onClick={onPay}
+              disabled={busy}
+            >
+              {busy ? "결제 준비 중..." : "결제하기"}
             </button>
           </div>
         </section>
       ) : null}
 
-      {step === 2 && record ? (
-        <section className="ticket">
-          <p className="kicker">SQUAD CONFIRMED</p>
-          <h2>단체 접수가 완료되었습니다</h2>
-          <p className="ticket__no">{record.orderNo}</p>
-          <p className="sec__body">
-            {record.groupName} · {record.participants.length}명 · {formatFee(total)}
-          </p>
-          <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
-          <div className="flow__nav">
-            <Link href="/lookup" className="btn btn--ghost">
-              신청조회
-            </Link>
-            <Link href="/" className="btn btn--red">
-              홈으로
-            </Link>
-          </div>
-        </section>
+      {payOpen && payment ? (
+        <SheetModal
+          kicker="PAY"
+          title="결제하기"
+          onClose={() => setPayOpen(false)}
+        >
+          <PaymentWidget
+            registration={payment}
+            customerName={draft.leaderName.trim()}
+            onError={setError}
+          />
+        </SheetModal>
       ) : null}
     </div>
   );
