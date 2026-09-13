@@ -1,7 +1,15 @@
 import { formatAddressForApi } from "@/lib/daumPostcode";
+import {
+  categoryLabel,
+  findCategory,
+  findSouvenir,
+} from "@/lib/registration-options";
 import { formatPhone, type GroupDraft } from "@/lib/register";
-import type { OrganizationRegistrationRequest } from "@/services/main/types";
-import type { PaymentOrder } from "./session";
+import type {
+  OrganizationRegistrationRequest,
+  RegistrationCategory,
+} from "@/services/main/types";
+import type { PaymentOrder, PaymentReceipt } from "./session";
 import { genderToApi, phoneDigits } from "./map";
 
 export function birthToIso(ymd: string) {
@@ -67,5 +75,32 @@ export function organizationPaymentOrder(data: PaymentLike): PaymentOrder {
     orderId,
     orderName,
     paymentAmount: Number(paymentAmount),
+  };
+}
+
+export function toGroupPaymentReceipt(
+  draft: GroupDraft,
+  categories: RegistrationCategory[],
+): PaymentReceipt {
+  return {
+    kind: "group",
+    title: draft.groupName.trim(),
+    subtitle: `${draft.leaderName.trim()} · ${draft.participants.length}명`,
+    items: draft.participants.map((p) => {
+      const category = findCategory(categories, p.categoryId);
+      const souvenir = findSouvenir(category, p.souvenirId);
+      const detail = [
+        category ? categoryLabel(category) : "",
+        souvenir?.name,
+        p.selectedSize ? `(${p.selectedSize})` : "",
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      return {
+        name: p.name.trim(),
+        detail,
+        amount: category?.amount ?? 0,
+      };
+    }),
   };
 }

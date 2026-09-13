@@ -4169,6 +4169,58 @@ button.course {
   min-height: 0;
 }
 
+.sheet-modal__receipt-body {
+  flex: 0 0 auto;
+  padding: 1rem 1.1rem 1.15rem;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.sheet-modal__receipt-body h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.sheet-modal__receipt-body p {
+  margin: 0 0 0.75rem;
+  color: #666;
+  font-size: 0.82rem;
+}
+
+.sheet-modal__receipt-body ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sheet-modal__receipt-body li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ececec;
+  font-size: 0.84rem;
+}
+
+.sheet-modal__receipt-body li span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.sheet-modal__receipt-body li em {
+  font-style: normal;
+  color: #666;
+  font-size: 0.76rem;
+}
+
+.sheet-modal__receipt-body li.is-sum {
+  border-bottom: 0;
+  font-weight: 800;
+}
+
 .sheet-modal__hint {
   flex: 0 0 auto;
   margin: 0;

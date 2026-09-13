@@ -6,6 +6,7 @@ import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/confi
 import { MainHttpError } from "@/lib/main/fetch";
 import {
   organizationPaymentOrder,
+  toGroupPaymentReceipt,
   toOrganizationRegistrationRequest,
 } from "@/lib/payment/organization";
 import {
@@ -13,7 +14,9 @@ import {
   type PaymentOrder,
 } from "@/lib/payment/session";
 import {
+  categoryClosedReason,
   categoryLabel,
+  categoryOpenForBirth,
   findCategory,
   findSouvenir,
   souvenirSizes,
@@ -197,6 +200,11 @@ export function GroupFlow({
         if (category.isActive === false) {
           throw new Error(`참가자 ${n}: 마감된 종목입니다.`);
         }
+        if (!categoryOpenForBirth(category, p.birth)) {
+          throw new Error(
+            `참가자 ${n}: ${categoryClosedReason(category, p.birth) || "이 종목은 참가할 수 없습니다."}`,
+          );
+        }
         const souvenir = findSouvenir(category, p.souvenirId);
         if (!souvenir) throw new Error(`참가자 ${n}: 기념품을 선택하세요.`);
         if (!souvenirSizes(souvenir).includes(p.selectedSize)) {
@@ -236,6 +244,7 @@ export function GroupFlow({
       savePendingPayment({
         registration: order,
         customerName: draft.leaderName.trim(),
+        receipt: toGroupPaymentReceipt(draft, categories),
         savedAt: Date.now(),
       });
       setPayment(order);
@@ -426,7 +435,22 @@ export function GroupFlow({
                         <td>
                           <BirthText
                             value={p.birth}
-                            onChange={(birth) => patchMember(i, { birth })}
+                            onChange={(birth) => {
+                              const current = findCategory(categories, p.categoryId);
+                              const keep =
+                                current && categoryOpenForBirth(current, birth);
+                              patchMember(
+                                i,
+                                keep
+                                  ? { birth }
+                                  : {
+                                      birth,
+                                      categoryId: "",
+                                      souvenirId: "",
+                                      selectedSize: "",
+                                    },
+                              );
+                            }}
                           />
                         </td>
                         <td>
@@ -469,16 +493,25 @@ export function GroupFlow({
                             <option value="">
                               {optionsLoading ? "불러오는 중" : "참가종목"}
                             </option>
-                            {categories.map((item) => (
-                              <option
-                                key={item.categoryId}
-                                value={item.categoryId}
-                                disabled={item.isActive === false}
-                              >
-                                {categoryLabel(item)}
-                                {item.isActive === false ? " (마감)" : ""}
-                              </option>
-                            ))}
+                            {categories.map((item) => {
+                              const ageOff = !categoryOpenForBirth(item, p.birth);
+                              const closed = item.isActive === false;
+                              const reason = closed
+                                ? "마감"
+                                : ageOff
+                                  ? categoryClosedReason(item, p.birth)
+                                  : "";
+                              return (
+                                <option
+                                  key={item.categoryId}
+                                  value={item.categoryId}
+                                  disabled={closed || ageOff}
+                                >
+                                  {categoryLabel(item)}
+                                  {reason ? ` (${reason})` : ""}
+                                </option>
+                              );
+                            })}
                           </select>
                         </td>
                         <td>

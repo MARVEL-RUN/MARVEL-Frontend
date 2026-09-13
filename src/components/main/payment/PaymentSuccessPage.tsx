@@ -7,11 +7,30 @@ import { Check, Copy } from "lucide-react";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { formatFee } from "@/lib/register";
-import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
+import {
+  clearPendingPayment,
+  readPendingPayment,
+  type PaymentReceipt,
+} from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
+
+function pickReceiptUrl(data: PaymentConfirmResponse | null) {
+  if (!data) return "";
+  if (typeof data.receiptUrl === "string") return data.receiptUrl;
+  const receipt = data.receipt;
+  if (
+    receipt &&
+    typeof receipt === "object" &&
+    "url" in receipt &&
+    typeof receipt.url === "string"
+  ) {
+    return receipt.url;
+  }
+  return "";
+}
 
 type Phase = "loading" | "done" | "error";
 
@@ -21,6 +40,7 @@ export function PaymentSuccessPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<PaymentConfirmResponse | null>(null);
   const [orderName, setOrderName] = useState("");
+  const [receipt, setReceipt] = useState<PaymentReceipt | null>(null);
   const [copied, setCopied] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
 
@@ -40,6 +60,7 @@ export function PaymentSuccessPage() {
     if (pending?.registration.orderName) {
       setOrderName(pending.registration.orderName);
     }
+    if (pending?.receipt) setReceipt(pending.receipt);
 
     let cancelled = false;
 
@@ -72,11 +93,14 @@ export function PaymentSuccessPage() {
     (typeof result?.orderId === "string" && result.orderId) ||
     params.get("orderId") ||
     "";
-  const receiptUrl =
-    typeof result?.receiptUrl === "string" ? result.receiptUrl : "";
+  const receiptUrl = pickReceiptUrl(result);
+  const hasReceipt = Boolean(receipt || receiptUrl);
   const title =
+    receipt?.title ||
     orderName ||
     (typeof result?.orderName === "string" ? result.orderName : "");
+  const receiptTotal =
+    receipt?.items.reduce((sum, item) => sum + item.amount, 0) ?? 0;
 
   async function copyOrderId() {
     if (!orderId) return;
@@ -143,12 +167,12 @@ export function PaymentSuccessPage() {
               </p>
             ) : null}
             <div className="flow__nav">
-              {receiptUrl ? (
+              {hasReceipt ? (
                 <button
                   type="button"
                   className="btn btn--ghost"
                   onClick={() => {
-                    if (isMobileView()) {
+                    if (isMobileView() && receiptUrl && !receipt) {
                       window.location.assign(receiptUrl);
                       return;
                     }
@@ -168,7 +192,7 @@ export function PaymentSuccessPage() {
           </section>
         ) : null}
 
-        {receiptOpen && receiptUrl ? (
+        {receiptOpen && hasReceipt ? (
           <SheetModal
             kicker="RECEIPT"
             title="영수증"
@@ -177,14 +201,39 @@ export function PaymentSuccessPage() {
             onClose={() => setReceiptOpen(false)}
           >
             <div className="sheet-modal__receipt">
-              <p className="sheet-modal__hint">
-                전표 위 인쇄 아이콘을 누른 뒤 PDF로 저장할 수 있습니다.
-              </p>
-              <iframe
-                className="sheet-modal__frame"
-                src={receiptUrl}
-                title="결제 영수증"
-              />
+              {receiptUrl ? (
+                <p className="sheet-modal__hint">
+                  전표 위 인쇄 아이콘을 누른 뒤 PDF로 저장할 수 있습니다.
+                </p>
+              ) : null}
+              {receipt ? (
+                <div className="sheet-modal__receipt-body">
+                  <h3>{receipt.title}</h3>
+                  {receipt.subtitle ? <p>{receipt.subtitle}</p> : null}
+                  <ul>
+                    {receipt.items.map((item, i) => (
+                      <li key={`${item.name}-${i}`}>
+                        <span>
+                          <strong>{item.name}</strong>
+                          {item.detail ? <em>{item.detail}</em> : null}
+                        </span>
+                        <b>{formatFee(item.amount)}</b>
+                      </li>
+                    ))}
+                    <li className="is-sum">
+                      <span>합계</span>
+                      <b>{formatFee(receiptTotal || paid)}</b>
+                    </li>
+                  </ul>
+                </div>
+              ) : null}
+              {receiptUrl ? (
+                <iframe
+                  className="sheet-modal__frame"
+                  src={receiptUrl}
+                  title="결제 영수증"
+                />
+              ) : null}
             </div>
           </SheetModal>
         ) : null}

@@ -6,9 +6,23 @@ export type PaymentOrder = {
   paymentAmount: number;
 };
 
+export type PaymentReceiptItem = {
+  name: string;
+  detail: string;
+  amount: number;
+};
+
+export type PaymentReceipt = {
+  kind: "group" | "individual";
+  title: string;
+  subtitle?: string;
+  items: PaymentReceiptItem[];
+};
+
 export type PendingPayment = {
   registration: PaymentOrder;
   customerName: string;
+  receipt?: PaymentReceipt;
   savedAt: number;
 };
 
