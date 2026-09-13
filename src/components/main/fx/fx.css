@@ -394,6 +394,13 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes panelsPull-m {
+  to {
+    transform: scale(1.18);
+    opacity: 0.12;
+  }
+}
+
 @keyframes flash {
   0% {
     opacity: 0;
@@ -427,6 +434,18 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes logoSlam-m {
+  from {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes runIn {
   from {
     opacity: 0;
@@ -438,6 +457,18 @@ html.is-intro .fx-letterbox span {
     opacity: 1;
     transform: none;
     filter: none;
+  }
+}
+
+@keyframes runIn-m {
+  from {
+    opacity: 0;
+    transform: translateX(-6%) scale(1.08);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -621,16 +652,22 @@ html.is-intro .fx-letterbox span {
   }
 
   .intro--overlap .intro__assemble {
-    width: min(155vw, 140vh);
+    width: min(108vw, 164vh);
     padding: 0;
   }
 
   .intro__box {
     width: min(36vw, 9.2rem);
+    animation-name: logoSlam-m;
   }
 
   .intro__run {
     width: min(78vw, 16.5rem);
+    animation-name: runIn-m;
+  }
+
+  .intro__panels {
+    animation-name: panelsPull-m;
   }
 
   .intro__sub {
