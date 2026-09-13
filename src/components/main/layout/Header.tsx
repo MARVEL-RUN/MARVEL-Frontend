@@ -128,18 +128,30 @@ export function Header() {
         className={open ? "site-header__drawer is-open" : "site-header__drawer"}
         hidden={!open}
       >
-        {NAV_ITEMS.map((item) => (
-          <Link key={item.href} href={item.href} className="site-header__drawer-link">
-            {item.label}
+        <nav className="site-header__drawer-nav" aria-label="모바일 메뉴">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={
+                pathname.startsWith(item.href)
+                  ? "site-header__drawer-link is-active"
+                  : "site-header__drawer-link"
+              }
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="site-header__drawer-actions">
+          <Link href={REGISTER_HREF} className="btn btn--red">
+            {cta}
           </Link>
-        ))}
-        <Link href={REGISTER_HREF} className="btn btn--red">
-          {cta}
-        </Link>
-        <Link href={LOOKUP_HREF} className="btn btn--ghost">
-          신청조회
-        </Link>
-        <SponsorInquiry className="site-header__spon" />
+          <Link href={LOOKUP_HREF} className="btn btn--ghost">
+            신청조회
+          </Link>
+          <SponsorInquiry className="site-header__spon" />
+        </div>
       </div>
     </header>
   );

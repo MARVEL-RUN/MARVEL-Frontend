@@ -604,6 +604,11 @@ html.is-intro .fx-letterbox span {
 }
 
 @media (max-width: 720px) {
+  .fx-letterbox span,
+  html.is-intro .fx-letterbox span {
+    height: 0;
+  }
+
   .intro__assemble {
     gap: 0.4rem;
     padding: 0 0.6rem;
