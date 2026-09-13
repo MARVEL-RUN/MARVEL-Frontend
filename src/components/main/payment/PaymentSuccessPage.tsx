@@ -17,17 +17,38 @@ import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
 
-function pickReceiptUrl(data: PaymentConfirmResponse | null) {
-  if (!data) return "";
-  if (typeof data.receiptUrl === "string") return data.receiptUrl;
-  const receipt = data.receipt;
-  if (
-    receipt &&
-    typeof receipt === "object" &&
-    "url" in receipt &&
-    typeof receipt.url === "string"
-  ) {
-    return receipt.url;
+function isHttpUrl(value: unknown): value is string {
+  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+}
+
+/* confirm 응답이 receiptUrl을 data/payment/receipt 안에 두기도 함 */
+function pickReceiptUrl(data: unknown) {
+  const queue: unknown[] = [data];
+  const seen = new Set<unknown>();
+
+  while (queue.length) {
+    const node = queue.shift();
+    if (!node || typeof node !== "object" || seen.has(node)) continue;
+    seen.add(node);
+
+    if (Array.isArray(node)) {
+      queue.push(...node);
+      continue;
+    }
+
+    const rec = node as Record<string, unknown>;
+    for (const key of ["receiptUrl", "receiptURL", "receipt_url"]) {
+      if (isHttpUrl(rec[key])) return rec[key].trim();
+    }
+    if (isHttpUrl(rec.receipt)) return rec.receipt.trim();
+    const nested = rec.receipt;
+    if (nested && typeof nested === "object" && "url" in nested) {
+      const url = (nested as { url: unknown }).url;
+      if (isHttpUrl(url)) return url.trim();
+    }
+    for (const key of ["data", "payment", "toss", "result"]) {
+      if (key in rec) queue.push(rec[key]);
+    }
   }
   return "";
 }
@@ -88,15 +109,16 @@ export function PaymentSuccessPage() {
   const paid =
     typeof result?.paidAmount === "number"
       ? result.paidAmount
-      : Number(params.get("amount")) || 0;
+      : typeof result?.amount === "number"
+        ? result.amount
+        : Number(params.get("amount")) || 0;
   const orderId =
     (typeof result?.orderId === "string" && result.orderId) ||
     params.get("orderId") ||
     "";
   const receiptUrl = pickReceiptUrl(result);
-  const hasReceipt = Boolean(receipt || receiptUrl);
+  const hasReceipt = Boolean(receiptUrl || receipt);
   const title =
-    receipt?.title ||
     orderName ||
     (typeof result?.orderName === "string" ? result.orderName : "");
   const receiptTotal =
@@ -172,7 +194,7 @@ export function PaymentSuccessPage() {
                   type="button"
                   className="btn btn--ghost"
                   onClick={() => {
-                    if (isMobileView() && receiptUrl && !receipt) {
+                    if (isMobileView() && receiptUrl) {
                       window.location.assign(receiptUrl);
                       return;
                     }
@@ -206,7 +228,7 @@ export function PaymentSuccessPage() {
                   전표 위 인쇄 아이콘을 누른 뒤 PDF로 저장할 수 있습니다.
                 </p>
               ) : null}
-              {receipt ? (
+              {receipt && !receiptUrl ? (
                 <div className="sheet-modal__receipt-body">
                   <h3>{receipt.title}</h3>
                   {receipt.subtitle ? <p>{receipt.subtitle}</p> : null}

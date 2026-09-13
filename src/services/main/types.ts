@@ -96,11 +96,15 @@ export type PaymentConfirmResponse = {
   paymentId?: string;
   paymentStatus?: string;
   tossStatus?: string;
+  processStatus?: string;
   registrationId?: string;
+  organizationId?: string;
+  registrationIds?: string[];
   registrationStatus?: string;
   orderId?: string;
   orderName?: string;
   paidAmount?: number;
+  amount?: number;
   approvedAt?: string;
   receiptUrl?: string;
   [key: string]: unknown;
