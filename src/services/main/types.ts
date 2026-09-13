@@ -1,3 +1,24 @@
+export type RegistrationSouvenir = {
+  order: number;
+  souvenirId: string;
+  name: string;
+  sizes: string[];
+};
+
+export type RegistrationCategory = {
+  order: number;
+  categoryId: string;
+  distance: string;
+  categoryName: string;
+  isActive: boolean;
+  amount: number;
+  souvenirs: RegistrationSouvenir[];
+};
+
+export type RegistrationOptionsResponse = {
+  categories: RegistrationCategory[];
+};
+
 export type RegistrationCreateRequest = {
   eventCategoryId: string;
   password: string;
