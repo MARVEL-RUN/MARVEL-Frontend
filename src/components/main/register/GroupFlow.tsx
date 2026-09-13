@@ -37,6 +37,8 @@ import {
   formatFee,
   genderLabel,
   emailOk,
+  orgAccountError,
+  orgPasswordError,
   requiredConsentsOk,
   type Consents,
   type Gender,
@@ -174,12 +176,10 @@ export function GroupFlow({
       return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
     }
     if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
-    if (!draft.organizationAccount.trim()) {
-      return fail("단체 계정을 입력하세요.");
-    }
-    if ((draft.organizationPassword ?? "").trim().length < 4) {
-      return fail("단체 비밀번호를 4자 이상 입력하세요.");
-    }
+    const accountErr = orgAccountError(draft.organizationAccount);
+    if (accountErr) return fail(accountErr);
+    const passwordErr = orgPasswordError(draft.organizationPassword ?? "");
+    if (passwordErr) return fail(passwordErr);
     if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
       return fail("단체 비밀번호가 일치하지 않습니다.");
     }
@@ -308,7 +308,7 @@ export function GroupFlow({
             <FormRow label="단체 계정" required>
               <input
                 type="text"
-                placeholder="조회·로그인에 사용할 단체 계정"
+                placeholder="5~20자, 영문·숫자·특수문자"
                 value={draft.organizationAccount}
                 onChange={(e) => patch({ organizationAccount: e.target.value })}
                 autoComplete="username"
@@ -320,7 +320,7 @@ export function GroupFlow({
                 value={draft.organizationPassword}
                 onChange={(organizationPassword) => patch({ organizationPassword })}
                 label="단체 비밀번호"
-                placeholder="조회용 비밀번호 (4자 이상)"
+                placeholder="조회용 비밀번호 (6~64자)"
                 required
               />
             </FormRow>

@@ -347,6 +347,23 @@ export function emailOk(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 }
 
+/** 백엔드: 5~20자, 영문/숫자/ASCII 특수문자 */
+export function orgAccountError(value: string) {
+  const v = value.trim();
+  if (!v) return "단체 계정을 입력하세요.";
+  if (!/^[\x21-\x7E]{5,20}$/.test(v)) {
+    return "단체 계정은 5~20자, 영문·숫자·특수문자만 사용할 수 있습니다.";
+  }
+  return "";
+}
+
+/** 백엔드: 6~64자 */
+export function orgPasswordError(value: string) {
+  const n = value.trim().length;
+  if (n < 6 || n > 64) return "단체 비밀번호는 6~64자로 입력하세요.";
+  return "";
+}
+
 export function groupFee(
   draft: GroupDraft,
   categories: { categoryId: string; amount: number }[] = [],
@@ -484,12 +501,10 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   >;
 } {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
-  if (!draft.organizationAccount.trim()) {
-    throw new Error("단체 계정을 입력하세요.");
-  }
-  if (draft.organizationPassword.trim().length < 4) {
-    throw new Error("단체 비밀번호를 4자 이상 입력하세요.");
-  }
+  const accountErr = orgAccountError(draft.organizationAccount);
+  if (accountErr) throw new Error(accountErr);
+  const passwordErr = orgPasswordError(draft.organizationPassword);
+  if (passwordErr) throw new Error(passwordErr);
   if (draft.organizationPassword !== draft.passwordConfirm) {
     throw new Error("단체 비밀번호가 일치하지 않습니다.");
   }

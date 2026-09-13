@@ -157,7 +157,6 @@ export function PaymentSuccessPage() {
                 </button>
               </div>
             ) : null}
-            <p className="form__note">신청조회에 필요하니 주문번호를 저장해 두세요.</p>
             {receiptUrl ? (
               <p className="form__note">
                 영수증은 토스 매출전표입니다. 전표 위 인쇄 아이콘을 누른 뒤 PDF로
