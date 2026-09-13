@@ -13,6 +13,27 @@ import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function pickReceiptUrl(data: PaymentConfirmResponse | null) {
+  const root = asRecord(data);
+  if (!root) return "";
+  const payload = asRecord(root.data) ?? root;
+  const direct = payload.receiptUrl;
+  if (typeof direct === "string" && direct.trim()) return direct.trim();
+  const receipt = payload.receipt;
+  if (typeof receipt === "string" && receipt.trim()) return receipt.trim();
+  const nested = asRecord(receipt);
+  if (nested && typeof nested.url === "string" && nested.url.trim()) {
+    return nested.url.trim();
+  }
+  return "";
+}
+
 type Phase = "loading" | "done" | "error";
 
 export function PaymentSuccessPage() {
@@ -67,13 +88,14 @@ export function PaymentSuccessPage() {
   const paid =
     typeof result?.paidAmount === "number"
       ? result.paidAmount
-      : Number(params.get("amount")) || 0;
+      : typeof result?.amount === "number"
+        ? result.amount
+        : Number(params.get("amount")) || 0;
   const orderId =
     (typeof result?.orderId === "string" && result.orderId) ||
     params.get("orderId") ||
     "";
-  const receiptUrl =
-    typeof result?.receiptUrl === "string" ? result.receiptUrl : "";
+  const receiptUrl = pickReceiptUrl(result);
   const title =
     orderName ||
     (typeof result?.orderName === "string" ? result.orderName : "");

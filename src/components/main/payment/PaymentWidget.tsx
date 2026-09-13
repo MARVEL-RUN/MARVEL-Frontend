@@ -4,10 +4,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { TossPaymentsWidgets } from "@tosspayments/tosspayments-sdk";
 import { formatFee } from "@/lib/register";
 import { createPaymentWidgets } from "@/lib/payment/toss";
-import type { RegistrationCreateResponse } from "@/services/main/types";
+import type { PaymentOrder } from "@/lib/payment/session";
 
 type Props = {
-  registration: RegistrationCreateResponse;
+  registration: PaymentOrder;
   customerName: string;
   onError?: (message: string) => void;
 };

@@ -13,7 +13,7 @@ export function eventCategoryIdForCourse(courseId: CourseId) {
   return id;
 }
 
-export function genderToApi(gender: Gender): "M" | "F" {
+export function genderToApi(gender: Gender | ""): "M" | "F" {
   if (gender === "male") return "M";
   if (gender === "female") return "F";
   throw new Error("결제 신청에는 성별(남성/여성)이 필요합니다.");
