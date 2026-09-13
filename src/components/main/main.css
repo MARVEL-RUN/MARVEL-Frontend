@@ -4669,6 +4669,45 @@ button.course {
     grid-template-columns: 1fr;
   }
 
+  .venue__grid {
+    gap: 1.6rem;
+  }
+
+  .venue__panel {
+    --card-cut: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+    min-height: 0;
+    aspect-ratio: 5 / 4;
+  }
+
+  .venue__slide {
+    padding: 1.25rem 1.15rem;
+  }
+
+  .venue__dist {
+    font-size: clamp(2.1rem, 9vw, 2.55rem);
+  }
+
+  .venue__hero--2\.3k {
+    width: 72%;
+    height: 78%;
+    right: -6%;
+    bottom: -4%;
+  }
+
+  .venue__hero--5k {
+    width: 46%;
+    height: 92%;
+    right: 2%;
+    bottom: -8%;
+  }
+
+  .venue__hero--10k {
+    width: 70%;
+    height: 82%;
+    right: -8%;
+    bottom: -4%;
+  }
+
   .venue-copy {
     height: auto;
     min-height: 0;
@@ -4816,6 +4855,43 @@ button.course {
     min-height: 2.5rem;
     padding: 0 1.15rem;
     font-size: 0.8rem;
+  }
+
+  .assemble {
+    padding: 4rem 1.25rem;
+  }
+
+  .assemble__ghost {
+    font-size: clamp(3.4rem, 24vw, 6rem);
+  }
+
+  .assemble h2 {
+    margin: 0.35rem 0 1rem;
+    font-size: clamp(1.3rem, 5.4vw, 1.65rem);
+  }
+
+  .assemble__count {
+    width: min(20.5rem, 100%);
+    gap: 0.16rem;
+    margin: 0 auto 1.35rem;
+  }
+
+  .assemble__tick {
+    padding: 0.55rem 0.1rem 0.42rem;
+  }
+
+  .assemble__count i {
+    font-size: 0.95rem;
+    padding-bottom: 0.6rem;
+  }
+
+  .assemble__count strong {
+    font-size: clamp(1.1rem, 4.8vw, 1.4rem);
+  }
+
+  .assemble__count em {
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
   }
 
   .sec {
