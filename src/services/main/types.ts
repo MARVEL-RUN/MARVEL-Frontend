@@ -40,6 +40,52 @@ export type RegistrationCreateResponse = {
   paymentAmount: number;
 };
 
+export type SelectedSouvenir = {
+  souvenirId: string;
+  selectedSize: string;
+};
+
+export type OrganizationAccount = {
+  organizationName: string;
+  organizationAccount: string;
+  organizationPassword: string;
+};
+
+export type OrganizationProfile = {
+  address: string;
+  addressDetail: string;
+  birth: string;
+  phNum: string;
+  email: string;
+  leaderName: string;
+};
+
+export type OrganizationParticipant = {
+  eventCategoryId: string;
+  selectedSouvenirList: SelectedSouvenir[];
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+};
+
+export type OrganizationRegistrationRequest = {
+  account: OrganizationAccount;
+  profile: OrganizationProfile;
+  registrations: OrganizationParticipant[];
+};
+
+export type OrganizationRegistrationResponse = {
+  organizationId?: string;
+  registrationId?: string;
+  registrationIds?: string[];
+  registrationStatus?: string;
+  paymentId?: string;
+  orderId: string;
+  orderName?: string;
+  paymentAmount: number;
+};
+
 export type PaymentConfirmRequest = {
   paymentKey: string;
   orderId: string;
