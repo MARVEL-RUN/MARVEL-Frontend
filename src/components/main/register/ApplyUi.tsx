@@ -401,12 +401,12 @@ export function EmailField({
         type="text"
         className="email-pick__local"
         inputMode="email"
-        autoComplete="username"
-        placeholder="아이디"
+        autoComplete="email"
+        placeholder="이메일"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         required={required}
-        aria-label="이메일 아이디"
+        aria-label="이메일"
       />
       <span aria-hidden>@</span>
       {custom ? (

@@ -7,48 +7,29 @@ import { Check, Copy } from "lucide-react";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { formatFee } from "@/lib/register";
-import {
-  clearPendingPayment,
-  readPendingPayment,
-  type PaymentReceipt,
-} from "@/lib/payment/session";
+import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
 
-function isHttpUrl(value: unknown): value is string {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
 }
 
-/* confirm 응답이 receiptUrl을 data/payment/receipt 안에 두기도 함 */
-function pickReceiptUrl(data: unknown) {
-  const queue: unknown[] = [data];
-  const seen = new Set<unknown>();
-
-  while (queue.length) {
-    const node = queue.shift();
-    if (!node || typeof node !== "object" || seen.has(node)) continue;
-    seen.add(node);
-
-    if (Array.isArray(node)) {
-      queue.push(...node);
-      continue;
-    }
-
-    const rec = node as Record<string, unknown>;
-    for (const key of ["receiptUrl", "receiptURL", "receipt_url"]) {
-      if (isHttpUrl(rec[key])) return rec[key].trim();
-    }
-    if (isHttpUrl(rec.receipt)) return rec.receipt.trim();
-    const nested = rec.receipt;
-    if (nested && typeof nested === "object" && "url" in nested) {
-      const url = (nested as { url: unknown }).url;
-      if (isHttpUrl(url)) return url.trim();
-    }
-    for (const key of ["data", "payment", "toss", "result"]) {
-      if (key in rec) queue.push(rec[key]);
-    }
+function pickReceiptUrl(data: PaymentConfirmResponse | null) {
+  const root = asRecord(data);
+  if (!root) return "";
+  const payload = asRecord(root.data) ?? root;
+  const direct = payload.receiptUrl;
+  if (typeof direct === "string" && direct.trim()) return direct.trim();
+  const receipt = payload.receipt;
+  if (typeof receipt === "string" && receipt.trim()) return receipt.trim();
+  const nested = asRecord(receipt);
+  if (nested && typeof nested.url === "string" && nested.url.trim()) {
+    return nested.url.trim();
   }
   return "";
 }
@@ -61,7 +42,6 @@ export function PaymentSuccessPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<PaymentConfirmResponse | null>(null);
   const [orderName, setOrderName] = useState("");
-  const [receipt, setReceipt] = useState<PaymentReceipt | null>(null);
   const [copied, setCopied] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
 
@@ -81,7 +61,6 @@ export function PaymentSuccessPage() {
     if (pending?.registration.orderName) {
       setOrderName(pending.registration.orderName);
     }
-    if (pending?.receipt) setReceipt(pending.receipt);
 
     let cancelled = false;
 
@@ -117,12 +96,9 @@ export function PaymentSuccessPage() {
     params.get("orderId") ||
     "";
   const receiptUrl = pickReceiptUrl(result);
-  const hasReceipt = Boolean(receiptUrl || receipt);
   const title =
     orderName ||
     (typeof result?.orderName === "string" ? result.orderName : "");
-  const receiptTotal =
-    receipt?.items.reduce((sum, item) => sum + item.amount, 0) ?? 0;
 
   async function copyOrderId() {
     if (!orderId) return;
@@ -189,12 +165,12 @@ export function PaymentSuccessPage() {
               </p>
             ) : null}
             <div className="flow__nav">
-              {hasReceipt ? (
+              {receiptUrl ? (
                 <button
                   type="button"
                   className="btn btn--ghost"
                   onClick={() => {
-                    if (isMobileView() && receiptUrl) {
+                    if (isMobileView()) {
                       window.location.assign(receiptUrl);
                       return;
                     }
@@ -214,7 +190,7 @@ export function PaymentSuccessPage() {
           </section>
         ) : null}
 
-        {receiptOpen && hasReceipt ? (
+        {receiptOpen && receiptUrl ? (
           <SheetModal
             kicker="RECEIPT"
             title="영수증"
@@ -223,39 +199,14 @@ export function PaymentSuccessPage() {
             onClose={() => setReceiptOpen(false)}
           >
             <div className="sheet-modal__receipt">
-              {receiptUrl ? (
-                <p className="sheet-modal__hint">
-                  전표 위 인쇄 아이콘을 누른 뒤 PDF로 저장할 수 있습니다.
-                </p>
-              ) : null}
-              {receipt && !receiptUrl ? (
-                <div className="sheet-modal__receipt-body">
-                  <h3>{receipt.title}</h3>
-                  {receipt.subtitle ? <p>{receipt.subtitle}</p> : null}
-                  <ul>
-                    {receipt.items.map((item, i) => (
-                      <li key={`${item.name}-${i}`}>
-                        <span>
-                          <strong>{item.name}</strong>
-                          {item.detail ? <em>{item.detail}</em> : null}
-                        </span>
-                        <b>{formatFee(item.amount)}</b>
-                      </li>
-                    ))}
-                    <li className="is-sum">
-                      <span>합계</span>
-                      <b>{formatFee(receiptTotal || paid)}</b>
-                    </li>
-                  </ul>
-                </div>
-              ) : null}
-              {receiptUrl ? (
-                <iframe
-                  className="sheet-modal__frame"
-                  src={receiptUrl}
-                  title="결제 영수증"
-                />
-              ) : null}
+              <p className="sheet-modal__hint">
+                전표 위 인쇄 아이콘을 누른 뒤 PDF로 저장할 수 있습니다.
+              </p>
+              <iframe
+                className="sheet-modal__frame"
+                src={receiptUrl}
+                title="결제 영수증"
+              />
             </div>
           </SheetModal>
         ) : null}

@@ -2714,7 +2714,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .form-row input[type="email"],
 .form-row input[type="tel"],
 .form-row input[type="password"],
-.form-row select {
+.form-row__ctrl > select {
   width: min(24rem, 100%);
   padding: 0.75rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -2759,7 +2759,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   color: rgba(255, 255, 255, 0.38);
 }
 
-.form-row select:focus,
+.form-row__ctrl > select:focus,
 .form-row input:focus {
   outline: none;
   border-color: var(--marvel);
@@ -2788,14 +2788,15 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .birth-pick {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.35rem;
 }
 
 .birth-pick select {
-  min-width: 5.2rem;
-  padding: 0.65rem 0.55rem;
+  width: 4.6rem;
+  min-width: 0;
+  padding: 0.65rem 0.4rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 6px;
   background: #08091d;
@@ -2803,9 +2804,13 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font: inherit;
 }
 
+.birth-pick select:first-of-type {
+  width: 6rem;
+}
+
 .email-pick {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.4rem;
 }
@@ -2828,15 +2833,21 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .form-row .email-pick input.email-pick__local {
-  width: 12.5rem;
+  width: 10.5rem;
   max-width: 100%;
 }
 
-.form-row .email-pick input.email-pick__host,
-.email-pick__pick {
-  width: 9.5rem;
+.form-row .email-pick input.email-pick__host {
+  width: 8rem;
   max-width: 100%;
   flex: none;
+}
+
+.form-row .email-pick select.email-pick__pick {
+  width: 7.6rem;
+  max-width: 7.6rem;
+  flex: none;
+  padding: 0.75rem 0.45rem;
 }
 
 .email-pick input::placeholder {
@@ -4861,18 +4872,22 @@ button.course {
   .form-row input[type="email"],
   .form-row input[type="tel"],
   .form-row input[type="password"],
-  .form-row select,
+  .form-row__ctrl > select,
   .form-row textarea {
     width: 100%;
   }
 
   .form-row .email-pick input.email-pick__local {
-    width: min(12.5rem, 100%);
+    width: min(10.5rem, 100%);
   }
 
-  .form-row .email-pick input.email-pick__host,
-  .email-pick__pick {
-    width: min(9.5rem, 100%);
+  .form-row .email-pick input.email-pick__host {
+    width: min(8rem, 100%);
+  }
+
+  .form-row .email-pick select.email-pick__pick {
+    width: 7.6rem;
+    max-width: 7.6rem;
   }
 
   .board-write__actions {

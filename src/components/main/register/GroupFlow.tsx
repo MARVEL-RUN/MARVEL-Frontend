@@ -6,7 +6,6 @@ import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/confi
 import { MainHttpError } from "@/lib/main/fetch";
 import {
   organizationPaymentOrder,
-  toGroupPaymentReceipt,
   toOrganizationRegistrationRequest,
 } from "@/lib/payment/organization";
 import {
@@ -258,7 +257,6 @@ export function GroupFlow({
       savePendingPayment({
         registration: order,
         customerName: draft.leaderName.trim(),
-        receipt: toGroupPaymentReceipt(draft, categories),
         savedAt: Date.now(),
       });
       setPayment(order);
