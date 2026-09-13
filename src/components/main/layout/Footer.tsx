@@ -23,7 +23,11 @@ export function Footer() {
       <div className="site-footer__top">
         <div>
           <p className="site-footer__office-name">{OFFICE.name}</p>
-          <address className="site-footer__office">
+          {/* iOS가 사업자번호·주소·시간을 tel/지도 링크로 바꿔 hydration이 깨진다 */}
+          <address
+            className="site-footer__office"
+            {...{ "x-apple-data-detectors": "false" }}
+          >
             <p>{OFFICE.address}</p>
             <p className="site-footer__meta">
               <span>대표자 : {OFFICE.ceo}</span>

@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     telephone: false,
     email: false,
     address: false,
+    date: false,
+    url: false,
   },
   verification: {
     ...(googleVerification ? { google: googleVerification } : {}),
