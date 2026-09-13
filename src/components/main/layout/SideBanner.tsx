@@ -15,7 +15,7 @@ export function SideBanner({
         <source
           media="(max-width: 720px)"
           srcSet={MAIN_ASSETS.sideBannerMobile}
-          type="image/svg+xml"
+          type="image/png"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

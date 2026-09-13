@@ -14,7 +14,7 @@ export const MAIN_ASSETS = {
   loadingLogo: "/images/main/loading-logo.png",
   hero: "/images/main/hero-characters.png",
   sideBanner: "/images/main/sidebanner.svg",
-  sideBannerMobile: "/images/main/sidebanner-mobile.svg",
+  sideBannerMobile: "/images/main/sidebanner-mobile.png",
   footerHost: "/images/main/footer/hosted.png",
   footerOrganizer: "/images/main/footer/organizer.png",
   introMarvel: "/images/main/intro-marvel.svg",
