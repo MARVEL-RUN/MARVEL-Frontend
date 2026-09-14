@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { KeyboardInset } from "./KeyboardInset";
 import { CinematicFX } from "../fx/CinematicFX";
 
 export function MainShell({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
   if (virtual) {
     return (
       <div className="site">
+        <KeyboardInset />
         {children}
         <Footer />
       </div>
@@ -20,6 +22,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="site">
       <CinematicFX />
+      <KeyboardInset />
       <Header />
       {children}
       <Footer />

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { EVENT } from "@/lib/event";
-import { MOBILE_MAX } from "@/lib/viewport";
+import { MOBILE_MQ } from "@/lib/viewport";
 
 const POP = EVENT.popup;
 const STORE = `mr-pop-${POP.id}`;
@@ -49,7 +49,7 @@ export function HomePopup() {
   const box = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
+    const mq = window.matchMedia(MOBILE_MQ);
     const sync = () => setMobile(mq.matches);
     sync();
     mq.addEventListener("change", sync);

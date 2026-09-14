@@ -50,6 +50,7 @@ import { createOrganizationRegistration } from "@/services/main/registrations";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
 import { SheetModal } from "../SheetModal";
+import { DockNav } from "../DockNav";
 import {
   AddressField,
   ApplyHint,
@@ -593,7 +594,7 @@ export function GroupFlow({
             <p className="party-sum">합계 {formatFee(total)}</p>
           </FormSec>
 
-          <div className="flow__nav">
+          <DockNav>
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -605,7 +606,7 @@ export function GroupFlow({
             <button type="submit" className="btn btn--red">
               확인하기
             </button>
-          </div>
+          </DockNav>
         </form>
       ) : null}
 
@@ -671,7 +672,7 @@ export function GroupFlow({
               );
             })}
           </ul>
-          <div className="flow__nav">
+          <DockNav>
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -696,7 +697,7 @@ export function GroupFlow({
             >
               {busy ? "결제 준비 중..." : "결제하기"}
             </button>
-          </div>
+          </DockNav>
         </section>
       ) : null}
 

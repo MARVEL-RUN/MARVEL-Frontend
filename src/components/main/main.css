@@ -12,6 +12,7 @@ html {
 html.is-main {
   /* 공개 페이지 110%. 인트로는 1배 */
   zoom: var(--site-zoom);
+  --kb: 0px;
 }
 
 html.is-intro {
@@ -5385,6 +5386,7 @@ button.course {
     --tap: 2.75rem;
     --guide-tabs-h: 3.2rem;
     scroll-padding-top: var(--header-h);
+    scroll-padding-bottom: calc(var(--kb) + var(--tap) + 1.5rem + env(safe-area-inset-bottom, 0px));
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -6110,7 +6112,8 @@ button.course {
     padding: 0 0.1rem 0 0.35rem;
   }
 
-  html.is-main .apply-terms__slot:has(.is-stuck) {
+  html.is-main .apply-terms__slot:has(.is-stuck),
+  html.is-main .flow__nav-slot:has(.is-stuck) {
     height: calc(var(--tap) + 1.3rem + env(safe-area-inset-bottom, 0px));
   }
 
@@ -6119,16 +6122,18 @@ button.course {
     gap: 0.55rem;
   }
 
-  html.is-main .apply-terms__actions.is-stuck {
+  html.is-main .apply-terms__actions.is-stuck,
+  html.is-main .flow__nav.is-stuck {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: var(--kb, 0px);
     z-index: 24;
     margin: 0;
     padding: 0.65rem var(--gutter) calc(0.65rem + env(safe-area-inset-bottom, 0px));
     background: var(--navy);
     box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
   }
 
   html.is-main .apply-terms__actions .btn {
@@ -6185,13 +6190,18 @@ button.course {
     min-height: var(--tap);
   }
 
+  .radio-row {
+    gap: 0.35rem 0.85rem;
+  }
+
   .radio-row label {
     min-height: var(--tap);
+    padding-right: 0.35rem;
   }
 
   .radio-row input {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .email-pick {
@@ -6245,13 +6255,72 @@ button.course {
   }
 
   .course-pick {
+    --course-row: var(--tap);
     grid-template-columns: 1fr;
-    gap: 1rem 0;
+    gap: 0.85rem 0;
   }
 
   .course-pick__box {
-    width: max-content;
+    width: 100%;
     max-width: 100%;
+    grid-template-columns: 6.8rem minmax(0, 1fr);
+  }
+
+  .course-pick__list button {
+    min-height: var(--tap);
+  }
+
+  .course-pick__fees,
+  .apply-hint .course-pick__fees {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .course-pick__fees-head,
+  .course-pick__fees-row,
+  .apply-hint .course-pick__fees-head,
+  .apply-hint .course-pick__fees-row {
+    grid-template-columns: 4rem minmax(0, 1.15fr) 3.8rem minmax(4.2rem, 1fr);
+  }
+
+  .course-pick__fees-head {
+    min-height: 2.35rem;
+    height: auto;
+  }
+
+  .course-pick__fees-body {
+    grid-template-rows: none;
+  }
+
+  .course-pick__fees-row {
+    min-height: var(--tap);
+    height: auto;
+  }
+
+  .course-pick__fees-head span,
+  .course-pick__fees-row span {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: keep-all;
+    line-height: 1.35;
+    padding: 0.4rem 0.45rem;
+  }
+
+  .seg button {
+    min-height: var(--tap);
+  }
+
+  .party input,
+  .party select {
+    min-height: var(--tap);
+    box-sizing: border-box;
+  }
+
+  .party .party__del button {
+    width: var(--tap);
+    height: var(--tap);
   }
 
   .board-write__actions {

@@ -5,6 +5,7 @@ import type { TossPaymentsWidgets } from "@tosspayments/tosspayments-sdk";
 import { formatFee } from "@/lib/register";
 import { createPaymentWidgets } from "@/lib/payment/toss";
 import type { PaymentOrder } from "@/lib/payment/session";
+import { DockNav } from "@/components/main/DockNav";
 
 type Props = {
   registration: PaymentOrder;
@@ -112,7 +113,7 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
       <div id={methodId} className="payment-panel__widget" />
       <div id={agreeId} className="payment-panel__widget" />
 
-      <div className="flow__nav">
+      <DockNav>
         <button
           type="button"
           className="btn btn--red"
@@ -121,7 +122,7 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
         >
           {busy ? "결제창 여는 중..." : ready ? "결제하기" : "결제수단 준비 중..."}
         </button>
-      </div>
+      </DockNav>
     </section>
   );
 }

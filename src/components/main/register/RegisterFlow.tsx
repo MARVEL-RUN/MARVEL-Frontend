@@ -41,6 +41,7 @@ import type {
 } from "@/services/main/types";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "@/components/main/SheetModal";
+import { DockNav } from "@/components/main/DockNav";
 import { ApplyTerms } from "./ApplyTerms";
 import {
   AddressField,
@@ -460,7 +461,7 @@ function IndividualFlow({
             </FormRow>
           </FormSec>
 
-          <div className="flow__nav">
+          <DockNav>
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -472,7 +473,7 @@ function IndividualFlow({
             <button type="submit" className="btn btn--red">
               확인하기
             </button>
-          </div>
+          </DockNav>
         </form>
       ) : null}
 
@@ -524,7 +525,7 @@ function IndividualFlow({
               </dd>
             </div>
           </dl>
-          <div className="flow__nav">
+          <DockNav>
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -549,7 +550,7 @@ function IndividualFlow({
             >
               {busy ? "결제 준비 중..." : "결제하기"}
             </button>
-          </div>
+          </DockNav>
         </section>
       ) : null}
 
