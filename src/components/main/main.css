@@ -3621,6 +3621,11 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   cursor: not-allowed;
 }
 
+.party .party__peek,
+.party .party__fold {
+  display: none;
+}
+
 .party-sum {
   margin-top: 0.9rem;
   color: #fff;
@@ -6494,6 +6499,200 @@ button.course {
   .party-wrap {
     min-width: 0;
     max-width: 100%;
+  }
+
+  .party-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .party-bar .btn {
+    width: 100%;
+    min-height: var(--tap);
+    justify-content: center;
+  }
+
+  .party-wrap {
+    overflow: visible;
+    border: 0;
+  }
+
+  .party {
+    min-width: 0;
+    display: block;
+  }
+
+  .party thead {
+    display: none;
+  }
+
+  .party tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .party tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .party th,
+  .party td {
+    display: grid;
+    gap: 0.35rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem 0.8rem;
+    text-align: left;
+    border: 0;
+    font-size: 0.9rem;
+  }
+
+  .party .party__no {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    grid-column: 1;
+    grid-row: 1;
+    width: auto;
+    padding-right: 0.2rem;
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 800;
+  }
+
+  .party .party__no::before {
+    content: "참가자 ";
+  }
+
+  .party .party__peek {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .party .party__peek button {
+    display: block;
+    width: 100%;
+    min-height: var(--tap);
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--silver);
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .party .party__del {
+    display: flex;
+    grid-column: 3;
+    grid-row: 1;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.15rem;
+    width: auto;
+    padding: 0.2rem 0.4rem 0.2rem 0;
+  }
+
+  .party .party__del button {
+    width: var(--tap);
+    height: var(--tap);
+  }
+
+  .party tr:not(.is-open) td[data-label] {
+    display: none;
+  }
+
+  .party tr.is-open {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+
+  .party tr.is-open .party__peek {
+    display: none;
+  }
+
+  .party tr.is-open .party__no {
+    grid-column: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .party tr.is-open .party__del {
+    grid-column: 2;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .party tr.is-open .party__fold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: var(--tap);
+    padding: 0 0.55rem;
+    border-radius: 0;
+    background: transparent;
+    color: var(--silver);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .party tr.is-open td[data-label] {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .party tr.is-open td[data-label="이름"],
+  .party tr.is-open td[data-label="연락처"],
+  .party tr.is-open td[data-label="기념품"] {
+    grid-column: 1;
+  }
+
+  .party tr.is-open td[data-label="생년월일"],
+  .party tr.is-open td[data-label="성별"],
+  .party tr.is-open td[data-label="사이즈"] {
+    grid-column: 2;
+  }
+
+  .party tr.is-open td[data-label="참가종목"],
+  .party tr.is-open td[data-label="참가비"] {
+    grid-column: 1 / -1;
+  }
+
+  .party tr.is-open td[data-label="참가비"] {
+    border-bottom: 0;
+  }
+
+  .party td[data-label]::before {
+    content: attr(data-label);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    word-break: keep-all;
+  }
+
+  .party input,
+  .party select {
+    min-height: var(--tap);
+    box-sizing: border-box;
+    padding: 0.5rem 0.65rem;
+    font-size: 1.05rem;
+    text-align: left;
+  }
+
+  .party-sum {
+    text-align: left;
   }
 
   .form-row__label {

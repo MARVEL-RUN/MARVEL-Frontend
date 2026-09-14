@@ -74,6 +74,16 @@ const NOTICE = [
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
 
+function memberPeek(
+  p: ParticipantDraft,
+  categories: RegistrationCategory[],
+) {
+  const name = p.name.trim() || "미입력";
+  const category = findCategory(categories, p.categoryId);
+  if (!category) return name;
+  return `${name} · ${categoryLabel(category)} · ${formatFee(categoryFeeAmount(category, p.birth))}`;
+}
+
 export function GroupFlow({
   onBack,
   consents,
@@ -90,6 +100,7 @@ export function GroupFlow({
   const [optionsError, setOptionsError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [openMember, setOpenMember] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
 
@@ -161,14 +172,21 @@ export function GroupFlow({
       setError(`한 번에 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다.`);
       return;
     }
+    const next = draft.participants.length;
     patch({
       participants: [...draft.participants, { ...EMPTY_PARTICIPANT }],
     });
+    setOpenMember(next);
   }
 
   function removeMember(i: number) {
     if (draft.participants.length <= 1) return;
     patch({ participants: draft.participants.filter((_, idx) => idx !== i) });
+    setOpenMember((prev) => {
+      if (prev === i) return Math.max(0, i - 1);
+      if (prev > i) return prev - 1;
+      return prev;
+    });
   }
 
   function onForm(e: FormEvent<HTMLFormElement>) {
@@ -434,9 +452,17 @@ export function GroupFlow({
                     const souvenir = findSouvenir(category, p.souvenirId);
                     const sizes = souvenirSizes(souvenir);
                     return (
-                      <tr key={i}>
+                      <tr key={i} className={openMember === i ? "is-open" : undefined}>
                         <td className="party__no">{i + 1}.</td>
-                        <td>
+                        <td className="party__peek">
+                          <button
+                            type="button"
+                            onClick={() => setOpenMember(i)}
+                          >
+                            {memberPeek(p, categories)}
+                          </button>
+                        </td>
+                        <td data-label="이름">
                           <input
                             type="text"
                             placeholder="성명"
@@ -445,7 +471,7 @@ export function GroupFlow({
                             required
                           />
                         </td>
-                        <td>
+                        <td data-label="생년월일">
                           <BirthText
                             value={p.birth}
                             onChange={(birth) => {
@@ -466,7 +492,7 @@ export function GroupFlow({
                             }}
                           />
                         </td>
-                        <td>
+                        <td data-label="연락처">
                           <PhoneField
                             placeholder="연락처"
                             value={p.phone}
@@ -474,7 +500,7 @@ export function GroupFlow({
                             required
                           />
                         </td>
-                        <td>
+                        <td data-label="성별">
                           <select
                             value={p.gender}
                             onChange={(e) =>
@@ -490,7 +516,7 @@ export function GroupFlow({
                             ))}
                           </select>
                         </td>
-                        <td>
+                        <td data-label="참가종목">
                           <select
                             value={p.categoryId}
                             onChange={(e) =>
@@ -527,7 +553,7 @@ export function GroupFlow({
                             })}
                           </select>
                         </td>
-                        <td>
+                        <td data-label="기념품">
                           <select
                             value={p.souvenirId}
                             onChange={(e) => {
@@ -551,7 +577,7 @@ export function GroupFlow({
                             ))}
                           </select>
                         </td>
-                        <td>
+                        <td data-label="사이즈">
                           <select
                             value={p.selectedSize}
                             onChange={(e) =>
@@ -570,12 +596,19 @@ export function GroupFlow({
                               : null}
                           </select>
                         </td>
-                        <td className="party__fee">
+                        <td className="party__fee" data-label="참가비">
                           {category
                             ? formatFee(categoryFeeAmount(category, p.birth))
                             : "—"}
                         </td>
                         <td className="party__del">
+                          <button
+                            type="button"
+                            className="party__fold"
+                            onClick={() => setOpenMember(-1)}
+                          >
+                            접기
+                          </button>
                           <button
                             type="button"
                             onClick={() => removeMember(i)}
