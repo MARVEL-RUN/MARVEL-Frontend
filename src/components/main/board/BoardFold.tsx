@@ -11,9 +11,11 @@ export type BoardFoldItem = {
 export function BoardFold({
   items,
   empty,
+  mark,
 }: {
   items: BoardFoldItem[];
   empty: string;
+  mark?: string;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -22,7 +24,7 @@ export function BoardFold({
   }
 
   return (
-    <ul className="board-fold">
+    <ul className={mark ? "board-fold has-mark" : "board-fold"}>
       {items.map((item) => {
         const open = openId === item.id;
         return (
@@ -33,6 +35,7 @@ export function BoardFold({
               aria-expanded={open}
               onClick={() => setOpenId(open ? null : item.id)}
             >
+              {mark ? <span className="board-fold__mark">{mark}</span> : null}
               <strong className="board-fold__title">{item.title}</strong>
               <span className="board-fold__chev" aria-hidden="true" />
             </button>

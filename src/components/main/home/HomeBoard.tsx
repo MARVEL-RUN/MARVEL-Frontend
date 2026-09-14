@@ -41,12 +41,26 @@ export function HomeBoard() {
 
   return (
     <section className="sec board-sec" id="bulletin">
-      <div className="wrap wrap--narrow reveal">
-        <h2 className="board-sec__title">
-          {tab === "notices" ? "공지사항" : "FAQ"}
+      <div className="wrap reveal">
+        <p className="kicker">04 / BULLETIN</p>
+        <h2 className="sec__title">
+          {tab === "notices" ? (
+            <>
+              공식 <em>공지</em>
+            </>
+          ) : (
+            <>
+              자주 묻는 <em>질문</em>
+            </>
+          )}
         </h2>
         <BoardSwitch active={tab} onSelect={setTab} />
-        <BoardFold key={tab} items={items} empty={empty} />
+        <BoardFold
+          key={tab}
+          items={items}
+          empty={empty}
+          mark={tab === "faq" ? "Q." : undefined}
+        />
       </div>
     </section>
   );
