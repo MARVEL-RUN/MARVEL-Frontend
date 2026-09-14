@@ -461,7 +461,7 @@ function IndividualFlow({
             </FormRow>
           </FormSec>
 
-          <DockNav>
+          <div className="flow__nav">
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -473,7 +473,7 @@ function IndividualFlow({
             <button type="submit" className="btn btn--red">
               확인하기
             </button>
-          </DockNav>
+          </div>
         </form>
       ) : null}
 

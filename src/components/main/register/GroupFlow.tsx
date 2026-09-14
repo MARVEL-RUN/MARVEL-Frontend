@@ -594,7 +594,7 @@ export function GroupFlow({
             <p className="party-sum">합계 {formatFee(total)}</p>
           </FormSec>
 
-          <DockNav>
+          <div className="flow__nav">
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -606,7 +606,7 @@ export function GroupFlow({
             <button type="submit" className="btn btn--red">
               확인하기
             </button>
-          </DockNav>
+          </div>
         </form>
       ) : null}
 

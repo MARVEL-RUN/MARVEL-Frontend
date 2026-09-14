@@ -11,7 +11,6 @@ import {
   type GroupRecord,
 } from "@/lib/register";
 import { SideBanner } from "../layout/SideBanner";
-import { DockNav } from "../DockNav";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 
 type View = "form" | "hit" | "miss";
@@ -118,14 +117,14 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         <input name="order" type="text" placeholder="MR26-10K-12345" required />
       </label>
       <p className="form__note">개인 접수 시 발급된 주문번호로 조회합니다.</p>
-      <DockNav>
+      <div className="flow__nav">
         <button type="button" className="btn btn--ghost" onClick={onBack}>
           유형 변경
         </button>
         <button type="submit" className="btn btn--red" disabled={busy}>
           {busy ? "조회 중..." : "조회"}
         </button>
-      </DockNav>
+      </div>
     </form>
   );
 }
@@ -220,14 +219,14 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         <input name="order" type="text" placeholder="MR26-GRP-12345" required />
       </label>
       <p className="form__note">단체 접수 시 발급된 주문번호로 조회합니다.</p>
-      <DockNav>
+      <div className="flow__nav">
         <button type="button" className="btn btn--ghost" onClick={onBack}>
           유형 변경
         </button>
         <button type="submit" className="btn btn--red" disabled={busy}>
           {busy ? "조회 중..." : "조회"}
         </button>
-      </DockNav>
+      </div>
     </form>
   );
 }
