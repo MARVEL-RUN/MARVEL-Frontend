@@ -5,7 +5,7 @@
 html {
   --header-h: 4.5rem;
   --site-zoom: 1.1;
-  --guide-tabs-h: 3.15rem;
+  --guide-tabs-h: 3.9rem;
   scroll-padding-top: var(--header-h);
 }
 
@@ -2090,7 +2090,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .guide-tabs {
   z-index: 30;
   height: var(--guide-tabs-h);
-  background: var(--marvel);
+  background: var(--marvel-deep);
 }
 
 .guide-tabs.is-stuck {
@@ -2114,7 +2114,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.15rem;
+  min-height: 2.45rem;
   padding: 0 1.2rem;
   border: 0;
   border-radius: 999px;
@@ -2130,14 +2130,14 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .guide-tabs__btn.is-on {
   background: #fff;
-  color: var(--marvel);
+  color: var(--marvel-deep);
 }
 
 .guide-sec:has(> .guide-rule) {
   padding-top: 0;
 }
 
-.guide-sec > .guide-rule {
+.guide-sec>.guide-rule {
   margin-bottom: 4.5rem;
 }
 
@@ -5209,6 +5209,10 @@ button.course {
     color: #fff;
   }
 
+  html {
+    --guide-tabs-h: 3.2rem;
+  }
+
   .guide-tabs__inner {
     justify-content: flex-start;
     width: 100%;
@@ -5890,7 +5894,7 @@ button.course {
     scroll-margin-top: var(--header-h);
   }
 
-  .guide-sec > .guide-rule {
+  .guide-sec>.guide-rule {
     margin-bottom: 2.6rem;
   }
 
