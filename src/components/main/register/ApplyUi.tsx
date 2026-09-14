@@ -396,7 +396,7 @@ export function EmailField({
   }
 
   return (
-    <div className="email-pick">
+    <div className={custom ? "email-pick is-custom" : "email-pick"}>
       <input
         type="text"
         className="email-pick__local"
