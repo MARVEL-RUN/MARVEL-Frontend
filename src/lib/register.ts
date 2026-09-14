@@ -277,8 +277,8 @@ export function courseClosedReason(birth: string) {
 export function courseNote(
   course: NonNullable<ReturnType<typeof courseById>>,
 ) {
-  if ("childFee" in course) return `어린이 ${course.childFee.replace("원", "")}`;
-  return "어린이 참가 불가";
+  if ("childFee" in course) return feeDigits(course.childFee);
+  return "참가 불가";
 }
 
 export function feeDigits(fee: string) {

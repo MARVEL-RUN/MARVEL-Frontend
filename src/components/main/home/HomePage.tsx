@@ -24,6 +24,12 @@ const TICKER = [
   "KOREA",
 ];
 
+const HOME_COURSE_CODE: Record<CourseId, string> = {
+  "10k": "FULL CIRCUIT",
+  "5k": "ACTION COURSE",
+  "2.3k": "FAMILY COURSE",
+};
+
 export function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLElement>(null);
@@ -186,7 +192,7 @@ export function HomePage() {
               <em>ORIGIN STORY</em>
             </h2>
             <p className="sec__body">
-              2026년 10월 31일, 인제스피디움. 캡틴부터 둠까지 — 히어로들이
+              2026년 10월 31일, 인제스피디움. 캡틴 아메리카부터 닥터 둠까지, 히어로들이
               같은 출발선에 선다. 배번호를 다는 순간, 당신도 그 세계의 일원이다.
             </p>
             <p className="sec__body">
@@ -234,7 +240,7 @@ export function HomePage() {
                     sizes="(max-width: 720px) 100vw, (max-width: 960px) 100vw, 33vw"
                   />
                 </button>
-                <p className="course__code">{c.code}</p>
+                <p className="course__code">{HOME_COURSE_CODE[c.id]}</p>
                 <p className="course__dist">{c.distance}</p>
                 <p className="course__desc">{c.desc}</p>
                 <dl>
@@ -274,7 +280,7 @@ export function HomePage() {
             <p className="sec__body">
               자동차가 질주하던 인제 스피디움 서킷,
               <br />
-              이번에는 히어로들이 두 발로 달린다.
+              이번에는 참가자의 러닝 코스로 다시 열린다.
             </p>
             <Link href="/directions" className="btn btn--ghost">
               오시는길
