@@ -24,15 +24,30 @@ import type { AdminPayStatus } from "@/types/admin";
 import { useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
 import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 10;
 
+const PAY_STATUSES: AdminPayStatus[] = [
+  "paid",
+  "pending",
+  "refund_requested",
+  "refunded",
+];
+
+function payStatusFromParam(value: string | null): AdminPayStatus | "" {
+  if (!value) return "";
+  return PAY_STATUSES.includes(value as AdminPayStatus)
+    ? (value as AdminPayStatus)
+    : "";
+}
+
 const STATUS_LABEL: Record<AdminPayStatus, string> = {
   paid: "결제완료",
   pending: "대기",
-  refund_requested: "환불신청",
+  refund_requested: "환불 대기",
   refunded: "환불완료",
 };
 
@@ -53,14 +68,14 @@ const STATUS_OPTIONS: { value: AdminPayStatus | ""; label: string }[] = [
   { value: "", label: "전체 상태" },
   { value: "paid", label: "결제완료" },
   { value: "pending", label: "대기" },
-  { value: "refund_requested", label: "환불신청" },
+  { value: "refund_requested", label: "환불 대기" },
   { value: "refunded", label: "환불완료" },
 ];
 
 const STATUS_EDIT_OPTIONS: { value: AdminPayStatus; label: string }[] = [
   { value: "paid", label: "결제완료" },
   { value: "pending", label: "대기" },
-  { value: "refund_requested", label: "환불신청" },
+  { value: "refund_requested", label: "환불 대기" },
   { value: "refunded", label: "환불완료" },
 ];
 
@@ -137,6 +152,8 @@ type Props = {
 
 export function ApplicationsListPage({ eventId }: Props) {
   const event = getAdminRaceEvent(eventId);
+  const searchParams = useSearchParams();
+  const statusFromUrl = payStatusFromParam(searchParams.get("status"));
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "applications", eventId],
     queryFn: () => listApplicationsByEvent(eventId),
@@ -150,8 +167,11 @@ export function ApplicationsListPage({ eventId }: Props) {
   const [kind, setKind] = useState<ApplicationKind | "">("");
   const [round, setRound] = useState<VirtualRoundId | "">("");
   const [courseId, setCourseId] = useState<CourseId | "">("");
-  const [status, setStatus] = useState<AdminPayStatus | "">("");
-  const [applied, setApplied] = useState<Applied>(INITIAL);
+  const [status, setStatus] = useState<AdminPayStatus | "">(statusFromUrl);
+  const [applied, setApplied] = useState<Applied>({
+    ...INITIAL,
+    status: statusFromUrl,
+  });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -162,6 +182,13 @@ export function ApplicationsListPage({ eventId }: Props) {
     setDraft([]);
     setSelectedId(null);
   }, [data]);
+
+  useEffect(() => {
+    const next = payStatusFromParam(searchParams.get("status"));
+    setStatus(next);
+    setApplied((prev) => (prev.status === next ? prev : { ...prev, status: next }));
+    setPage(1);
+  }, [searchParams]);
 
   const courseOptions = useMemo(
     () => [

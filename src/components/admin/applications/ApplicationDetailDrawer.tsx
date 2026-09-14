@@ -73,7 +73,7 @@ function FieldSelect({
 const STATUS_OPTIONS: { value: AdminPayStatus; label: string }[] = [
   { value: "paid", label: "결제완료" },
   { value: "pending", label: "미결제" },
-  { value: "refund_requested", label: "환불신청" },
+  { value: "refund_requested", label: "환불 대기" },
   { value: "refunded", label: "환불완료" },
 ];
 

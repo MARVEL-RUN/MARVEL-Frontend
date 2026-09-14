@@ -1,124 +1,177 @@
 "use client";
 
 import { TrendPanel } from "@/components/admin/dashboard/TrendPanel";
-import { getAdminDashboardStats } from "@/services/admin/stats";
+import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
+import {
+  ADMIN_RACE_EVENTS,
+  getAdminRaceEvent,
+  type AdminRaceEventId,
+} from "@/lib/admin/raceEvents";
+import {
+  getAdminDashboardStats,
+  type EventIntakeStats,
+} from "@/services/admin/stats";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, FileText, HelpCircle, MessageSquare } from "lucide-react";
+import { Ban, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
-const ACTIONS = [
-  {
-    href: "/admin/boards/notice",
-    title: "공지사항",
-    description: "공식 공지 등록·수정",
-    icon: Bell,
-  },
-  {
-    href: "/admin/boards/inquiry",
-    title: "문의사항",
-    description: "문의 확인·답변",
-    icon: MessageSquare,
-  },
-  {
-    href: "/admin/boards/faq/write",
-    title: "FAQ 등록",
-    description: "자주 묻는 질문 작성",
-    icon: HelpCircle,
-  },
-  {
-    href: "/admin/legal/terms",
-    title: "이용약관",
-    description: "약관 조항 수정",
-    icon: FileText,
-  },
-];
+const APPS = "/admin/applications";
 
-export function DashboardPage() {
+function TaskLink({
+  href,
+  tone,
+  icon: Icon,
+  label,
+  count,
+  loading,
+}: {
+  href: string;
+  tone: string;
+  icon: typeof MessageSquare;
+  label: string;
+  count?: number;
+  loading: boolean;
+}) {
+  const on = !loading && (count ?? 0) > 0;
+  return (
+    <Link
+      href={href}
+      className={`admin-task admin-task--${tone}${on ? " is-on" : ""}`}
+    >
+      <span className="admin-task__mark">
+        <Icon size={16} strokeWidth={2.2} />
+      </span>
+      <span className="admin-task__label">{label}</span>
+      <strong>{loading ? "…" : (count ?? 0).toLocaleString()}</strong>
+      <ChevronRight className="admin-task__go" size={16} strokeWidth={2} />
+    </Link>
+  );
+}
+
+function IntakeCard({
+  eventId,
+  stats,
+  loading,
+}: {
+  eventId: AdminRaceEventId;
+  stats?: EventIntakeStats;
+  loading: boolean;
+}) {
+  const event = getAdminRaceEvent(eventId);
+  const n = (value?: number) => (loading ? "…" : (value ?? 0).toLocaleString());
+  const hero =
+    eventId === "virtual"
+      ? { label: "참가 확정", value: stats?.confirmedCount }
+      : { label: "총 인원", value: stats?.participantCount };
+  const side: [string, number | undefined][] =
+    eventId === "virtual"
+      ? [
+          ["1차", stats?.roundCounts[0]],
+          ["2차", stats?.roundCounts[1]],
+          ["3차", stats?.roundCounts[2]],
+        ]
+      : [
+          ["개인", stats?.individualCount],
+          ["단체", stats?.groupCount],
+          ["참가 확정", stats?.confirmedCount],
+        ];
+
+  return (
+    <Link href={`${APPS}/${eventId}`} className="admin-intake__card">
+      <span className="admin-intake__head">
+        <strong>{event?.name}</strong>
+        <ChevronRight className="admin-intake__go" size={16} strokeWidth={2} />
+      </span>
+      <span className="admin-intake__body">
+        <span className="admin-intake__hero">
+          <b>{n(hero.value)}</b>
+          <em>{hero.label}</em>
+        </span>
+        <span className="admin-intake__side">
+          {side.map(([label, value]) => (
+            <span key={label}>
+              <em>{label}</em>
+              <b>{n(value)}</b>
+            </span>
+          ))}
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+export function DashboardPage({
+  gaRealtimeUrl,
+}: {
+  gaRealtimeUrl?: string;
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "dashboard"],
     queryFn: getAdminDashboardStats,
   });
 
-  const n = (value?: number) => (isLoading ? "…" : (value ?? 0).toLocaleString());
+  const cancelHref = data?.cancellationPendingEventId
+    ? `${APPS}/${data.cancellationPendingEventId}?status=refund_requested`
+    : APPS;
 
   return (
     <div className="admin-page">
       <header className="admin-dash__head">
-        <h1>운영 홈</h1>
-        <p>마블런 2026 운영 현황을 한눈에 확인합니다.</p>
+        <div>
+          <h1>운영 홈</h1>
+          <p>오늘 처리할 일과 접수 현황을 확인합니다.</p>
+        </div>
+        <div className="admin-dash__links">
+          {gaRealtimeUrl ? (
+            <a href={gaRealtimeUrl} target="_blank" rel="noopener noreferrer">
+              GA 실시간
+            </a>
+          ) : null}
+          <a href={NAVER_ANALYTICS_URL} target="_blank" rel="noopener noreferrer">
+            네이버 애널리틱스
+          </a>
+        </div>
       </header>
 
-      <div className="admin-stat-row">
-        <Link href="/admin/applications/individual" className="admin-stat">
-          <span>개인 신청</span>
-          <strong>{n(data?.individualCount)}</strong>
-          <em>신청 내역 보기</em>
-        </Link>
-        <Link href="/admin/boards/inquiry" className="admin-stat">
-          <span>미답변 문의</span>
-          <strong>{n(data?.unansweredCount)}</strong>
-          <em>문의 처리하기</em>
-        </Link>
-        <Link href="/admin/boards/faq" className="admin-stat">
-          <span>FAQ</span>
-          <strong>{n(data?.faqCount)}</strong>
-          <em>FAQ 관리</em>
-        </Link>
-        <Link href="/admin/boards/notice" className="admin-stat">
-          <span>공지</span>
-          <strong>{n(data?.noticeCount)}</strong>
-          <em>공지 관리</em>
-        </Link>
-      </div>
+      <section className="admin-dash__section">
+        <h2>오늘 할 일</h2>
+        <div className="admin-task-board">
+          <TaskLink
+            href="/admin/boards/inquiry"
+            tone="inquiry"
+            icon={MessageSquare}
+            label="미답변 문의"
+            count={data?.unansweredCount}
+            loading={isLoading}
+          />
+          <TaskLink
+            href={cancelHref}
+            tone="cancel"
+            icon={Ban}
+            label="환불 대기"
+            count={data?.cancellationPendingCount}
+            loading={isLoading}
+          />
+        </div>
+      </section>
+
+      <section className="admin-dash__section">
+        <h2>접수 현황</h2>
+        <div className="admin-intake">
+          {ADMIN_RACE_EVENTS.map((event) => (
+            <IntakeCard
+              key={event.id}
+              eventId={event.id}
+              stats={data?.events.find((row) => row.eventId === event.id)}
+              loading={isLoading}
+            />
+          ))}
+        </div>
+      </section>
 
       <div className="admin-trend-grid">
         <TrendPanel kind="visitor" title="방문자 현황" unit="명" />
         <TrendPanel kind="applicant" title="신청자 현황" unit="건" />
-      </div>
-
-      <div className="admin-grid">
-        <section className="admin-card">
-          <h2>바로가기</h2>
-          <div className="admin-quick">
-            {ACTIONS.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <span className="admin-quick__icon">
-                  <item.icon size={16} />
-                </span>
-                <span className="admin-quick__text">
-                  <strong>{item.title}</strong>
-                  <span>{item.description}</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <aside className="admin-card">
-          <h2>처리할 업무</h2>
-          <div className="admin-quick">
-            <Link href="/admin/boards/inquiry">
-              <span className="admin-quick__text">
-                <strong>문의사항</strong>
-                <span>
-                  {n(data?.inquiryCount)}건 · 미답변 {n(data?.unansweredCount)}
-                </span>
-              </span>
-            </Link>
-            <Link href="/admin/applications/individual">
-              <span className="admin-quick__text">
-                <strong>개인 접수</strong>
-                <span>{n(data?.individualCount)}건</span>
-              </span>
-            </Link>
-            <Link href="/admin/applications/individual">
-              <span className="admin-quick__text">
-                <strong>결제 대기</strong>
-                <span>{n(data?.pendingCount)}건</span>
-              </span>
-            </Link>
-          </div>
-        </aside>
       </div>
     </div>
   );
