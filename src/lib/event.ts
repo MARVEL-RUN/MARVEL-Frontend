@@ -11,7 +11,7 @@ export const EVENT = {
   openAt: "2026-09-22T14:00:00+09:00",
   /* 홈 팝업 — 끄려면 enabled: false. image에 경로 넣으면 본문에 표시 */
   popup: {
-    enabled: true,
+    enabled: false,
     id: "home-open",
     title: "안내",
     image: "",
