@@ -20,74 +20,83 @@ const SPONSOR_LOGOS = {
   },
 } as const;
 
+const OFFICE_FACTS = [
+  { label: "주소", value: OFFICE.address, wide: true },
+  {
+    label: "대표번호",
+    value: <a href={`tel:${OFFICE.tel}`}>{OFFICE.tel}</a>,
+  },
+  {
+    label: "이메일",
+    value: <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>,
+  },
+  { label: "운영시간", value: OFFICE.hours, wide: true },
+  { label: "대표자", value: OFFICE.ceo },
+  { label: "사업자번호", value: OFFICE.bizNo },
+  { label: "통신판매번호", value: OFFICE.mailOrderNo, wide: true },
+] as const;
+
 export function Footer() {
   const { open } = useLegalModal();
 
   return (
     <footer className="site-footer">
-      <div className="site-footer__top">
-        <div>
+      <div className="site-footer__inner">
+        <ul className="site-footer__hosts">
+          {EVENT.sponsors.map((s) => {
+            const logo = SPONSOR_LOGOS[s.role];
+
+            return (
+              <li key={s.role}>
+                <p className="site-footer__host-role">{s.role}</p>
+                <span className="site-footer__host-logo">
+                  <Image
+                    src={logo.src}
+                    alt={s.name}
+                    width={logo.width}
+                    height={logo.height}
+                  />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="site-footer__info">
+          <nav className="site-footer__nav" aria-label="약관">
+            {LEGAL_DOCS.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  open(item.id);
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <Link href="/faq">FAQ</Link>
+          </nav>
+
           <p className="site-footer__office-name">{OFFICE.name}</p>
-          {/* iOS가 사업자번호·주소·시간을 tel/지도 링크로 바꿔 hydration이 깨진다 */}
-          <address
-            className="site-footer__office"
+          <dl
+            className="site-footer__facts"
             {...{ "x-apple-data-detectors": "false" }}
           >
-            <p>{OFFICE.address}</p>
-            <p className="site-footer__meta">
-              <span>대표자 : {OFFICE.ceo}</span>
-              <span>
-                Tel : <a href={`tel:${OFFICE.tel}`}>{OFFICE.tel}</a>
-              </span>
-              <span>
-                Email: <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>
-              </span>
-            </p>
-            <p className="site-footer__meta">
-              <span>사업자번호: {OFFICE.bizNo}</span>
-              <span>통신판매번호: {OFFICE.mailOrderNo}</span>
-            </p>
-            <p>※ 사무국 운영시간 : {OFFICE.hours}</p>
-          </address>
+            {OFFICE_FACTS.map((item) => (
+              <div
+                key={item.label}
+                className={item.wide ? "is-wide" : undefined}
+              >
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
           <p className="site-footer__copy">{OFFICE.copyright}</p>
         </div>
-
-        <nav className="site-footer__nav" aria-label="약관">
-          {LEGAL_DOCS.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              onClick={(e) => {
-                e.preventDefault();
-                open(item.id);
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link href="/faq">FAQ</Link>
-        </nav>
       </div>
-
-      <ul className="site-footer__sponsors">
-        {EVENT.sponsors.map((s) => {
-          const logo = SPONSOR_LOGOS[s.role];
-
-          return (
-            <li key={s.role}>
-              <span>{s.role}</span>
-              <span className="site-footer__sponsor-logo">
-                <Image
-                  src={logo.src}
-                  alt={s.name}
-                  width={logo.width}
-                  height={logo.height}
-                />
-              </span>
-            </li>
-          );
-        })}
-      </ul>
 
       <Link
         href="/"
