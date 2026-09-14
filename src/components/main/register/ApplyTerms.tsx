@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   APPLY_ALL_AGREE,
   APPLY_NOTICE_POINTS,
@@ -19,6 +19,7 @@ import {
   type Consents,
 } from "@/lib/register";
 import { LegalBlocks } from "../legal/LegalBlocks";
+import { isMobileView } from "@/lib/viewport";
 
 const OTHER_CONSENTS = REGISTER_CONSENTS.filter((item) => item.id !== "rules");
 
@@ -56,6 +57,44 @@ export function ApplyTerms({
     privacy: true,
   });
   const [error, setError] = useState("");
+  const [stuck, setStuck] = useState(true);
+  const slotRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const slot = slotRef.current;
+    const dock = dockRef.current;
+    if (!slot || !dock) return;
+
+    const sync = () => {
+      if (!isMobileView()) {
+        setStuck(false);
+        dock.style.bottom = "";
+        return;
+      }
+      const vv = window.visualViewport;
+      const covered = vv
+        ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+        : 0;
+      const line = window.innerHeight - dock.offsetHeight - covered;
+      const next = slot.getBoundingClientRect().top > line + 0.5;
+      setStuck(next);
+      dock.style.bottom = next && covered ? `${covered}px` : "";
+    };
+
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", sync);
+    vv?.addEventListener("scroll", sync);
+    return () => {
+      window.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+      vv?.removeEventListener("resize", sync);
+      vv?.removeEventListener("scroll", sync);
+    };
+  }, []);
 
   function setOne(id: ConsentId, next: boolean) {
     onChange({ ...values, [CONSENT_FIELD[id]]: next });
@@ -151,13 +190,18 @@ export function ApplyTerms({
 
       {error ? <p className="form__err">{error}</p> : null}
 
-      <div className="apply-terms__actions">
-        <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
-          개인신청
-        </button>
-        <button type="button" className="btn btn--ghost" onClick={() => pick("group")}>
-          단체신청
-        </button>
+      <div className="apply-terms__slot" ref={slotRef}>
+        <div
+          className={stuck ? "apply-terms__actions is-stuck" : "apply-terms__actions"}
+          ref={dockRef}
+        >
+          <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
+            개인신청
+          </button>
+          <button type="button" className="btn btn--ghost" onClick={() => pick("group")}>
+            단체신청
+          </button>
+        </div>
       </div>
     </div>
   );

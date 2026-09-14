@@ -6087,9 +6087,48 @@ button.course {
     padding: 0 0.9rem 1rem;
   }
 
+  html.is-main .apply-terms__row {
+    align-items: center;
+    min-height: var(--tap);
+    padding: 0.15rem 0.9rem;
+  }
+
+  html.is-main .apply-terms__agree {
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  html.is-main .apply-terms__agree input {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0;
+  }
+
+  html.is-main .apply-terms__toggle {
+    min-height: var(--tap);
+    margin-top: 0;
+    padding: 0 0.1rem 0 0.35rem;
+  }
+
+  html.is-main .apply-terms__slot:has(.is-stuck) {
+    height: calc(var(--tap) + 1.3rem + env(safe-area-inset-bottom, 0px));
+  }
+
   html.is-main .apply-terms__actions {
     flex-wrap: nowrap;
     gap: 0.55rem;
+  }
+
+  html.is-main .apply-terms__actions.is-stuck {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 24;
+    margin: 0;
+    padding: 0.65rem var(--gutter) calc(0.65rem + env(safe-area-inset-bottom, 0px));
+    background: var(--navy);
+    box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1);
   }
 
   html.is-main .apply-terms__actions .btn {
