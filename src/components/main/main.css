@@ -5134,10 +5134,20 @@ button.course {
 .wait h2 {
   font-size: clamp(1.6rem, 4vw, 2.4rem);
   line-height: 1.3;
+  word-break: keep-all;
 }
 
 .wait .sec__body {
   margin-inline: auto;
+  word-break: keep-all;
+}
+
+.wait>.btn {
+  margin-top: 1.35rem;
+}
+
+.wait .flow__nav {
+  margin-top: 1.35rem;
 }
 
 .courses__grid--stack {
@@ -6250,6 +6260,24 @@ button.course {
 
   .flow__nav .btn {
     flex: 1;
+    min-height: var(--tap);
+    justify-content: center;
+  }
+
+  .wait {
+    padding: 0.4rem 0 2rem;
+  }
+
+  .wait h2 {
+    font-size: clamp(1.45rem, 6.5vw, 2rem);
+  }
+
+  .wait .flow__nav {
+    flex-wrap: nowrap;
+    gap: 0.55rem;
+  }
+
+  .wait>.btn {
     min-height: var(--tap);
     justify-content: center;
   }
