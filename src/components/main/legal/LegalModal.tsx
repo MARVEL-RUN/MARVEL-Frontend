@@ -26,7 +26,7 @@ type LegalModalContextValue = {
 };
 
 const LegalModalContext = createContext<LegalModalContextValue>({
-  open: () => {},
+  open: () => { },
 });
 
 export function useLegalModal() {
@@ -89,14 +89,18 @@ function LegalDialogFrame({
             ×
           </button>
         </header>
-        <div className="legal-modal__body">
-          <p className="legal-modal__heading">{doc.heading}</p>
-          <LegalDocBody id={doc.id} />
-        </div>
-        <div className="legal-modal__foot">
-          <button type="button" className="legal-modal__ok" onClick={onClose}>
-            확인
-          </button>
+        <div className="legal-modal__main">
+          <div className="legal-modal__frame">
+            <div className="legal-modal__body">
+              <p className="legal-modal__heading">{doc.heading}</p>
+              <LegalDocBody id={doc.id} />
+            </div>
+          </div>
+          <div className="legal-modal__foot">
+            <button type="button" className="legal-modal__ok" onClick={onClose}>
+              확인
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -4147,6 +4147,25 @@ fieldset.field {
   cursor: pointer;
 }
 
+.legal-modal__main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 1.3rem 0;
+  background: #fff;
+}
+
+.legal-modal__frame {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #d0d0d0;
+  border-radius: 0.5rem;
+}
+
 .legal-modal__body {
   flex: 1 1 auto;
   min-height: 0;
@@ -4238,7 +4257,7 @@ fieldset.field {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  padding: 0.85rem 1rem 1.15rem;
+  padding: 0.9rem 0 1.15rem;
   background: #fff;
 }
 
@@ -5808,6 +5827,10 @@ button.course {
   .legal-modal__x {
     width: var(--tap);
     height: var(--tap);
+  }
+
+  .legal-modal__main {
+    padding: 0.85rem 0.8rem 0;
   }
 
   .legal-modal__body {
