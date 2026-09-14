@@ -604,6 +604,13 @@ export function GroupFlow({
                         <td className="party__del">
                           <button
                             type="button"
+                            className="party__expand"
+                            onClick={() => setOpenMember(i)}
+                          >
+                            펼치기
+                          </button>
+                          <button
+                            type="button"
                             className="party__fold"
                             onClick={() => setOpenMember(-1)}
                           >
@@ -611,11 +618,11 @@ export function GroupFlow({
                           </button>
                           <button
                             type="button"
+                            className="party__remove"
                             onClick={() => removeMember(i)}
                             disabled={draft.participants.length <= 1}
-                            aria-label="참가자 삭제"
                           >
-                            ×
+                            삭제
                           </button>
                         </td>
                       </tr>
