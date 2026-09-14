@@ -41,10 +41,31 @@ export const OFFICE = {
 /** 헤더 협찬문의 — 메일 앱에서 바로 작성 */
 export const SPONSOR_MAILTO = `mailto:${OFFICE.email}?subject=${encodeURIComponent("MARVEL RUN 2026 협찬문의")}`;
 
+export const LEGAL_DOCS = [
+  {
+    id: "terms",
+    href: "/terms",
+    label: "이용약관",
+    heading: "마블런 2026 이용약관",
+  },
+  {
+    id: "privacy",
+    href: "/privacy",
+    label: "개인정보 처리방침",
+    heading: "마블런 2026 개인정보 처리방침",
+  },
+  {
+    id: "precautions",
+    href: "/precautions",
+    label: "대회유의사항",
+    heading: "마블런 2026 대회유의사항",
+  },
+] as const;
+
+export type LegalDocId = (typeof LEGAL_DOCS)[number]["id"];
+
 export const LEGAL_LINKS = [
-  { href: "/terms", label: "이용약관" },
-  { href: "/privacy", label: "개인정보 처리방침" },
-  { href: "/precautions", label: "대회유의사항" },
+  ...LEGAL_DOCS.map(({ href, label }) => ({ href, label })),
   { href: "/faq", label: "FAQ" },
 ] as const;
 

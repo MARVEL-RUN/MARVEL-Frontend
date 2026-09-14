@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { MAIN_ASSETS } from "@/lib/assets";
-import { LEGAL_LINKS, OFFICE } from "@/lib/legal";
+import { LEGAL_DOCS, OFFICE } from "@/lib/legal";
+import { useLegalModal } from "../legal/LegalModal";
 
 const SPONSOR_LOGOS = {
   주최: {
@@ -18,6 +21,8 @@ const SPONSOR_LOGOS = {
 } as const;
 
 export function Footer() {
+  const { open } = useLegalModal();
+
   return (
     <footer className="site-footer">
       <div className="site-footer__top">
@@ -48,11 +53,19 @@ export function Footer() {
         </div>
 
         <nav className="site-footer__nav" aria-label="약관">
-          {LEGAL_LINKS.map((item) => (
-            <Link key={item.href} href={item.href}>
+          {LEGAL_DOCS.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+              onClick={(e) => {
+                e.preventDefault();
+                open(item.id);
+              }}
+            >
               {item.label}
             </Link>
           ))}
+          <Link href="/faq">FAQ</Link>
         </nav>
       </div>
 

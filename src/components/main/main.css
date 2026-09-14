@@ -4079,6 +4079,174 @@ fieldset.field {
   white-space: nowrap;
 }
 
+/* zoom 1.1이면 100dvh가 화면보다 커짐 */
+.legal-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  width: calc(100dvw / var(--site-zoom, 1));
+  height: calc(100dvh / var(--site-zoom, 1));
+  max-width: calc(100dvw / var(--site-zoom, 1));
+  max-height: calc(100dvh / var(--site-zoom, 1));
+  padding: 4.2rem 1.5rem 1.6rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.legal-modal__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(8, 10, 24, 0.78);
+  cursor: pointer;
+}
+
+.legal-modal__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(46rem, 100%);
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.legal-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+  min-height: 3rem;
+  padding: 0 0.35rem 0 1.15rem;
+  background: #111;
+  color: #fff;
+}
+
+.legal-modal__head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.legal-modal__x {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 1.55rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.legal-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 2.1rem 2.2rem 1.2rem;
+  color: #222;
+}
+
+.legal-modal__heading {
+  margin: 0 0 1.15rem;
+  color: #111;
+  font-size: 1.28rem;
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.legal-modal .sec__body {
+  max-width: none;
+  color: #333;
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+.legal-modal .sec__body+.block {
+  margin-top: 1.5rem;
+}
+
+.legal-modal .block+.block {
+  margin-top: 1.6rem;
+}
+
+.legal-modal .block h2 {
+  margin-bottom: 0.7rem;
+  color: #111;
+  font-size: 1.02rem;
+  font-weight: 800;
+  word-break: keep-all;
+}
+
+.legal-modal .legal {
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.legal-modal .legal h3 {
+  color: #111;
+}
+
+.legal-modal .legal__note,
+.legal-modal .legal__effective {
+  color: #555;
+}
+
+.legal-modal .legal-table-wrap {
+  margin: 0.35rem 0 0.2rem;
+}
+
+.legal-modal .legal-table {
+  min-width: 0;
+  color: #222;
+}
+
+.legal-modal .legal-table th,
+.legal-modal .legal-table td {
+  border-color: #c8c8c8;
+  word-break: keep-all;
+}
+
+.legal-modal .legal-table th {
+  color: #111;
+  background: #f3f3f3;
+  white-space: normal;
+}
+
+.legal-modal__foot {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  padding: 0.85rem 1rem 1.15rem;
+  background: #fff;
+}
+
+.legal-modal__ok {
+  min-width: 8.2rem;
+  min-height: 2.6rem;
+  padding: 0 1.6rem;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .stepper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
@@ -5608,6 +5776,64 @@ button.course {
 
   .page--legal .legal ul {
     padding-left: 1.2rem;
+  }
+
+  .legal-modal {
+    padding: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 0.55rem) 0.7rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    place-items: start center;
+  }
+
+  .legal-modal__panel {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+  }
+
+  .legal-modal__head {
+    min-height: var(--tap);
+    padding-left: 1rem;
+  }
+
+  .legal-modal__head h2 {
+    font-size: 0.92rem;
+  }
+
+  .legal-modal__x {
+    width: var(--tap);
+    height: var(--tap);
+  }
+
+  .legal-modal__body {
+    padding: 1.35rem 1.05rem 1rem;
+  }
+
+  .legal-modal__heading {
+    margin-bottom: 0.95rem;
+    font-size: 1.08rem;
+  }
+
+  .legal-modal .sec__body,
+  .legal-modal .legal {
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .legal-modal .block h2 {
+    font-size: 0.95rem;
+  }
+
+  .legal-modal .legal-table {
+    font-size: 0.74rem;
+  }
+
+  .legal-modal .legal-table th,
+  .legal-modal .legal-table td {
+    padding: 0.55rem 0.45rem;
+  }
+
+  .legal-modal__ok {
+    min-width: 7.5rem;
+    min-height: var(--tap);
   }
 
   html.is-main .site-footer {
