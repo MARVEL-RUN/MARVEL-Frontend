@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EVENT } from "@/lib/event";
 
 export function RegisterClosed() {
@@ -13,6 +14,14 @@ export function RegisterClosed() {
         접수는 아직 열리지 않았습니다. 오픈 시각에 이 페이지에서 개인 또는 단체
         신청을 할 수 있습니다.
       </p>
+      <div className="flow__nav">
+        <Link href="/guide" className="btn btn--ghost">
+          대회안내
+        </Link>
+        <Link href="/notices" className="btn btn--red">
+          공지사항
+        </Link>
+      </div>
     </section>
   );
 }

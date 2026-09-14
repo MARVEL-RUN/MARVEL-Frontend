@@ -83,6 +83,11 @@ export function FaqListPage() {
         }
         columns={[
           {
+            key: "category",
+            header: "분류",
+            render: (row) => row.category,
+          },
+          {
             key: "question",
             header: "질문",
             render: (row) => (

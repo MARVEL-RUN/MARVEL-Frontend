@@ -111,13 +111,13 @@ export type GroupRecord = {
 export type LookupQuery = {
   name: string;
   birth: string;
-  orderNo: string;
+  phone: string;
+  password: string;
 };
 
 export type GroupLookupQuery = {
-  groupName: string;
-  leaderName: string;
-  orderNo: string;
+  account: string;
+  password: string;
 };
 
 export const MAX_GROUP_SIZE = 20;
@@ -445,7 +445,9 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   assertAgeTicket(draft.birth, draft.ticket, picked);
   if (!draft.gender) throw new Error("성별을 선택하세요.");
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
-  if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (draft.email.trim() && !emailOk(draft.email)) {
+    throw new Error("이메일 형식을 확인하세요.");
+  }
   if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
     throw new Error("만 14세 미만은 보호자 연락처를 입력하세요.");
   }
@@ -513,7 +515,9 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
     throw new Error("대표자 생년월일을 선택하세요.");
   }
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
-  if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (draft.email.trim() && !emailOk(draft.email)) {
+    throw new Error("이메일 형식을 확인하세요.");
+  }
   if (!draft.zonecode.trim() || !draft.address.trim()) {
     throw new Error("우편번호 찾기로 주소를 선택하세요.");
   }
@@ -547,25 +551,30 @@ export async function submitEntry(draft: EntryDraft): Promise<EntryRecord> {
   };
 }
 
-/** 퍼블리싱 스텁. 주문번호 6자 이상이면 조회 성공으로 보여 줌. */
+/** 퍼블리싱 스텁. 조회 칸이 채워지면 성공으로 보여 줌. */
 export async function lookupEntry(query: LookupQuery): Promise<EntryRecord | null> {
   await wait(420);
-  const orderNo = query.orderNo.trim().toUpperCase();
   const name = query.name.trim();
-  if (!name || !/^\d{8}$/.test(query.birth) || orderNo.length < 6) {
+  const birth = query.birth.replace(/\D/g, "");
+  const phone = formatPhone(query.phone);
+  const phoneDigits = query.phone.replace(/\D/g, "");
+  if (
+    !name ||
+    !/^\d{8}$/.test(birth) ||
+    phoneDigits.length < 10 ||
+    query.password.trim().length < 4
+  ) {
     return null;
   }
-  const fromOrder = EVENT.courses.find((c) =>
-    orderNo.includes(`-${c.id.toUpperCase()}-`),
-  );
+  const seq = String(10000 + (name.length * 419) % 80000);
   return {
-    orderNo,
-    courseId: fromOrder?.id ?? "10k",
+    orderNo: `MR26-10K-${seq}`,
+    courseId: "10k",
     ticket: "adult",
     name,
-    birth: query.birth,
+    birth,
     gender: "none",
-    phone: "010-0000-0000",
+    phone,
     email: "runner@marvelrun.kr",
     emergency: "010-0000-0000",
     shirt: "M",
@@ -595,14 +604,13 @@ export async function lookupGroup(
   query: GroupLookupQuery,
 ): Promise<GroupRecord | null> {
   await wait(420);
-  const orderNo = query.orderNo.trim().toUpperCase();
-  const groupName = query.groupName.trim();
-  const leaderName = query.leaderName.trim();
-  if (!groupName || !leaderName || orderNo.length < 6) return null;
+  const account = query.account.trim();
+  if (orgAccountError(account) || orgPasswordError(query.password)) return null;
+  const seq = String(20000 + (account.length * 419) % 80000);
   return {
-    orderNo,
-    groupName,
-    leaderName,
+    orderNo: `MR26-GRP-${seq}`,
+    groupName: account,
+    leaderName: "대표자",
     phone: "010-0000-0000",
     email: "group@marvelrun.kr",
     participants: [
@@ -610,7 +618,7 @@ export async function lookupGroup(
         categoryId: "",
         souvenirId: "",
         selectedSize: "",
-        name: leaderName,
+        name: "대표자",
         birth: "19900101",
         gender: "none",
         phone: "010-0000-0000",

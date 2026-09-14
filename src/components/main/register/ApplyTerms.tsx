@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   APPLY_ALL_AGREE,
   APPLY_NOTICE_POINTS,
@@ -18,6 +18,7 @@ import {
   type ApplyKind,
   type Consents,
 } from "@/lib/register";
+import { useStickyDock } from "@/lib/sticky-dock";
 import { LegalBlocks } from "../legal/LegalBlocks";
 
 const OTHER_CONSENTS = REGISTER_CONSENTS.filter((item) => item.id !== "rules");
@@ -56,6 +57,9 @@ export function ApplyTerms({
     privacy: true,
   });
   const [error, setError] = useState("");
+  const slotRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const stuck = useStickyDock(slotRef, dockRef);
 
   function setOne(id: ConsentId, next: boolean) {
     onChange({ ...values, [CONSENT_FIELD[id]]: next });
@@ -151,13 +155,18 @@ export function ApplyTerms({
 
       {error ? <p className="form__err">{error}</p> : null}
 
-      <div className="apply-terms__actions">
-        <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
-          개인신청
-        </button>
-        <button type="button" className="btn btn--ghost" onClick={() => pick("group")}>
-          단체신청
-        </button>
+      <div className="apply-terms__slot" ref={slotRef}>
+        <div
+          className={stuck ? "apply-terms__actions is-stuck" : "apply-terms__actions"}
+          ref={dockRef}
+        >
+          <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
+            개인신청
+          </button>
+          <button type="button" className="btn btn--ghost" onClick={() => pick("group")}>
+            단체신청
+          </button>
+        </div>
       </div>
     </div>
   );

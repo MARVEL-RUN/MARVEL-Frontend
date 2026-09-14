@@ -30,12 +30,19 @@ export async function mainFetch<T>(
   }
 
   const headers = new Headers(init.headers);
-  if (!headers.has("Accept")) headers.set("Accept", "application/json");
+  const method = (init.method ?? "GET").toUpperCase();
+  if (method !== "GET" && !headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(joinUrl(endpoint), { ...init, headers });
+  const response = await fetch(joinUrl(endpoint), {
+    ...init,
+    cache: method === "GET" ? "no-store" : init.cache,
+    headers,
+  });
   const text = await response.text().catch(() => "");
 
   if (!response.ok) {

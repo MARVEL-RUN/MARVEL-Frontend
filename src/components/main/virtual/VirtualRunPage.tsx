@@ -99,6 +99,7 @@ export function VirtualRunPage() {
             width={926}
             height={420}
             className="virtual-header__logo"
+            sizes="(max-width: 720px) 40vw, 173px"
             priority
           />
         </Link>
@@ -141,7 +142,8 @@ export function VirtualRunPage() {
                       ? "virtual-card__img is-on"
                       : "virtual-card__img"
                   }
-                  priority
+                  sizes="(max-width: 860px) calc(100vw - 2rem), 640px"
+                  priority={item.id === "1"}
                 />
               ))}
             </div>
@@ -177,6 +179,7 @@ export function VirtualRunPage() {
                           ? "virtual-hosts__logo is-organizer"
                           : "virtual-hosts__logo"
                       }
+                      sizes="160px"
                     />
                   ))}
                 </div>

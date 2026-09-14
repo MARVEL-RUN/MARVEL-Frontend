@@ -396,7 +396,7 @@ export function EmailField({
   }
 
   return (
-    <div className="email-pick">
+    <div className={custom ? "email-pick is-custom" : "email-pick"}>
       <input
         type="text"
         className="email-pick__local"
@@ -448,6 +448,7 @@ export function PasswordField({
   label = "신청 비밀번호",
   placeholder = "신청조회용 비밀번호 (4자 이상)",
   minLength = 4,
+  autoComplete = "new-password",
 }: {
   value: string;
   onChange: (next: string) => void;
@@ -456,6 +457,7 @@ export function PasswordField({
   label?: string;
   placeholder?: string;
   minLength?: number;
+  autoComplete?: string;
 }) {
   const [show, setShow] = useState(false);
 
@@ -467,7 +469,7 @@ export function PasswordField({
         placeholder={placeholder}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
-        autoComplete="new-password"
+        autoComplete={autoComplete}
         minLength={minLength}
         required={required}
         aria-label={label}
