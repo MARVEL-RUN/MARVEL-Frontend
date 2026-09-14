@@ -3612,7 +3612,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   box-sizing: border-box;
 }
 
-.course-pick__fees-head span,
+.course-pick__fees-head > span,
 .course-pick__fees-row span {
   display: flex;
   align-items: center;
@@ -3624,10 +3624,26 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   white-space: nowrap;
 }
 
-.course-pick__fees-head span {
+.course-pick__fees-head > span,
+.course-pick__fees-h {
   color: #fff;
   font-size: 0.78rem;
   font-weight: 800;
+}
+
+.course-pick__fees-label--short {
+  display: none;
+}
+
+.course-pick__fees-h {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .course-pick__fees-body {
@@ -7198,7 +7214,7 @@ button.course {
 
   .course-pick {
     --course-row: var(--tap);
-    --course-fees-cols: 3.85rem 6.35rem 5.35rem 10.85rem;
+    --course-fees-cols: minmax(0, 0.85fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr);
     grid-template-columns: 1fr;
     gap: 0.85rem 0;
     min-width: 0;
@@ -7215,17 +7231,11 @@ button.course {
   }
 
   .course-pick__fees {
+    --course-fees-cols: minmax(0, 0.85fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr);
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-    /* 잘린 열이 있다는 힌트 */
-    background:
-      linear-gradient(to right, transparent calc(100% - 1.25rem), rgba(4, 7, 18, 0.92)) border-box;
+    overflow: hidden;
   }
 
   .apply-hint .course-pick__fees {
@@ -7235,9 +7245,16 @@ button.course {
   }
 
   .course-pick__fees-table {
-    width: max-content;
-    min-width: 100%;
-    max-width: none;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .course-pick__fees-head,
+  .course-pick__fees-row,
+  .apply-hint .course-pick__fees-head,
+  .apply-hint .course-pick__fees-row {
+    grid-template-columns: var(--course-fees-cols);
   }
 
   .course-pick__fees-head {
@@ -7254,15 +7271,24 @@ button.course {
     height: auto;
   }
 
-  .course-pick__fees-head span,
+  .course-pick__fees-head > span,
+  .course-pick__fees-h,
   .course-pick__fees-row span {
-    min-width: auto;
+    min-width: 0;
     padding: 0 0.35rem;
-    overflow: visible;
-    text-overflow: unset;
+    justify-content: flex-start;
   }
 
-  .course-pick__fees-head span {
+  .course-pick__fees-label--long {
+    display: none;
+  }
+
+  .course-pick__fees-label--short {
+    display: inline;
+  }
+
+  .course-pick__fees-head > span,
+  .course-pick__fees-h {
     font-size: 0.7rem;
   }
 
