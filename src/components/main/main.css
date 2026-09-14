@@ -1850,6 +1850,114 @@ html.is-live .hero__actions {
   letter-spacing: 0.16em;
 }
 
+.board-sec {
+  text-align: center;
+}
+
+.board-sec__title {
+  margin: 0 0 1.6rem;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.board-switch {
+  display: flex;
+  width: fit-content;
+  margin: 0 auto 1.8rem;
+  padding: 0.28rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.board-switch__btn {
+  min-width: 8.6rem;
+  min-height: 2.7rem;
+  padding: 0 1.45rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.68);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.board-switch__btn.is-on {
+  background: #fff;
+  color: #141428;
+}
+
+.board-fold {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.board-fold li {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.05rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.board-fold__btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.15rem 1.35rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.board-fold__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.board-fold__chev {
+  flex: none;
+  display: block;
+  width: 0.52rem;
+  height: 0.52rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  opacity: 0.7;
+  transform: rotate(45deg);
+}
+
+.board-fold__btn[aria-expanded="true"] .board-fold__chev {
+  transform: rotate(-135deg);
+}
+
+.board-fold__body {
+  margin: 0;
+  padding: 0 1.35rem 1.2rem;
+  color: var(--silver);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.board-sec .board__empty {
+  margin-top: 0.4rem;
+}
+
 /* inner pages */
 .page {
   padding-top: var(--header-h);
@@ -6288,6 +6396,36 @@ button.course {
   .sec__title {
     font-size: clamp(1.65rem, 8vw, 2.15rem);
     word-break: keep-all;
+  }
+
+  .board-sec__title {
+    margin-bottom: 1.25rem;
+    font-size: clamp(1.65rem, 8vw, 2.15rem);
+    word-break: keep-all;
+  }
+
+  .board-switch {
+    margin-bottom: 1.35rem;
+  }
+
+  .board-switch__btn {
+    min-width: 7.4rem;
+    min-height: var(--tap);
+    font-size: 0.9rem;
+  }
+
+  .board-fold__btn {
+    min-height: var(--tap);
+    padding: 1rem 1.1rem;
+  }
+
+  .board-fold__title,
+  .board-fold__body {
+    font-size: 0.9rem;
+  }
+
+  .board-fold__body {
+    padding: 0 1.1rem 1.05rem;
   }
 
   .sec__body {

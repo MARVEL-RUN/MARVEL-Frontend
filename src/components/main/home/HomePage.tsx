@@ -11,6 +11,7 @@ import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
 import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown, OpenDday } from "./OpenCountdown";
+import { HomeBoard } from "./HomeBoard";
 import { HomePopup } from "./HomePopup";
 import { SideDock } from "./SideDock";
 
@@ -335,6 +336,7 @@ export function HomePage() {
           </Link>
         </div>
       </section>
+      <HomeBoard />
       <SideDock />
       <HomePopup />
     </main>
