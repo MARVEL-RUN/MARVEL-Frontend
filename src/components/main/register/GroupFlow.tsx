@@ -207,7 +207,9 @@ export function GroupFlow({
       return fail("대표자 생년월일을 선택하세요.");
     }
     if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
-    if (!emailOk(draft.email)) return fail("이메일을 입력하세요.");
+    if (draft.email.trim() && !emailOk(draft.email)) {
+      return fail("이메일 형식을 확인하세요.");
+    }
     if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
       return fail("우편번호 찾기로 주소를 선택하세요.");
     }
@@ -383,11 +385,10 @@ export function GroupFlow({
                 required
               />
             </FormRow>
-            <FormRow label="이메일" required>
+            <FormRow label="이메일">
               <EmailField
                 value={draft.email}
                 onChange={(email) => patch({ email })}
-                required
               />
             </FormRow>
           </FormSec>
@@ -676,7 +677,7 @@ export function GroupFlow({
             </div>
             <div>
               <dt>이메일</dt>
-              <dd>{draft.email}</dd>
+              <dd>{draft.email.trim() || "—"}</dd>
             </div>
             <div>
               <dt>주소</dt>

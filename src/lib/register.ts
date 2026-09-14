@@ -445,7 +445,9 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   assertAgeTicket(draft.birth, draft.ticket, picked);
   if (!draft.gender) throw new Error("성별을 선택하세요.");
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
-  if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (draft.email.trim() && !emailOk(draft.email)) {
+    throw new Error("이메일 형식을 확인하세요.");
+  }
   if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
     throw new Error("만 14세 미만은 보호자 연락처를 입력하세요.");
   }
@@ -513,7 +515,9 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
     throw new Error("대표자 생년월일을 선택하세요.");
   }
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
-  if (!emailOk(draft.email)) throw new Error("이메일을 입력하세요.");
+  if (draft.email.trim() && !emailOk(draft.email)) {
+    throw new Error("이메일 형식을 확인하세요.");
+  }
   if (!draft.zonecode.trim() || !draft.address.trim()) {
     throw new Error("우편번호 찾기로 주소를 선택하세요.");
   }

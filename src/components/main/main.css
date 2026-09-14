@@ -648,7 +648,8 @@ body:has(.sheet-modal) .side-dock {
   display: none;
 }
 
-@media (max-width: 720px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .home-pop-root {
     position: fixed;
     inset: 0;
@@ -5677,7 +5678,8 @@ button.course {
   }
 }
 
-@media (max-width: 720px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   html.is-main {
     --site-zoom: 1;
     --header-h: calc(3.4rem + env(safe-area-inset-top, 0px));
@@ -7535,7 +7537,8 @@ button.course {
   content: "• ";
 }
 
-@media (max-width: 720px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
 
   .board-write__head .btn,
   .board-write__actions .btn,
