@@ -34,6 +34,7 @@ function SponsorInquiry({ className }: { className?: string }) {
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [hash, setHash] = useState("");
   const home = pathname === "/";
@@ -47,7 +48,12 @@ export function Header() {
 
   useEffect(() => {
     setOpen(false);
+    setOpenGroup(null);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!open) setOpenGroup(null);
+  }, [open]);
 
   useEffect(() => {
     const jump = () => {
@@ -199,25 +205,43 @@ export function Header() {
               </Link>
             );
             if (!kids) return <span key={item.href}>{parent}</span>;
+            const expanded = openGroup === item.href;
             return (
               <div key={item.href} className="site-header__drawer-group">
-                {parent}
-                {kids.map((child) => {
-                  const id = child.href.split("#")[1];
-                  const on = pathname.startsWith(item.href) && hash === "#" + id;
-                  return (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      className={
-                        on ? "site-header__drawer-sub is-active" : "site-header__drawer-sub"
-                      }
-                      onClick={(event) => goSection(event, child.href, item.href, true)}
-                    >
-                      {child.label}
-                    </Link>
-                  );
-                })}
+                <div className="site-header__drawer-row">
+                  {parent}
+                  <button
+                    type="button"
+                    className="site-header__drawer-caret"
+                    aria-expanded={expanded}
+                    aria-label={`${item.label} 하위 메뉴`}
+                    onClick={() =>
+                      setOpenGroup((v) => (v === item.href ? null : item.href))
+                    }
+                  />
+                </div>
+                {expanded
+                  ? kids.map((child) => {
+                      const id = child.href.split("#")[1];
+                      const on = pathname.startsWith(item.href) && hash === "#" + id;
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={
+                            on
+                              ? "site-header__drawer-sub is-active"
+                              : "site-header__drawer-sub"
+                          }
+                          onClick={(event) =>
+                            goSection(event, child.href, item.href, true)
+                          }
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })
+                  : null}
               </div>
             );
           })}
