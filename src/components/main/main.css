@@ -2942,6 +2942,22 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   gap: 2.4rem;
 }
 
+.form__head {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.form__head h2 {
+  margin: 0;
+}
+
+.form__sub {
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
 .apply-notice {
   padding: 1.05rem 1.15rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3669,6 +3685,22 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font: inherit;
   font-size: 1.05rem;
   color-scheme: dark;
+}
+
+.field .password-pick {
+  width: 100%;
+}
+
+.field .password-pick input {
+  padding-right: 2.75rem;
+}
+
+.field__hint {
+  margin: 0;
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.55;
 }
 
 .field input:focus {
@@ -5394,6 +5426,10 @@ button.course {
   word-break: keep-all;
 }
 
+.wait .sec__body a {
+  color: inherit;
+}
+
 .wait>.btn {
   margin-top: 1.35rem;
 }
@@ -6903,6 +6939,10 @@ button.course {
     flex: 1;
     min-height: var(--tap);
     justify-content: center;
+  }
+
+  .form .flow__nav .btn {
+    flex: 1 1 8.5rem;
   }
 
   .form {
