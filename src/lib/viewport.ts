@@ -7,9 +7,9 @@ export function isMobileView() {
   return window.matchMedia(MOBILE_MQ).matches;
 }
 
-/* iOS는 키보드가 innerHeight를 안 줄임 */
+/* iOS 팬(offsetTop)은 빼지 않음. 치면 --kb가 흔들림 */
 export function keyboardCover() {
   const vv = window.visualViewport;
   if (!vv) return 0;
-  return Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+  return Math.max(0, window.innerHeight - vv.height);
 }

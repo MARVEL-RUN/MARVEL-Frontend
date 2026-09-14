@@ -8,6 +8,20 @@ const FIELD = "input, textarea, select";
 export function KeyboardInset() {
   useEffect(() => {
     const html = document.documentElement;
+    let kb = 0;
+    let pinTimer = 0;
+
+    const setKb = (next: number) => {
+      const rounded = Math.max(0, Math.round(next));
+      if (rounded === kb) return;
+      if (rounded > 0 && kb > 0 && Math.abs(rounded - kb) < 16) return;
+      kb = rounded;
+      html.style.setProperty("--kb", `${kb}px`);
+    };
+
+    const measure = () => {
+      setKb(isMobileView() ? keyboardCover() : 0);
+    };
 
     const pinField = () => {
       const el = document.activeElement;
@@ -26,28 +40,43 @@ export function KeyboardInset() {
       window.scrollBy(0, r.bottom > bottom ? r.bottom - bottom : r.top - top);
     };
 
-    const sync = () => {
-      html.style.setProperty("--kb", isMobileView() ? `${keyboardCover()}px` : "0px");
-      pinField();
-    };
-
     const onFocusIn = (e: FocusEvent) => {
-      if (e.target instanceof HTMLElement && e.target.matches(FIELD)) {
-        requestAnimationFrame(sync);
-      }
+      if (!(e.target instanceof HTMLElement) || !e.target.matches(FIELD)) return;
+      measure();
+      window.clearTimeout(pinTimer);
+      pinTimer = window.setTimeout(() => {
+        measure();
+        pinField();
+      }, 350);
     };
 
-    sync();
-    window.addEventListener("resize", sync);
+    const onFocusOut = () => {
+      window.setTimeout(() => {
+        const el = document.activeElement;
+        if (el instanceof HTMLElement && el.matches(FIELD)) return;
+        window.clearTimeout(pinTimer);
+        setKb(0);
+      }, 50);
+    };
+
+    const onResize = () => {
+      const el = document.activeElement;
+      if (el instanceof HTMLElement && el.matches(FIELD)) measure();
+      else if (!isMobileView()) setKb(0);
+    };
+
+    measure();
+    window.addEventListener("resize", onResize);
     window.addEventListener("focusin", onFocusIn);
+    window.addEventListener("focusout", onFocusOut);
     const vv = window.visualViewport;
-    vv?.addEventListener("resize", sync);
-    vv?.addEventListener("scroll", sync);
+    vv?.addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("resize", sync);
+      window.clearTimeout(pinTimer);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("focusin", onFocusIn);
-      vv?.removeEventListener("resize", sync);
-      vv?.removeEventListener("scroll", sync);
+      window.removeEventListener("focusout", onFocusOut);
+      vv?.removeEventListener("resize", onResize);
       html.style.setProperty("--kb", "0px");
     };
   }, []);
