@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { OFFICE } from "@/lib/legal";
 import {
   courseById,
   genderLabel,
@@ -15,7 +14,7 @@ import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 import { PasswordField, PhoneField } from "../register/ApplyUi";
 
-type View = "form" | "hit" | "miss" | "reset";
+type View = "form" | "hit" | "miss";
 
 const LOOKUP_LEAD =
   "신청 내역을 확인하기 위해 신청시와 동일한 정보를 입력한 후, 확인하기를 클릭하세요.";
@@ -39,46 +38,16 @@ export function LookupPage() {
   );
 }
 
-function LookupNav({
-  busy,
-  onBack,
-  onReset,
-}: {
-  busy: boolean;
-  onBack: () => void;
-  onReset: () => void;
-}) {
+function LookupNav({ busy, onBack }: { busy: boolean; onBack: () => void }) {
   return (
     <div className="flow__nav">
       <button type="button" className="btn btn--ghost" onClick={onBack}>
         유형 변경
       </button>
-      <button type="button" className="btn btn--ghost" onClick={onReset}>
-        비밀번호 초기화
-      </button>
       <button type="submit" className="btn btn--red" disabled={busy}>
         {busy ? "확인 중..." : "확인하기"}
       </button>
     </div>
-  );
-}
-
-function PasswordReset({ onBack }: { onBack: () => void }) {
-  return (
-    <section className="block wait">
-      <p className="kicker">PASSWORD</p>
-      <h2>비밀번호 초기화</h2>
-      <p className="sec__body">
-        비밀번호 초기화는 사무국으로 문의해 주세요.
-        <br />
-        Tel <a href={`tel:${OFFICE.tel}`}>{OFFICE.tel}</a>
-        <br />
-        Email <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>
-      </p>
-      <button type="button" className="btn btn--red" onClick={onBack}>
-        조회 화면으로
-      </button>
-    </section>
   );
 }
 
@@ -104,10 +73,6 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   }
 
   const course = record ? courseById(record.courseId) : undefined;
-
-  if (view === "reset") {
-    return <PasswordReset onBack={() => setView("form")} />;
-  }
 
   if (view === "miss") {
     return (
@@ -204,7 +169,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           required
         />
       </div>
-      <LookupNav busy={busy} onBack={onBack} onReset={() => setView("reset")} />
+      <LookupNav busy={busy} onBack={onBack} />
     </form>
   );
 }
@@ -226,10 +191,6 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     } finally {
       setBusy(false);
     }
-  }
-
-  if (view === "reset") {
-    return <PasswordReset onBack={() => setView("form")} />;
   }
 
   if (view === "miss") {
@@ -317,7 +278,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         />
         <p className="field__hint">6~64자, 공백 없이 입력해주세요.</p>
       </div>
-      <LookupNav busy={busy} onBack={onBack} onReset={() => setView("reset")} />
+      <LookupNav busy={busy} onBack={onBack} />
     </form>
   );
 }

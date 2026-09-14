@@ -5426,10 +5426,6 @@ button.course {
   word-break: keep-all;
 }
 
-.wait .sec__body a {
-  color: inherit;
-}
-
 .wait>.btn {
   margin-top: 1.35rem;
 }
@@ -6939,10 +6935,6 @@ button.course {
     flex: 1;
     min-height: var(--tap);
     justify-content: center;
-  }
-
-  .form .flow__nav .btn {
-    flex: 1 1 8.5rem;
   }
 
   .form {
