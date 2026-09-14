@@ -4818,8 +4818,7 @@ button.course {
   color: var(--note);
 }
 
-.page--post .page__body,
-.page--faq .page__body {
+.page--post .page__body {
   padding: 4.75rem 0 6.5rem;
 }
 
@@ -4852,18 +4851,6 @@ button.course {
 
 .page--post .post__foot {
   margin-top: 2.4rem;
-}
-
-.faq__title {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 .faq__tabs {
@@ -5323,8 +5310,7 @@ button.course {
     width: min(720px, calc(100% - 3.25rem));
   }
 
-  html.is-main .page--post .page__body,
-  html.is-main .page--faq .page__body {
+  html.is-main .page--post .page__body {
     padding: 4.75rem 0 5.5rem;
   }
 
@@ -6050,22 +6036,6 @@ button.course {
     overflow: visible;
     text-overflow: unset;
     word-break: break-all;
-  }
-
-  .faq__title {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: 0;
-    margin: 0 0 1.6rem;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-    border: 0;
-    font-size: clamp(1.7rem, 8vw, 2.15rem);
-    font-weight: 800;
-    line-height: 1.15;
-    word-break: keep-all;
   }
 
   .faq__tab {

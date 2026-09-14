@@ -4,6 +4,7 @@ import { FAQ_CATEGORIES, type FaqCategory } from "@/lib/admin/faqCategories";
 import { listFaqs } from "@/services/admin/faqs";
 import type { AdminFaq } from "@/types/boards";
 import { useEffect, useMemo, useState } from "react";
+import { SideBanner } from "../layout/SideBanner";
 
 export function FaqPage() {
   const [items, setItems] = useState<AdminFaq[]>([]);
@@ -26,8 +27,8 @@ export function FaqPage() {
 
   return (
     <main className="page page--faq">
+      <SideBanner kicker="FAQ" title="자주 묻는 질문" en="HELP DESK" />
       <div className="page__body wrap wrap--narrow">
-        <h1 className="faq__title">자주 묻는 질문</h1>
         <div className="faq__tabs" role="tablist" aria-label="FAQ 분류">
           {FAQ_CATEGORIES.map((item) => (
             <button
