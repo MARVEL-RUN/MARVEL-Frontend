@@ -44,8 +44,8 @@ export const SPONSOR_MAILTO = `mailto:${OFFICE.email}?subject=${encodeURICompone
 export const LEGAL_LINKS = [
   { href: "/terms", label: "이용약관" },
   { href: "/privacy", label: "개인정보 처리방침" },
+  { href: "/precautions", label: "대회유의사항" },
   { href: "/faq", label: "FAQ" },
-  { href: "/inquiry", label: "문의사항" },
 ] as const;
 
 export const APPLY_TERMS_TITLE = "참가자 유의사항 및 동의 서약서";
