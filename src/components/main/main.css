@@ -4130,7 +4130,7 @@ fieldset.field {
 
 .legal-modal__head h2 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -4157,11 +4157,11 @@ fieldset.field {
 }
 
 .legal-modal__heading {
-  margin: 0 0 1.15rem;
+  margin: 0 0 0.85rem;
   color: #111;
-  font-size: 1.28rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  line-height: 1.4;
+  line-height: 1.3;
   text-align: center;
   word-break: keep-all;
 }
@@ -4169,40 +4169,47 @@ fieldset.field {
 .legal-modal .sec__body {
   max-width: none;
   color: #333;
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   font-weight: 400;
-  line-height: 1.7;
+  line-height: 1.5;
+}
+
+.legal-modal .sec__body+.sec__body {
+  margin-top: 0.5rem;
 }
 
 .legal-modal .sec__body+.block {
-  margin-top: 1.5rem;
+  margin-top: 1.05rem;
 }
 
 .legal-modal .block+.block {
-  margin-top: 1.6rem;
+  margin-top: 1.1rem;
 }
 
 .legal-modal .block h2 {
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.45rem;
   color: #111;
-  font-size: 1.02rem;
+  font-size: 0.94rem;
   font-weight: 800;
   word-break: keep-all;
 }
 
 .legal-modal .legal {
+  gap: 0.45rem;
   color: #333;
-  font-size: 0.9rem;
-  line-height: 1.7;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .legal-modal .legal h3 {
   color: #111;
+  font-size: 0.85rem;
 }
 
 .legal-modal .legal__note,
 .legal-modal .legal__effective {
   color: #555;
+  font-size: 0.76rem;
 }
 
 .legal-modal .legal-table-wrap {
@@ -4212,6 +4219,7 @@ fieldset.field {
 .legal-modal .legal-table {
   min-width: 0;
   color: #222;
+  font-size: 0.72rem;
 }
 
 .legal-modal .legal-table th,
@@ -4242,7 +4250,7 @@ fieldset.field {
   background: #111;
   color: #fff;
   font: inherit;
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -5795,7 +5803,7 @@ button.course {
   }
 
   .legal-modal__head h2 {
-    font-size: 0.92rem;
+    font-size: 0.85rem;
   }
 
   .legal-modal__x {
@@ -5808,22 +5816,26 @@ button.course {
   }
 
   .legal-modal__heading {
-    margin-bottom: 0.95rem;
-    font-size: 1.08rem;
+    margin-bottom: 0.7rem;
+    font-size: 1rem;
   }
 
   .legal-modal .sec__body,
   .legal-modal .legal {
-    font-size: 0.88rem;
-    line-height: 1.7;
+    font-size: 0.8rem;
+    line-height: 1.5;
   }
 
   .legal-modal .block h2 {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
+  }
+
+  .legal-modal .legal h3 {
+    font-size: 0.8rem;
   }
 
   .legal-modal .legal-table {
-    font-size: 0.74rem;
+    font-size: 0.68rem;
   }
 
   .legal-modal .legal-table th,
