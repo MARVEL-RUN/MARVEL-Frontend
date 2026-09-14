@@ -20,7 +20,7 @@ export function PrivacyPage() {
   }, []);
 
   return (
-    <main className="page">
+    <main className="page page--legal">
       <SideBanner kicker="PRIVACY" title="개인정보 처리방침" en="PRIVACY POLICY" />
       <div className="page__body wrap wrap--narrow">
         <LegalSections sections={sections} lead={lead} effective={effective} />

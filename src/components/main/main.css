@@ -4023,6 +4023,8 @@ fieldset.field {
   color: var(--silver);
   font-size: 0.88rem;
   line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .legal h3 {
@@ -4033,6 +4035,12 @@ fieldset.field {
 
 .legal ul {
   padding-left: 1.1rem;
+}
+
+/* ①항 다음 줄이 번호 밑으로 붙지 않게 */
+.legal__clause {
+  padding-left: 1.35em;
+  text-indent: -1.35em;
 }
 
 .legal__note,
@@ -5571,6 +5579,35 @@ button.course {
 
   html.is-main .page--post .page__body {
     padding: 4.75rem 0 5.5rem;
+  }
+
+  .page--legal .block+.block {
+    margin-top: 1.75rem;
+  }
+
+  .page--legal .block h2 {
+    margin-bottom: 0.75rem;
+    font-size: 1.15rem;
+    line-height: 1.35;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .page--legal .legal {
+    gap: 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .page--legal .legal h3 {
+    font-size: 1rem;
+    word-break: keep-all;
+  }
+
+  .page--legal .legal ul {
+    padding-left: 1.2rem;
   }
 
   html.is-main .site-footer {

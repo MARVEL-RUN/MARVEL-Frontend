@@ -4,7 +4,7 @@ import { LegalBlocks } from "../legal/LegalBlocks";
 
 export function PrecautionsPage() {
   return (
-    <main className="page">
+    <main className="page page--legal">
       <SideBanner kicker="PROTOCOL" title="대회유의사항" en="BEFORE YOU RUN" />
       <div className="page__body wrap wrap--narrow">
         {PARTICIPANT_NOTICE.map((section) => (

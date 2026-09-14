@@ -20,7 +20,7 @@ export function TermsPage() {
   }, []);
 
   return (
-    <main className="page">
+    <main className="page page--legal">
       <SideBanner kicker="TERMS" title="이용약관" en="TERMS OF USE" />
       <div className="page__body wrap wrap--narrow">
         <LegalSections sections={sections} lead={lead} effective={effective} />
