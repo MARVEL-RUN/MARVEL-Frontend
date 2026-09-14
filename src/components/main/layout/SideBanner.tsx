@@ -1,4 +1,5 @@
 import { MAIN_ASSETS } from "@/lib/assets";
+import { MOBILE_MQ } from "@/lib/viewport";
 
 export function SideBanner({
   kicker,
@@ -13,7 +14,7 @@ export function SideBanner({
     <section className="side-banner">
       <picture>
         <source
-          media="(max-width: 720px)"
+          media={MOBILE_MQ}
           srcSet={MAIN_ASSETS.sideBannerMobile}
           type="image/png"
         />

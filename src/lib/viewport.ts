@@ -1,6 +1,7 @@
 export const MOBILE_MAX = 720;
 
-export const MOBILE_MQ = `(max-width: ${MOBILE_MAX}px)`;
+/* main.css @media도 이 문자열과 같게 */
+export const MOBILE_MQ = `(max-width: ${MOBILE_MAX}px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px)`;
 
 export function isMobileView() {
   return window.matchMedia(MOBILE_MQ).matches;

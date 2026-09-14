@@ -36,28 +36,41 @@ function pickReceiptUrl(data: PaymentConfirmResponse | null) {
 
 type Phase = "loading" | "done" | "error";
 
+function authFromParams(params: { get: (key: string) => string | null }) {
+  const paymentKey = params.get("paymentKey");
+  const orderId = params.get("orderId");
+  const amountRaw = params.get("amount");
+  const amount = Number(amountRaw);
+  if (!paymentKey || !orderId || !amountRaw || !Number.isFinite(amount)) {
+    return null;
+  }
+  return { paymentKey, orderId, amount };
+}
+
 export function PaymentSuccessPage() {
   const params = useSearchParams();
-  const [phase, setPhase] = useState<Phase>("loading");
-  const [error, setError] = useState("");
+  const [phase, setPhase] = useState<Phase>(() =>
+    authFromParams(params) ? "loading" : "error",
+  );
+  const [error, setError] = useState(() =>
+    authFromParams(params) ? "" : "결제 인증 정보가 올바르지 않습니다.",
+  );
   const [result, setResult] = useState<PaymentConfirmResponse | null>(null);
   const [orderName, setOrderName] = useState("");
   const [copied, setCopied] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
+  const [canRetry, setCanRetry] = useState(false);
 
   useEffect(() => {
-    const paymentKey = params.get("paymentKey");
-    const orderId = params.get("orderId");
-    const amountRaw = params.get("amount");
-    const amount = Number(amountRaw);
-
-    if (!paymentKey || !orderId || !amountRaw || !Number.isFinite(amount)) {
+    const auth = authFromParams(params);
+    if (!auth) {
       setPhase("error");
       setError("결제 인증 정보가 올바르지 않습니다.");
       return;
     }
 
     const pending = readPendingPayment();
+    setCanRetry(Boolean(pending));
     if (pending?.registration.orderName) {
       setOrderName(pending.registration.orderName);
     }
@@ -66,7 +79,7 @@ export function PaymentSuccessPage() {
 
     (async () => {
       try {
-        const data = await confirmPayment({ paymentKey, orderId, amount });
+        const data = await confirmPayment(auth);
         if (cancelled) return;
         clearPendingPayment();
         setResult(data);
@@ -219,11 +232,17 @@ export function PaymentSuccessPage() {
               이미 승인됐을 수 있습니다. 신청조회로 확인하거나 다시 시도해 주세요.
             </p>
             <div className="flow__nav">
+              <Link
+                href={canRetry ? "/payment" : "/register"}
+                className="btn btn--red"
+              >
+                {canRetry ? "다시 결제" : "다시 신청"}
+              </Link>
               <Link href="/lookup" className="btn btn--ghost">
                 신청조회
               </Link>
-              <Link href="/register" className="btn btn--red">
-                신청으로
+              <Link href="/" className="btn btn--ghost">
+                홈으로
               </Link>
             </div>
           </section>

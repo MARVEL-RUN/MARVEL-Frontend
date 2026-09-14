@@ -648,7 +648,7 @@ body:has(.sheet-modal) .side-dock {
   display: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .home-pop-root {
     position: fixed;
     inset: 0;
@@ -4546,10 +4546,16 @@ button.course {
   margin-inline: auto;
   max-width: 28rem;
   text-align: center;
+  word-break: keep-all;
 }
 
-.ticket--status .flow__nav {
+.ticket--status .flow__nav,
+.ticket .flow__nav {
   width: 100%;
+}
+
+.ticket--status .ticket__order {
+  margin-top: 0.9rem;
 }
 
 .ticket .spec {
@@ -4565,9 +4571,29 @@ button.course {
   margin-top: 0.4rem;
 }
 
+.payment-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.payment-panel h2 {
+  word-break: keep-all;
+}
+
 .payment-panel__widget {
   margin-top: 1rem;
-  min-height: 1px;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior: contain;
+}
+
+.payment-panel__widget iframe {
+  max-width: 100%;
+}
+
+.payment-panel__widget--method {
+  min-height: 13rem;
 }
 
 /* zoom 1.1이면 100dvh가 화면보다 커져서, 보이는 높이로 나눈다 */
@@ -5595,7 +5621,7 @@ button.course {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   html.is-main {
     --site-zoom: 1;
     --header-h: calc(3.4rem + env(safe-area-inset-top, 0px));
@@ -6611,6 +6637,18 @@ button.course {
     justify-content: center;
   }
 
+  .ticket .flow__nav .btn {
+    flex: 1 1 7.5rem;
+  }
+
+  .payment-panel {
+    padding-bottom: 0.4rem;
+  }
+
+  .payment-panel__widget--method {
+    min-height: 11rem;
+  }
+
   .wait {
     padding: 0.4rem 0 2rem;
   }
@@ -7190,7 +7228,7 @@ button.course {
   content: "• ";
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
 
   .board-write__head .btn,
   .board-write__actions .btn,
@@ -7230,5 +7268,56 @@ button.course {
     grid-column: 2;
     grid-row: 1 / span 2;
     min-width: var(--tap);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  html.is-main {
+    --header-h: calc(2.85rem + env(safe-area-inset-top, 0px));
+  }
+
+  .side-banner {
+    aspect-ratio: auto;
+    height: 4.2rem;
+    min-height: 4.2rem;
+  }
+
+  .side-banner__copy {
+    max-width: none;
+    padding: 0.4rem 0;
+  }
+
+  .side-banner__en {
+    display: none;
+  }
+
+  .side-banner__title {
+    font-size: 1.35rem;
+  }
+
+  .ticket--wait {
+    min-height: 0;
+    padding: 1rem 0 1.4rem;
+    gap: 0.55rem;
+  }
+
+  .ticket__loader {
+    width: 5.2rem;
+    height: 5.2rem;
+    margin: 0.2rem 0;
+  }
+
+  .ticket__loader-mark {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
+
+  .payment-panel__widget--method {
+    min-height: 8.5rem;
+  }
+
+  .sheet-modal,
+  .legal-modal {
+    padding: max(0.45rem, env(safe-area-inset-top, 0px)) 0.65rem max(0.45rem, env(safe-area-inset-bottom, 0px));
   }
 }

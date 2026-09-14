@@ -110,7 +110,7 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
 
       {bootError ? <p className="form__err">{bootError}</p> : null}
 
-      <div id={methodId} className="payment-panel__widget" />
+      <div id={methodId} className="payment-panel__widget payment-panel__widget--method" />
       <div id={agreeId} className="payment-panel__widget" />
 
       <DockNav>
