@@ -5691,7 +5691,13 @@ button.course {
   }
 
   html.is-main.is-typing {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
+    overflow: hidden;
     scroll-padding-top: 0;
+    scroll-padding-bottom: 0;
     overflow-anchor: none;
   }
 
