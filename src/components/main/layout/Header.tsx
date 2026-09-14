@@ -48,6 +48,20 @@ export function Header() {
   }, [pathname]);
 
   useEffect(() => {
+    const jump = () => {
+      const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      if (!id) return;
+      document.getElementById(id)?.scrollIntoView();
+    };
+    const timer = window.setTimeout(jump, 80);
+    window.addEventListener("hashchange", jump);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("hashchange", jump);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
@@ -84,19 +98,44 @@ export function Header() {
         </Link>
 
         <nav className="site-header__nav" aria-label="주요 메뉴">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                pathname.startsWith(item.href)
-                  ? "site-header__link is-active"
-                  : "site-header__link"
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const active = pathname.startsWith(item.href);
+            const kids = "children" in item ? item.children : undefined;
+            const link = (
+              <Link
+                href={item.href}
+                className={active ? "site-header__link is-active" : "site-header__link"}
+              >
+                {item.label}
+              </Link>
+            );
+            if (!kids) return <span key={item.href}>{link}</span>;
+            return (
+              <div key={item.href} className="site-header__item">
+                {link}
+                <div className="site-header__drop">
+                  {kids.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className="site-header__drop-link"
+                      onClick={(event) => {
+                        const id = child.href.split("#")[1];
+                        if (!id || pathname !== item.href) return;
+                        const target = document.getElementById(id);
+                        if (!target) return;
+                        event.preventDefault();
+                        target.scrollIntoView();
+                        history.replaceState(null, "", child.href);
+                      }}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </nav>
 
         <div className="site-header__actions">
