@@ -3,6 +3,7 @@ import { EVENT } from "@/lib/event";
 import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import { SideBanner } from "../layout/SideBanner";
 import { CourseMaps } from "./CourseMaps";
+import { GuideTabs } from "./GuideTabs";
 import { KitGallery } from "./KitGallery";
 import { TimeTable } from "../home/TimeTable";
 
@@ -27,6 +28,8 @@ export function GuidePage() {
           </dl>
         </div>
       </section>
+
+      <GuideTabs />
 
       <section className="guide-sec" id="timeline">
         <hr className="guide-rule" />

@@ -15,6 +15,8 @@ export const GUIDE_SECTIONS = [
   { href: "/guide#kit", label: "기념품" },
 ] as const;
 
+export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href !== "/guide#overview");
+
 export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
   { href: "/directions", label: "오시는길" },

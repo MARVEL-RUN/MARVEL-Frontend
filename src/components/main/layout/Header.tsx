@@ -7,18 +7,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
 import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
-
-function pinToHeader(el: HTMLElement) {
-  const pin = (el.querySelector(":scope > .guide-rule") as HTMLElement | null) ?? el;
-  const bar = document.querySelector(".site-header__bar");
-  const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-  let y = 0;
-  for (let n: HTMLElement | null = pin; n; n = n.offsetParent as HTMLElement | null) {
-    y += n.offsetTop;
-  }
-  const headerH = bar instanceof HTMLElement ? bar.offsetHeight : 0;
-  window.scrollTo(0, Math.max(0, (y - headerH) * zoom));
-}
+import { pinToHeader } from "@/lib/pin-header";
 
 function SponsorInquiry({ className }: { className?: string }) {
   return (

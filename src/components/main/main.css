@@ -5,6 +5,7 @@
 html {
   --header-h: 4.5rem;
   --site-zoom: 1.1;
+  --guide-tabs-h: 3.15rem;
   scroll-padding-top: var(--header-h);
 }
 
@@ -2074,7 +2075,62 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .guide-sec {
   padding: 4.5rem 0;
+  scroll-margin-top: calc(var(--header-h) + var(--guide-tabs-h));
+}
+
+#overview.guide-sec {
+  padding-bottom: 2.4rem;
   scroll-margin-top: var(--header-h);
+}
+
+.guide-tabs-slot {
+  height: var(--guide-tabs-h);
+}
+
+.guide-tabs {
+  z-index: 30;
+  height: var(--guide-tabs-h);
+  background: var(--marvel);
+}
+
+.guide-tabs.is-stuck {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+}
+
+.guide-tabs__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: min(1120px, calc(100% - 2.5rem));
+  height: 100%;
+  margin-inline: auto;
+}
+
+.guide-tabs__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.15rem;
+  padding: 0 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.guide-tabs__btn.is-on {
+  background: #fff;
+  color: var(--marvel);
 }
 
 .guide-sec:has(> .guide-rule) {
@@ -5153,6 +5209,18 @@ button.course {
     color: #fff;
   }
 
+  .guide-tabs__inner {
+    justify-content: flex-start;
+    width: 100%;
+    padding-inline: 0.7rem;
+    gap: 0.1rem;
+  }
+
+  .guide-tabs__btn {
+    padding: 0 0.85rem;
+    font-size: 0.84rem;
+  }
+
   .site-header__drawer-actions {
     display: flex;
     flex-direction: column;
@@ -5311,6 +5379,7 @@ button.course {
     --header-h: calc(3.4rem + env(safe-area-inset-top, 0px));
     --gutter: 1rem;
     --tap: 2.75rem;
+    --guide-tabs-h: 3.2rem;
     scroll-padding-top: var(--header-h);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -5403,6 +5472,19 @@ button.course {
 
   html.is-main .site-header__drawer-sub.is-active {
     color: #fff;
+  }
+
+  html.is-main .guide-tabs__inner {
+    justify-content: flex-start;
+    width: 100%;
+    padding-inline: calc(var(--gutter) - 0.35rem);
+    gap: 0;
+  }
+
+  html.is-main .guide-tabs__btn {
+    min-height: 2.4rem;
+    padding: 0 0.75rem;
+    font-size: 0.84rem;
   }
 
   html.is-main .site-header__drawer-actions {
@@ -5800,6 +5882,11 @@ button.course {
 
   .guide-sec {
     padding: 2.6rem 0 3rem;
+    scroll-margin-top: calc(var(--header-h) + var(--guide-tabs-h));
+  }
+
+  #overview.guide-sec {
+    padding-bottom: 1.6rem;
     scroll-margin-top: var(--header-h);
   }
 
