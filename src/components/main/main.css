@@ -5690,6 +5690,30 @@ button.course {
     text-size-adjust: 100%;
   }
 
+  html.is-main.is-typing {
+    scroll-padding-top: 0;
+    overflow-anchor: none;
+  }
+
+  html.is-main input,
+  html.is-main textarea,
+  html.is-main select {
+    touch-action: manipulation;
+  }
+
+  html.is-main input[type="text"],
+  html.is-main input[type="email"],
+  html.is-main input[type="tel"],
+  html.is-main input[type="password"],
+  html.is-main input[type="search"],
+  html.is-main input[type="number"],
+  html.is-main input[type="url"],
+  html.is-main input:not([type]),
+  html.is-main textarea,
+  html.is-main select {
+    font-size: 16px;
+  }
+
   html.is-main,
   html.is-main body,
   html.is-main .site {
