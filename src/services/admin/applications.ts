@@ -344,7 +344,7 @@ export function applicationGenderLabel(gender?: "male" | "female") {
 export function applicationPayLabel(status: AdminPayStatus) {
   if (status === "paid") return "결제완료";
   if (status === "pending") return "미결제";
-  if (status === "refund_requested") return "환불신청";
+  if (status === "refund_requested") return "환불 대기";
   return "환불완료";
 }
 

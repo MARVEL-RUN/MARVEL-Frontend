@@ -248,6 +248,25 @@ export function CoursePick({
   );
 }
 
+function CourseFeeHead({
+  long,
+  short,
+}: {
+  long: string;
+  short: string;
+}) {
+  return (
+    <span className="course-pick__fees-h" aria-label={long}>
+      <span className="course-pick__fees-label course-pick__fees-label--long" aria-hidden="true">
+        {long}
+      </span>
+      <span className="course-pick__fees-label course-pick__fees-label--short" aria-hidden="true">
+        {short}
+      </span>
+    </span>
+  );
+}
+
 export function CourseFeeTable({
   value,
   ticket,
@@ -257,32 +276,34 @@ export function CourseFeeTable({
 }) {
   return (
     <div className="course-pick__fees">
-      <div className="course-pick__fees-head">
-        <span>종목</span>
-        <span>세부종목</span>
-        <span>단가</span>
-        <span>비고</span>
-      </div>
-      <div className="course-pick__fees-body">
-        {EVENT.courses.map((c) => {
-          const on = value === c.id;
-          return (
-            <div key={c.id} className="course-pick__fees-row">
-              <span className={on ? "is-on" : undefined}>{c.distance}</span>
-              <span
-                className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
-              >
-                {c.code}
-              </span>
-              <span className={on && ticket !== "child" ? "is-on" : undefined}>
-                {feeDigits(c.fee)}
-              </span>
-              <span className={on && ticket === "child" ? "is-on" : undefined}>
-                {courseNote(c)}
-              </span>
-            </div>
-          );
-        })}
+      <div className="course-pick__fees-table">
+        <div className="course-pick__fees-head">
+          <span>종목</span>
+          <CourseFeeHead long="세부종목" short="세부" />
+          <CourseFeeHead long="일반 참가비" short="참가비" />
+          <CourseFeeHead long="만 12세 이하 참가비" short="만 12세 이하" />
+        </div>
+        <div className="course-pick__fees-body">
+          {EVENT.courses.map((c) => {
+            const on = value === c.id;
+            return (
+              <div key={c.id} className="course-pick__fees-row">
+                <span className={on ? "is-on" : undefined}>{c.distance}</span>
+                <span
+                  className={`course-pick__code--${c.tone}${on ? " is-on" : ""}`}
+                >
+                  {c.code}
+                </span>
+                <span className={on && ticket !== "child" ? "is-on" : undefined}>
+                  {feeDigits(c.fee)}
+                </span>
+                <span className={on && ticket === "child" ? "is-on" : undefined}>
+                  {courseNote(c)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 @import "../components/main/main.css";
 @import "../components/admin/admin.css";
 
+
 @font-face {
   font-family: "SC Dream";
   src: url("/fonts/SCDream1.otf") format("opentype");

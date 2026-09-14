@@ -63,7 +63,7 @@ export function InquiryDetailPage() {
         <div className="admin-legal-list">
           <article className="admin-section-card">
             <h2>{data?.title}</h2>
-            <p style={{ margin: 0, color: "#5c6173", fontSize: 13 }}>
+            <p style={{ margin: 0, color: "#5c6173", fontSize: 14 }}>
               {data?.name} · {data?.date}
             </p>
             <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{data?.body}</p>
