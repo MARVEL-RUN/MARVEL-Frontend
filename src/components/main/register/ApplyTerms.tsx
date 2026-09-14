@@ -19,7 +19,6 @@ import {
   type Consents,
 } from "@/lib/register";
 import { LegalBlocks } from "../legal/LegalBlocks";
-import { ApplyKindPick } from "./ApplyKindPick";
 
 const OTHER_CONSENTS = REGISTER_CONSENTS.filter((item) => item.id !== "rules");
 
@@ -152,7 +151,14 @@ export function ApplyTerms({
 
       {error ? <p className="form__err">{error}</p> : null}
 
-      <ApplyKindPick heading="신청 유형을 선택하세요" onPick={pick} />
+      <div className="apply-terms__actions">
+        <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
+          개인신청
+        </button>
+        <button type="button" className="btn btn--ghost" onClick={() => pick("group")}>
+          단체신청
+        </button>
+      </div>
     </div>
   );
 }
