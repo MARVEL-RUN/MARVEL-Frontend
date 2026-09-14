@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
 import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
@@ -46,6 +46,7 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hash, setHash] = useState("");
   const home = pathname === "/";
 
   useEffect(() => {
@@ -61,7 +62,9 @@ export function Header() {
 
   useEffect(() => {
     const jump = () => {
-      const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      const next = window.location.hash;
+      setHash(next);
+      const id = decodeURIComponent(next.replace(/^#/, ""));
       if (!id) return;
       const target = document.getElementById(id);
       if (target) pinToHeader(target);
@@ -82,6 +85,24 @@ export function Header() {
   }, [open]);
 
   const cta = registerUiOpen ? "참가신청" : "접수 안내";
+
+  function goSection(
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+    parentHref: string,
+    close: boolean,
+  ) {
+    const id = href.split("#")[1];
+    if (close) setOpen(false);
+    if (!id || pathname !== parentHref) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    history.replaceState(null, "", href);
+    setHash("#" + id);
+    if (close) window.setTimeout(() => pinToHeader(target), 60);
+    else pinToHeader(target);
+  }
 
   return (
     <header
@@ -132,15 +153,7 @@ export function Header() {
                       key={child.href}
                       href={child.href}
                       className="site-header__drop-link"
-                      onClick={(event) => {
-                        const id = child.href.split("#")[1];
-                        if (!id || pathname !== item.href) return;
-                        const target = document.getElementById(id);
-                        if (!target) return;
-                        event.preventDefault();
-                        pinToHeader(target);
-                        history.replaceState(null, "", child.href);
-                      }}
+                      onClick={(event) => goSection(event, child.href, item.href, false)}
                     >
                       {child.label}
                     </Link>
@@ -181,19 +194,44 @@ export function Header() {
         hidden={!open}
       >
         <nav className="site-header__drawer-nav" aria-label="모바일 메뉴">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                pathname.startsWith(item.href)
-                  ? "site-header__drawer-link is-active"
-                  : "site-header__drawer-link"
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const kids = "children" in item ? item.children : undefined;
+            const parent = (
+              <Link
+                href={item.href}
+                className={
+                  pathname.startsWith(item.href)
+                    ? "site-header__drawer-link is-active"
+                    : "site-header__drawer-link"
+                }
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+            if (!kids) return <span key={item.href}>{parent}</span>;
+            return (
+              <div key={item.href} className="site-header__drawer-group">
+                {parent}
+                {kids.map((child) => {
+                  const id = child.href.split("#")[1];
+                  const on = pathname.startsWith(item.href) && hash === "#" + id;
+                  return (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className={
+                        on ? "site-header__drawer-sub is-active" : "site-header__drawer-sub"
+                      }
+                      onClick={(event) => goSection(event, child.href, item.href, true)}
+                    >
+                      {child.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            );
+          })}
         </nav>
         <div className="site-header__drawer-actions">
           <Link href={REGISTER_HREF} className="btn btn--red">

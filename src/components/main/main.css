@@ -5115,8 +5115,11 @@ button.course {
   .site-header__drawer {
     display: flex;
     flex-direction: column;
+    position: fixed;
+    inset: var(--header-h) 0 0;
     gap: 1.1rem;
     padding: 1rem 1.25rem 2rem;
+    overflow: auto;
     background: var(--navy);
   }
 
@@ -5128,6 +5131,26 @@ button.course {
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
+  }
+
+  .site-header__drawer-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .site-header__drawer-sub {
+    display: flex;
+    align-items: center;
+    min-height: 2.4rem;
+    color: var(--silver);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .site-header__drawer-sub.is-active {
+    color: #fff;
   }
 
   .site-header__drawer-actions {
@@ -5359,6 +5382,27 @@ button.course {
     padding: 0 var(--gutter);
     font-size: 1.125rem;
     letter-spacing: -0.02em;
+  }
+
+  html.is-main .site-header__drawer-group {
+    gap: 0;
+    padding-bottom: 0.2rem;
+  }
+
+  html.is-main .site-header__drawer-sub {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding: 0 var(--gutter) 0 calc(var(--gutter) + 0.9rem);
+    color: var(--silver);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  html.is-main .site-header__drawer-sub.is-active {
+    color: #fff;
   }
 
   html.is-main .site-header__drawer-actions {
