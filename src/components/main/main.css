@@ -5,7 +5,7 @@
 html {
   --header-h: 4.5rem;
   --site-zoom: 1.1;
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: var(--header-h);
 }
 
 html.is-main {
@@ -2074,7 +2074,15 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .guide-sec {
   padding: 4.5rem 0;
-  scroll-margin-top: calc(var(--header-h) + 0.75rem);
+  scroll-margin-top: var(--header-h);
+}
+
+.guide-sec:has(> .guide-rule) {
+  padding-top: 0;
+}
+
+.guide-sec > .guide-rule {
+  margin-bottom: 4.5rem;
 }
 
 .guide-sec h2 {
@@ -5280,7 +5288,7 @@ button.course {
     --header-h: calc(3.4rem + env(safe-area-inset-top, 0px));
     --gutter: 1rem;
     --tap: 2.75rem;
-    scroll-padding-top: calc(var(--header-h) + 0.75rem);
+    scroll-padding-top: var(--header-h);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -5748,7 +5756,11 @@ button.course {
 
   .guide-sec {
     padding: 2.6rem 0 3rem;
-    scroll-margin-top: calc(var(--header-h) + 0.55rem);
+    scroll-margin-top: var(--header-h);
+  }
+
+  .guide-sec > .guide-rule {
+    margin-bottom: 2.6rem;
   }
 
   .guide-sec h2 {

@@ -8,6 +8,18 @@ import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
 import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 
+function pinToHeader(el: HTMLElement) {
+  const pin = (el.querySelector(":scope > .guide-rule") as HTMLElement | null) ?? el;
+  const bar = document.querySelector(".site-header__bar");
+  const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  let y = 0;
+  for (let n: HTMLElement | null = pin; n; n = n.offsetParent as HTMLElement | null) {
+    y += n.offsetTop;
+  }
+  const headerH = bar instanceof HTMLElement ? bar.offsetHeight : 0;
+  window.scrollTo(0, Math.max(0, (y - headerH) * zoom));
+}
+
 function SponsorInquiry({ className }: { className?: string }) {
   return (
     <a
@@ -51,7 +63,8 @@ export function Header() {
     const jump = () => {
       const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
       if (!id) return;
-      document.getElementById(id)?.scrollIntoView();
+      const target = document.getElementById(id);
+      if (target) pinToHeader(target);
     };
     const timer = window.setTimeout(jump, 80);
     window.addEventListener("hashchange", jump);
@@ -125,7 +138,7 @@ export function Header() {
                         const target = document.getElementById(id);
                         if (!target) return;
                         event.preventDefault();
-                        target.scrollIntoView();
+                        pinToHeader(target);
                         history.replaceState(null, "", child.href);
                       }}
                     >

@@ -28,27 +28,24 @@ export function GuidePage() {
         </div>
       </section>
 
-      <hr className="guide-rule" />
-
       <section className="guide-sec" id="timeline">
+        <hr className="guide-rule" />
         <div className="wrap">
           <h2>타임라인</h2>
           <TimeTable />
         </div>
       </section>
 
-      <hr className="guide-rule" />
-
       <section className="guide-sec" id="course">
+        <hr className="guide-rule" />
         <div className="wrap">
           <h2>코스</h2>
           <CourseMaps />
         </div>
       </section>
 
-      <hr className="guide-rule" />
-
       <section className="guide-sec" id="kit">
+        <hr className="guide-rule" />
         <div className="wrap">
           <h2>기념품</h2>
           <KitGallery />
