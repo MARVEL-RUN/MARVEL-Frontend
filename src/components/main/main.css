@@ -4354,6 +4354,10 @@ button.course {
   margin: 1.6rem 0;
 }
 
+.ticket .member-list {
+  text-align: left;
+}
+
 .ticket .btn {
   margin-top: 0.4rem;
 }
@@ -6264,6 +6268,52 @@ button.course {
     justify-content: center;
   }
 
+  .form {
+    gap: 1.15rem;
+  }
+
+  .form h2 {
+    font-size: 1.25rem;
+    word-break: keep-all;
+  }
+
+  .field span {
+    font-size: 0.82rem;
+  }
+
+  .field input {
+    min-height: var(--tap);
+    box-sizing: border-box;
+    padding: 0.55rem 0;
+    font-size: 1.05rem;
+  }
+
+  button.course {
+    width: 100%;
+  }
+
+  .ticket {
+    padding: 0.4rem 0 2rem;
+  }
+
+  .ticket h2 {
+    font-size: clamp(1.45rem, 6.5vw, 2rem);
+    word-break: keep-all;
+  }
+
+  .ticket .spec dd,
+  .member-list strong,
+  .member-list span {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .ticket .btn,
+  .ticket__order-copy {
+    min-height: var(--tap);
+    justify-content: center;
+  }
+
   .wait {
     padding: 0.4rem 0 2rem;
   }
@@ -6608,9 +6658,27 @@ button.course {
     flex-shrink: 0;
   }
 
-  .courses__grid,
-  .courses__grid--stack {
+  .courses__grid {
     grid-template-columns: 1fr;
+  }
+
+  .courses__grid--stack {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+
+  .courses__grid--stack .course {
+    padding: 1.05rem 0.85rem 0.95rem;
+  }
+
+  .courses__grid--stack .course__dist {
+    font-size: 1.15rem;
+    word-break: keep-all;
+  }
+
+  .courses__grid--stack .course__desc {
+    font-size: 0.82rem;
+    word-break: keep-all;
   }
 
   .timeline li {
