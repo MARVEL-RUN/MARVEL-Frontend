@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -84,13 +85,28 @@ function useRotateHint(ready: boolean) {
   return ready && show;
 }
 
-function useModelViewer() {
+function useLowPowerMedal() {
+  const [low, setLow] = useState(false);
+
   useEffect(() => {
-    void import("@google/model-viewer");
+    const conn = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setLow(!!conn?.saveData || reduce);
   }, []);
+
+  return low;
 }
 
-function useMedalModel(fileSrc: string) {
+function useModelViewer(enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return;
+    void import("@google/model-viewer");
+  }, [enabled]);
+}
+
+function useMedalModel(fileSrc: string, enabled: boolean) {
   const ref = useRef<MvEl>(null);
   const [blobSrc, setBlobSrc] = useState<string>();
   const [progress, setProgress] = useState(0);
@@ -103,6 +119,8 @@ function useMedalModel(fileSrc: string) {
     setProgress(0);
     setReady(false);
     setFailed(false);
+
+    if (!enabled) return;
 
     loadMedalBlob(fileSrc, (p) => {
       if (live) setProgress(p);
@@ -120,7 +138,7 @@ function useMedalModel(fileSrc: string) {
     return () => {
       live = false;
     };
-  }, [fileSrc]);
+  }, [fileSrc, enabled]);
 
   useEffect(() => {
     const el = ref.current;
@@ -178,14 +196,36 @@ function ModelStage({
   alt,
   poster,
   wide,
+  staticOnly,
 }: {
   src: string;
   alt: string;
   poster?: string;
   wide?: boolean;
+  staticOnly?: boolean;
 }) {
-  const { ref, blobSrc, progress, ready, failed } = useMedalModel(src);
-  const hint = useRotateHint(ready);
+  const still = !!staticOnly;
+  const { ref, blobSrc, progress, ready, failed } = useMedalModel(src, !still);
+  const hint = useRotateHint(ready && !still);
+  const showStill = still || (failed && !!poster);
+
+  if (showStill) {
+    return (
+      <div className="medal-3d__stage medal-3d__stage--still">
+        {poster ? (
+          <Image
+            src={poster}
+            alt={alt}
+            fill
+            sizes={wide ? "100vw" : "(max-width: 720px) 100vw, 280px"}
+            className="medal-3d__still"
+          />
+        ) : (
+          <LoadCover progress={progress} ready={ready} failed />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="medal-3d__stage">
@@ -212,7 +252,10 @@ function ModelStage({
       <LoadCover progress={progress} ready={ready} failed={failed} />
       {hint ? (
         <button type="button" className="medal-3d__hint" onClick={() => dismissRotateHint()}>
-          <p>클릭하여 회전해 보세요</p>
+          <p>
+            <span className="medal-3d__hint-desk">클릭하여 회전해 보세요</span>
+            <span className="medal-3d__hint-mob">손가락으로 돌려 보세요</span>
+          </p>
         </button>
       ) : null}
     </div>
@@ -230,6 +273,8 @@ function Medal3dPreview({
   poster?: string;
   onClose: () => void;
 }) {
+  const staticOnly = useLowPowerMedal();
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -265,9 +310,18 @@ function Medal3dPreview({
           </button>
         </header>
         <div className="course-preview__stage medal-3d-preview__stage">
-          <ModelStage src={src} alt={alt} poster={poster} wide />
+          <ModelStage src={src} alt={alt} poster={poster} wide staticOnly={staticOnly} />
         </div>
-        <p className="course-preview__foot">드래그로 회전 · 스크롤로 확대·축소 · Esc로 닫기</p>
+        <p className="course-preview__foot">
+          {staticOnly ? (
+            <span>바깥을 눌러 닫기</span>
+          ) : (
+            <>
+              <span className="medal-3d__hint-desk">드래그로 회전 · 스크롤로 확대·축소 · Esc로 닫기</span>
+              <span className="medal-3d__hint-mob">드래그로 회전 · 두 손가락으로 확대 · 바깥을 눌러 닫기</span>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
@@ -283,28 +337,31 @@ export function MedalViewer({
   poster?: string;
 }) {
   const [open, setOpen] = useState(false);
-  useModelViewer();
+  const staticOnly = useLowPowerMedal();
+  useModelViewer(!staticOnly);
 
   return (
     <>
-      <ModelStage src={src} alt={alt} poster={poster} />
-      <button
-        type="button"
-        className="medal-3d__expand"
-        onClick={() => setOpen(true)}
-        aria-label="크게 보기"
-        title="크게 보기"
-      >
-        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
-          <path
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="square"
-            d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"
-          />
-        </svg>
-      </button>
+      <ModelStage src={src} alt={alt} poster={poster} staticOnly={staticOnly} />
+      {staticOnly ? null : (
+        <button
+          type="button"
+          className="medal-3d__expand"
+          onClick={() => setOpen(true)}
+          aria-label="크게 보기"
+          title="크게 보기"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
+            <path
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="square"
+              d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"
+            />
+          </svg>
+        </button>
+      )}
       {open
         ? createPortal(
             <Medal3dPreview

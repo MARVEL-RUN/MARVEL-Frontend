@@ -41,6 +41,7 @@ import type {
 } from "@/services/main/types";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "@/components/main/SheetModal";
+import { DockNav } from "@/components/main/DockNav";
 import { ApplyTerms } from "./ApplyTerms";
 import {
   AddressField,
@@ -180,7 +181,9 @@ function IndividualFlow({
       return fail("성별을 선택하세요.");
     }
     if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
-    if (!emailOk(draft.email)) return fail("이메일을 입력하세요.");
+    if (draft.email.trim() && !emailOk(draft.email)) {
+      return fail("이메일 형식을 확인하세요.");
+    }
     if (!draft.courseId) return fail("참가종목을 선택하세요.");
     if (optionsLoading) return fail("신청 옵션을 불러오는 중입니다.");
     if (optionsError || !categories.length) {
@@ -330,11 +333,10 @@ function IndividualFlow({
                 required
               />
             </FormRow>
-            <FormRow label="이메일" required>
+            <FormRow label="이메일">
               <EmailField
                 value={draft.email}
                 onChange={(email) => patch({ email })}
-                required
               />
             </FormRow>
           </FormSec>
@@ -505,7 +507,7 @@ function IndividualFlow({
             </div>
             <div>
               <dt>이메일</dt>
-              <dd>{draft.email}</dd>
+              <dd>{draft.email.trim() || "—"}</dd>
             </div>
             <div>
               <dt>주소</dt>
@@ -524,7 +526,7 @@ function IndividualFlow({
               </dd>
             </div>
           </dl>
-          <div className="flow__nav">
+          <DockNav>
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
                 {error}
@@ -549,7 +551,7 @@ function IndividualFlow({
             >
               {busy ? "결제 준비 중..." : "결제하기"}
             </button>
-          </div>
+          </DockNav>
         </section>
       ) : null}
 

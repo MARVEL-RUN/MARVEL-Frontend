@@ -29,6 +29,7 @@ export const EVENT = {
   venueAccess: [
     {
       title: "자가용",
+      note: "서울·수도권 기준",
       items: [
         {
           badge: "고속",

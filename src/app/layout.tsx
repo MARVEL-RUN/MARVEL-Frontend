@@ -13,6 +13,13 @@ export const metadata: Metadata = {
   title: "MARVEL RUN 2026 KOREA",
   description:
     "2026년 10월 31일 토요일 인제스피디움. 접수는 2026년 9월 22일 화요일 오후 2시에 시작합니다.",
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+    date: false,
+    url: false,
+  },
   verification: {
     ...(googleVerification ? { google: googleVerification } : {}),
     ...(naverVerification
@@ -25,6 +32,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  interactiveWidget: "overlays-content",
 };
 
 export default function RootLayout({

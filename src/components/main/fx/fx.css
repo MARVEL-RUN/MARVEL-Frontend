@@ -394,6 +394,13 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes panelsPull-m {
+  to {
+    transform: scale(1.18);
+    opacity: 0.12;
+  }
+}
+
 @keyframes flash {
   0% {
     opacity: 0;
@@ -427,6 +434,18 @@ html.is-intro .fx-letterbox span {
   }
 }
 
+@keyframes logoSlam-m {
+  from {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes runIn {
   from {
     opacity: 0;
@@ -438,6 +457,18 @@ html.is-intro .fx-letterbox span {
     opacity: 1;
     transform: none;
     filter: none;
+  }
+}
+
+@keyframes runIn-m {
+  from {
+    opacity: 0;
+    transform: translateX(-6%) scale(1.08);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -604,13 +635,52 @@ html.is-intro .fx-letterbox span {
 }
 
 @media (max-width: 720px) {
+  .fx-letterbox span,
+  html.is-intro .fx-letterbox span {
+    height: 0;
+  }
+
+  .fx-grain,
+  .fx-scan,
+  .fx-dust {
+    display: none;
+  }
+
   .intro__assemble {
     gap: 0.4rem;
     padding: 0 0.6rem;
   }
 
   .intro--overlap .intro__assemble {
+    width: min(108vw, 164vh);
     padding: 0;
+  }
+
+  .intro__box {
+    width: min(36vw, 9.2rem);
+    animation-name: logoSlam-m;
+  }
+
+  .intro__run {
+    width: min(78vw, 16.5rem);
+    animation-name: runIn-m;
+  }
+
+  .intro__panels {
+    animation-name: panelsPull-m;
+  }
+
+  .intro__sub {
+    width: min(52vw, 11rem);
+  }
+
+  .intro__skip {
+    right: var(--gutter, 1.25rem);
+    bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    min-height: var(--tap, 2.75rem);
+    padding: 0 1.05rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.14em;
   }
 
   .assemble__ghost {

@@ -5,7 +5,6 @@ import type { AdminInquiry } from "@/types/boards";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { SideBanner } from "../layout/SideBanner";
 import { orderInquiries } from "./order";
 
 export function InquiryViewPage() {
@@ -31,9 +30,8 @@ export function InquiryViewPage() {
   }, [id]);
 
   return (
-    <main className="page">
-      <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
-      <div className="page__body wrap">
+    <main className="page page--post">
+      <div className="page__body wrap wrap--narrow">
         {post === undefined ? (
           <p className="board__empty">불러오는 중...</p>
         ) : post === null ? (

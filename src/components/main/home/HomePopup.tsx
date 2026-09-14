@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { EVENT } from "@/lib/event";
+import { MOBILE_MQ } from "@/lib/viewport";
 
 const POP = EVENT.popup;
 const STORE = `mr-pop-${POP.id}`;
@@ -38,6 +39,7 @@ function clamp(left: number, top: number, el: HTMLElement) {
 
 export function HomePopup() {
   const [open, setOpen] = useState(false);
+  const [mobile, setMobile] = useState(false);
   const [mute, setMute] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -45,6 +47,14 @@ export function HomePopup() {
   const done = useRef(false);
   const muteRef = useRef(false);
   const box = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(MOBILE_MQ);
+    const sync = () => setMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     muteRef.current = mute;
@@ -78,7 +88,16 @@ export function HomePopup() {
   }, [open]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !mobile) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open, mobile]);
+
+  useEffect(() => {
+    if (!open || mobile) return;
     const el = box.current;
     if (!el) return;
 
@@ -118,7 +137,7 @@ export function HomePopup() {
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
     };
-  }, [open]);
+  }, [open, mobile]);
 
   function close() {
     done.current = true;
@@ -134,14 +153,18 @@ export function HomePopup() {
 
   if (!open) return null;
 
-  return createPortal(
+  const sheet = (
     <aside
       ref={box}
-      className={dragging ? "home-pop is-drag" : "home-pop"}
+      className={["home-pop", mobile ? "home-pop--sheet" : "", dragging ? "is-drag" : ""]
+        .filter(Boolean)
+        .join(" ")}
       role="dialog"
+      aria-modal={mobile ? true : undefined}
       aria-label={POP.title}
-      style={pos ? { left: pos.left, top: pos.top } : undefined}
+      style={!mobile && pos ? { left: pos.left, top: pos.top } : undefined}
     >
+      {mobile ? <span className="home-pop__handle" aria-hidden /> : null}
       <div className={POP.image ? "home-pop__shot has-img" : "home-pop__shot"}>
         {POP.image ? (
           <Image src={POP.image} alt={POP.title} fill sizes="26.5rem" draggable={false} />
@@ -163,7 +186,23 @@ export function HomePopup() {
           CLOSE
         </button>
       </div>
-    </aside>,
+    </aside>
+  );
+
+  return createPortal(
+    mobile ? (
+      <div className="home-pop-root">
+        <button
+          type="button"
+          className="home-pop-root__dim"
+          aria-label="닫기"
+          onClick={close}
+        />
+        {sheet}
+      </div>
+    ) : (
+      sheet
+    ),
     document.body,
   );
 }
