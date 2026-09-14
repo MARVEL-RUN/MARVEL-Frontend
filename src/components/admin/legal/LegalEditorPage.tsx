@@ -96,7 +96,7 @@ export function LegalEditorPage({ kind }: { kind: LegalDocKind }) {
                   onChange={(e) => updateSection(index, { body: e.target.value })}
                 />
               </label>
-              <p style={{ margin: 0, fontSize: 12, color: "#7a7f90" }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#7a7f90" }}>
                 목록은 `- 항목`, 주석은 `&gt; 문구`, 소제목은 `## 제목` 형식입니다.
               </p>
             </article>

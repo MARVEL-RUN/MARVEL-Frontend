@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
+.admin-root,
+.admin-login,
+html.admin-mode,
+html.admin-mode body {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 14px;
+}
+
 .admin-root {
   --admin-side: 220px;
   --admin-head: 52px;
@@ -11,8 +27,6 @@
   min-height: 100vh;
   background: var(--admin-bg);
   color: var(--admin-ink);
-  font-family: var(--font-korean), "Malgun Gothic", system-ui, sans-serif;
-  font-size: 13px;
 }
 
 .admin-root.is-collapsed {
@@ -72,13 +86,13 @@ html.admin-mode body {
 
 .admin-login__brand h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
 }
 
 .admin-login__brand p {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.62);
   line-height: 1.6;
 }
@@ -97,14 +111,14 @@ html.admin-mode body {
 
 .admin-login__title {
   margin: 0 0 6px;
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
 }
 
 .admin-login__sub {
   margin: 0 0 28px;
   color: #6b7380;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-login__form {
@@ -119,7 +133,7 @@ html.admin-mode body {
 .admin-login__field label {
   display: block;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #4a5160;
 }
@@ -171,12 +185,12 @@ html.admin-mode body {
 .admin-login__error {
   margin: 0;
   color: #d92d20;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-login__hint {
   margin: 28px 0 0;
-  font-size: 12px;
+  font-size: 13px;
   color: #8a93a3;
   text-align: center;
 }
@@ -216,7 +230,7 @@ html.admin-mode body {
   place-items: center;
   background: #e60012;
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -245,7 +259,7 @@ html.admin-mode body {
   min-height: 40px;
   padding: 0 16px;
   color: #c5cad3;
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
 }
 
@@ -270,7 +284,7 @@ html.admin-mode body {
 .admin-side-link--sub {
   min-height: 36px;
   padding-left: 42px;
-  font-size: 13px;
+  font-size: 14px;
   color: #9aa2b0;
 }
 
@@ -377,7 +391,7 @@ html.admin-mode body {
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--admin-muted);
 }
 
@@ -390,7 +404,7 @@ html.admin-mode body {
 }
 
 .admin-header__now {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -408,7 +422,7 @@ html.admin-mode body {
   padding: 0 10px;
   border: 1px solid var(--admin-line);
   border-radius: 2px;
-  font-size: 12px;
+  font-size: 13px;
   color: #4a5160;
 }
 
@@ -427,7 +441,7 @@ html.admin-mode body {
   gap: 6px;
   height: 32px;
   color: var(--admin-ink);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -446,7 +460,7 @@ html.admin-mode body {
 .admin-user__who {
   padding: 10px 12px;
   border-bottom: 1px solid var(--admin-line);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--admin-muted);
 }
@@ -457,7 +471,7 @@ html.admin-mode body {
   width: 100%;
   text-align: left;
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-user__menu a:hover,
@@ -481,7 +495,7 @@ html.admin-mode body {
   margin: 0;
   padding: 12px 16px;
   color: var(--admin-muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.4;
   border-bottom: 1px solid var(--admin-line);
 }
@@ -489,17 +503,17 @@ html.admin-mode body {
 .admin-apps-list .admin-table th,
 .admin-apps-list .admin-table td {
   padding: 8px 10px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-root .admin-apps-list .admin-cell-input {
   height: 28px;
-  font-size: 12px;
+  font-size: 13px;
   min-width: 72px;
 }
 
 .admin-apps-list .admin-badge {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .admin-drawer__dim {
@@ -544,7 +558,7 @@ html.admin-mode body {
 .admin-drawer__actions .admin-btn {
   min-height: 26px;
   padding: 0 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .admin-drawer__fields {
@@ -566,20 +580,20 @@ html.admin-mode body {
 .admin-drawer__row dt {
   margin: 0;
   color: #667085;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .admin-drawer__row dd {
   margin: 0;
   color: var(--admin-ink);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   word-break: break-word;
 }
 
 .admin-drawer__row .admin-badge {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .admin-drawer__foot {
@@ -593,13 +607,13 @@ html.admin-mode body {
 .admin-drawer__foot .admin-btn {
   min-height: 26px;
   padding: 0 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .admin-drawer__input {
   min-width: 0;
   height: 28px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-dash__head {
@@ -608,14 +622,14 @@ html.admin-mode body {
 
 .admin-dash__head h1 {
   margin: 0 0 4px;
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
 }
 
 .admin-dash__head p {
   margin: 0;
   color: var(--admin-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-stat-row {
@@ -638,14 +652,14 @@ html.admin-mode body {
 
 .admin-stat span {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--admin-muted);
 }
 
 .admin-stat strong {
   display: block;
   margin-top: 8px;
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -653,7 +667,7 @@ html.admin-mode body {
 .admin-stat em {
   display: block;
   margin-top: 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   color: var(--admin-blue);
 }
@@ -672,7 +686,7 @@ html.admin-mode body {
 .admin-trend h2 {
   margin: 0;
   padding: 12px 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   border-bottom: 1px solid var(--admin-line);
   background: #f8fafc;
@@ -694,7 +708,7 @@ html.admin-mode body {
 .admin-trend__filters label {
   display: grid;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--admin-muted);
 }
@@ -719,7 +733,7 @@ html.admin-mode body {
   border: 1px solid #cfd5de;
   border-radius: 2px;
   background: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -748,7 +762,7 @@ html.admin-mode body {
 
 .admin-trend__stats span {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--admin-muted);
 }
 
@@ -759,7 +773,7 @@ html.admin-mode body {
 .admin-trend__stats strong {
   display: block;
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 19px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -786,14 +800,14 @@ html.admin-mode body {
 
 .admin-trend__tip p {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--admin-muted);
 }
 
 .admin-trend__tip strong {
   display: block;
   margin-top: 2px;
-  font-size: 15px;
+  font-size: 16px;
   color: #1a73e8;
 }
 
@@ -801,7 +815,7 @@ html.admin-mode body {
 .admin-trend__list em {
   margin-left: 2px;
   font-style: normal;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--admin-muted);
 }
@@ -819,7 +833,7 @@ html.admin-mode body {
   width: 28px;
   padding: 4px 0 22px;
   text-align: right;
-  font-size: 10px;
+  font-size: 11px;
   color: #9aa2b0;
   font-variant-numeric: tabular-nums;
 }
@@ -881,7 +895,7 @@ html.admin-mode body {
   flex: 1;
   min-width: 0;
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   color: #9aa2b0;
   font-variant-numeric: tabular-nums;
 }
@@ -904,7 +918,7 @@ html.admin-mode body {
   display: flex;
   justify-content: space-between;
   padding: 0 2px 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--admin-muted);
 }
 
@@ -950,7 +964,7 @@ html.admin-mode body {
 .admin-card h2 {
   margin: 0;
   padding: 12px 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   border-bottom: 1px solid var(--admin-line);
   background: #f8fafc;
@@ -998,13 +1012,13 @@ html.admin-mode body {
 }
 
 .admin-quick__text strong {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--admin-ink);
 }
 
 .admin-quick__text span {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--admin-muted);
 }
 
@@ -1027,7 +1041,7 @@ html.admin-mode body {
 
 .admin-table-shell__head h1 {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   flex: 1;
 }
 
@@ -1049,7 +1063,7 @@ html.admin-mode body {
 
 .admin-toolbar__count {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--admin-muted);
   flex: 1 1 auto;
   min-width: 0;
@@ -1109,7 +1123,7 @@ html.admin-mode body {
   background: #fff;
   color: var(--admin-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
   cursor: pointer;
 }
@@ -1165,7 +1179,7 @@ html.admin-mode body {
   background: transparent;
   color: var(--admin-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
   cursor: pointer;
 }
@@ -1262,7 +1276,7 @@ html.admin-mode body {
 .admin-table td {
   padding: 10px 12px;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
   border-bottom: 1px solid #edf0f4;
   white-space: nowrap;
 }
@@ -1278,7 +1292,7 @@ html.admin-mode body {
   background: #fff;
   color: var(--admin-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-root .admin-cell-input--select {
@@ -1328,7 +1342,7 @@ html.admin-mode body {
   align-items: center;
   height: 22px;
   padding: 0 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -1360,7 +1374,7 @@ html.admin-mode body {
   padding: 14px 16px;
   border-top: 1px solid var(--admin-line);
   color: #4a5160;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-pagination__total {
@@ -1392,7 +1406,7 @@ html.admin-mode body {
   background: transparent;
   color: #4a5160;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
 }
@@ -1438,7 +1452,7 @@ html.admin-mode body {
   flex-wrap: wrap;
   gap: 8px 24px;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .admin-footer strong {
@@ -1464,7 +1478,7 @@ html.admin-mode body {
 
 .admin-overlay__box h2 {
   margin: 0 0 8px;
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .admin-overlay__box p {
@@ -1491,13 +1505,13 @@ html.admin-mode body {
 
 .admin-confirm__title {
   margin: 0 0 10px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
 }
 
 .admin-overlay__box .admin-confirm__message {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   color: var(--admin-ink);
 }
@@ -1525,7 +1539,7 @@ html.admin-mode body {
 
 .admin-input-modal__head h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -1538,7 +1552,7 @@ html.admin-mode body {
   border: 0;
   background: transparent;
   color: var(--admin-muted);
-  font-size: 20px;
+  font-size: 21px;
   line-height: 1;
   cursor: pointer;
 }
@@ -1549,14 +1563,14 @@ html.admin-mode body {
 
 .admin-input-modal__desc {
   margin: 0 0 14px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--admin-muted);
 }
 
 .admin-input-modal__field {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #4a5160;
 }
@@ -1576,7 +1590,7 @@ html.admin-mode body {
   background: #fff;
   color: var(--admin-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -1607,7 +1621,7 @@ html.admin-mode body {
 
 .admin-input-modal__hint {
   margin: 8px 0 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #d93025;
 }
@@ -1658,7 +1672,7 @@ html.admin-mode body {
 
 .admin-toast__label {
   flex: none;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -1673,7 +1687,7 @@ html.admin-mode body {
 
 .admin-toast__message {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--admin-ink);
   line-height: 1.3;
@@ -1741,7 +1755,7 @@ html.admin-mode body {
 .admin-form label {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #4a5160;
 }
@@ -1832,13 +1846,13 @@ html.admin-mode body {
 }
 
 .admin-attach__head strong {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--admin-ink);
 }
 
 .admin-attach__head span {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--admin-muted);
 }
 
@@ -1873,7 +1887,7 @@ html.admin-mode body {
 
 .admin-attach__empty {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: #98a2b3;
 }
 
@@ -1902,12 +1916,12 @@ html.admin-mode body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .admin-attach__size {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--admin-muted);
 }
 
@@ -1934,7 +1948,7 @@ html.admin-mode body {
   display: grid;
   gap: 4px;
   color: #667085;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-attach__notes li::before {
@@ -1949,7 +1963,7 @@ html.admin-mode body {
   min-height: 32px;
   padding: 0 12px;
   border-radius: 2px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -1999,7 +2013,7 @@ html.admin-mode body {
 
 .admin-section-card h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -2111,7 +2125,7 @@ html.admin-mode body {
   background: transparent;
   color: var(--admin-muted);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -2139,13 +2153,13 @@ html.admin-mode body {
 
 .admin-popup-empty p {
   margin: 0 0 6px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .admin-popup-empty span {
   color: var(--admin-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-popup-grid {
@@ -2161,7 +2175,7 @@ html.admin-mode body {
   display: grid;
   gap: 4px;
   color: #667085;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-popup-notes li::before {
@@ -2238,7 +2252,7 @@ html.admin-mode body {
   border-radius: 999px;
   background: #1a73e8;
   color: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -2261,7 +2275,7 @@ html.admin-mode body {
 .admin-popup-card__media p {
   margin: 0;
   color: var(--admin-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-root .admin-popup-card__flip {
@@ -2272,7 +2286,7 @@ html.admin-mode body {
   background: #eef1f5;
   color: #4a5160;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   pointer-events: none;
@@ -2305,7 +2319,7 @@ html.admin-mode body {
   display: grid;
   gap: 6px;
   min-width: 0;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #4a5160;
 }
@@ -2321,7 +2335,7 @@ html.admin-mode body {
   background: #fff;
   color: var(--admin-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -2335,7 +2349,7 @@ html.admin-mode body {
 
 .admin-popup-card__file-hint {
   color: var(--admin-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
 }
 
@@ -2361,7 +2375,7 @@ html.admin-mode body {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--admin-ink);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -2395,7 +2409,7 @@ html.admin-mode body {
 .admin-popup-preview__meta {
   margin: 0 0 12px;
   color: var(--admin-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-popup-preview__grid {
@@ -2412,7 +2426,7 @@ html.admin-mode body {
 
 .admin-popup-preview__pane h3 {
   margin: 0 0 12px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -2460,7 +2474,7 @@ html.admin-mode body {
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -2506,7 +2520,7 @@ html.admin-mode body {
   gap: 8px;
   padding: 10px 12px;
   border-top: 1px solid var(--admin-line);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-popup-preview__bar label {
@@ -2526,7 +2540,7 @@ html.admin-mode body {
   background: transparent;
   color: #1a73e8;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
