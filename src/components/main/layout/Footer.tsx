@@ -21,7 +21,7 @@ const SPONSOR_LOGOS = {
 } as const;
 
 const OFFICE_FACTS = [
-  { label: "주소", value: OFFICE.address, wide: true },
+  { label: "주소", value: OFFICE.address },
   {
     label: "대표번호",
     value: <a href={`tel:${OFFICE.tel}`}>{OFFICE.tel}</a>,
@@ -30,10 +30,10 @@ const OFFICE_FACTS = [
     label: "이메일",
     value: <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>,
   },
-  { label: "운영시간", value: OFFICE.hours, wide: true },
+  { label: "운영시간", value: OFFICE.hours },
   { label: "대표자", value: OFFICE.ceo },
   { label: "사업자번호", value: OFFICE.bizNo },
-  { label: "통신판매번호", value: OFFICE.mailOrderNo, wide: true },
+  { label: "통신판매번호", value: OFFICE.mailOrderNo },
 ] as const;
 
 export function Footer() {
@@ -85,10 +85,7 @@ export function Footer() {
             {...{ "x-apple-data-detectors": "false" }}
           >
             {OFFICE_FACTS.map((item) => (
-              <div
-                key={item.label}
-                className={item.wide ? "is-wide" : undefined}
-              >
+              <div key={item.label}>
                 <dt>{item.label}</dt>
                 <dd>{item.value}</dd>
               </div>
