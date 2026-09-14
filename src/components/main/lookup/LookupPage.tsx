@@ -121,7 +121,6 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     <form className="form" onSubmit={onSubmit}>
       <div className="form__head">
         <h2>개인 신청 조회</h2>
-        <p className="form__sub">개인 참가자 정보</p>
         <p className="form__note">{LOOKUP_LEAD}</p>
       </div>
       <label className="field">
@@ -249,7 +248,6 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     <form className="form" onSubmit={onSubmit}>
       <div className="form__head">
         <h2>단체 신청 조회</h2>
-        <p className="form__sub">단체 참가자 정보</p>
         <p className="form__note">{LOOKUP_LEAD}</p>
       </div>
       <label className="field">

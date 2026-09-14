@@ -2949,12 +2949,8 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 .form__head h2 {
   margin: 0;
-}
-
-.form__sub {
-  margin: 0;
   color: #fff;
-  font-size: 1.05rem;
+  font-size: 1.35rem;
   font-weight: 800;
 }
 
