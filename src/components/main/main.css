@@ -927,7 +927,7 @@ html.is-live .hero__actions {
   letter-spacing: 0;
 }
 
-.hero__dday > i {
+.hero__dday>i {
   align-self: center;
   width: 2px;
   height: 0.72em;
@@ -1992,6 +1992,26 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   font-size: 0.78rem;
 }
 
+.guide-sec {
+  padding: 4.5rem 0;
+  scroll-margin-top: calc(var(--header-h) + 0.75rem);
+}
+
+.guide-sec h2 {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+}
+
+.guide-rule {
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .table {
   width: 100%;
   border-top: 1px solid var(--rule);
@@ -2414,7 +2434,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   background: #050614;
 }
 
-.medal-3d-preview__stage > * {
+.medal-3d-preview__stage>* {
   grid-area: 1 / 1;
 }
 
@@ -2432,10 +2452,12 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 @keyframes medal-3d-wait {
+
   0%,
   100% {
     transform: translateX(-120%);
   }
+
   50% {
     transform: translateX(180%);
   }
@@ -2869,7 +2891,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 .form-row input[type="email"],
 .form-row input[type="tel"],
 .form-row input[type="password"],
-.form-row__ctrl > select {
+.form-row__ctrl>select {
   width: min(24rem, 100%);
   padding: 0.75rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -2914,7 +2936,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   color: rgba(255, 255, 255, 0.38);
 }
 
-.form-row__ctrl > select:focus,
+.form-row__ctrl>select:focus,
 .form-row input:focus {
   outline: none;
   border-color: var(--marvel);
@@ -4150,11 +4172,13 @@ button.course {
 }
 
 @keyframes ticket-pulse {
+
   0%,
   100% {
     opacity: 0.55;
     transform: scale(0.94);
   }
+
   50% {
     opacity: 1;
     transform: scale(1);
@@ -4336,6 +4360,7 @@ button.course {
   from {
     transform: translateX(-100%);
   }
+
   to {
     transform: translateX(0);
   }
@@ -5641,6 +5666,16 @@ button.course {
     gap: 0.35rem;
   }
 
+  .guide-sec {
+    padding: 2.6rem 0 3rem;
+    scroll-margin-top: calc(var(--header-h) + 0.55rem);
+  }
+
+  .guide-sec h2 {
+    margin-bottom: 1.1rem;
+    font-size: 1.35rem;
+  }
+
   .course-guide {
     grid-template-columns: 1fr;
     height: auto;
@@ -5718,7 +5753,7 @@ button.course {
     grid-template-columns: 1fr 1fr;
   }
 
-  .kit-gallery__medals--3d > li:first-child {
+  .kit-gallery__medals--3d>li:first-child {
     grid-column: 1 / -1;
   }
 
@@ -5740,7 +5775,7 @@ button.course {
     display: inline;
   }
 
-  .page__body > .btn {
+  .page__body>.btn {
     width: 100%;
     min-height: var(--tap);
   }
@@ -5845,7 +5880,7 @@ button.course {
   .form-row input[type="email"],
   .form-row input[type="tel"],
   .form-row input[type="password"],
-  .form-row__ctrl > select,
+  .form-row__ctrl>select,
   .form-row textarea {
     width: 100%;
   }
@@ -6340,6 +6375,7 @@ button.course {
 }
 
 @media (max-width: 720px) {
+
   .board-write__head .btn,
   .board-write__actions .btn,
   .board-attach__upload,

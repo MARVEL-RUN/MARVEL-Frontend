@@ -10,8 +10,9 @@ export function GuidePage() {
   return (
     <main className="page">
       <SideBanner kicker="GUIDE" title="대회안내" en="RACE BRIEFING" />
-      <div className="page__body wrap">
-        <section className="block">
+
+      <section className="guide-sec" id="overview">
+        <div className="wrap">
           <h2>한눈에 보기</h2>
           <dl className="spec">
             {EVENT.info.map((item) => (
@@ -24,19 +25,31 @@ export function GuidePage() {
               </div>
             ))}
           </dl>
-        </section>
+        </div>
+      </section>
 
-        <section className="block">
+      <hr className="guide-rule" />
+
+      <section className="guide-sec" id="timeline">
+        <div className="wrap">
           <h2>타임라인</h2>
           <TimeTable />
-        </section>
+        </div>
+      </section>
 
-        <section className="block">
+      <hr className="guide-rule" />
+
+      <section className="guide-sec" id="course">
+        <div className="wrap">
           <h2>코스</h2>
           <CourseMaps />
-        </section>
+        </div>
+      </section>
 
-        <section className="block">
+      <hr className="guide-rule" />
+
+      <section className="guide-sec" id="kit">
+        <div className="wrap">
           <h2>기념품</h2>
           <KitGallery />
           <ul className="chips">
@@ -44,12 +57,11 @@ export function GuidePage() {
               <li key={item}>{item}</li>
             ))}
           </ul>
-        </section>
-
-        <Link href={REGISTER_HREF} className="btn btn--red">
-          {registerUiOpen ? "참가신청" : "접수 안내"}
-        </Link>
-      </div>
+          <Link href={REGISTER_HREF} className="btn btn--red">
+            {registerUiOpen ? "참가신청" : "접수 안내"}
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
