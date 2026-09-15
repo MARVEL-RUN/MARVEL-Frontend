@@ -10,6 +10,7 @@ import {
   courseAllowsChild,
   courseById,
   courseClosedReason,
+  courseHasTimingChip,
   courseNote,
   courseOpenForBirth,
   feeDigits,
@@ -181,6 +182,45 @@ export function ShirtPick({
           {size}
         </button>
       ))}
+    </div>
+  );
+}
+
+export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
+  const course = courseId ? courseById(courseId) : undefined;
+  const locked = !course;
+  const chip = course ? courseHasTimingChip(course.id) : false;
+  const items = [
+    course ? `${course.distance} 메달` : "메달",
+    "스카프",
+    "배번호",
+    locked ? "기록칩" : chip ? "기록칩" : "기록칩 없음",
+  ];
+
+  return (
+    <div className="kit-fixed">
+      <div className="seg seg--fixed">
+        {items.map((item) => (
+          <button
+            key={item}
+            type="button"
+            className={locked ? undefined : "is-on"}
+            disabled={locked}
+            tabIndex={-1}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+      {course ? (
+        <p className="form-row__hint">
+          {chip
+            ? "배번호 뒷면에 기록칩이 부착되어 있습니다."
+            : "2.3 Km 부문에는 기록칩이 없습니다."}
+        </p>
+      ) : (
+        <p className="form-row__hint">종목을 먼저 선택하세요</p>
+      )}
     </div>
   );
 }

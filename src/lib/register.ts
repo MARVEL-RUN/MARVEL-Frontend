@@ -240,6 +240,10 @@ export function needsGuardian(birth: string) {
   return band === "child" || band === "teen";
 }
 
+export function courseHasTimingChip(courseId: CourseId) {
+  return courseId !== "2.3k";
+}
+
 export function courseOpenForBirth(
   course: NonNullable<ReturnType<typeof courseById>>,
   birth: string,

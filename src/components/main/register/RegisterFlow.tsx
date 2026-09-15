@@ -52,6 +52,7 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  KitFixed,
   PasswordField,
   PhoneField,
   ShirtPick,
@@ -404,6 +405,9 @@ function IndividualFlow({
             {optionsError ? (
               <p className="form__err">{optionsError}</p>
             ) : null}
+            <FormRow label="패키지">
+              <KitFixed courseId={draft.courseId} />
+            </FormRow>
             <FormRow label="티셔츠 사이즈" required>
               <ShirtPick
                 value={draft.selectedSize}
