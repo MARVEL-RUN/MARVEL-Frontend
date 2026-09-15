@@ -301,12 +301,19 @@ export function HomePage() {
                     alt=""
                     fill
                     sizes="(max-width: 720px) 100vw, (max-width: 960px) 80vw, 420px"
-                    style={{ objectFit: "contain", objectPosition: "right bottom" }}
                   />
                 </span>
-                <span className="venue__dist">{c.distance}</span>
-                <span>START / FINISH</span>
-                <span>CHECKERED</span>
+                <span className="venue__copy">
+                  <span className="venue__dist">{c.distance}</span>
+                  <span className="venue__code">{c.code}</span>
+                  <span className="venue__desc">{c.desc}</span>
+                  <span className="venue__facts">
+                    <span>참가비 {c.fee}</span>
+                    <span>
+                      어린이 {"childFee" in c ? c.childFee : "참가 불가"}
+                    </span>
+                  </span>
+                </span>
               </div>
             ))}
             <span key={venueFx} className="venue__glitch">

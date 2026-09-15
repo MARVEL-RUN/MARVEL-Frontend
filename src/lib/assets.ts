@@ -50,7 +50,7 @@ export const MAIN_ASSETS = {
   medal5kRibbon: "/images/main/guide/medal-5k-ribbon.png",
   medal10kRibbon: "/images/main/guide/medal-10k-ribbon.png",
   venueThor: "/images/main/venue/2.3k-thor.png",
-  venueCyclops: "/images/main/venue/5k-cyclops.png",
+  venueFalcon: "/images/main/venue/2.3k-falcon.png",
   venueDoom: "/images/main/venue/10k-doom.png",
   virtualBlack: "/images/virtual/black.svg",
   virtualThor: "/images/virtual/thor.svg",
