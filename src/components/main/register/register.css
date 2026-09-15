@@ -80,7 +80,7 @@
 
 .form-row:has(.course-pick),
 .form-row:has(.form-row__hint),
-.form-row:has(.seg) {
+.form-row:has(.kit-fixed) {
   align-items: start;
 }
 
@@ -811,6 +811,9 @@
 }
 
 .seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.4rem;
   padding: 0 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -819,6 +822,7 @@
   font: inherit;
   font-size: 0.85rem;
   font-weight: 700;
+  line-height: 1;
   cursor: pointer;
   clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
