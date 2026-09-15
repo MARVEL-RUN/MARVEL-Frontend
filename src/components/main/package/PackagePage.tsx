@@ -49,6 +49,8 @@ const SLIDES = [
   },
 ] as const;
 
+type SlideId = (typeof SLIDES)[number]["id"];
+
 const PRELOAD_SRCS = [
   ...SLIDES.map((s) => s.src),
   MAIN_ASSETS.kitShirtFront,
@@ -100,18 +102,27 @@ function nearestIndex(rail: HTMLElement) {
   return best;
 }
 
-function preloadImages(srcs: string[]) {
-  const unique = [...new Set(srcs.filter(Boolean))];
-  unique.forEach((src) => {
+function slideIdAt(i: number): SlideId {
+  return SLIDES[((i % N) + N) % N].id;
+}
+
+function warmImage(src: string) {
+  return new Promise<void>((resolve) => {
     const img = new window.Image();
     img.decoding = "async";
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
     img.src = src;
-    void img.decode?.().catch(() => undefined);
+    if (img.decode) {
+      void img.decode().then(() => resolve()).catch(() => resolve());
+    }
   });
 }
 
 export function PackagePage() {
   const [index, setIndex] = useState(N);
+  const [detailId, setDetailId] = useState<SlideId>("all");
+  const [ready, setReady] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
   const lockRef = useRef(false);
   const dragRef = useRef<{
@@ -121,23 +132,51 @@ export function PackagePage() {
   } | null>(null);
   const skipClickRef = useRef(false);
   const wrapTimer = useRef(0);
+  const detailTimer = useRef(0);
 
   useEffect(() => {
-    preloadImages(PRELOAD_SRCS);
+    let alive = true;
+    const slides = SLIDES.map((s) => warmImage(s.src));
+    const rest = PRELOAD_SRCS.filter((src) => !SLIDES.some((s) => s.src === src)).map(
+      (src) => warmImage(src),
+    );
+    void Promise.all(slides).then(() => {
+      if (alive) setReady(true);
+    });
+    void Promise.all(rest);
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const jump = useCallback((next: number) => {
-    const rail = railRef.current;
-    if (!rail) return;
-    lockRef.current = true;
-    rail.classList.add("is-jump");
-    rail.scrollLeft = centerLeft(rail, next);
-    setIndex(next);
-    requestAnimationFrame(() => {
-      rail.classList.remove("is-jump");
-      lockRef.current = false;
-    });
+  const queueDetail = useCallback((i: number, immediate = false) => {
+    const next = slideIdAt(i);
+    window.clearTimeout(detailTimer.current);
+    if (immediate) {
+      setDetailId(next);
+      return;
+    }
+    detailTimer.current = window.setTimeout(() => {
+      setDetailId(next);
+    }, 140);
   }, []);
+
+  const jump = useCallback(
+    (next: number) => {
+      const rail = railRef.current;
+      if (!rail) return;
+      lockRef.current = true;
+      rail.classList.add("is-jump");
+      rail.scrollLeft = centerLeft(rail, next);
+      setIndex(next);
+      queueDetail(next, true);
+      requestAnimationFrame(() => {
+        rail.classList.remove("is-jump");
+        lockRef.current = false;
+      });
+    },
+    [queueDetail],
+  );
 
   const goTo = useCallback(
     (next: number) => {
@@ -145,6 +184,7 @@ export function PackagePage() {
       if (!rail || next === index) return;
       lockRef.current = true;
       setIndex(next);
+      queueDetail(next, true);
       rail.scrollTo({ left: centerLeft(rail, next), behavior: "smooth" });
       window.clearTimeout(wrapTimer.current);
       wrapTimer.current = window.setTimeout(() => {
@@ -153,7 +193,7 @@ export function PackagePage() {
         else lockRef.current = false;
       }, 460);
     },
-    [index, jump],
+    [index, jump, queueDetail],
   );
 
   useLayoutEffect(() => {
@@ -165,6 +205,7 @@ export function PackagePage() {
     if (!rail || lockRef.current) return;
     const best = nearestIndex(rail);
     setIndex(best);
+    queueDetail(best);
     window.clearTimeout(wrapTimer.current);
     wrapTimer.current = window.setTimeout(() => {
       if (lockRef.current) return;
@@ -203,7 +244,6 @@ export function PackagePage() {
   };
 
   const real = ((index % N) + N) % N;
-  const current = SLIDES[real];
 
   return (
     <main className="page">
@@ -221,7 +261,13 @@ export function PackagePage() {
           <KitApplyNote className="pkg__apply" />
         </header>
 
-        <div className="pkg-media">
+        <div className={ready ? "pkg-media is-ready" : "pkg-media"}>
+          <div aria-hidden className="pkg-preload">
+            {SLIDES.map((slide) => (
+              <img key={slide.id} src={slide.src} alt="" />
+            ))}
+          </div>
+
           <div
             ref={railRef}
             className="pkg-rail"
@@ -233,7 +279,6 @@ export function PackagePage() {
           >
             {LOOP.map(({ i, slide }) => {
               const active = index === i;
-              const near = Math.abs(i - index) <= 1 || Math.abs(i - index) >= N * COPIES - 1;
               return (
                 <article
                   key={i}
@@ -261,9 +306,8 @@ export function PackagePage() {
                         src={slide.src}
                         alt=""
                         draggable={false}
-                        loading={near ? "eager" : "lazy"}
+                        loading="eager"
                         decoding="async"
-                        fetchPriority={active ? "high" : "low"}
                       />
                     </span>
                     {slide.en ? <p className="pkg-card__en">{slide.en}</p> : null}
@@ -290,10 +334,8 @@ export function PackagePage() {
 
         <div className="pkg__detail wrap">
           <div
-            className={
-              current.id === "all" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
-            }
-            aria-hidden={current.id !== "all"}
+            className={detailId === "all" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
+            aria-hidden={detailId !== "all"}
           >
             <section className="kit-gallery__pane">
               <h3>구성</h3>
@@ -305,34 +347,26 @@ export function PackagePage() {
             </section>
           </div>
           <div
-            className={
-              current.id === "shirt" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
-            }
-            aria-hidden={current.id !== "shirt"}
+            className={detailId === "shirt" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
+            aria-hidden={detailId !== "shirt"}
           >
             <KitShirtPane />
           </div>
           <div
-            className={
-              current.id === "bib" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
-            }
-            aria-hidden={current.id !== "bib"}
+            className={detailId === "bib" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
+            aria-hidden={detailId !== "bib"}
           >
             <KitBibPane />
           </div>
           <div
-            className={
-              current.id === "medal" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
-            }
-            aria-hidden={current.id !== "medal"}
+            className={detailId === "medal" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
+            aria-hidden={detailId !== "medal"}
           >
             <KitMedalPane />
           </div>
           <div
-            className={
-              current.id === "scarf" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
-            }
-            aria-hidden={current.id !== "scarf"}
+            className={detailId === "scarf" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
+            aria-hidden={detailId !== "scarf"}
           >
             <KitScarfPane />
           </div>
