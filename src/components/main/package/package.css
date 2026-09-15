@@ -1,34 +1,40 @@
 /* PACKAGE */
 
 .pkg {
-  padding: 1.6rem 0 4.5rem;
+  padding: 6.5rem 0 4.5rem;
 }
 
 .pkg__intro {
-  margin-bottom: 1.2rem;
-  text-align: center;
+  max-width: 40rem;
+  margin: 0 auto 2.4rem;
+  text-align: left;
 }
 
 .pkg__title {
-  margin: 0 0 0.85rem;
-  font-size: clamp(2.2rem, 4.4vw, 3.1rem);
+  margin: 0 0 1.1rem;
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
   font-weight: 800;
   letter-spacing: -0.04em;
+  line-height: 1.05;
 }
 
 .pkg__intro .sec__body {
-  margin: 0 auto;
-  font-size: 1.05rem;
-  line-height: 1.55;
+  margin: 0;
+  max-width: 28rem;
+  color: var(--note);
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.65;
 }
 
 .pkg__meta {
   display: flex;
-  gap: 0.55rem;
-  justify-content: center;
-  margin: 1.15rem 0 0;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.55rem;
+  justify-content: flex-start;
+  margin: 1.35rem 0 0;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 700;
 }
 
@@ -38,13 +44,14 @@
 
 .pkg__apply {
   display: grid;
-  gap: 0.35rem;
-  max-width: 38rem;
-  margin: 1.15rem auto 0;
+  gap: 0.28rem;
+  max-width: 36rem;
+  margin: 0.85rem 0 0;
   color: var(--note);
   font-size: 0.92rem;
   font-weight: 500;
   line-height: 1.55;
+  text-align: left;
 }
 
 .pkg__apply span,
@@ -288,22 +295,50 @@
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .pkg {
-    padding: 1.75rem 0 4.5rem;
+    padding: 3.8rem 0 4.5rem;
   }
+
+  .pkg__intro {
+    margin-bottom: 1.6rem;
+  }
+
+  .pkg__title {
+    margin-bottom: 0.85rem;
+    font-size: clamp(2rem, 9vw, 2.6rem);
+  }
+
+  .pkg__intro .sec__body {
+    font-size: 0.95rem;
+  }
+
+  .pkg__meta {
+    margin-top: 1rem;
+    font-size: 0.92rem;
+  }
+
+  .pkg__apply {
+    margin-top: 0.7rem;
+    font-size: 0.88rem;
+  }
+
   .pkg-slide {
     flex-basis: 52vw;
   }
+
   .pkg-card {
     border-radius: 1.2rem;
     padding: 0.75rem 0.75rem 0.65rem;
   }
+
   .pkg-card__en {
     font-size: 0.95rem;
   }
+
   .pkg-dots__dot {
     width: 0.42rem;
     height: 0.42rem;
   }
+
   .pkg-dots__dot.is-on {
     width: 1.32rem;
   }

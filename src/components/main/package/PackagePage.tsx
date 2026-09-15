@@ -4,7 +4,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import {
-  KitApplyNote,
   KitBibPane,
   KitMedalPane,
   KitScarfPane,
@@ -258,7 +257,6 @@ export function PackagePage() {
           <p className="pkg__meta">
             <b>수령</b> 대회 당일 지정 부스
           </p>
-          <KitApplyNote className="pkg__apply" />
         </header>
 
         <div className={ready ? "pkg-media is-ready" : "pkg-media"}>
