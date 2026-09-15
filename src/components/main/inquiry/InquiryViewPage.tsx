@@ -1,25 +1,38 @@
 "use client";
 
-import { getInquiry, listInquiries } from "@/services/admin/inquiries";
+import {
+  getInquiry,
+  INQUIRY_PUBLIC_TITLE,
+  listInquiries,
+} from "@/services/admin/inquiries";
 import type { AdminInquiry } from "@/types/boards";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { orderInquiries } from "./order";
+import { InquirySecretModal } from "./InquirySecretModal";
+import { isInquiryUnlocked, orderInquiries, toDateTimeAttr, unlockInquiry } from "./order";
 
 export function InquiryViewPage() {
+  const router = useRouter();
   const id = useSearchParams().get("id") ?? "";
   const [post, setPost] = useState<AdminInquiry | null | undefined>(undefined);
   const [prev, setPrev] = useState<AdminInquiry | null>(null);
   const [next, setNext] = useState<AdminInquiry | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
 
   useEffect(() => {
     if (!id) {
       setPost(null);
       setPrev(null);
       setNext(null);
+      setUnlocked(false);
+      setGateOpen(false);
       return;
     }
+    const open = isInquiryUnlocked(id);
+    setUnlocked(open);
+    setGateOpen(!open);
     void Promise.all([getInquiry(id), listInquiries()]).then(([found, rows]) => {
       const ordered = orderInquiries(rows);
       const i = ordered.findIndex((row) => row.id === id);
@@ -28,6 +41,14 @@ export function InquiryViewPage() {
       setPrev(i >= 0 && i < ordered.length - 1 ? ordered[i + 1] : null);
     });
   }, [id]);
+
+  function goNeighbor(targetId: string) {
+    if (isInquiryUnlocked(targetId)) {
+      router.push(`/inquiry/view?id=${targetId}`);
+      return;
+    }
+    router.push(`/inquiry/view?id=${targetId}`);
+  }
 
   return (
     <main className="page page--post">
@@ -43,14 +64,29 @@ export function InquiryViewPage() {
               </Link>
             </div>
           </div>
+        ) : !unlocked ? (
+          <div className="post">
+            <p className="board__empty">비밀글입니다. 비밀번호를 입력해 주세요.</p>
+            <div className="post__foot">
+              <Link href="/inquiry" className="btn btn--ghost">
+                목록
+              </Link>
+            </div>
+          </div>
         ) : (
           <article className="post">
             <header className="post__head">
               <h2 className="post__title">{post.title}</h2>
               <p className="post__meta">
-                <span>{post.answer ? "답변" : "대기"}</span>
+                <span
+                  className={
+                    post.answer ? "post__status" : "post__status is-wait"
+                  }
+                >
+                  {post.answer ? "답변" : "대기"}
+                </span>
                 <span>{post.name}</span>
-                <time dateTime={post.date.replaceAll(".", "-")}>{post.date}</time>
+                <time dateTime={toDateTimeAttr(post.date)}>{post.date}</time>
               </p>
             </header>
             <div className="post__body">{post.body}</div>
@@ -72,13 +108,18 @@ export function InquiryViewPage() {
               {post.answer ? <p>{post.answer}</p> : <p className="is-wait">답변 준비 중입니다.</p>}
             </section>
             <nav className="post__nav" aria-label="이전·다음 글">
-              <NavRow label="다음글" item={next} />
-              <NavRow label="이전글" item={prev} />
+              <NavRow label="다음글" item={next} onOpen={goNeighbor} />
+              <NavRow label="이전글" item={prev} onOpen={goNeighbor} />
             </nav>
             <div className="post__foot">
               <Link href="/inquiry" className="btn btn--ghost">
                 목록
               </Link>
+              {!post.answer ? (
+                <Link href={`/inquiry/write?id=${post.id}`} className="btn btn--ghost">
+                  수정
+                </Link>
+              ) : null}
               <Link href="/inquiry/write" className="btn btn--red">
                 글쓰기
               </Link>
@@ -86,6 +127,20 @@ export function InquiryViewPage() {
           </article>
         )}
       </div>
+      <InquirySecretModal
+        open={Boolean(post) && gateOpen}
+        onClose={() => {
+          setGateOpen(false);
+          router.push("/inquiry");
+        }}
+        onConfirm={() => {
+          if (!id) return;
+          // 임시: 비밀번호 검증 생략
+          unlockInquiry(id);
+          setUnlocked(true);
+          setGateOpen(false);
+        }}
+      />
     </main>
   );
 }
@@ -99,9 +154,11 @@ function formatFileSize(size: number) {
 function NavRow({
   label,
   item,
+  onOpen,
 }: {
   label: string;
   item: AdminInquiry | null;
+  onOpen: (id: string) => void;
 }) {
   if (!item) {
     return (
@@ -113,9 +170,9 @@ function NavRow({
   }
 
   return (
-    <Link href={`/inquiry/view?id=${item.id}`} className="post__nav-row">
+    <button type="button" className="post__nav-row" onClick={() => onOpen(item.id)}>
       <span>{label}</span>
-      <strong>{item.title}</strong>
-    </Link>
+      <strong>{INQUIRY_PUBLIC_TITLE}</strong>
+    </button>
   );
 }

@@ -5119,8 +5119,16 @@ button.course {
 }
 
 .board__row {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
   color: inherit;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .board__row:hover {
@@ -5256,7 +5264,7 @@ button.course {
 
 .board--qna .board__head,
 .board--qna .board__row {
-  grid-template-columns: 4.4rem minmax(0, 1fr) 5.5rem 7rem;
+  grid-template-columns: 4.4rem minmax(0, 1fr) 5.5rem 8.8rem;
 }
 
 .board__subject {
@@ -5267,6 +5275,17 @@ button.course {
 
 .board__subject .board__title {
   min-width: 0;
+}
+
+.board__lock {
+  flex-shrink: 0;
+  margin-right: 0.35rem;
+  color: var(--note);
+}
+
+.post__title .board__lock {
+  margin-right: 0.45rem;
+  vertical-align: -0.12em;
 }
 
 .board__name {
@@ -5306,10 +5325,32 @@ button.course {
 
 .post__meta {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.85rem;
   margin-top: 0.7rem;
   color: var(--note);
   font-size: 0.86rem;
+}
+
+.post__status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: 0.14rem 0.5rem;
+  border: 1px solid rgba(237, 29, 36, 0.7);
+  background: rgba(237, 29, 36, 0.16);
+  color: #ff8b90;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.post__status.is-wait {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--note);
 }
 
 .post__body {
@@ -5318,6 +5359,179 @@ button.course {
   color: var(--silver);
   line-height: 1.75;
   white-space: pre-wrap;
+}
+
+.post__unlock {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.8rem 0 0.4rem;
+}
+
+.post__unlock-lead {
+  margin: 0;
+  color: var(--silver);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.post__unlock-error {
+  margin: 0;
+  color: var(--marvel);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.post__unlock-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+/* 문의사항 비밀글 모달 */
+.inquiry-secret {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.inquiry-secret__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(4, 8, 20, 0.72);
+  cursor: pointer;
+}
+
+.inquiry-secret__panel {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  padding: 1.35rem 1.35rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #12182a;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.inquiry-secret__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.inquiry-secret__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(237, 29, 36, 0.55);
+  color: var(--marvel);
+  background: rgba(237, 29, 36, 0.12);
+}
+
+.inquiry-secret__head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.inquiry-secret__x {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.inquiry-secret__x:hover {
+  color: #fff;
+}
+
+.inquiry-secret__desc {
+  margin: 0.95rem 0 1.15rem;
+  color: var(--silver);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.inquiry-secret__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.inquiry-secret__field > span:first-child {
+  color: var(--note);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.inquiry-secret__control {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0 0.35rem 0 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.inquiry-secret__control:focus-within {
+  border-color: rgba(237, 29, 36, 0.7);
+}
+
+.inquiry-secret__control input {
+  flex: 1;
+  min-width: 0;
+  height: 2.8rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.inquiry-secret__control input::placeholder {
+  color: var(--note);
+}
+
+.inquiry-secret__eye {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.inquiry-secret__eye:hover {
+  color: #fff;
+}
+
+.inquiry-secret__actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
+}
+
+.inquiry-secret__actions .btn {
+  min-width: 5.5rem;
+  min-height: 2.4rem;
+  padding: 0 1.1rem;
+  font-size: 0.84rem;
 }
 
 .post__files {
@@ -5372,13 +5586,20 @@ button.course {
 
 .post__nav-row {
   display: grid;
+  width: 100%;
+  margin: 0;
+  padding: 0.95rem 0.35rem;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
   grid-template-columns: 4.4rem minmax(0, 1fr);
   gap: 0.75rem;
   align-items: center;
-  padding: 0.95rem 0.35rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   color: inherit;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .post__nav-row span:first-child {

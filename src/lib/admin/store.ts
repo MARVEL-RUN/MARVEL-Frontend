@@ -20,6 +20,13 @@ export function todayStamp() {
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
 }
 
+/** 문의 등록일 — YYYY.MM.DD HH:mm */
+export function nowStamp() {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${todayStamp()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 let idSeq = 0;
 
 export function nextId(prefix: string) {

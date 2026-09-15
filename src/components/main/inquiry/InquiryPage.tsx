@@ -1,8 +1,10 @@
 "use client";
 
-import { listInquiries } from "@/services/admin/inquiries";
+import { INQUIRY_PUBLIC_TITLE, listInquiries } from "@/services/admin/inquiries";
 import type { AdminInquiry } from "@/types/boards";
+import { Lock } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   BoardSearch,
@@ -11,14 +13,17 @@ import {
   type BoardSort,
 } from "../board/BoardSearch";
 import { SideBanner } from "../layout/SideBanner";
-import { inquiryNo, orderInquiries } from "./order";
+import { InquirySecretModal } from "./InquirySecretModal";
+import { inquiryNo, orderInquiries, toDateTimeAttr, unlockInquiry } from "./order";
 
 export function InquiryPage() {
+  const router = useRouter();
   const [items, setItems] = useState<AdminInquiry[]>([]);
   const [ready, setReady] = useState(false);
   const [query, setQuery] = useState("");
   const [applied, setApplied] = useState("");
   const [sort, setSort] = useState<BoardSort>("latest");
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   useEffect(() => {
     void listInquiries().then((rows) => {
@@ -29,11 +34,13 @@ export function InquiryPage() {
 
   const nos = useMemo(() => inquiryNo(items), [items]);
   const shown = useMemo(() => {
-    const filtered = items.filter((item) =>
-      matchQuery([item.title, item.name], applied),
-    );
+    const filtered = items.filter((item) => matchQuery([item.name], applied));
     return [...filtered].sort(byDate(sort));
   }, [items, applied, sort]);
+
+  function openPost(id: string) {
+    setPendingId(id);
+  }
 
   return (
     <main className="page">
@@ -65,10 +72,11 @@ export function InquiryPage() {
             </p>
           ) : (
             shown.map((item) => (
-              <Link
+              <button
                 key={item.id}
-                href={`/inquiry/view?id=${item.id}`}
+                type="button"
                 className="board__row"
+                onClick={() => openPost(item.id)}
               >
                 <span className="board__no">{nos.get(item.id)}</span>
                 <span className="board__subject">
@@ -79,15 +87,28 @@ export function InquiryPage() {
                   >
                     {item.answer ? "답변" : "대기"}
                   </span>
-                  <strong className="board__title">{item.title}</strong>
+                  <Lock className="board__lock" size={14} aria-hidden />
+                  <strong className="board__title">{INQUIRY_PUBLIC_TITLE}</strong>
                 </span>
                 <span className="board__name">{item.name}</span>
-                <time dateTime={item.date.replaceAll(".", "-")}>{item.date}</time>
-              </Link>
+                <time dateTime={toDateTimeAttr(item.date)}>{item.date}</time>
+              </button>
             ))
           )}
         </div>
       </div>
+      <InquirySecretModal
+        open={Boolean(pendingId)}
+        onClose={() => setPendingId(null)}
+        onConfirm={() => {
+          if (!pendingId) return;
+          // 임시: 비밀번호 검증 생략
+          unlockInquiry(pendingId);
+          const id = pendingId;
+          setPendingId(null);
+          router.push(`/inquiry/view?id=${id}`);
+        }}
+      />
     </main>
   );
 }
