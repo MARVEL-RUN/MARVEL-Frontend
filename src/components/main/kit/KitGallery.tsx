@@ -5,7 +5,6 @@ import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import { SHIRT_SIZES, type CourseId } from "@/lib/register";
-// import { MedalViewer } from "./MedalViewer"; /* 모바일 불안정 — 3D 보류 */
 
 export function KitGallery() {
   return (
@@ -66,23 +65,6 @@ export function KitMedalPane() {
         ))}
       </div>
       <ul className="kit-gallery__medals">
-        {/* 모바일 불안정 — 3D 보류
-        {course.medal3d ? (
-          <li>
-            <figure>
-              <span className="kit-gallery__frame kit-gallery__frame--3d">
-                <MedalViewer
-                  key={course.medal3d}
-                  src={course.medal3d}
-                  poster={course.medalTurn}
-                  alt={`${course.distance} 피니셔 메달 3D`}
-                />
-              </span>
-              <figcaption>3D</figcaption>
-            </figure>
-          </li>
-        ) : null}
-        */}
         <li>
           <figure>
             <span className="kit-gallery__frame">
@@ -111,13 +93,6 @@ export function KitMedalPane() {
         </li>
       </ul>
       <p className="kit-gallery__note">선택한 코스에 따라 지급됩니다.</p>
-      {/* 모바일 불안정 — 3D 보류
-      {course.medal3d ? (
-        <p className="kit-gallery__note">
-          ※ 3D 이미지는 연출용이며, 실제 지급 메달과 다를 수 있습니다.
-        </p>
-      ) : null}
-      */}
     </section>
   );
 }

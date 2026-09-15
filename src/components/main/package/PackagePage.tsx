@@ -60,7 +60,7 @@ const PRELOAD_SRCS = [
   ...EVENT.courses.flatMap((c) => [c.medalRibbon, c.medalTurn, c.medalBack]),
 ];
 
-const N = SLIDES.length;
+const N: number = SLIDES.length;
 const COPIES = 3;
 const LOOP = Array.from({ length: N * COPIES }, (_, i) => ({
   i,

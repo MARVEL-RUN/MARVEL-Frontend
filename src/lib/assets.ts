@@ -39,11 +39,6 @@ export const MAIN_ASSETS = {
   medal5kBack: "/images/main/guide/medal-5k-back.svg",
   medal10kTurn: "/images/main/guide/medal-10k-turn.svg",
   medal10kBack: "/images/main/guide/medal-10k-back.svg",
-  /* 모바일 불안정 — 3D 보류
-  medal10k3d: "/models/main/guide/medal-10k.glb",
-  medal5k3d: "/models/main/guide/medal-5k.glb",
-  medal2_3k3d: "/models/main/guide/medal-2.3k.glb",
-  */
   kitBib: "/images/main/guide/kit-bib.svg",
   kitShirt: "/images/main/guide/kit-shirt.png",
   kitShirtFront: "/images/main/guide/kit-shirt-front.svg",

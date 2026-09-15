@@ -90,7 +90,6 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal10kTurn,
       medalBack: MAIN_ASSETS.medal10kBack,
       medalRibbon: MAIN_ASSETS.medal10kRibbon,
-      // medal3d: MAIN_ASSETS.medal10k3d, /* 모바일 불안정 — 3D 보류 */
       figure: MAIN_ASSETS.venueDoom,
     },
     {
@@ -106,7 +105,6 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal5kTurn,
       medalBack: MAIN_ASSETS.medal5kBack,
       medalRibbon: MAIN_ASSETS.medal5kRibbon,
-      // medal3d: MAIN_ASSETS.medal5k3d, /* 모바일 불안정 — 3D 보류 */
       figure: MAIN_ASSETS.venueCyclops,
     },
     {
@@ -122,7 +120,6 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal2_3kTurn,
       medalBack: MAIN_ASSETS.medal2_3kBack,
       medalRibbon: MAIN_ASSETS.medal2_3kRibbon,
-      // medal3d: MAIN_ASSETS.medal2_3k3d, /* 모바일 불안정 — 3D 보류 */
       figure: MAIN_ASSETS.venueThor,
     },
   ],
