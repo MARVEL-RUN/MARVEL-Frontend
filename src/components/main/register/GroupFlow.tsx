@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { MainHttpError } from "@/lib/main/fetch";
 import {
@@ -17,22 +17,25 @@ import {
   categoryFeeAmount,
   categoryLabel,
   categoryOpenForBirth,
+  courseForCategory,
   findCategory,
-  findSouvenir,
   groupOptionsFee,
+  shirtAssignment,
+  shirtSouvenir,
   souvenirSizes,
   sortedCategories,
-  sortedSouvenirs,
 } from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
 import {
   CHILD_AGE_NOTE,
+  TIMING_CHIP_NOTE,
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
   GUARDIAN_AGE_NOTE,
   GENDERS,
   MAX_GROUP_SIZE,
+  SHIRT_SIZES,
   ageBand,
   formatFee,
   genderLabel,
@@ -61,8 +64,10 @@ import {
   EmailField,
   FormRow,
   FormSec,
+  KitFixed,
   PasswordField,
   PhoneField,
+  ShirtPick,
   birthView,
 } from "./ApplyUi";
 
@@ -152,6 +157,33 @@ export function GroupFlow({
     };
   }, []);
 
+  useEffect(() => {
+    if (optionsLoading || !categories.length) return;
+    setDraft((prev) => {
+      let changed = false;
+      const participants = prev.participants.map((p) => {
+        if (!p.categoryId) {
+          if (!p.souvenirId && !p.selectedSize) return p;
+          changed = true;
+          return { ...p, souvenirId: "", selectedSize: "" };
+        }
+        const next = shirtAssignment(
+          findCategory(categories, p.categoryId),
+          p.selectedSize,
+        );
+        if (
+          next.souvenirId === p.souvenirId &&
+          next.selectedSize === p.selectedSize
+        ) {
+          return p;
+        }
+        changed = true;
+        return { ...p, ...next };
+      });
+      return changed ? { ...prev, participants } : prev;
+    });
+  }, [categories, optionsLoading]);
+
   function patch(next: Partial<GroupDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
     setError("");
@@ -238,10 +270,12 @@ export function GroupFlow({
             `참가자 ${n}: ${categoryClosedReason(category, p.birth) || "이 종목은 참가할 수 없습니다."}`,
           );
         }
-        const souvenir = findSouvenir(category, p.souvenirId);
-        if (!souvenir) throw new Error(`참가자 ${n}: 기념품을 선택하세요.`);
+        const souvenir = shirtSouvenir(category);
+        if (!souvenir) {
+          throw new Error(`참가자 ${n}: 티셔츠 옵션을 불러오지 못했습니다.`);
+        }
         if (!souvenirSizes(souvenir).includes(p.selectedSize)) {
-          throw new Error(`참가자 ${n}: 기념품 사이즈를 선택하세요.`);
+          throw new Error(`참가자 ${n}: 티셔츠 사이즈를 선택하세요.`);
         }
       });
     } catch (err) {
@@ -316,7 +350,7 @@ export function GroupFlow({
         <form className="form" onSubmit={onForm} noValidate>
           <ApplyNotice lines={NOTICE} />
 
-          <FormSec title="단체 정보">
+          <FormSec kicker="01 / GROUP" title="단체 정보">
             <FormRow label="단체명" required>
               <input
                 type="text"
@@ -357,7 +391,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="대표자 정보">
+          <FormSec kicker="02 / LEADER" title="대표자 정보">
             <FormRow label="대표자 성명" required>
               <input
                 type="text"
@@ -375,7 +409,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="연락처 정보">
+          <FormSec kicker="03 / CONTACT" title="연락처 정보">
             <FormRow label="휴대폰번호" required>
               <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
@@ -393,7 +427,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+          <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
             <FormRow label="주소" required>
               <AddressField
                 zonecode={draft.zonecode}
@@ -405,7 +439,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="참가자">
+          <FormSec kicker="05 / RUNNERS" title="참가자">
             <ApplyHint>
               <p>대표자도 대회에 참여하는 경우 아래 참가자 정보를 작성하시기 바랍니다.</p>
               <p>
@@ -414,6 +448,7 @@ export function GroupFlow({
               <p>{CHILD_AGE_NOTE}</p>
               <p>{GUARDIAN_AGE_NOTE}</p>
               <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
+              <p>{TIMING_CHIP_NOTE}</p>
               <CourseFeeTable />
             </ApplyHint>
             <div className="party-bar">
@@ -433,28 +468,44 @@ export function GroupFlow({
             ) : null}
             <div className="party-wrap">
               <table className="party">
+                <colgroup>
+                  <col className="party__c-no" />
+                  <col className="party__c-name" />
+                  <col className="party__c-birth" />
+                  <col className="party__c-phone" />
+                  <col className="party__c-gender" />
+                  <col className="party__c-fee" />
+                  <col className="party__c-del" />
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>번호</th>
+                    <th rowSpan={2}>번호</th>
                     <th>이름</th>
                     <th>생년월일</th>
                     <th>연락처</th>
                     <th>성별</th>
+                    <th rowSpan={2}>참가비</th>
+                    <th rowSpan={2}>삭제</th>
+                  </tr>
+                  <tr>
                     <th>참가종목</th>
-                    <th>기념품</th>
                     <th>사이즈</th>
-                    <th>참가비</th>
-                    <th>삭제</th>
+                    <th colSpan={2}>패키지</th>
                   </tr>
                 </thead>
                 <tbody>
                   {draft.participants.map((p, i) => {
                     const category = findCategory(categories, p.categoryId);
-                    const souvenir = findSouvenir(category, p.souvenirId);
+                    const souvenir = shirtSouvenir(category);
                     const sizes = souvenirSizes(souvenir);
+                    const courseId = category
+                      ? (courseForCategory(category)?.id ?? "")
+                      : "";
+                    const open = openMember === i;
                     return (
-                      <tr key={i} className={openMember === i ? "is-open" : undefined}>
-                        <td className="party__no">{i + 1}.</td>
+                      <Fragment key={i}>
+                      <tr className={open ? "party__info is-open" : "party__info"}>
+                        <td className="party__no" rowSpan={2}>{i + 1}.</td>
                         <td className="party__peek">
                           <button
                             type="button"
@@ -482,12 +533,14 @@ export function GroupFlow({
                               patchMember(
                                 i,
                                 keep
-                                  ? { birth }
+                                  ? {
+                                      birth,
+                                      ...shirtAssignment(current, p.selectedSize),
+                                    }
                                   : {
                                       birth,
                                       categoryId: "",
-                                      souvenirId: "",
-                                      selectedSize: "",
+                                      ...shirtAssignment(undefined),
                                     },
                               );
                             }}
@@ -517,16 +570,50 @@ export function GroupFlow({
                             ))}
                           </select>
                         </td>
+                        <td className="party__fee" data-label="참가비" rowSpan={2}>
+                          {category
+                            ? formatFee(categoryFeeAmount(category, p.birth))
+                            : "—"}
+                        </td>
+                        <td className="party__del" rowSpan={2}>
+                          <button
+                            type="button"
+                            className="party__expand"
+                            onClick={() => setOpenMember(i)}
+                          >
+                            펼치기
+                          </button>
+                          <button
+                            type="button"
+                            className="party__fold"
+                            onClick={() => setOpenMember(-1)}
+                          >
+                            접기
+                          </button>
+                          <button
+                            type="button"
+                            className="party__remove"
+                            onClick={() => removeMember(i)}
+                            disabled={draft.participants.length <= 1}
+                          >
+                            삭제
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className={open ? "party__more is-open" : "party__more"}>
                         <td data-label="참가종목">
                           <select
                             value={p.categoryId}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const categoryId = e.target.value;
                               patchMember(i, {
-                                categoryId: e.target.value,
-                                souvenirId: "",
-                                selectedSize: "",
-                              })
-                            }
+                                categoryId,
+                                ...shirtAssignment(
+                                  findCategory(categories, categoryId),
+                                  p.selectedSize,
+                                ),
+                              });
+                            }}
                             disabled={!optionsReady}
                             required
                           >
@@ -554,79 +641,22 @@ export function GroupFlow({
                             })}
                           </select>
                         </td>
-                        <td data-label="기념품">
-                          <select
-                            value={p.souvenirId}
-                            onChange={(e) => {
-                              const souvenirId = e.target.value;
-                              const next = findSouvenir(category, souvenirId);
-                              const nextSizes = souvenirSizes(next);
-                              patchMember(i, {
-                                souvenirId,
-                                selectedSize:
-                                  nextSizes.length === 1 ? nextSizes[0] : "",
-                              });
-                            }}
-                            disabled={!p.categoryId || category?.isActive === false}
-                            required
-                          >
-                            <option value="">기념품</option>
-                            {sortedSouvenirs(category).map((item) => (
-                              <option key={item.souvenirId} value={item.souvenirId}>
-                                {item.name}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
                         <td data-label="사이즈">
-                          <select
+                          <ShirtPick
                             value={p.selectedSize}
-                            onChange={(e) =>
-                              patchMember(i, { selectedSize: e.target.value })
+                            sizes={SHIRT_SIZES}
+                            enabled={souvenir ? sizes : []}
+                            disabled={!souvenir}
+                            onChange={(selectedSize) =>
+                              patchMember(i, { selectedSize })
                             }
-                            disabled={!p.souvenirId}
-                            required
-                          >
-                            <option value="">사이즈</option>
-                            {p.souvenirId
-                              ? sizes.map((size) => (
-                                  <option key={size} value={size}>
-                                    {size}
-                                  </option>
-                                ))
-                              : null}
-                          </select>
+                          />
                         </td>
-                        <td className="party__fee" data-label="참가비">
-                          {category
-                            ? formatFee(categoryFeeAmount(category, p.birth))
-                            : "—"}
-                        </td>
-                        <td className="party__del">
-                          <button
-                            type="button"
-                            className="party__expand"
-                            onClick={() => setOpenMember(i)}
-                          >
-                            펼치기
-                          </button>
-                          <button
-                            type="button"
-                            className="party__fold"
-                            onClick={() => setOpenMember(-1)}
-                          >
-                            접기
-                          </button>
-                          <button
-                            type="button"
-                            className="party__remove"
-                            onClick={() => removeMember(i)}
-                            disabled={draft.participants.length <= 1}
-                          >
-                            삭제
-                          </button>
+                        <td colSpan={2} data-label="패키지">
+                          <KitFixed courseId={courseId} />
                         </td>
                       </tr>
+                      </Fragment>
                     );
                   })}
                 </tbody>
@@ -697,7 +727,9 @@ export function GroupFlow({
           <ul className="member-list">
             {draft.participants.map((p, i) => {
               const category = findCategory(categories, p.categoryId);
-              const souvenir = findSouvenir(category, p.souvenirId);
+              const courseId = category
+                ? (courseForCategory(category)?.id ?? "")
+                : "";
               return (
                 <li key={`${p.name}-${i}`}>
                   <strong>
@@ -705,10 +737,10 @@ export function GroupFlow({
                   </strong>
                   <span>
                     {category ? categoryLabel(category) : "—"} ·{" "}
-                    {souvenir?.name ?? "—"} ({p.selectedSize || "—"}) ·{" "}
-                    {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
-                    {p.phone}
+                    {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
+                    {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
                   </span>
+                  <KitFixed courseId={courseId} />
                 </li>
               );
             })}

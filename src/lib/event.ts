@@ -105,7 +105,7 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal5kTurn,
       medalBack: MAIN_ASSETS.medal5kBack,
       medalRibbon: MAIN_ASSETS.medal5kRibbon,
-      figure: MAIN_ASSETS.venueCyclops,
+      figure: MAIN_ASSETS.venueThor,
     },
     {
       id: "2.3k",
@@ -120,7 +120,7 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal2_3kTurn,
       medalBack: MAIN_ASSETS.medal2_3kBack,
       medalRibbon: MAIN_ASSETS.medal2_3kRibbon,
-      figure: MAIN_ASSETS.venueThor,
+      figure: MAIN_ASSETS.venueFalcon,
     },
   ],
   timeline: [

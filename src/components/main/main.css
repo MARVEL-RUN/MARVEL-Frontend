@@ -483,7 +483,7 @@ fieldset.field {
   margin-top: 1.4rem;
 }
 
-.member-list li {
+.member-list > li {
   display: grid;
   gap: 0.2rem;
   padding-bottom: 0.7rem;

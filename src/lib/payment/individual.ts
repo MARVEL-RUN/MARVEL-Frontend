@@ -1,7 +1,7 @@
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import {
   categoryForCourse,
-  findSouvenir,
+  shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
 import type { EntryDraft } from "@/lib/register";
@@ -24,11 +24,11 @@ export function toRegistrationCreateRequest(
   const category = categoryForCourse(categories, courseId, draft.birth);
   if (!category) throw new Error("선택한 종목을 신청할 수 없습니다.");
 
-  const souvenir = findSouvenir(category, draft.souvenirId);
+  const souvenir = shirtSouvenir(category);
   const size = draft.selectedSize.trim();
-  if (!souvenir) throw new Error("기념품을 선택하세요.");
+  if (!souvenir) throw new Error("티셔츠 옵션을 불러오지 못했습니다.");
   if (!size || !souvenirSizes(souvenir).includes(size)) {
-    throw new Error("기념품 사이즈를 선택하세요.");
+    throw new Error("티셔츠 사이즈를 선택하세요.");
   }
 
   return {

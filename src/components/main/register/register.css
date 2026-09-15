@@ -36,11 +36,28 @@
 }
 
 .form-sec__head {
-  margin-bottom: 0.2rem;
-  padding-bottom: 0.55rem;
-  border-bottom: 2px solid #fff;
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.15rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-sec__index {
+  margin: 0;
+  color: var(--marvel);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.form-sec__head h2 {
+  margin: 0;
+  color: #fff;
   font-size: 1.15rem;
   font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
 }
 
 .form-sec__note {
@@ -496,7 +513,7 @@
   --course-row: 2.2rem;
   --course-head: 2.05rem;
   --course-rows: 3;
-  --course-fees-cols: 4.8rem 7rem 6rem 11rem;
+  --course-fees-cols: 5.4rem 7rem 6rem 11rem;
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -542,7 +559,7 @@
   align-items: center;
   min-width: 0;
   height: 100%;
-  padding: 0 0.5rem;
+  padding: 0 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -564,7 +581,7 @@
   align-items: center;
   min-width: 0;
   height: 100%;
-  padding: 0 0.5rem;
+  padding: 0 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -625,8 +642,10 @@
 
 .party {
   width: 100%;
-  min-width: 64rem;
-  border-collapse: collapse;
+  min-width: 58rem;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .party th,
@@ -639,8 +658,8 @@
   font-size: 0.8rem;
 }
 
-.party th:last-child,
-.party td:last-child {
+.party thead tr:first-child > :last-child,
+.party .party__del {
   border-right: 0;
 }
 
@@ -683,8 +702,35 @@
   background-size: 0.65rem;
 }
 
-.party .party__no {
+.party__c-no {
   width: 2.8rem;
+}
+
+.party__c-name {
+  width: 9.5rem;
+}
+
+.party__c-birth {
+  width: 16.5rem;
+}
+
+.party__c-phone {
+  width: 12.5rem;
+}
+
+.party__c-gender {
+  width: 7.5rem;
+}
+
+.party__c-fee {
+  width: 6.6rem;
+}
+
+.party__c-del {
+  width: 3.6rem;
+}
+
+.party .party__no {
   color: var(--silver);
 }
 
@@ -692,10 +738,6 @@
   color: var(--gold);
   font-weight: 800;
   white-space: nowrap;
-}
-
-.party .party__del {
-  width: 3.6rem;
 }
 
 .party .party__del button {
@@ -716,6 +758,26 @@
 .party .party__remove:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.party td[data-label="사이즈"] .seg {
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.party td[data-label="패키지"] {
+  text-align: left;
+}
+
+.party .seg button {
+  min-height: 2.1rem;
+  padding: 0 0.55rem;
+  font-size: 0.75rem;
+}
+
+.party tbody tr:last-child td,
+.party .party__info:has(+ .party__more:last-child) :is(.party__no, .party__fee, .party__del) {
+  border-bottom: 0;
 }
 
 .party .party__peek,
@@ -810,6 +872,9 @@
 }
 
 .seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.4rem;
   padding: 0 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -818,6 +883,7 @@
   font: inherit;
   font-size: 0.85rem;
   font-weight: 700;
+  line-height: 1;
   cursor: pointer;
   clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
@@ -826,6 +892,51 @@
   background: var(--marvel);
   border-color: var(--marvel);
   color: #fff;
+}
+
+.seg button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.kit-fixed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.kit-fixed--empty {
+  color: var(--silver);
+  font-weight: 600;
+}
+
+.kit-fixed li {
+  white-space: nowrap;
+}
+
+.kit-fixed li + li::before {
+  content: "·";
+  margin: 0 0.45rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+}
+
+.kit-fixed .is-off {
+  color: var(--silver);
+  opacity: 0.4;
+}
+
+.party .kit-fixed {
+  justify-content: flex-start;
+  font-size: 0.78rem;
 }
 
 .apply-terms {
@@ -1261,6 +1372,19 @@
   text-align: left;
 }
 
+.member-list .kit-fixed {
+  margin-top: 0.25rem;
+  color: var(--silver);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.member-list .kit-fixed li {
+  display: inline;
+  padding: 0;
+  border: 0;
+}
+
 .ticket .btn {
   margin-top: 0.4rem;
 }
@@ -1602,6 +1726,9 @@
     min-width: 0;
     max-width: 100%;
   }
+  .form-sec__head h2 {
+    font-size: 1.05rem;
+  }
   .party-bar {
     flex-direction: column;
     align-items: stretch;
@@ -1623,6 +1750,10 @@
   .party {
     min-width: 0;
     display: block;
+    table-layout: auto;
+  }
+  .party colgroup {
+    display: none;
   }
   .party thead {
     display: none;
@@ -1630,7 +1761,7 @@
   .party tbody {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0;
   }
   .party tr {
     display: grid;
@@ -1638,6 +1769,13 @@
     align-items: center;
     overflow: visible;
     border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .party tr.party__info {
+    margin-bottom: 0.65rem;
+  }
+  .party tr.party__info.is-open {
+    margin-bottom: 0;
+    border-bottom: 0;
   }
   .party th,
   .party td {
@@ -1750,21 +1888,45 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   }
   .party tr.is-open td[data-label="이름"],
-  .party tr.is-open td[data-label="연락처"],
-  .party tr.is-open td[data-label="기념품"] {
+  .party tr.is-open td[data-label="연락처"] {
     grid-column: 1;
   }
   .party tr.is-open td[data-label="생년월일"],
-  .party tr.is-open td[data-label="성별"],
-  .party tr.is-open td[data-label="사이즈"] {
+  .party tr.is-open td[data-label="성별"] {
     grid-column: 2;
   }
   .party tr.is-open td[data-label="참가종목"],
+  .party tr.is-open td[data-label="사이즈"],
+  .party tr.is-open td[data-label="패키지"],
   .party tr.is-open td[data-label="참가비"] {
     grid-column: 1 / -1;
   }
-  .party tr.is-open td[data-label="참가비"] {
+  .party tr.party__info.is-open td[data-label="참가비"] {
     border-bottom: 0;
+  }
+  .party tr.party__more:not(.is-open) {
+    display: none;
+  }
+  .party tr.party__more.is-open {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: -1px;
+    margin-bottom: 0.65rem;
+    border-top: 0;
+  }
+  .party tbody > tr:last-child {
+    margin-bottom: 0;
+  }
+  .party tr.party__more.is-open td {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .party td[data-label="사이즈"] {
+    min-width: 0;
+  }
+  .party td[data-label="사이즈"] .seg {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
   .party td[data-label]::before {
     content: attr(data-label);
@@ -1979,7 +2141,7 @@
   .course-pick__fees-h,
   .course-pick__fees-row span {
     min-width: 0;
-    padding: 0 0.35rem;
+    padding: 0 0.7rem;
     justify-content: flex-start;
   }
   .course-pick__fees-label--long {

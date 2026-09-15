@@ -157,8 +157,8 @@ export function VirtualRunPage() {
               <Image
                 src={MAIN_ASSETS.virtualSoonHero}
                 alt="마블 히어로들과 어벤져스 엠블럼"
-                width={353}
-                height={377}
+                width={706}
+                height={753}
                 className="virtual-soon-hero__img"
                 sizes="(max-width: 720px) min(92vw, 420px), 520px"
                 priority

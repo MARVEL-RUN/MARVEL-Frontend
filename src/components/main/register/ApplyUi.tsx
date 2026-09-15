@@ -10,6 +10,7 @@ import {
   courseAllowsChild,
   courseById,
   courseClosedReason,
+  courseHasTimingChip,
   courseNote,
   courseOpenForBirth,
   feeDigits,
@@ -20,7 +21,6 @@ import {
   ticketForBirth,
   type CourseId,
   type Gender,
-  type ShirtSize,
   type TicketKind,
 } from "@/lib/register";
 
@@ -42,16 +42,21 @@ export function ApplyNotice({ lines }: { lines: string[] }) {
 
 export function FormSec({
   title,
+  kicker,
   note,
   children,
 }: {
   title: string;
+  kicker?: string;
   note?: string;
   children: ReactNode;
 }) {
   return (
     <section className="form-sec">
-      <h2 className="form-sec__head">{title}</h2>
+      <header className="form-sec__head">
+        {kicker ? <p className="form-sec__index">{kicker}</p> : null}
+        <h2>{title}</h2>
+      </header>
       {note ? <p className="form-sec__note">{note}</p> : null}
       <div className="form-sec__body">{children}</div>
     </section>
@@ -162,10 +167,14 @@ export function ShirtPick({
   value,
   onChange,
   sizes = SHIRT_SIZES,
+  enabled,
+  disabled,
 }: {
   value: string;
-  onChange: (next: ShirtSize) => void;
+  onChange: (next: string) => void;
   sizes?: readonly string[];
+  enabled?: readonly string[];
+  disabled?: boolean;
 }) {
   return (
     <div className="seg">
@@ -174,12 +183,38 @@ export function ShirtPick({
           key={size}
           type="button"
           className={value === size ? "is-on" : undefined}
-          onClick={() => onChange(size as ShirtSize)}
+          disabled={disabled || (enabled ? !enabled.includes(size) : false)}
+          onClick={() => onChange(size)}
         >
           {size}
         </button>
       ))}
     </div>
+  );
+}
+
+export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
+  const course = courseId ? courseById(courseId) : undefined;
+  if (!course) {
+    return <p className="kit-fixed kit-fixed--empty">—</p>;
+  }
+
+  const chip = courseHasTimingChip(course.id);
+  const items = [
+    { id: "medal", label: `${course.distance} 메달`, on: true },
+    { id: "scarf", label: "스카프", on: true },
+    { id: "bib", label: "배번호", on: true },
+    { id: "chip", label: "기록칩", on: chip },
+  ];
+
+  return (
+    <ul className="kit-fixed">
+      {items.map((item) => (
+        <li key={item.id} className={item.on ? undefined : "is-off"}>
+          {item.label}
+        </li>
+      ))}
+    </ul>
   );
 }
 
