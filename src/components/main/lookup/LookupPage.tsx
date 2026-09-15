@@ -12,8 +12,12 @@ import {
 } from "@/lib/register";
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
+import { PasswordField, PhoneField } from "../register/ApplyUi";
 
 type View = "form" | "hit" | "miss";
+
+const LOOKUP_LEAD =
+  "신청 내역을 확인하기 위해 신청시와 동일한 정보를 입력한 후, 확인하기를 클릭하세요.";
 
 export function LookupPage() {
   const [kind, setKind] = useState<ApplyKind | "">("");
@@ -34,21 +38,33 @@ export function LookupPage() {
   );
 }
 
+function LookupNav({ busy, onBack }: { busy: boolean; onBack: () => void }) {
+  return (
+    <div className="flow__nav">
+      <button type="button" className="btn btn--ghost" onClick={onBack}>
+        유형 변경
+      </button>
+      <button type="submit" className="btn btn--red" disabled={busy}>
+        {busy ? "확인 중..." : "확인하기"}
+      </button>
+    </div>
+  );
+}
+
 function IndividualLookup({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<View>("form");
   const [busy, setBusy] = useState(false);
   const [record, setRecord] = useState<EntryRecord | null>(null);
+  const [name, setName] = useState("");
+  const [birth, setBirth] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
     setBusy(true);
     try {
-      const found = await lookupEntry({
-        name: String(data.get("name") ?? ""),
-        birth: String(data.get("birth") ?? ""),
-        orderNo: String(data.get("order") ?? ""),
-      });
+      const found = await lookupEntry({ name, birth, phone, password });
       setRecord(found);
       setView(found ? "hit" : "miss");
     } finally {
@@ -63,7 +79,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       <section className="block wait">
         <p className="kicker">NO RECORD</p>
         <h2>접수 내역이 없습니다</h2>
-        <p className="sec__body">이름·생년월일·주문번호를 다시 확인해 주세요.</p>
+        <p className="sec__body">이름·생년월일·전화번호·비밀번호를 다시 확인해 주세요.</p>
         <button type="button" className="btn btn--red" onClick={() => setView("form")}>
           다시 조회
         </button>
@@ -86,6 +102,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             <dt>코스</dt>
             <dd>
               {course.distance} · {course.code}
+              {record.ticket === "child" ? " · 어린이" : ""}
             </dd>
           </div>
           <div>
@@ -102,28 +119,56 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
 
   return (
     <form className="form" onSubmit={onSubmit}>
-      <h2>개인 신청 조회</h2>
+      <div className="form__head">
+        <h2>개인 신청 조회</h2>
+        <p className="form__note">{LOOKUP_LEAD}</p>
+      </div>
       <label className="field">
         <span>이름</span>
-        <input name="name" type="text" autoComplete="name" required />
+        <input
+          name="name"
+          type="text"
+          autoComplete="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
       </label>
       <label className="field">
         <span>생년월일</span>
-        <input name="birth" type="text" inputMode="numeric" placeholder="YYYYMMDD" required />
+        <input
+          name="birth"
+          type="text"
+          inputMode="numeric"
+          placeholder="YYYYMMDD"
+          autoComplete="bday"
+          value={birth}
+          onChange={(e) => setBirth(e.target.value.replace(/\D/g, "").slice(0, 8))}
+          required
+        />
       </label>
       <label className="field">
-        <span>주문번호</span>
-        <input name="order" type="text" placeholder="MR26-10K-12345" required />
+        <span>전화번호</span>
+        <PhoneField
+          name="phone"
+          placeholder="휴대폰번호를 입력해주세요."
+          value={phone}
+          onChange={setPhone}
+          autoComplete="tel"
+          required
+        />
       </label>
-      <div className="flow__nav">
-        <button type="button" className="btn btn--ghost" onClick={onBack}>
-          유형 변경
-        </button>
-        <button type="submit" className="btn btn--red" disabled={busy}>
-          {busy ? "조회 중..." : "조회"}
-        </button>
+      <div className="field">
+        <span>비밀번호</span>
+        <PasswordField
+          value={password}
+          onChange={setPassword}
+          placeholder="신청조회용 비밀번호 (4자 이상)"
+          autoComplete="current-password"
+          required
+        />
       </div>
-      <p className="form__note">개인 접수 시 발급된 주문번호로 조회합니다.</p>
+      <LookupNav busy={busy} onBack={onBack} />
     </form>
   );
 }
@@ -132,17 +177,14 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<View>("form");
   const [busy, setBusy] = useState(false);
   const [record, setRecord] = useState<GroupRecord | null>(null);
+  const [account, setAccount] = useState("");
+  const [password, setPassword] = useState("");
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
     setBusy(true);
     try {
-      const found = await lookupGroup({
-        groupName: String(data.get("group") ?? ""),
-        leaderName: String(data.get("leader") ?? ""),
-        orderNo: String(data.get("order") ?? ""),
-      });
+      const found = await lookupGroup({ account, password });
       setRecord(found);
       setView(found ? "hit" : "miss");
     } finally {
@@ -155,7 +197,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       <section className="block wait">
         <p className="kicker">NO RECORD</p>
         <h2>접수 내역이 없습니다</h2>
-        <p className="sec__body">단체명·대표자·주문번호를 다시 확인해 주세요.</p>
+        <p className="sec__body">단체 조회용 ID·단체 비밀번호를 다시 확인해 주세요.</p>
         <button type="button" className="btn btn--red" onClick={() => setView("form")}>
           다시 조회
         </button>
@@ -184,20 +226,16 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           </div>
         </dl>
         <ul className="member-list">
-          {record.participants.map((p, i) => {
-            const course = courseById(p.courseId);
-            return (
-              <li key={`${p.name}-${i}`}>
-                <strong>
-                  {String(i + 1).padStart(2, "0")} {p.name}
-                </strong>
-                <span>
-                  {course ? `${course.distance} · ${course.code}` : "—"} ·{" "}
-                  {genderLabel(p.gender)} · {p.shirt}
-                </span>
-              </li>
-            );
-          })}
+          {record.participants.map((p, i) => (
+            <li key={`${p.name}-${i}`}>
+              <strong>
+                {String(i + 1).padStart(2, "0")} {p.name}
+              </strong>
+              <span>
+                {p.selectedSize || "—"} · {genderLabel(p.gender)}
+              </span>
+            </li>
+          ))}
         </ul>
         <button type="button" className="btn btn--ghost" onClick={() => setView("form")}>
           다른 접수건
@@ -208,28 +246,37 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
 
   return (
     <form className="form" onSubmit={onSubmit}>
-      <h2>단체 신청 조회</h2>
-      <label className="field">
-        <span>단체명</span>
-        <input name="group" type="text" required />
-      </label>
-      <label className="field">
-        <span>대표자 성명</span>
-        <input name="leader" type="text" required />
-      </label>
-      <label className="field">
-        <span>주문번호</span>
-        <input name="order" type="text" placeholder="MR26-GRP-12345" required />
-      </label>
-      <div className="flow__nav">
-        <button type="button" className="btn btn--ghost" onClick={onBack}>
-          유형 변경
-        </button>
-        <button type="submit" className="btn btn--red" disabled={busy}>
-          {busy ? "조회 중..." : "조회"}
-        </button>
+      <div className="form__head">
+        <h2>단체 신청 조회</h2>
+        <p className="form__note">{LOOKUP_LEAD}</p>
       </div>
-      <p className="form__note">단체 접수 시 발급된 주문번호로 조회합니다.</p>
+      <label className="field">
+        <span>단체 조회용 ID</span>
+        <input
+          name="account"
+          type="text"
+          autoComplete="username"
+          placeholder="5~20자, 영문·숫자·특수문자"
+          value={account}
+          onChange={(e) => setAccount(e.target.value)}
+          required
+        />
+        <p className="field__hint">신청조회 시 사용합니다.</p>
+      </label>
+      <div className="field">
+        <span>단체 비밀번호</span>
+        <PasswordField
+          value={password}
+          onChange={setPassword}
+          label="단체 비밀번호"
+          placeholder="단체 비밀번호를 입력해주세요."
+          minLength={6}
+          autoComplete="current-password"
+          required
+        />
+        <p className="field__hint">6~64자, 공백 없이 입력해주세요.</p>
+      </div>
+      <LookupNav busy={busy} onBack={onBack} />
     </form>
   );
 }

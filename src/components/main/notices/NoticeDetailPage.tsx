@@ -5,7 +5,6 @@ import type { AdminNotice } from "@/types/admin";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { SideBanner } from "../layout/SideBanner";
 import { orderNotices } from "./order";
 
 export function NoticeDetailPage() {
@@ -31,9 +30,8 @@ export function NoticeDetailPage() {
   }, [id]);
 
   return (
-    <main className="page">
-      <SideBanner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
-      <div className="page__body wrap">
+    <main className="page page--post">
+      <div className="page__body wrap wrap--narrow">
         {post === undefined ? (
           <p className="board__empty">불러오는 중...</p>
         ) : post === null ? (

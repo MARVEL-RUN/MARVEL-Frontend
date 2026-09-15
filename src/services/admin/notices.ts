@@ -1,13 +1,30 @@
 import { EVENT } from "@/lib/event";
 import { nextId, readStore, todayStamp, wait, writeStore } from "@/lib/admin/store";
+import { isNoticeCategory } from "@/lib/admin/noticeCategories";
 import type { AdminNotice } from "@/types/admin";
 
 const KEY = "mr-admin-notices";
 
+const TAG_MAP: Record<string, string> = {
+  NOTICE: "공지",
+  RACE: "이벤트",
+  ENTRY: "일반",
+};
+
 const SEED: AdminNotice[] = EVENT.notices.map((item) => ({ ...item }));
 
+function normalizeTag(tag: string) {
+  if (isNoticeCategory(tag)) return tag;
+  return TAG_MAP[tag] ?? "공지";
+}
+
 function load() {
-  return readStore<AdminNotice[]>(KEY, SEED);
+  const rows = readStore<AdminNotice[]>(KEY, SEED).map((row) => ({
+    ...row,
+    tag: normalizeTag(row.tag),
+  }));
+  writeStore(KEY, rows);
+  return rows;
 }
 
 function save(rows: AdminNotice[]) {
@@ -33,7 +50,7 @@ export async function createAdminNotice(
     date: todayStamp(),
     ...input,
     title: input.title.trim(),
-    tag: input.tag.trim() || "NOTICE",
+    tag: input.tag.trim() || "공지",
     body: input.body.trim(),
   };
   save([row, ...load()]);
@@ -50,7 +67,7 @@ export async function updateAdminNotice(
       ? {
           ...row,
           title: input.title.trim(),
-          tag: input.tag.trim() || "NOTICE",
+          tag: input.tag.trim() || "공지",
           body: input.body.trim(),
           pinned: input.pinned,
         }

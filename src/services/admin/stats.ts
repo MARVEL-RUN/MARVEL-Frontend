@@ -1,43 +1,62 @@
-import { listFaqs } from "./faqs";
-import { listInquiries } from "./inquiries";
 import {
-  listGroupApplications,
-  listIndividualApplications,
-} from "./applications";
-import { listAdminNotices } from "./notices";
+  ADMIN_RACE_EVENTS,
+  type AdminRaceEventId,
+} from "@/lib/admin/raceEvents";
+import { listAllApplications, type AdminApplicationRow } from "./applications";
+import { listInquiries } from "./inquiries";
 
-export type AdminDashboardStats = {
+export type EventIntakeStats = {
+  eventId: AdminRaceEventId;
   individualCount: number;
   groupCount: number;
+  confirmedCount: number;
   participantCount: number;
-  pendingCount: number;
-  noticeCount: number;
-  faqCount: number;
-  inquiryCount: number;
-  unansweredCount: number;
+  roundCounts: [number, number, number];
 };
 
+export type AdminDashboardStats = {
+  unansweredCount: number;
+  cancellationPendingCount: number;
+  cancellationPendingEventId: AdminRaceEventId | null;
+  events: EventIntakeStats[];
+};
+
+function intakeFor(rows: AdminApplicationRow[]): Omit<EventIntakeStats, "eventId"> {
+  const individuals = rows.filter((row) => row.kind === "individual");
+  const groups = rows.filter((row) => row.kind === "group");
+  const roundCounts: [number, number, number] = [0, 0, 0];
+  for (const row of rows) {
+    if (row.round === "1") roundCounts[0] += 1;
+    else if (row.round === "2") roundCounts[1] += 1;
+    else if (row.round === "3") roundCounts[2] += 1;
+  }
+  return {
+    individualCount: individuals.length,
+    groupCount: groups.length,
+    confirmedCount: rows.filter((row) => row.status === "paid").length,
+    participantCount:
+      individuals.length + groups.reduce((sum, row) => sum + (row.memberCount ?? 0), 0),
+    roundCounts,
+  };
+}
+
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const [entries, groups, notices, faqs, inquiries] = await Promise.all([
-    listIndividualApplications(),
-    listGroupApplications(),
-    listAdminNotices(),
-    listFaqs(),
+  const [applications, inquiries] = await Promise.all([
+    listAllApplications(),
     listInquiries(),
   ]);
 
-  const pendingCount =
-    entries.filter((row) => row.status === "pending").length +
-    groups.filter((row) => row.status === "pending").length;
+  const cancellationPending = applications.filter(
+    (row) => row.status === "refund_requested",
+  );
 
   return {
-    individualCount: entries.length,
-    groupCount: groups.length,
-    participantCount: groups.reduce((sum, row) => sum + row.participants.length, 0),
-    pendingCount,
-    noticeCount: notices.length,
-    faqCount: faqs.length,
-    inquiryCount: inquiries.length,
     unansweredCount: inquiries.filter((row) => !row.answer).length,
+    cancellationPendingCount: cancellationPending.length,
+    cancellationPendingEventId: cancellationPending[0]?.eventId ?? null,
+    events: ADMIN_RACE_EVENTS.map((event) => ({
+      eventId: event.id,
+      ...intakeFor(applications.filter((row) => row.eventId === event.id)),
+    })),
   };
 }

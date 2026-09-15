@@ -2,9 +2,16 @@ import type { LegalNode, LegalSection } from "@/lib/legal";
 
 export function LegalBlocks({ nodes }: { nodes: LegalNode[] }) {
   return (
-    <div className="legal">
+    <div className="legal" {...{ "x-apple-data-detectors": "false" }}>
       {nodes.map((node, i) => {
-        if (node.kind === "p") return <p key={i}>{node.text}</p>;
+        if (node.kind === "p") {
+          const clause = /^[①-⑳]/.test(node.text);
+          return (
+            <p key={i} className={clause ? "legal__clause" : undefined}>
+              {node.text}
+            </p>
+          );
+        }
         if (node.kind === "h") return <h3 key={i}>{node.text}</h3>;
         if (node.kind === "note") return <p key={i} className="legal__note">{node.text}</p>;
         if (node.kind === "ul") {

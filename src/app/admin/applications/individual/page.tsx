@@ -1,5 +1,5 @@
-import { IndividualApplicationsPage } from "@/components/admin/applications/IndividualApplicationsPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <IndividualApplicationsPage />;
+  redirect("/admin/applications");
 }

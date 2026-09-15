@@ -33,16 +33,41 @@ export const OFFICE = {
   mailOrderNo: "2010 – 서울마포 – 1496",
   ceo: "주상은",
   tel: "02-338-0344",
-  email: "@gmail.com",
+  email: "marvelrun2026@gmail.com",
   hours: "평일 10:00 ~ 17:00(점심시간 : 12:30 ~ 13:30, 주말 및 공휴일 휴무)",
   copyright: "COPYRIGHT © MARVEL RUN 사무국. ALL RIGHTS RESERVED.",
 } as const;
 
+/** 헤더 협찬문의 — 메일 앱에서 바로 작성 */
+export const SPONSOR_EMAIL = "contact@oneuniversestudio.com";
+export const SPONSOR_MAILTO = `mailto:${SPONSOR_EMAIL}?subject=${encodeURIComponent("MARVEL RUN 2026 협찬문의")}`;
+
+export const LEGAL_DOCS = [
+  {
+    id: "terms",
+    href: "/terms",
+    label: "이용약관",
+    heading: "마블런 2026 이용약관",
+  },
+  {
+    id: "privacy",
+    href: "/privacy",
+    label: "개인정보 처리방침",
+    heading: "마블런 2026 개인정보 처리방침",
+  },
+  {
+    id: "precautions",
+    href: "/precautions",
+    label: "대회유의사항",
+    heading: "마블런 2026 대회유의사항",
+  },
+] as const;
+
+export type LegalDocId = (typeof LEGAL_DOCS)[number]["id"];
+
 export const LEGAL_LINKS = [
-  { href: "/terms", label: "이용약관" },
-  { href: "/privacy", label: "개인정보 처리방침" },
+  ...LEGAL_DOCS.map(({ href, label }) => ({ href, label })),
   { href: "/faq", label: "FAQ" },
-  { href: "/inquiry", label: "문의사항" },
 ] as const;
 
 export const APPLY_TERMS_TITLE = "참가자 유의사항 및 동의 서약서";
@@ -59,7 +84,7 @@ export const APPLY_NOTICE_POINTS = [
   },
   {
     title: "2. 출전 제한",
-    body: "만 14세 미만 참가자는 법정대리인의 동의를 받은 경우에 한하여 참가할 수 있습니다. 참가권 양도, 대리참가 또는 명의도용은 금지됩니다.",
+    body: "만 14세 미만 참가자(2012년 11월 1일 이후 출생자)는 법정대리인의 동의를 받은 경우에 한하여 참가할 수 있습니다. 참가권 양도, 대리참가 또는 명의도용은 금지됩니다. 어린이 종목은 만 6세~만 12세(2013년 11월 1일 이후 출생자)입니다.",
   },
   {
     title: "3. 신청·입금·취소",
@@ -83,7 +108,7 @@ export const PARTICIPANT_NOTICE: LegalSection[] = [
       },
       {
         kind: "p",
-        text: "② 만 14세 미만 참가자는 법정대리인의 동의를 받은 경우에 한하여 참가할 수 있습니다.",
+        text: "② 만 14세 미만 참가자(2012년 11월 1일 이후 출생자)는 법정대리인의 동의를 받은 경우에 한하여 참가할 수 있습니다.",
       },
       {
         kind: "p",

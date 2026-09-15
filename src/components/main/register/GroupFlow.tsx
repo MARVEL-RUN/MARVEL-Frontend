@@ -1,44 +1,93 @@
 "use client";
 
-import Link from "next/link";
-import { FormEvent, useState } from "react";
-import { EVENT } from "@/lib/event";
+import { useRouter } from "next/navigation";
+import { Fragment, FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
+import { MainHttpError } from "@/lib/main/fetch";
 import {
+  organizationPaymentOrder,
+  toOrganizationRegistrationRequest,
+} from "@/lib/payment/organization";
+import {
+  savePendingPayment,
+  type PaymentOrder,
+} from "@/lib/payment/session";
+import {
+  categoryClosedReason,
+  categoryFeeAmount,
+  categoryLabel,
+  categoryOpenForBirth,
+  courseForCategory,
+  findCategory,
+  groupOptionsFee,
+  shirtAssignment,
+  shirtSouvenir,
+  souvenirSizes,
+  sortedCategories,
+} from "@/lib/registration-options";
+import { scrollPageTop } from "@/lib/scroll-page";
+import { isMobileView } from "@/lib/viewport";
+import {
+  CHILD_AGE_NOTE,
+  TIMING_CHIP_NOTE,
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
+  GUARDIAN_AGE_NOTE,
   GENDERS,
   MAX_GROUP_SIZE,
   SHIRT_SIZES,
-  courseById,
+  ageBand,
   formatFee,
   genderLabel,
-  groupFee,
+  emailOk,
+  orgAccountError,
+  orgPasswordError,
   requiredConsentsOk,
-  submitGroup,
   type Consents,
-  type CourseId,
   type Gender,
   type GroupDraft,
-  type GroupRecord,
   type ParticipantDraft,
-  type ShirtSize,
 } from "@/lib/register";
+import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
+import { createOrganizationRegistration } from "@/services/main/registrations";
+import { fetchRegistrationOptions } from "@/services/main/registration-options";
+import type { RegistrationCategory } from "@/services/main/types";
+import { SheetModal } from "../SheetModal";
+import { DockNav } from "../DockNav";
 import {
+  AddressField,
   ApplyHint,
   ApplyNotice,
+  CourseFeeTable,
+  BirthPick,
   BirthText,
+  EmailField,
   FormRow,
   FormSec,
+  KitFixed,
+  PasswordField,
+  PhoneField,
+  ShirtPick,
   birthView,
 } from "./ApplyUi";
 
-const STEPS = ["정보", "확인", "완료"] as const;
-type Step = 0 | 1 | 2;
+const STEPS = ["정보", "확인"] as const;
+type Step = 0 | 1;
 
 const NOTICE = [
   `한 번에 최대 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다. 초과 인원은 별도 단체로 신청하세요.`,
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
+
+function memberPeek(
+  p: ParticipantDraft,
+  categories: RegistrationCategory[],
+) {
+  const name = p.name.trim() || "미입력";
+  const category = findCategory(categories, p.categoryId);
+  if (!category) return name;
+  return `${name} · ${categoryLabel(category)} · ${formatFee(categoryFeeAmount(category, p.birth))}`;
+}
 
 export function GroupFlow({
   onBack,
@@ -49,9 +98,91 @@ export function GroupFlow({
 }) {
   const [step, setStep] = useState<Step>(0);
   const [draft, setDraft] = useState<GroupDraft>({ ...EMPTY_GROUP, ...consents });
-  const [record, setRecord] = useState<GroupRecord | null>(null);
+  const [payment, setPayment] = useState<PaymentOrder | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
+  const [categories, setCategories] = useState<RegistrationCategory[]>([]);
+  const [optionsLoading, setOptionsLoading] = useState(true);
+  const [optionsError, setOptionsError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [openMember, setOpenMember] = useState(0);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const router = useRouter();
+
+  function fail(message: string) {
+    setError(message);
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  function openPay() {
+    if (isMobileView()) {
+      router.push("/payment");
+      return;
+    }
+    setPayOpen(true);
+  }
+
+  useEffect(() => {
+    if (!hasMainApi) {
+      setOptionsLoading(false);
+      setOptionsError("API 주소가 설정되지 않았습니다.");
+      return;
+    }
+
+    let cancelled = false;
+    setOptionsLoading(true);
+    setOptionsError("");
+
+    fetchRegistrationOptions(DEFAULT_EVENT_ID)
+      .then((data) => {
+        if (cancelled) return;
+        setCategories(sortedCategories(data.categories ?? []));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setOptionsError(
+          err instanceof MainHttpError
+            ? err.message
+            : "신청 옵션을 불러오지 못했습니다.",
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setOptionsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (optionsLoading || !categories.length) return;
+    setDraft((prev) => {
+      let changed = false;
+      const participants = prev.participants.map((p) => {
+        if (!p.categoryId) {
+          if (!p.souvenirId && !p.selectedSize) return p;
+          changed = true;
+          return { ...p, souvenirId: "", selectedSize: "" };
+        }
+        const next = shirtAssignment(
+          findCategory(categories, p.categoryId),
+          p.selectedSize,
+        );
+        if (
+          next.souvenirId === p.souvenirId &&
+          next.selectedSize === p.selectedSize
+        ) {
+          return p;
+        }
+        changed = true;
+        return { ...p, ...next };
+      });
+      return changed ? { ...prev, participants } : prev;
+    });
+  }, [categories, optionsLoading]);
 
   function patch(next: Partial<GroupDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
@@ -73,22 +204,50 @@ export function GroupFlow({
       setError(`한 번에 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다.`);
       return;
     }
+    const next = draft.participants.length;
     patch({
       participants: [...draft.participants, { ...EMPTY_PARTICIPANT }],
     });
+    setOpenMember(next);
   }
 
   function removeMember(i: number) {
     if (draft.participants.length <= 1) return;
     patch({ participants: draft.participants.filter((_, idx) => idx !== i) });
+    setOpenMember((prev) => {
+      if (prev === i) return Math.max(0, i - 1);
+      if (prev > i) return prev - 1;
+      return prev;
+    });
   }
 
   function onForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!draft.groupName.trim()) return setError("단체명을 입력하세요.");
-    if (!draft.leaderName.trim()) return setError("대표자 성명을 입력하세요.");
-    if (!draft.phone.trim()) return setError("휴대폰번호를 입력하세요.");
-    if (!draft.email.trim()) return setError("이메일을 입력하세요.");
+    if (!optionsReady) {
+      return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
+    }
+    if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
+    const accountErr = orgAccountError(draft.organizationAccount);
+    if (accountErr) return fail(accountErr);
+    const passwordErr = orgPasswordError(draft.organizationPassword ?? "");
+    if (passwordErr) return fail(passwordErr);
+    if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
+      return fail("단체 비밀번호가 일치하지 않습니다.");
+    }
+    if (!draft.leaderName.trim()) return fail("대표자 성명을 입력하세요.");
+    if (!/^\d{8}$/.test(draft.leaderBirth)) {
+      return fail("대표자 생년월일을 선택하세요.");
+    }
+    if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
+    if (draft.email.trim() && !emailOk(draft.email)) {
+      return fail("이메일 형식을 확인하세요.");
+    }
+    if (!(draft.zonecode ?? "").trim() || !(draft.address ?? "").trim()) {
+      return fail("우편번호 찾기로 주소를 선택하세요.");
+    }
+    if (!(draft.addressDetail ?? "").trim()) {
+      return fail("상세주소를 입력하세요.");
+    }
     try {
       draft.participants.forEach((p, i) => {
         const n = i + 1;
@@ -97,31 +256,81 @@ export function GroupFlow({
           throw new Error(`참가자 ${n}: 생년월일을 입력하세요.`);
         }
         if (!p.phone.trim()) throw new Error(`참가자 ${n}: 연락처를 입력하세요.`);
+        if (ageBand(p.birth) === "tooYoung") {
+          throw new Error(`참가자 ${n}: 만 6세 미만은 참가할 수 없습니다.`);
+        }
         if (!p.gender) throw new Error(`참가자 ${n}: 성별을 선택하세요.`);
-        if (!p.courseId) throw new Error(`참가자 ${n}: 참가종목을 선택하세요.`);
-        if (!p.shirt) throw new Error(`참가자 ${n}: 기념품을 선택하세요.`);
+        const category = findCategory(categories, p.categoryId);
+        if (!category) throw new Error(`참가자 ${n}: 참가종목을 선택하세요.`);
+        if (category.isActive === false) {
+          throw new Error(`참가자 ${n}: 마감된 종목입니다.`);
+        }
+        if (!categoryOpenForBirth(category, p.birth)) {
+          throw new Error(
+            `참가자 ${n}: ${categoryClosedReason(category, p.birth) || "이 종목은 참가할 수 없습니다."}`,
+          );
+        }
+        const souvenir = shirtSouvenir(category);
+        if (!souvenir) {
+          throw new Error(`참가자 ${n}: 티셔츠 옵션을 불러오지 못했습니다.`);
+        }
+        if (!souvenirSizes(souvenir).includes(p.selectedSize)) {
+          throw new Error(`참가자 ${n}: 티셔츠 사이즈를 선택하세요.`);
+        }
       });
     } catch (err) {
-      return setError(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
+      return fail(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
     }
-    if (!requiredConsentsOk(draft)) return setError("필수 약관에 동의해 주세요.");
+    if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
+    setError("");
     setStep(1);
   }
 
-  async function onConfirm() {
+  useLayoutEffect(() => {
+    if (step !== 0) scrollPageTop();
+  }, [step]);
+
+  async function onPay() {
+    if (payment) {
+      openPay();
+      return;
+    }
+    if (!hasMainApi || !hasTossClientKey) {
+      return fail(
+        "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
+      );
+    }
+
     setBusy(true);
     setError("");
     try {
-      setRecord(await submitGroup(draft));
-      setStep(2);
+      const created = await createOrganizationRegistration(
+        DEFAULT_EVENT_ID,
+        toOrganizationRegistrationRequest(draft),
+      );
+      const order = organizationPaymentOrder(created);
+      savePendingPayment({
+        registration: order,
+        customerName: draft.leaderName.trim(),
+        savedAt: Date.now(),
+      });
+      setPayment(order);
+      openPay();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "접수를 완료하지 못했습니다.");
+      fail(
+        err instanceof MainHttpError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "결제를 시작하지 못했습니다.",
+      );
     } finally {
       setBusy(false);
     }
   }
 
-  const total = groupFee(draft);
+  const total = payment?.paymentAmount ?? groupOptionsFee(draft, categories);
+  const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
 
   return (
     <div className="flow">
@@ -137,13 +346,11 @@ export function GroupFlow({
         ))}
       </ol>
 
-      {error ? <p className="form__err">{error}</p> : null}
-
       {step === 0 ? (
-        <form className="form" onSubmit={onForm}>
+        <form className="form" onSubmit={onForm} noValidate>
           <ApplyNotice lines={NOTICE} />
 
-          <FormSec title="단체 정보">
+          <FormSec kicker="01 / GROUP" title="단체 정보">
             <FormRow label="단체명" required>
               <input
                 type="text"
@@ -153,6 +360,38 @@ export function GroupFlow({
                 required
               />
             </FormRow>
+            <FormRow label="단체 계정" required>
+              <input
+                type="text"
+                placeholder="5~20자, 영문·숫자·특수문자"
+                value={draft.organizationAccount}
+                onChange={(e) => patch({ organizationAccount: e.target.value })}
+                autoComplete="username"
+                required
+              />
+            </FormRow>
+            <FormRow label="단체 비밀번호" required>
+              <PasswordField
+                value={draft.organizationPassword}
+                onChange={(organizationPassword) => patch({ organizationPassword })}
+                label="단체 비밀번호"
+                placeholder="조회용 비밀번호 (6~64자)"
+                required
+              />
+            </FormRow>
+            <FormRow label="단체 비밀번호 확인" required>
+              <PasswordField
+                name="passwordConfirm"
+                label="단체 비밀번호 확인"
+                placeholder="단체 비밀번호를 다시 입력하세요."
+                value={draft.passwordConfirm}
+                onChange={(passwordConfirm) => patch({ passwordConfirm })}
+                required
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec kicker="02 / LEADER" title="대표자 정보">
             <FormRow label="대표자 성명" required>
               <input
                 type="text"
@@ -162,37 +401,55 @@ export function GroupFlow({
                 required
               />
             </FormRow>
+            <FormRow label="대표자 생년월일" required>
+              <BirthPick
+                value={draft.leaderBirth}
+                onChange={(leaderBirth) => patch({ leaderBirth })}
+              />
+            </FormRow>
           </FormSec>
 
-          <FormSec title="연락처 정보">
+          <FormSec kicker="03 / CONTACT" title="연락처 정보">
             <FormRow label="휴대폰번호" required>
-              <input
-                type="tel"
+              <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
                 value={draft.phone}
-                onChange={(e) => patch({ phone: e.target.value })}
+                onChange={(phone) => patch({ phone })}
                 autoComplete="tel"
                 required
               />
             </FormRow>
-            <FormRow label="이메일" required>
-              <input
-                type="email"
-                placeholder="이메일을 입력해주세요."
+            <FormRow label="이메일">
+              <EmailField
                 value={draft.email}
-                onChange={(e) => patch({ email: e.target.value })}
-                autoComplete="email"
+                onChange={(email) => patch({ email })}
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+            <FormRow label="주소" required>
+              <AddressField
+                zonecode={draft.zonecode}
+                address={draft.address}
+                addressDetail={draft.addressDetail}
+                onChange={patch}
                 required
               />
             </FormRow>
           </FormSec>
 
-          <FormSec title="참가자">
+          <FormSec kicker="05 / RUNNERS" title="참가자">
             <ApplyHint>
               <p>대표자도 대회에 참여하는 경우 아래 참가자 정보를 작성하시기 바랍니다.</p>
               <p>
                 {`*(한번에 최대 ${MAX_GROUP_SIZE}명까지만 신청 가능하며, 초과 인원은 별도의 단체로 신청 해주시기 바랍니다.)`}
               </p>
+              <p>{CHILD_AGE_NOTE}</p>
+              <p>{GUARDIAN_AGE_NOTE}</p>
+              <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
+              <p>{TIMING_CHIP_NOTE}</p>
+              <CourseFeeTable />
             </ApplyHint>
             <div className="party-bar">
               <p>{draft.participants.length}명 등록</p>
@@ -205,28 +462,59 @@ export function GroupFlow({
                 참가자 추가
               </button>
             </div>
+            {optionsError ? <p className="form__err">{optionsError}</p> : null}
+            {optionsLoading ? (
+              <p className="form__note">신청 옵션을 불러오는 중...</p>
+            ) : null}
             <div className="party-wrap">
               <table className="party">
+                <colgroup>
+                  <col className="party__c-no" />
+                  <col className="party__c-name" />
+                  <col className="party__c-birth" />
+                  <col className="party__c-phone" />
+                  <col className="party__c-gender" />
+                  <col className="party__c-fee" />
+                  <col className="party__c-del" />
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>번호</th>
+                    <th rowSpan={2}>번호</th>
                     <th>이름</th>
                     <th>생년월일</th>
                     <th>연락처</th>
                     <th>성별</th>
+                    <th rowSpan={2}>참가비</th>
+                    <th rowSpan={2}>삭제</th>
+                  </tr>
+                  <tr>
                     <th>참가종목</th>
-                    <th>기념품</th>
-                    <th>참가비</th>
-                    <th>삭제</th>
+                    <th>사이즈</th>
+                    <th colSpan={2}>패키지</th>
                   </tr>
                 </thead>
                 <tbody>
                   {draft.participants.map((p, i) => {
-                    const course = p.courseId ? courseById(p.courseId) : undefined;
+                    const category = findCategory(categories, p.categoryId);
+                    const souvenir = shirtSouvenir(category);
+                    const sizes = souvenirSizes(souvenir);
+                    const courseId = category
+                      ? (courseForCategory(category)?.id ?? "")
+                      : "";
+                    const open = openMember === i;
                     return (
-                      <tr key={i}>
-                        <td className="party__no">{i + 1}.</td>
-                        <td>
+                      <Fragment key={i}>
+                      <tr className={open ? "party__info is-open" : "party__info"}>
+                        <td className="party__no" rowSpan={2}>{i + 1}.</td>
+                        <td className="party__peek">
+                          <button
+                            type="button"
+                            onClick={() => setOpenMember(i)}
+                          >
+                            {memberPeek(p, categories)}
+                          </button>
+                        </td>
+                        <td data-label="이름">
                           <input
                             type="text"
                             placeholder="성명"
@@ -235,22 +523,38 @@ export function GroupFlow({
                             required
                           />
                         </td>
-                        <td>
+                        <td data-label="생년월일">
                           <BirthText
                             value={p.birth}
-                            onChange={(birth) => patchMember(i, { birth })}
+                            onChange={(birth) => {
+                              const current = findCategory(categories, p.categoryId);
+                              const keep =
+                                current && categoryOpenForBirth(current, birth);
+                              patchMember(
+                                i,
+                                keep
+                                  ? {
+                                      birth,
+                                      ...shirtAssignment(current, p.selectedSize),
+                                    }
+                                  : {
+                                      birth,
+                                      categoryId: "",
+                                      ...shirtAssignment(undefined),
+                                    },
+                              );
+                            }}
                           />
                         </td>
-                        <td>
-                          <input
-                            type="tel"
+                        <td data-label="연락처">
+                          <PhoneField
                             placeholder="연락처"
                             value={p.phone}
-                            onChange={(e) => patchMember(i, { phone: e.target.value })}
+                            onChange={(phone) => patchMember(i, { phone })}
                             required
                           />
                         </td>
-                        <td>
+                        <td data-label="성별">
                           <select
                             value={p.gender}
                             onChange={(e) =>
@@ -266,54 +570,93 @@ export function GroupFlow({
                             ))}
                           </select>
                         </td>
-                        <td>
-                          <select
-                            value={p.courseId}
-                            onChange={(e) =>
-                              patchMember(i, {
-                                courseId: e.target.value as CourseId,
-                              })
-                            }
-                            required
-                          >
-                            <option value="">참가종목</option>
-                            {EVENT.courses.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.distance} {c.code}
-                              </option>
-                            ))}
-                          </select>
+                        <td className="party__fee" data-label="참가비" rowSpan={2}>
+                          {category
+                            ? formatFee(categoryFeeAmount(category, p.birth))
+                            : "—"}
                         </td>
-                        <td>
-                          <select
-                            value={p.shirt}
-                            onChange={(e) =>
-                              patchMember(i, { shirt: e.target.value as ShirtSize })
-                            }
-                            required
-                          >
-                            <option value="">기념품</option>
-                            {SHIRT_SIZES.map((size) => (
-                              <option key={size} value={size}>
-                                티셔츠 ({size})
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="party__fee">
-                          {course ? course.fee : "—"}
-                        </td>
-                        <td className="party__del">
+                        <td className="party__del" rowSpan={2}>
                           <button
                             type="button"
+                            className="party__expand"
+                            onClick={() => setOpenMember(i)}
+                          >
+                            펼치기
+                          </button>
+                          <button
+                            type="button"
+                            className="party__fold"
+                            onClick={() => setOpenMember(-1)}
+                          >
+                            접기
+                          </button>
+                          <button
+                            type="button"
+                            className="party__remove"
                             onClick={() => removeMember(i)}
                             disabled={draft.participants.length <= 1}
-                            aria-label="참가자 삭제"
                           >
-                            ×
+                            삭제
                           </button>
                         </td>
                       </tr>
+                      <tr className={open ? "party__more is-open" : "party__more"}>
+                        <td data-label="참가종목">
+                          <select
+                            value={p.categoryId}
+                            onChange={(e) => {
+                              const categoryId = e.target.value;
+                              patchMember(i, {
+                                categoryId,
+                                ...shirtAssignment(
+                                  findCategory(categories, categoryId),
+                                  p.selectedSize,
+                                ),
+                              });
+                            }}
+                            disabled={!optionsReady}
+                            required
+                          >
+                            <option value="">
+                              {optionsLoading ? "불러오는 중" : "참가종목"}
+                            </option>
+                            {categories.map((item) => {
+                              const ageOff = !categoryOpenForBirth(item, p.birth);
+                              const closed = item.isActive === false;
+                              const reason = closed
+                                ? "마감"
+                                : ageOff
+                                  ? categoryClosedReason(item, p.birth)
+                                  : "";
+                              return (
+                                <option
+                                  key={item.categoryId}
+                                  value={item.categoryId}
+                                  disabled={closed || ageOff}
+                                >
+                                  {categoryLabel(item)}
+                                  {reason ? ` (${reason})` : ""}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </td>
+                        <td data-label="사이즈">
+                          <ShirtPick
+                            value={p.selectedSize}
+                            sizes={SHIRT_SIZES}
+                            enabled={souvenir ? sizes : []}
+                            disabled={!souvenir}
+                            onChange={(selectedSize) =>
+                              patchMember(i, { selectedSize })
+                            }
+                          />
+                        </td>
+                        <td colSpan={2} data-label="패키지">
+                          <KitFixed courseId={courseId} />
+                        </td>
+                      </tr>
+                      </Fragment>
                     );
                   })}
                 </tbody>
@@ -323,6 +666,11 @@ export function GroupFlow({
           </FormSec>
 
           <div className="flow__nav">
+            {error ? (
+              <p ref={errorRef} className="form__err flow__err" role="alert">
+                {error}
+              </p>
+            ) : null}
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
@@ -342,8 +690,16 @@ export function GroupFlow({
               <dd>{draft.groupName}</dd>
             </div>
             <div>
+              <dt>단체 계정</dt>
+              <dd>{draft.organizationAccount}</dd>
+            </div>
+            <div>
               <dt>대표자</dt>
               <dd>{draft.leaderName}</dd>
+            </div>
+            <div>
+              <dt>대표자 생년월일</dt>
+              <dd>{birthView(draft.leaderBirth)}</dd>
             </div>
             <div>
               <dt>휴대폰번호</dt>
@@ -351,7 +707,13 @@ export function GroupFlow({
             </div>
             <div>
               <dt>이메일</dt>
-              <dd>{draft.email}</dd>
+              <dd>{draft.email.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>주소</dt>
+              <dd>
+                ({draft.zonecode}) {draft.address} {draft.addressDetail}
+              </dd>
             </div>
             <div>
               <dt>인원</dt>
@@ -364,50 +726,66 @@ export function GroupFlow({
           </dl>
           <ul className="member-list">
             {draft.participants.map((p, i) => {
-              const course = p.courseId ? courseById(p.courseId) : undefined;
+              const category = findCategory(categories, p.categoryId);
+              const courseId = category
+                ? (courseForCategory(category)?.id ?? "")
+                : "";
               return (
                 <li key={`${p.name}-${i}`}>
                   <strong>
                     {String(i + 1).padStart(2, "0")} {p.name}
                   </strong>
                   <span>
-                    {course ? `${course.distance} · ${course.code}` : "—"} ·{" "}
-                    {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
-                    티셔츠 ({p.shirt}) · {p.phone}
+                    {category ? categoryLabel(category) : "—"} ·{" "}
+                    {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
+                    {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
                   </span>
+                  <KitFixed courseId={courseId} />
                 </li>
               );
             })}
           </ul>
-          <div className="flow__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(0)}>
+          <DockNav>
+            {error ? (
+              <p ref={errorRef} className="form__err flow__err" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => {
+                setPayOpen(false);
+                setStep(0);
+                requestAnimationFrame(scrollPageTop);
+              }}
+            >
               수정
             </button>
-            <button type="button" className="btn btn--red" onClick={onConfirm} disabled={busy}>
-              {busy ? "접수 중..." : "접수하기"}
+            <button
+              type="button"
+              className="btn btn--red"
+              onClick={onPay}
+              disabled={busy}
+            >
+              {busy ? "결제 준비 중..." : "결제하기"}
             </button>
-          </div>
+          </DockNav>
         </section>
       ) : null}
 
-      {step === 2 && record ? (
-        <section className="ticket">
-          <p className="kicker">SQUAD CONFIRMED</p>
-          <h2>단체 접수가 완료되었습니다</h2>
-          <p className="ticket__no">{record.orderNo}</p>
-          <p className="sec__body">
-            {record.groupName} · {record.participants.length}명 · {formatFee(total)}
-          </p>
-          <p className="form__note">주문번호로 신청조회에서 확인할 수 있습니다.</p>
-          <div className="flow__nav">
-            <Link href="/lookup" className="btn btn--ghost">
-              신청조회
-            </Link>
-            <Link href="/" className="btn btn--red">
-              홈으로
-            </Link>
-          </div>
-        </section>
+      {payOpen && payment ? (
+        <SheetModal
+          kicker="PAY"
+          title="결제하기"
+          onClose={() => setPayOpen(false)}
+        >
+          <PaymentWidget
+            registration={payment}
+            customerName={draft.leaderName.trim()}
+            onError={setError}
+          />
+        </SheetModal>
       ) : null}
     </div>
   );

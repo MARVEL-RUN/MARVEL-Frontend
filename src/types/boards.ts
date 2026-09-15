@@ -1,8 +1,15 @@
 export type AdminFaq = {
   id: string;
+  category: string;
   question: string;
   answer: string;
   date: string;
+};
+
+export type InquiryAttachment = {
+  id: string;
+  name: string;
+  size: number;
 };
 
 export type AdminInquiry = {
@@ -11,6 +18,8 @@ export type AdminInquiry = {
   title: string;
   body: string;
   date: string;
+  password: string;
   answer?: string;
   answeredAt?: string;
+  attachments?: InquiryAttachment[];
 };
