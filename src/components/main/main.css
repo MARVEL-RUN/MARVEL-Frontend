@@ -1029,8 +1029,13 @@ html.is-live .hero__actions {
 
 .hero__lead {
   font-size: clamp(1.15rem, 2.4vw, 1.7rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.hero__lead span {
+  display: inline-block;
+  transform: skewX(-10deg);
 }
 
 .hero__meta {
@@ -6293,8 +6298,8 @@ button.course {
 
   .hero__lead {
     font-size: 1.18rem;
+    letter-spacing: 0.08em;
     line-height: 1.4;
-    word-break: keep-all;
   }
 
   .hero__meta {
