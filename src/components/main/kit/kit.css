@@ -321,21 +321,13 @@
   width: 100%;
   height: auto;
   min-height: 0;
-  aspect-ratio: 2.05 / 1;
+  aspect-ratio: 1077 / 796;
   overflow: hidden;
 }
 
 .kit-gallery__frame--bib img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
   padding: 0;
   object-fit: contain;
-  /* 원본에서 배번호가 왼쪽(46.6%)이라 확대 기준을 맞춤 */
-  object-position: 54% center;
-  transform-origin: center center;
-  transform: scale(2.4);
 }
 
 .kit-gallery__shirts {
@@ -352,7 +344,7 @@
 
 .kit-gallery__frame--shirt {
   flex: none;
-  aspect-ratio: 1010.77 / 1168.77;
+  aspect-ratio: 2022 / 2338;
 }
 
 .kit-gallery__frame--shirt img {
@@ -376,26 +368,13 @@
   flex: none;
   width: 100%;
   overflow: hidden;
-}
-/* SVG 3118.11×831.91, 스카프 띠 0,472.01–3118.11,613.75 */
-.kit-gallery__frame--scarf-front {
-  aspect-ratio: 3118.11 / 141.74;
+  aspect-ratio: 6237 / 284;
 }
 
-.kit-gallery__frame--scarf-front img {
-  padding: 0;
-  object-fit: cover;
-  object-position: center 65.3%;
-}
-/* SVG 3118.11×1792.86, 스카프 띠 0,880.87–3118.11,1022.6 */
-.kit-gallery__frame--scarf-back {
-  aspect-ratio: 3118.11 / 141.73;
-}
-
+.kit-gallery__frame--scarf-front img,
 .kit-gallery__frame--scarf-back img {
   padding: 0;
-  object-fit: cover;
-  object-position: center 53.1%;
+  object-fit: contain;
 }
 
 .kit-gallery__medals figcaption,
@@ -502,24 +481,6 @@
   .kit-gallery__frame img,
   .medal-3d__still {
     padding: 0;
-  }
-  .kit-gallery__frame--bib {
-    /* SVG viewBox 안 배번호 사각형 323.11,390.69–861.45,788.67 */
-    aspect-ratio: 538.34 / 397.98;
-    height: auto;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .kit-gallery__frame--bib img {
-    inset: auto;
-    width: calc(100% * 1271.71 / 538.34);
-    height: calc(100% * 1141.59 / 397.98);
-    left: calc(-100% * 323.11 / 538.34);
-    top: calc(-100% * 390.69 / 397.98);
-    max-width: none;
-    object-fit: fill;
-    object-position: 0 0;
-    transform: none;
   }
   .kit-gallery__medals {
     grid-template-columns: 1fr 1fr;

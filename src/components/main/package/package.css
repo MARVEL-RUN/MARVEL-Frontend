@@ -201,15 +201,8 @@
 }
 
 .pkg-card__shot--bib img {
-  inset: auto;
-  width: calc(100% * 1271.71 / 620);
-  height: calc(100% * 1141.59 / 620);
-  left: calc(100% * -282.28 / 620);
-  top: calc(100% * -279.68 / 620);
-  max-width: none;
-  object-fit: fill;
-  object-position: 0 0;
-  transform: none;
+  object-fit: contain;
+  object-position: center;
 }
 
 .pkg-card__shot--medal img {
