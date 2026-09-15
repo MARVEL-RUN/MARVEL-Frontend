@@ -150,7 +150,7 @@ export function KitBibPane() {
             src={MAIN_ASSETS.kitBib}
             alt="배번표"
             fill
-            sizes="(max-width: 720px) 100vw, 1100px"
+            sizes="(max-width: 720px) 100vw, 640px"
           />
         </span>
       </figure>
