@@ -1,5 +1,7 @@
 "use client";
 
+/* 모바일 불안정 — 3D 보류. KitGallery에서 import 주석. 복구 시 event/assets medal3d도 함께. */
+
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";

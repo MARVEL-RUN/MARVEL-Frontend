@@ -90,7 +90,7 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal10kTurn,
       medalBack: MAIN_ASSETS.medal10kBack,
       medalRibbon: MAIN_ASSETS.medal10kRibbon,
-      medal3d: MAIN_ASSETS.medal10k3d,
+      // medal3d: MAIN_ASSETS.medal10k3d, /* 모바일 불안정 — 3D 보류 */
       figure: MAIN_ASSETS.venueDoom,
     },
     {
@@ -106,7 +106,7 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal5kTurn,
       medalBack: MAIN_ASSETS.medal5kBack,
       medalRibbon: MAIN_ASSETS.medal5kRibbon,
-      medal3d: MAIN_ASSETS.medal5k3d,
+      // medal3d: MAIN_ASSETS.medal5k3d, /* 모바일 불안정 — 3D 보류 */
       figure: MAIN_ASSETS.venueCyclops,
     },
     {
@@ -122,7 +122,7 @@ export const EVENT = {
       medalTurn: MAIN_ASSETS.medal2_3kTurn,
       medalBack: MAIN_ASSETS.medal2_3kBack,
       medalRibbon: MAIN_ASSETS.medal2_3kRibbon,
-      medal3d: MAIN_ASSETS.medal2_3k3d,
+      // medal3d: MAIN_ASSETS.medal2_3k3d, /* 모바일 불안정 — 3D 보류 */
       figure: MAIN_ASSETS.venueThor,
     },
   ],
@@ -208,11 +208,6 @@ export const EVENT = {
     "배번표",
     "피니셔 메달",
     "스카프",
-  ],
-  kitApply: [
-    "메달은 선택한 코스에 따라 지급됩니다.",
-    "배번표와 스카프는 모두 준비되어 있습니다.",
-    "참가 신청 시 티셔츠 사이즈만 선택하면 됩니다.",
   ],
   notices: [
     {
