@@ -82,6 +82,37 @@ export function KitGallery() {
           </p>
         ) : null}
       </section>
+      <section className="kit-gallery__pane">
+        <h3>공식 티셔츠</h3>
+        <ul className="kit-gallery__shirts">
+          <li>
+            <figure>
+              <span className="kit-gallery__frame kit-gallery__frame--shirt">
+                <Image
+                  src={MAIN_ASSETS.kitShirtFront}
+                  alt="공식 티셔츠 앞면"
+                  fill
+                  sizes="(max-width: 720px) 50vw, 540px"
+                />
+              </span>
+              <figcaption>앞면</figcaption>
+            </figure>
+          </li>
+          <li>
+            <figure>
+              <span className="kit-gallery__frame kit-gallery__frame--shirt">
+                <Image
+                  src={MAIN_ASSETS.kitShirtBack}
+                  alt="공식 티셔츠 뒷면"
+                  fill
+                  sizes="(max-width: 720px) 50vw, 540px"
+                />
+              </span>
+              <figcaption>뒷면</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </section>
       <section className="kit-gallery__pane kit-gallery__pane--bib">
         <h3>배번표</h3>
         <figure className="kit-gallery__bib">

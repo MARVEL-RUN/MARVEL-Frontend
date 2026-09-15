@@ -23,11 +23,13 @@ export const BOARD_SECTIONS = [
   { href: "/notices", label: "공지사항" },
 ] as const;
 
+export const BOARD_HREF = "/notices";
+
 export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
   { href: KIT_HREF, label: "기념품 안내" },
   { href: "/directions", label: "오시는길" },
-  { href: "/notices", label: "게시판", children: BOARD_SECTIONS },
+  { href: BOARD_HREF, label: "게시판", children: BOARD_SECTIONS },
   { href: "/inquiry", label: "문의사항" },
   { href: "/virtual", label: "버추얼런" },
 ] as const;

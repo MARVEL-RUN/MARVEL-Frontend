@@ -2836,6 +2836,28 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   transform: scale(2.4);
 }
 
+.kit-gallery__shirts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.kit-gallery__shirts figure {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.kit-gallery__frame--shirt {
+  flex: none;
+  aspect-ratio: 1010.77 / 1168.77;
+}
+
+.kit-gallery__frame--shirt img {
+  padding: 0;
+  object-fit: contain;
+}
+
 .kit-gallery__scarves {
   display: grid;
   gap: 0.65rem;
@@ -2877,6 +2899,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 }
 
 .kit-gallery__medals figcaption,
+.kit-gallery__shirts figcaption,
 .kit-gallery__scarves figcaption {
   margin-top: 0.4rem;
   color: var(--note);
