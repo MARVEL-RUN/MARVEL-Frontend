@@ -2831,7 +2831,48 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   transform: scale(2.4);
 }
 
-.kit-gallery__medals figcaption {
+.kit-gallery__scarves {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.kit-gallery__scarves figure {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.kit-gallery__frame--scarf-front,
+.kit-gallery__frame--scarf-back {
+  flex: none;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* SVG 3118.11×831.91, 스카프 띠 0,472.01–3118.11,613.75 */
+.kit-gallery__frame--scarf-front {
+  aspect-ratio: 3118.11 / 141.74;
+}
+
+.kit-gallery__frame--scarf-front img {
+  padding: 0;
+  object-fit: cover;
+  object-position: center 65.3%;
+}
+
+/* SVG 3118.11×1792.86, 스카프 띠 0,880.87–3118.11,1022.6 */
+.kit-gallery__frame--scarf-back {
+  aspect-ratio: 3118.11 / 141.73;
+}
+
+.kit-gallery__frame--scarf-back img {
+  padding: 0;
+  object-fit: cover;
+  object-position: center 53.1%;
+}
+
+.kit-gallery__medals figcaption,
+.kit-gallery__scarves figcaption {
   margin-top: 0.4rem;
   color: var(--note);
   font-size: 0.7rem;

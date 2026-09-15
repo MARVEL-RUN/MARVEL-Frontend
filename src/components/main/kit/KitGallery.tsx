@@ -96,6 +96,37 @@ export function KitGallery() {
           </span>
         </figure>
       </section>
+      <section className="kit-gallery__pane">
+        <h3>스카프</h3>
+        <ul className="kit-gallery__scarves">
+          <li>
+            <figure>
+              <span className="kit-gallery__frame kit-gallery__frame--scarf-front">
+                <Image
+                  src={MAIN_ASSETS.kitScarfFront}
+                  alt="스카프 앞면"
+                  fill
+                  sizes="(max-width: 720px) 100vw, 1100px"
+                />
+              </span>
+              <figcaption>앞면</figcaption>
+            </figure>
+          </li>
+          <li>
+            <figure>
+              <span className="kit-gallery__frame kit-gallery__frame--scarf-back">
+                <Image
+                  src={MAIN_ASSETS.kitScarfBack}
+                  alt="스카프 뒷면"
+                  fill
+                  sizes="(max-width: 720px) 100vw, 1100px"
+                />
+              </span>
+              <figcaption>뒷면</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }
