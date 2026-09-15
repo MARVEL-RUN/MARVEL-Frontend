@@ -31,14 +31,34 @@ export function KitGallery() {
 export function KitMedalPane() {
   const [selectedId, setSelected] = useState<CourseId>(EVENT.courses[0].id);
   const course = EVENT.courses.find((c) => c.id === selectedId) ?? EVENT.courses[0];
-  const lineup = ["2.3k", "5k", "10k"]
+  const lineup = ["10k", "5k", "2.3k"]
     .map((id) => EVENT.courses.find((c) => c.id === id))
     .filter((c): c is (typeof EVENT.courses)[number] => Boolean(c));
 
   return (
     <section className="kit-gallery__pane">
       <h3>메달</h3>
-      <div className="kit-gallery__picks" role="tablist" aria-label="코스별 메달">
+      <ul className="kit-gallery__lineup" aria-label="코스별 메달">
+        {lineup.map((c) => (
+          <li key={c.id}>
+            <button
+              type="button"
+              className={c.id === course.id ? "is-on" : undefined}
+              onClick={() => setSelected(c.id)}
+            >
+              <span className="kit-gallery__lineup-shot">
+                <img
+                  src={c.medalRibbon}
+                  alt={`${c.distance} 피니셔 메달`}
+                  loading="eager"
+                  decoding="async"
+                />
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="kit-gallery__picks" role="tablist" aria-label="코스별 메달 상세">
         {EVENT.courses.map((c) => (
           <button
             key={c.id}
@@ -99,27 +119,6 @@ export function KitMedalPane() {
           </figure>
         </li>
       </ul>
-      <ul className="kit-gallery__lineup">
-        {lineup.map((c) => (
-          <li key={c.id}>
-            <button
-              type="button"
-              className={c.id === course.id ? "is-on" : undefined}
-              onClick={() => setSelected(c.id)}
-            >
-              <span className="kit-gallery__lineup-shot">
-                <img
-                  src={c.medalRibbon}
-                  alt={`${c.distance} 피니셔 메달`}
-                  loading="eager"
-                  decoding="async"
-                />
-              </span>
-              <span className="kit-gallery__lineup-name">{medalLineLabel(c.id)}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
       <p className="kit-gallery__note">선택한 코스에 따라 지급됩니다.</p>
       {course.medal3d ? (
         <p className="kit-gallery__note">
@@ -128,12 +127,6 @@ export function KitMedalPane() {
       ) : null}
     </section>
   );
-}
-
-function medalLineLabel(id: CourseId) {
-  if (id === "2.3k") return "2.3K 메달";
-  if (id === "5k") return "5K 메달";
-  return "10K 메달";
 }
 
 export function KitShirtPane() {
