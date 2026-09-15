@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
-  CHILD_AGE_NOTE,
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
   GUARDIAN_AGE_NOTE,
@@ -291,27 +290,20 @@ function IndividualFlow({
               />
             </FormRow>
             <FormRow label="생년월일" required>
-              <div>
-                <BirthPick
-                  value={draft.birth}
-                  onChange={(birth) => {
-                    const next = applyCourseForBirth(draft.courseId, birth);
-                    const keepCourse = next.courseId === draft.courseId;
-                    patch({
-                      birth,
-                      ...next,
-                      ...(keepCourse
-                        ? {}
-                        : { souvenirId: "", selectedSize: "" }),
-                    });
-                  }}
-                />
-                <p className="form-row__hint">
-                  {CHILD_AGE_NOTE}
-                  <br />
-                  {GUARDIAN_AGE_NOTE}
-                </p>
-              </div>
+              <BirthPick
+                value={draft.birth}
+                onChange={(birth) => {
+                  const next = applyCourseForBirth(draft.courseId, birth);
+                  const keepCourse = next.courseId === draft.courseId;
+                  patch({
+                    birth,
+                    ...next,
+                    ...(keepCourse
+                      ? {}
+                      : { souvenirId: "", selectedSize: "" }),
+                  });
+                }}
+              />
             </FormRow>
             <FormRow label="성별" required>
               <GenderPick
