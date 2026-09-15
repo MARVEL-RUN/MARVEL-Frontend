@@ -81,7 +81,7 @@ export const EVENT = {
     {
       id: "10k",
       distance: "10 Km",
-      code: "ASSEMBLE",
+      code: "FULL CIRCUIT",
       tone: "cyan",
       fee: "70,000원",
       start: "13:30",
@@ -95,7 +95,7 @@ export const EVENT = {
     {
       id: "5k",
       distance: "5 Km",
-      code: "FIRST STRIKE",
+      code: "ACTION COURSE",
       tone: "red",
       fee: "70,000원",
       childFee: "40,000원",
@@ -110,7 +110,7 @@ export const EVENT = {
     {
       id: "2.3k",
       distance: "2.3 Km",
-      code: "ORIGIN",
+      code: "FAMILY COURSE",
       tone: "gold",
       fee: "55,000원",
       childFee: "40,000원",
