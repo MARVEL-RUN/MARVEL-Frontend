@@ -81,7 +81,7 @@ export const EVENT = {
     {
       id: "10k",
       distance: "10 Km",
-      code: "ASSEMBLE",
+      code: "FULL CIRCUIT",
       tone: "cyan",
       fee: "70,000원",
       start: "13:30",
@@ -89,13 +89,13 @@ export const EVENT = {
       map: MAIN_ASSETS.course10k,
       medalTurn: MAIN_ASSETS.medal10kTurn,
       medalBack: MAIN_ASSETS.medal10kBack,
-      medal3d: MAIN_ASSETS.medal10k3d,
+      medalRibbon: MAIN_ASSETS.medal10kRibbon,
       figure: MAIN_ASSETS.venueDoom,
     },
     {
       id: "5k",
       distance: "5 Km",
-      code: "FIRST STRIKE",
+      code: "ACTION COURSE",
       tone: "red",
       fee: "70,000원",
       childFee: "40,000원",
@@ -104,13 +104,13 @@ export const EVENT = {
       map: MAIN_ASSETS.course5k,
       medalTurn: MAIN_ASSETS.medal5kTurn,
       medalBack: MAIN_ASSETS.medal5kBack,
-      medal3d: MAIN_ASSETS.medal5k3d,
+      medalRibbon: MAIN_ASSETS.medal5kRibbon,
       figure: MAIN_ASSETS.venueCyclops,
     },
     {
       id: "2.3k",
       distance: "2.3 Km",
-      code: "ORIGIN",
+      code: "FAMILY COURSE",
       tone: "gold",
       fee: "55,000원",
       childFee: "40,000원",
@@ -119,7 +119,7 @@ export const EVENT = {
       map: MAIN_ASSETS.course2_3k,
       medalTurn: MAIN_ASSETS.medal2_3kTurn,
       medalBack: MAIN_ASSETS.medal2_3kBack,
-      medal3d: MAIN_ASSETS.medal2_3k3d,
+      medalRibbon: MAIN_ASSETS.medal2_3kRibbon,
       figure: MAIN_ASSETS.venueThor,
     },
   ],
@@ -202,9 +202,9 @@ export const EVENT = {
   ],
   kit: [
     "공식 티셔츠",
-    "배번호 · 타이밍칩",
+    "배번표",
     "피니셔 메달",
-    "웨이스트백",
+    "스카프",
   ],
   notices: [
     {
@@ -236,5 +236,6 @@ export const EVENT = {
     { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
   ],
+  sponsorMore: "and many more...",
   copyright: "©2026 MARVEL",
 } as const;

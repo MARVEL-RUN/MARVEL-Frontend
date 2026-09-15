@@ -24,12 +24,6 @@ const TICKER = [
   "KOREA",
 ];
 
-const HOME_COURSE_CODE: Record<CourseId, string> = {
-  "10k": "FULL CIRCUIT",
-  "5k": "ACTION COURSE",
-  "2.3k": "FAMILY COURSE",
-};
-
 export function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLElement>(null);
@@ -242,7 +236,7 @@ export function HomePage() {
                     sizes="(max-width: 720px) 100vw, (max-width: 960px) 100vw, 33vw"
                   />
                 </button>
-                <p className="course__code">{HOME_COURSE_CODE[c.id]}</p>
+                <p className="course__code">{c.code}</p>
                 <p className="course__dist">{c.distance}</p>
                 <p className="course__desc">{c.desc}</p>
                 <dl>
