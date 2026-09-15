@@ -110,6 +110,10 @@
   word-break: keep-all;
 }
 
+.block .spec>div:has(.kit-fixed) {
+  align-items: start;
+}
+
 .form-row__label {
   color: #fff;
   font-size: 0.95rem;

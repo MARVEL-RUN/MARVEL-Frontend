@@ -508,9 +508,13 @@ function IndividualFlow({
               <dd>{draft.emergency.trim() || "—"}</dd>
             </div>
             <div>
-              <dt>기념품</dt>
+              <dt>티셔츠 사이즈</dt>
+              <dd>{draft.selectedSize || "—"}</dd>
+            </div>
+            <div>
+              <dt>패키지</dt>
               <dd>
-                {souvenir?.name ?? "—"} ({draft.selectedSize || "—"})
+                <KitFixed courseId={draft.courseId} />
               </dd>
             </div>
           </dl>
