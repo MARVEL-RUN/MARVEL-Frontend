@@ -42,16 +42,21 @@ export function ApplyNotice({ lines }: { lines: string[] }) {
 
 export function FormSec({
   title,
+  kicker,
   note,
   children,
 }: {
   title: string;
+  kicker?: string;
   note?: string;
   children: ReactNode;
 }) {
   return (
     <section className="form-sec">
-      <h2 className="form-sec__head">{title}</h2>
+      <header className="form-sec__head">
+        {kicker ? <p className="form-sec__index">{kicker}</p> : null}
+        <h2>{title}</h2>
+      </header>
       {note ? <p className="form-sec__note">{note}</p> : null}
       <div className="form-sec__body">{children}</div>
     </section>

@@ -36,11 +36,28 @@
 }
 
 .form-sec__head {
-  margin-bottom: 0.2rem;
-  padding-bottom: 0.55rem;
-  border-bottom: 2px solid #fff;
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.15rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-sec__index {
+  margin: 0;
+  color: var(--marvel);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.form-sec__head h2 {
+  margin: 0;
+  color: #fff;
   font-size: 1.15rem;
   font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
 }
 
 .form-sec__note {
@@ -1616,6 +1633,9 @@
   .party-wrap {
     min-width: 0;
     max-width: 100%;
+  }
+  .form-sec__head h2 {
+    font-size: 1.05rem;
   }
   .party-bar {
     flex-direction: column;

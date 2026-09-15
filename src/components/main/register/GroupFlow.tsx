@@ -316,7 +316,7 @@ export function GroupFlow({
         <form className="form" onSubmit={onForm} noValidate>
           <ApplyNotice lines={NOTICE} />
 
-          <FormSec title="단체 정보">
+          <FormSec kicker="01 / GROUP" title="단체 정보">
             <FormRow label="단체명" required>
               <input
                 type="text"
@@ -357,7 +357,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="대표자 정보">
+          <FormSec kicker="02 / LEADER" title="대표자 정보">
             <FormRow label="대표자 성명" required>
               <input
                 type="text"
@@ -375,7 +375,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="연락처 정보">
+          <FormSec kicker="03 / CONTACT" title="연락처 정보">
             <FormRow label="휴대폰번호" required>
               <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
@@ -393,7 +393,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+          <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
             <FormRow label="주소" required>
               <AddressField
                 zonecode={draft.zonecode}
@@ -405,7 +405,7 @@ export function GroupFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="참가자">
+          <FormSec kicker="05 / RUNNERS" title="참가자">
             <ApplyHint>
               <p>대표자도 대회에 참여하는 경우 아래 참가자 정보를 작성하시기 바랍니다.</p>
               <p>

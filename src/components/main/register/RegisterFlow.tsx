@@ -298,7 +298,7 @@ function IndividualFlow({
         <form className="form" onSubmit={onReview} noValidate>
           <ApplyNotice lines={NOTICE} />
 
-          <FormSec title="개인정보">
+          <FormSec kicker="01 / PROFILE" title="개인정보">
             <FormRow label="이름" required>
               <input
                 type="text"
@@ -335,7 +335,7 @@ function IndividualFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="연락처 정보">
+          <FormSec kicker="02 / CONTACT" title="연락처 정보">
             <FormRow label="휴대폰번호" required>
               <PhoneField
                 name="phone"
@@ -354,7 +354,7 @@ function IndividualFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+          <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
             <FormRow label="주소" required>
               <AddressField
                 zonecode={draft.zonecode ?? ""}
@@ -367,6 +367,7 @@ function IndividualFlow({
           </FormSec>
 
           <FormSec
+            kicker="04 / GUARDIAN"
             title={needsGuardian(draft.birth) ? "보호자 정보" : "보호자 정보 (선택)"}
             note={
               needsGuardian(draft.birth)
@@ -385,7 +386,7 @@ function IndividualFlow({
             </FormRow>
           </FormSec>
 
-          <FormSec title="신청 정보">
+          <FormSec kicker="05 / ENTRY" title="신청 정보">
             <FormRow label="참가종목" required>
               <CoursePick
                 value={draft.courseId}
