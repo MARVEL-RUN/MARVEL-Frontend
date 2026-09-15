@@ -20,7 +20,6 @@ import {
   ticketForBirth,
   type CourseId,
   type Gender,
-  type ShirtSize,
   type TicketKind,
 } from "@/lib/register";
 
@@ -162,10 +161,12 @@ export function ShirtPick({
   value,
   onChange,
   sizes = SHIRT_SIZES,
+  disabled,
 }: {
   value: string;
-  onChange: (next: ShirtSize) => void;
+  onChange: (next: string) => void;
   sizes?: readonly string[];
+  disabled?: boolean;
 }) {
   return (
     <div className="seg">
@@ -174,7 +175,8 @@ export function ShirtPick({
           key={size}
           type="button"
           className={value === size ? "is-on" : undefined}
-          onClick={() => onChange(size as ShirtSize)}
+          disabled={disabled}
+          onClick={() => onChange(size)}
         >
           {size}
         </button>

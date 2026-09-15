@@ -35,6 +35,26 @@ export function findSouvenir(
   return category?.souvenirs.find((item) => item.souvenirId === souvenirId);
 }
 
+export function shirtSouvenir(category: RegistrationCategory | undefined) {
+  const items = sortedSouvenirs(category);
+  if (!items.length) return undefined;
+  return items.find((item) => /티셔츠|t-?shirt/i.test(item.name)) ?? items[0];
+}
+
+export function shirtAssignment(
+  category: RegistrationCategory | undefined,
+  selectedSize = "",
+) {
+  const souvenir = shirtSouvenir(category);
+  if (!souvenir) return { souvenirId: "", selectedSize: "" };
+  const sizes = souvenirSizes(souvenir);
+  const keep = sizes.includes(selectedSize) ? selectedSize : "";
+  return {
+    souvenirId: souvenir.souvenirId,
+    selectedSize: keep || (sizes.length === 1 ? sizes[0] : ""),
+  };
+}
+
 export function categoryLabel(category: RegistrationCategory) {
   const parts = [category.distance, category.categoryName].filter(Boolean);
   const unique = parts.filter((part, i) => parts.indexOf(part) === i);

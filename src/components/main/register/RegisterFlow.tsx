@@ -26,9 +26,9 @@ import { savePendingPayment } from "@/lib/payment/session";
 import {
   categoryForCourse,
   findSouvenir,
+  shirtAssignment,
   souvenirSizes,
   sortedCategories,
-  sortedSouvenirs,
 } from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
@@ -54,6 +54,7 @@ import {
   GenderPick,
   PasswordField,
   PhoneField,
+  ShirtPick,
   birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
@@ -145,6 +146,25 @@ function IndividualFlow({
     };
   }, []);
 
+  useEffect(() => {
+    if (optionsLoading || !categories.length) return;
+    setDraft((prev) => {
+      if (!prev.courseId) {
+        if (!prev.souvenirId && !prev.selectedSize) return prev;
+        return { ...prev, souvenirId: "", selectedSize: "" };
+      }
+      const category = categoryForCourse(categories, prev.courseId, prev.birth);
+      const next = shirtAssignment(category, prev.selectedSize);
+      if (
+        next.souvenirId === prev.souvenirId &&
+        next.selectedSize === prev.selectedSize
+      ) {
+        return prev;
+      }
+      return { ...prev, ...next };
+    });
+  }, [categories, optionsLoading]);
+
   function openPay() {
     if (isMobileView()) {
       router.push("/payment");
@@ -196,8 +216,8 @@ function IndividualFlow({
     if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
       return fail("만 14세 미만은 보호자 연락처를 입력하세요.");
     }
-    if (!draft.souvenirId) return fail("기념품을 선택하세요.");
-    if (!draft.selectedSize) return fail("기념품 사이즈를 선택하세요.");
+    if (!draft.souvenirId) return fail("티셔츠 옵션을 불러오지 못했습니다.");
+    if (!draft.selectedSize) return fail("티셔츠 사이즈를 선택하세요.");
     if ((draft.password ?? "").trim().length < 4) {
       return fail("신청 비밀번호를 4자 이상 입력하세요.");
     }
@@ -294,13 +314,13 @@ function IndividualFlow({
                 value={draft.birth}
                 onChange={(birth) => {
                   const next = applyCourseForBirth(draft.courseId, birth);
-                  const keepCourse = next.courseId === draft.courseId;
+                  const category = next.courseId
+                    ? categoryForCourse(categories, next.courseId, birth)
+                    : undefined;
                   patch({
                     birth,
                     ...next,
-                    ...(keepCourse
-                      ? {}
-                      : { souvenirId: "", selectedSize: "" }),
+                    ...shirtAssignment(category, draft.selectedSize),
                   });
                 }}
               />
@@ -373,8 +393,10 @@ function IndividualFlow({
                   patch({
                     courseId,
                     ticket,
-                    souvenirId: "",
-                    selectedSize: "",
+                    ...shirtAssignment(
+                      categoryForCourse(categories, courseId, draft.birth),
+                      draft.selectedSize,
+                    ),
                   })
                 }
               />
@@ -382,51 +404,20 @@ function IndividualFlow({
             {optionsError ? (
               <p className="form__err">{optionsError}</p>
             ) : null}
-            <FormRow label="기념품" required>
-              <select
-                value={draft.souvenirId}
-                onChange={(e) => {
-                  const souvenirId = e.target.value;
-                  const next = findSouvenir(selectedCategory, souvenirId);
-                  const nextSizes = souvenirSizes(next);
-                  patch({
-                    souvenirId,
-                    selectedSize: nextSizes.length === 1 ? nextSizes[0] : "",
-                  });
-                }}
-                disabled={!draft.courseId || !optionsReady}
-                required
-              >
-                <option value="">
-                  {optionsLoading
-                    ? "불러오는 중"
-                    : draft.courseId
-                      ? "기념품"
-                      : "종목을 먼저 선택하세요"}
-                </option>
-                {sortedSouvenirs(selectedCategory).map((item) => (
-                  <option key={item.souvenirId} value={item.souvenirId}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </FormRow>
-            <FormRow label="사이즈" required>
-              <select
+            <FormRow label="티셔츠 사이즈" required>
+              <ShirtPick
                 value={draft.selectedSize}
-                onChange={(e) => patch({ selectedSize: e.target.value })}
-                disabled={!draft.souvenirId}
-                required
-              >
-                <option value="">사이즈</option>
-                {draft.souvenirId
-                  ? sizes.map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))
-                  : null}
-              </select>
+                sizes={souvenir ? sizes : undefined}
+                disabled={!souvenir || !optionsReady}
+                onChange={(selectedSize) => patch({ selectedSize })}
+              />
+              {!draft.courseId ? (
+                <p className="form-row__hint">종목을 먼저 선택하세요</p>
+              ) : optionsLoading ? (
+                <p className="form-row__hint">불러오는 중</p>
+              ) : !souvenir && !optionsError ? (
+                <p className="form-row__hint">티셔츠 옵션을 불러오지 못했습니다</p>
+              ) : null}
             </FormRow>
             <FormRow label="신청 비밀번호" required>
               <PasswordField

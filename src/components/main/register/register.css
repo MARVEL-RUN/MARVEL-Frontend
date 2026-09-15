@@ -79,7 +79,8 @@
 }
 
 .form-row:has(.course-pick),
-.form-row:has(.form-row__hint) {
+.form-row:has(.form-row__hint),
+.form-row:has(.seg) {
   align-items: start;
 }
 
@@ -826,6 +827,11 @@
   background: var(--marvel);
   border-color: var(--marvel);
   color: #fff;
+}
+
+.seg button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .apply-terms {
