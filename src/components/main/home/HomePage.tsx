@@ -147,7 +147,9 @@ export function HomePage() {
             <i aria-hidden />
             <OpenDday />
           </a>
-          <p className="hero__lead">{EVENT.lead}</p>
+          <p className="hero__lead">
+            <span>{EVENT.lead}</span>
+          </p>
           <p className="hero__meta">
             {EVENT.dateShort}
             <span aria-hidden> · </span>
@@ -186,8 +188,8 @@ export function HomePage() {
               <em>ORIGIN STORY</em>
             </h2>
             <p className="sec__body">
-              2026년 10월 31일, 인제스피디움. 캡틴 아메리카부터 닥터 둠까지, 히어로들이
-              같은 출발선에 선다. 배번호를 다는 순간, 당신도 그 세계의 일원이다.
+              2026년 10월 31일, 인제스피디움. 캡틴 아메리카부터 닥터 둠까지.
+              배번호를 다는 순간, 당신도 그 세계의 일원이다.
             </p>
             <p className="sec__body">
               미션을 선택하고, 피니시 게이트를 통과하여 완수하라!

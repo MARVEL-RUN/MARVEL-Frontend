@@ -19,10 +19,10 @@ function SponsorInquiry({ className }: { className?: string }) {
       title="협찬문의"
     >
       <span className="site-header__spon-icon" aria-hidden>
-        <svg viewBox="0 0 24 24" width="13" height="13">
+        <svg viewBox="0 0 24 24" width="15" height="15">
           <path
             fill="currentColor"
-            d="M6.62 10.79a15.15 15.15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.58.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.58 1 1 0 0 1-.25 1.02z"
+            d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 4-8 5L4 8V6l8 5 8-5z"
           />
         </svg>
       </span>

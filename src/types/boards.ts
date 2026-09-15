@@ -18,6 +18,7 @@ export type AdminInquiry = {
   title: string;
   body: string;
   date: string;
+  password: string;
   answer?: string;
   answeredAt?: string;
   attachments?: InquiryAttachment[];
