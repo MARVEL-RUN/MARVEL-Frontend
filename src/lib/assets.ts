@@ -55,6 +55,6 @@ export const MAIN_ASSETS = {
   virtualBlack: "/images/virtual/black.svg",
   virtualThor: "/images/virtual/thor.svg",
   virtualDom: "/images/virtual/dom.svg",
-  virtualSoonBg: "/images/virtual/soon-bg.svg",
-  virtualSoonHero: "/images/virtual/soon-hero.svg",
+  virtualSoonBg: "/images/virtual/soon-bg.png",
+  virtualSoonHero: "/images/virtual/soon-hero.png",
 } as const;

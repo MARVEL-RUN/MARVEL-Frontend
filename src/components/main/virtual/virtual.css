@@ -344,6 +344,7 @@
   display: block;
   width: 100%;
   height: auto;
+  mix-blend-mode: screen;
   -webkit-user-drag: none;
   user-select: none;
   pointer-events: none;
