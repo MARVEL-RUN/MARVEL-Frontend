@@ -514,7 +514,7 @@
   --course-row: 2.2rem;
   --course-head: 2.05rem;
   --course-rows: 3;
-  --course-fees-cols: 4.8rem 7rem 6rem 11rem;
+  --course-fees-cols: 5.4rem 7rem 6rem 11rem;
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -560,7 +560,7 @@
   align-items: center;
   min-width: 0;
   height: 100%;
-  padding: 0 0.5rem;
+  padding: 0 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -582,7 +582,7 @@
   align-items: center;
   min-width: 0;
   height: 100%;
-  padding: 0 0.5rem;
+  padding: 0 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2031,7 +2031,7 @@
   .course-pick__fees-h,
   .course-pick__fees-row span {
     min-width: 0;
-    padding: 0 0.35rem;
+    padding: 0 0.7rem;
     justify-content: flex-start;
   }
   .course-pick__fees-label--long {
