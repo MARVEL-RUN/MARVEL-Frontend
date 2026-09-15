@@ -96,8 +96,7 @@
 }
 
 .form-row:has(.course-pick),
-.form-row:has(.form-row__hint),
-.form-row:has(.kit-fixed) {
+.form-row:has(.form-row__hint) {
   align-items: start;
 }
 
@@ -108,10 +107,6 @@
   font-weight: 500;
   line-height: 1.55;
   word-break: keep-all;
-}
-
-.block .spec>div:has(.kit-fixed) {
-  align-items: start;
 }
 
 .form-row__label {
@@ -647,7 +642,7 @@
 
 .party {
   width: 100%;
-  min-width: 68rem;
+  min-width: 58rem;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
@@ -724,7 +719,7 @@
 }
 
 .party__c-gender {
-  width: 16rem;
+  width: 7.5rem;
 }
 
 .party__c-fee {
@@ -783,14 +778,6 @@
 .party tbody tr:last-child td,
 .party .party__info:has(+ .party__more:last-child) :is(.party__no, .party__fee, .party__del) {
   border-bottom: 0;
-}
-
-.party .kit-fixed {
-  min-height: 0;
-}
-
-.party .kit-fixed .seg {
-  grid-template-columns: 8.4rem repeat(3, 5.6rem);
 }
 
 .party .party__peek,
@@ -912,22 +899,44 @@
   cursor: not-allowed;
 }
 
-.seg--fixed button {
-  cursor: default;
-  pointer-events: none;
+.kit-fixed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: keep-all;
 }
 
-.kit-fixed .seg {
-  display: grid;
-  grid-template-columns: 8.4rem repeat(3, 5.6rem);
-  justify-content: start;
+.kit-fixed--empty {
+  color: var(--silver);
+  font-weight: 600;
 }
 
-.kit-fixed .seg button {
-  width: 100%;
-  min-width: 0;
-  padding: 0 0.4rem;
+.kit-fixed li {
   white-space: nowrap;
+}
+
+.kit-fixed li + li::before {
+  content: "·";
+  margin: 0 0.45rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+}
+
+.kit-fixed .is-off {
+  color: var(--silver);
+  opacity: 0.4;
+}
+
+.party .kit-fixed {
+  justify-content: flex-start;
+  font-size: 0.78rem;
 }
 
 .apply-terms {
@@ -2140,25 +2149,6 @@
   }
   .seg button {
     min-height: var(--tap);
-  }
-  .kit-fixed .seg {
-    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
-    width: 100%;
-  }
-  .party .kit-fixed,
-  .party td[data-label="패키지"] {
-    min-width: 0;
-    max-width: 100%;
-  }
-  .party .kit-fixed .seg {
-    grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr));
-    width: 100%;
-    gap: 0.3rem;
-  }
-  .party .kit-fixed .seg button {
-    min-width: 0;
-    padding: 0 0.2rem;
-    font-size: 0.68rem;
   }
   .party input,
   .party select {

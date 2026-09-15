@@ -195,31 +195,26 @@ export function ShirtPick({
 
 export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
   const course = courseId ? courseById(courseId) : undefined;
-  const locked = !course;
-  const chip = course ? courseHasTimingChip(course.id) : false;
+  if (!course) {
+    return <p className="kit-fixed kit-fixed--empty">—</p>;
+  }
+
+  const chip = courseHasTimingChip(course.id);
   const items = [
-    { id: "medal", label: course ? `${course.distance} 메달` : "메달", on: !locked },
-    { id: "scarf", label: "스카프", on: !locked },
-    { id: "bib", label: "배번호", on: !locked },
+    { id: "medal", label: `${course.distance} 메달`, on: true },
+    { id: "scarf", label: "스카프", on: true },
+    { id: "bib", label: "배번호", on: true },
     { id: "chip", label: "기록칩", on: chip },
   ];
 
   return (
-    <div className="kit-fixed">
-      <div className="seg seg--fixed">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={item.on ? "is-on" : undefined}
-            disabled={locked || !item.on}
-            tabIndex={-1}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-    </div>
+    <ul className="kit-fixed">
+      {items.map((item) => (
+        <li key={item.id} className={item.on ? undefined : "is-off"}>
+          {item.label}
+        </li>
+      ))}
+    </ul>
   );
 }
 
