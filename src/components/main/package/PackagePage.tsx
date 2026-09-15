@@ -50,16 +50,6 @@ const SLIDES = [
 
 type SlideId = (typeof SLIDES)[number]["id"];
 
-const PRELOAD_SRCS = [
-  ...SLIDES.map((s) => s.src),
-  MAIN_ASSETS.kitShirtFront,
-  MAIN_ASSETS.kitShirtBack,
-  MAIN_ASSETS.kitBib,
-  MAIN_ASSETS.kitScarfFront,
-  MAIN_ASSETS.kitScarfBack,
-  ...EVENT.courses.flatMap((c) => [c.medalRibbon, c.medalTurn, c.medalBack]),
-];
-
 const N: number = SLIDES.length;
 const COPIES = 3;
 const LOOP = Array.from({ length: N * COPIES }, (_, i) => ({
@@ -123,6 +113,7 @@ export function PackagePage() {
   const [detailId, setDetailId] = useState<SlideId>("all");
   const [ready, setReady] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
+  const indexRef = useRef(N);
   const lockRef = useRef(false);
   const dragRef = useRef<{
     x: number;
@@ -132,24 +123,27 @@ export function PackagePage() {
   const skipClickRef = useRef(false);
   const wrapTimer = useRef(0);
   const detailTimer = useRef(0);
+  const holdId = useRef<SlideId | null>(null);
 
   useEffect(() => {
     let alive = true;
-    const slides = SLIDES.map((s) => warmImage(s.src));
-    const rest = PRELOAD_SRCS.filter((src) => !SLIDES.some((s) => s.src === src)).map(
-      (src) => warmImage(src),
-    );
-    void Promise.all(slides).then(() => {
+    void Promise.all(SLIDES.map((s) => warmImage(s.src))).then(() => {
       if (alive) setReady(true);
     });
-    void Promise.all(rest);
     return () => {
       alive = false;
     };
   }, []);
 
+  const setRailIndex = useCallback((next: number) => {
+    if (indexRef.current === next) return;
+    indexRef.current = next;
+    setIndex(next);
+  }, []);
+
   const queueDetail = useCallback((i: number, immediate = false) => {
     const next = slideIdAt(i);
+    if (holdId.current && next !== holdId.current) return;
     window.clearTimeout(detailTimer.current);
     if (immediate) {
       setDetailId(next);
@@ -167,22 +161,22 @@ export function PackagePage() {
       lockRef.current = true;
       rail.classList.add("is-jump");
       rail.scrollLeft = centerLeft(rail, next);
-      setIndex(next);
+      setRailIndex(next);
       queueDetail(next, true);
       requestAnimationFrame(() => {
         rail.classList.remove("is-jump");
         lockRef.current = false;
       });
     },
-    [queueDetail],
+    [queueDetail, setRailIndex],
   );
 
   const goTo = useCallback(
     (next: number) => {
       const rail = railRef.current;
-      if (!rail || next === index) return;
+      if (!rail || next === indexRef.current) return;
+      holdId.current = slideIdAt(next);
       lockRef.current = true;
-      setIndex(next);
       queueDetail(next, true);
       rail.scrollTo({ left: centerLeft(rail, next), behavior: "smooth" });
       window.clearTimeout(wrapTimer.current);
@@ -192,7 +186,7 @@ export function PackagePage() {
         else lockRef.current = false;
       }, 460);
     },
-    [index, jump, queueDetail],
+    [jump, queueDetail],
   );
 
   useLayoutEffect(() => {
@@ -201,16 +195,23 @@ export function PackagePage() {
 
   const onScroll = () => {
     const rail = railRef.current;
-    if (!rail || lockRef.current) return;
+    if (!rail) return;
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft < 0 || rail.scrollLeft > max) return;
     const best = nearestIndex(rail);
-    setIndex(best);
+    setRailIndex(best);
+    if (lockRef.current) return;
+    if (holdId.current) {
+      if (slideIdAt(best) !== holdId.current) return;
+      holdId.current = null;
+    }
     queueDetail(best);
     window.clearTimeout(wrapTimer.current);
     wrapTimer.current = window.setTimeout(() => {
       if (lockRef.current) return;
       const wrapped = wrapPos(best);
       if (wrapped !== best) jump(wrapped);
-    }, 80);
+    }, 120);
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -226,6 +227,7 @@ export function PackagePage() {
     if (!rail || !drag) return;
     if (!drag.moved && Math.abs(e.clientX - drag.x) > 6) {
       drag.moved = true;
+      holdId.current = null;
       skipClickRef.current = true;
       rail.setPointerCapture(e.pointerId);
     }
@@ -242,7 +244,7 @@ export function PackagePage() {
     }
   };
 
-  const real = ((index % N) + N) % N;
+  const real = SLIDES.findIndex((slide) => slide.id === detailId);
 
   return (
     <main className="page">
@@ -304,7 +306,6 @@ export function PackagePage() {
                         src={slide.src}
                         alt=""
                         draggable={false}
-                        loading="eager"
                         decoding="async"
                       />
                     </span>
@@ -331,43 +332,38 @@ export function PackagePage() {
         </div>
 
         <div className="pkg__detail wrap">
-          <div
-            className={detailId === "all" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
-            aria-hidden={detailId !== "all"}
-          >
-            <section className="kit-gallery__pane">
-              <h3>구성</h3>
-              <ul className="chips">
-                {EVENT.kit.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          </div>
-          <div
-            className={detailId === "shirt" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
-            aria-hidden={detailId !== "shirt"}
-          >
-            <KitShirtPane />
-          </div>
-          <div
-            className={detailId === "bib" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
-            aria-hidden={detailId !== "bib"}
-          >
-            <KitBibPane />
-          </div>
-          <div
-            className={detailId === "medal" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
-            aria-hidden={detailId !== "medal"}
-          >
-            <KitMedalPane />
-          </div>
-          <div
-            className={detailId === "scarf" ? "pkg__detail-pane is-on" : "pkg__detail-pane"}
-            aria-hidden={detailId !== "scarf"}
-          >
-            <KitScarfPane />
-          </div>
+          {detailId === "all" ? (
+            <div className="pkg__detail-pane is-on">
+              <section className="kit-gallery__pane">
+                <h3>구성</h3>
+                <ul className="chips">
+                  {EVENT.kit.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+          ) : null}
+          {detailId === "shirt" ? (
+            <div className="pkg__detail-pane is-on">
+              <KitShirtPane />
+            </div>
+          ) : null}
+          {detailId === "bib" ? (
+            <div className="pkg__detail-pane is-on">
+              <KitBibPane />
+            </div>
+          ) : null}
+          {detailId === "medal" ? (
+            <div className="pkg__detail-pane is-on">
+              <KitMedalPane />
+            </div>
+          ) : null}
+          {detailId === "scarf" ? (
+            <div className="pkg__detail-pane is-on">
+              <KitScarfPane />
+            </div>
+          ) : null}
         </div>
       </div>
     </main>
