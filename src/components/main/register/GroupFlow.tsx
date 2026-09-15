@@ -19,7 +19,6 @@ import {
   categoryOpenForBirth,
   courseForCategory,
   findCategory,
-  findSouvenir,
   groupOptionsFee,
   shirtAssignment,
   shirtSouvenir,
@@ -728,7 +727,9 @@ export function GroupFlow({
           <ul className="member-list">
             {draft.participants.map((p, i) => {
               const category = findCategory(categories, p.categoryId);
-              const souvenir = findSouvenir(category, p.souvenirId);
+              const courseId = category
+                ? (courseForCategory(category)?.id ?? "")
+                : "";
               return (
                 <li key={`${p.name}-${i}`}>
                   <strong>
@@ -736,10 +737,10 @@ export function GroupFlow({
                   </strong>
                   <span>
                     {category ? categoryLabel(category) : "—"} ·{" "}
-                    {souvenir?.name ?? "—"} ({p.selectedSize || "—"}) ·{" "}
-                    {birthView(p.birth)} · {p.gender ? genderLabel(p.gender) : "—"} ·{" "}
-                    {p.phone}
+                    {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
+                    {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
                   </span>
+                  <KitFixed courseId={courseId} />
                 </li>
               );
             })}

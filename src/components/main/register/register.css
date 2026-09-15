@@ -1372,6 +1372,19 @@
   text-align: left;
 }
 
+.member-list .kit-fixed {
+  margin-top: 0.25rem;
+  color: var(--silver);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.member-list .kit-fixed li {
+  display: inline;
+  padding: 0;
+  border: 0;
+}
+
 .ticket .btn {
   margin-top: 0.4rem;
 }
