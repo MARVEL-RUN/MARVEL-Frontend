@@ -39,7 +39,8 @@ export const OFFICE = {
 } as const;
 
 /** 헤더 협찬문의 — 메일 앱에서 바로 작성 */
-export const SPONSOR_MAILTO = `mailto:${OFFICE.email}?subject=${encodeURIComponent("MARVEL RUN 2026 협찬문의")}`;
+export const SPONSOR_EMAIL = "contact@oneuniversestudio.com";
+export const SPONSOR_MAILTO = `mailto:${SPONSOR_EMAIL}?subject=${encodeURIComponent("MARVEL RUN 2026 협찬문의")}`;
 
 export const LEGAL_DOCS = [
   {

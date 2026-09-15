@@ -1029,8 +1029,13 @@ html.is-live .hero__actions {
 
 .hero__lead {
   font-size: clamp(1.15rem, 2.4vw, 1.7rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.hero__lead span {
+  display: inline-block;
+  transform: skewX(-10deg);
 }
 
 .hero__meta {
@@ -5114,8 +5119,16 @@ button.course {
 }
 
 .board__row {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
   color: inherit;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .board__row:hover {
@@ -5251,7 +5264,16 @@ button.course {
 
 .board--qna .board__head,
 .board--qna .board__row {
-  grid-template-columns: 4.4rem minmax(0, 1fr) 5.5rem 7rem;
+  grid-template-columns: 4rem 5rem minmax(0, 1fr) 5.5rem 8.8rem;
+}
+
+.board--qna .board__head span:nth-child(2),
+.board--qna .board__head span:nth-child(3) {
+  text-align: left;
+}
+
+.board__meta {
+  display: contents;
 }
 
 .board__subject {
@@ -5262,6 +5284,17 @@ button.course {
 
 .board__subject .board__title {
   min-width: 0;
+}
+
+.board__lock {
+  flex-shrink: 0;
+  margin-right: 0.35rem;
+  color: var(--note);
+}
+
+.post__title .board__lock {
+  margin-right: 0.45rem;
+  vertical-align: -0.12em;
 }
 
 .board__name {
@@ -5276,12 +5309,13 @@ button.course {
 .board__badge {
   flex-shrink: 0;
   display: inline-block;
-  margin-right: 0.55rem;
+  margin: 0;
   color: var(--marvel);
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  vertical-align: 0.05em;
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .board__badge.is-wait {
@@ -5301,10 +5335,32 @@ button.course {
 
 .post__meta {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.85rem;
   margin-top: 0.7rem;
   color: var(--note);
   font-size: 0.86rem;
+}
+
+.post__status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.6rem;
+  padding: 0.22rem 0.65rem;
+  border: 1px solid rgba(237, 29, 36, 0.85);
+  background: rgba(237, 29, 36, 0.22);
+  color: #ff9ea2;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.post__status.is-wait {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
 }
 
 .post__body {
@@ -5313,6 +5369,179 @@ button.course {
   color: var(--silver);
   line-height: 1.75;
   white-space: pre-wrap;
+}
+
+.post__unlock {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.8rem 0 0.4rem;
+}
+
+.post__unlock-lead {
+  margin: 0;
+  color: var(--silver);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.post__unlock-error {
+  margin: 0;
+  color: var(--marvel);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.post__unlock-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+/* 문의사항 비밀글 모달 */
+.inquiry-secret {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.inquiry-secret__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(4, 8, 20, 0.72);
+  cursor: pointer;
+}
+
+.inquiry-secret__panel {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  padding: 1.35rem 1.35rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #12182a;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.inquiry-secret__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.inquiry-secret__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(237, 29, 36, 0.55);
+  color: var(--marvel);
+  background: rgba(237, 29, 36, 0.12);
+}
+
+.inquiry-secret__head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.inquiry-secret__x {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.inquiry-secret__x:hover {
+  color: #fff;
+}
+
+.inquiry-secret__desc {
+  margin: 0.95rem 0 1.15rem;
+  color: var(--silver);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.inquiry-secret__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.inquiry-secret__field > span:first-child {
+  color: var(--note);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.inquiry-secret__control {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0 0.35rem 0 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.inquiry-secret__control:focus-within {
+  border-color: rgba(237, 29, 36, 0.7);
+}
+
+.inquiry-secret__control input {
+  flex: 1;
+  min-width: 0;
+  height: 2.8rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.inquiry-secret__control input::placeholder {
+  color: var(--note);
+}
+
+.inquiry-secret__eye {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.inquiry-secret__eye:hover {
+  color: #fff;
+}
+
+.inquiry-secret__actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
+}
+
+.inquiry-secret__actions .btn {
+  min-width: 5.5rem;
+  min-height: 2.4rem;
+  padding: 0 1.1rem;
+  font-size: 0.84rem;
 }
 
 .post__files {
@@ -5367,13 +5596,20 @@ button.course {
 
 .post__nav-row {
   display: grid;
+  width: 100%;
+  margin: 0;
+  padding: 0.95rem 0.35rem;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
   grid-template-columns: 4.4rem minmax(0, 1fr);
   gap: 0.75rem;
   align-items: center;
-  padding: 0.95rem 0.35rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   color: inherit;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .post__nav-row span:first-child {
@@ -6293,8 +6529,8 @@ button.course {
 
   .hero__lead {
     font-size: 1.18rem;
+    letter-spacing: 0.08em;
     line-height: 1.4;
-    word-break: keep-all;
   }
 
   .hero__meta {
@@ -7375,14 +7611,83 @@ button.course {
     padding: 0.95rem 0.15rem;
   }
 
-  .board--qna .board__head,
+  .board--qna .board__head {
+    grid-template-columns: 2.4rem 4.2rem minmax(0, 1fr);
+  }
+
   .board--qna .board__row {
-    grid-template-columns: 3.2rem minmax(0, 1fr) 5.6rem;
+    grid-template-columns: 2.4rem 4.2rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 0.35rem 0.45rem;
+    align-items: start;
+    padding: 0.95rem 0.1rem;
+  }
+
+  .board--qna .board__no {
+    grid-row: 1 / span 2;
+    align-self: start;
+    padding-top: 0.2rem;
+  }
+
+  .board--qna .board__badge {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+  }
+
+  .board--qna .board__subject {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .board--qna .board__lock {
+    margin-right: 0.2rem;
+  }
+
+  .board--qna .board__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.45rem;
+    grid-column: 2 / -1;
+    grid-row: 2;
+    min-width: 0;
+    color: var(--note);
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .board--qna .board__name {
+    display: inline;
+    overflow: hidden;
+    max-width: 40%;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .board--qna .board__row time {
+    padding-top: 0;
+    font-size: inherit;
+    line-height: inherit;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .board--qna .board__row time::before {
+    content: "·";
+    margin-right: 0.45rem;
   }
 
   .board__name,
-  .board--qna .board__head span:nth-child(3) {
+  .board--qna .board__head span:nth-child(4),
+  .board--qna .board__head span:nth-child(5) {
     display: none;
+  }
+
+  .board--qna .board__name {
+    display: inline;
   }
 
   .board__title {
