@@ -83,18 +83,21 @@ export function KitGallery() {
         ) : null}
       </section>
       <section className="kit-gallery__pane kit-gallery__pane--bib">
-        <h3>배번호</h3>
+        <h3>배번표</h3>
         <figure className="kit-gallery__bib">
           <span className="kit-gallery__frame kit-gallery__frame--bib">
             <Image
               src={MAIN_ASSETS.kitBib}
-              alt="배번호"
+              alt="배번표"
               width={1272}
               height={1142}
               sizes="(max-width: 720px) 100vw, 1100px"
             />
           </span>
         </figure>
+        <p className="kit-gallery__note">
+          ※ 배번표 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.
+        </p>
       </section>
       <section className="kit-gallery__pane">
         <h3>스카프</h3>
