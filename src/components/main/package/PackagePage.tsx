@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import {
@@ -49,6 +49,16 @@ const SLIDES = [
   },
 ] as const;
 
+const PRELOAD_SRCS = [
+  ...SLIDES.map((s) => s.src),
+  MAIN_ASSETS.kitShirtFront,
+  MAIN_ASSETS.kitShirtBack,
+  MAIN_ASSETS.kitBib,
+  MAIN_ASSETS.kitScarfFront,
+  MAIN_ASSETS.kitScarfBack,
+  ...EVENT.courses.flatMap((c) => [c.medalRibbon, c.medalTurn, c.medalBack]),
+];
+
 const N = SLIDES.length;
 const COPIES = 3;
 const LOOP = Array.from({ length: N * COPIES }, (_, i) => ({
@@ -90,6 +100,16 @@ function nearestIndex(rail: HTMLElement) {
   return best;
 }
 
+function preloadImages(srcs: string[]) {
+  const unique = [...new Set(srcs.filter(Boolean))];
+  unique.forEach((src) => {
+    const img = new window.Image();
+    img.decoding = "async";
+    img.src = src;
+    void img.decode?.().catch(() => undefined);
+  });
+}
+
 export function PackagePage() {
   const [index, setIndex] = useState(N);
   const railRef = useRef<HTMLDivElement>(null);
@@ -101,6 +121,10 @@ export function PackagePage() {
   } | null>(null);
   const skipClickRef = useRef(false);
   const wrapTimer = useRef(0);
+
+  useEffect(() => {
+    preloadImages(PRELOAD_SRCS);
+  }, []);
 
   const jump = useCallback((next: number) => {
     const rail = railRef.current;
@@ -207,35 +231,46 @@ export function PackagePage() {
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerUp}
           >
-            {LOOP.map(({ i, slide }) => (
-              <article
-                key={i}
-                data-i={i}
-                className={index === i ? "pkg-slide is-on" : "pkg-slide"}
-                onClick={() => {
-                  if (skipClickRef.current) {
-                    skipClickRef.current = false;
-                    return;
-                  }
-                  goTo(i);
-                }}
-              >
-                <div
-                  className={
-                    slide.feature
-                      ? "pkg-card pkg-card--all"
-                      : slide.id === "bib"
-                        ? "pkg-card"
-                        : "pkg-card pkg-card--photo"
-                  }
+            {LOOP.map(({ i, slide }) => {
+              const active = index === i;
+              const near = Math.abs(i - index) <= 1 || Math.abs(i - index) >= N * COPIES - 1;
+              return (
+                <article
+                  key={i}
+                  data-i={i}
+                  className={active ? "pkg-slide is-on" : "pkg-slide"}
+                  onClick={() => {
+                    if (skipClickRef.current) {
+                      skipClickRef.current = false;
+                      return;
+                    }
+                    goTo(i);
+                  }}
                 >
-                  <span className={`pkg-card__shot pkg-card__shot--${slide.fit}`}>
-                    <img src={slide.src} alt="" draggable={false} />
-                  </span>
-                  {slide.en ? <p className="pkg-card__en">{slide.en}</p> : null}
-                </div>
-              </article>
-            ))}
+                  <div
+                    className={
+                      slide.feature
+                        ? "pkg-card pkg-card--all"
+                        : slide.id === "bib"
+                          ? "pkg-card"
+                          : "pkg-card pkg-card--photo"
+                    }
+                  >
+                    <span className={`pkg-card__shot pkg-card__shot--${slide.fit}`}>
+                      <img
+                        src={slide.src}
+                        alt=""
+                        draggable={false}
+                        loading={near ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={active ? "high" : "low"}
+                      />
+                    </span>
+                    {slide.en ? <p className="pkg-card__en">{slide.en}</p> : null}
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
           <div className="pkg-dots" role="tablist" aria-label="패키지 구성">
@@ -254,28 +289,55 @@ export function PackagePage() {
         </div>
 
         <div className="pkg__detail wrap">
-          <PackageDetail id={current.id} />
+          <div
+            className={
+              current.id === "all" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
+            }
+            aria-hidden={current.id !== "all"}
+          >
+            <section className="kit-gallery__pane">
+              <h3>구성</h3>
+              <ul className="chips">
+                {EVENT.kit.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          </div>
+          <div
+            className={
+              current.id === "shirt" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
+            }
+            aria-hidden={current.id !== "shirt"}
+          >
+            <KitShirtPane />
+          </div>
+          <div
+            className={
+              current.id === "bib" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
+            }
+            aria-hidden={current.id !== "bib"}
+          >
+            <KitBibPane />
+          </div>
+          <div
+            className={
+              current.id === "medal" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
+            }
+            aria-hidden={current.id !== "medal"}
+          >
+            <KitMedalPane />
+          </div>
+          <div
+            className={
+              current.id === "scarf" ? "pkg__detail-pane is-on" : "pkg__detail-pane"
+            }
+            aria-hidden={current.id !== "scarf"}
+          >
+            <KitScarfPane />
+          </div>
         </div>
       </div>
     </main>
   );
-}
-
-function PackageDetail({ id }: { id: (typeof SLIDES)[number]["id"] }) {
-  if (id === "all") {
-    return (
-      <section className="kit-gallery__pane">
-        <h3>구성</h3>
-        <ul className="chips">
-          {EVENT.kit.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-    );
-  }
-  if (id === "shirt") return <KitShirtPane />;
-  if (id === "bib") return <KitBibPane />;
-  if (id === "medal") return <KitMedalPane />;
-  return <KitScarfPane />;
 }

@@ -108,7 +108,12 @@ export function KitMedalPane() {
               onClick={() => setSelected(c.id)}
             >
               <span className="kit-gallery__lineup-shot">
-                <img src={c.medalRibbon} alt={`${c.distance} 피니셔 메달`} />
+                <img
+                  src={c.medalRibbon}
+                  alt={`${c.distance} 피니셔 메달`}
+                  loading="eager"
+                  decoding="async"
+                />
               </span>
               <span className="kit-gallery__lineup-name">{medalLineLabel(c.id)}</span>
             </button>
@@ -144,6 +149,7 @@ export function KitShirtPane() {
                 alt="공식 티셔츠 앞면"
                 fill
                 sizes="(max-width: 720px) 50vw, 540px"
+                priority
               />
             </span>
             <figcaption>앞면</figcaption>
@@ -157,6 +163,7 @@ export function KitShirtPane() {
                 alt="공식 티셔츠 뒷면"
                 fill
                 sizes="(max-width: 720px) 50vw, 540px"
+                priority
               />
             </span>
             <figcaption>뒷면</figcaption>
@@ -180,6 +187,7 @@ export function KitBibPane() {
             width={1272}
             height={1142}
             sizes="(max-width: 720px) 100vw, 1100px"
+            priority
           />
         </span>
       </figure>
@@ -203,6 +211,7 @@ export function KitScarfPane() {
                 alt="스카프 앞면"
                 fill
                 sizes="(max-width: 720px) 100vw, 1100px"
+                priority
               />
             </span>
             <figcaption>앞면</figcaption>
@@ -216,6 +225,7 @@ export function KitScarfPane() {
                 alt="스카프 뒷면"
                 fill
                 sizes="(max-width: 720px) 100vw, 1100px"
+                priority
               />
             </span>
             <figcaption>뒷면</figcaption>
