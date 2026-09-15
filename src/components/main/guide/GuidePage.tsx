@@ -1,10 +1,7 @@
-import Link from "next/link";
 import { EVENT } from "@/lib/event";
-import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import { SideBanner } from "../layout/SideBanner";
 import { CourseMaps } from "./CourseMaps";
 import { GuideTabs } from "./GuideTabs";
-import { KitGallery } from "./KitGallery";
 import { TimeTable } from "../home/TimeTable";
 
 export function GuidePage() {
@@ -44,22 +41,6 @@ export function GuidePage() {
         <div className="wrap">
           <h2>코스</h2>
           <CourseMaps />
-        </div>
-      </section>
-
-      <section className="guide-sec" id="kit">
-        <hr className="guide-rule" />
-        <div className="wrap">
-          <h2>기념품</h2>
-          <KitGallery />
-          <ul className="chips">
-            {EVENT.kit.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <Link href={REGISTER_HREF} className="btn btn--red">
-            {registerUiOpen ? "참가신청" : "접수 안내"}
-          </Link>
         </div>
       </section>
     </main>

@@ -12,13 +12,15 @@ export const GUIDE_SECTIONS = [
   { href: "/guide#overview", label: "한눈에 보기" },
   { href: "/guide#timeline", label: "타임라인" },
   { href: "/guide#course", label: "코스" },
-  { href: "/guide#kit", label: "기념품" },
 ] as const;
 
 export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href !== "/guide#overview");
 
+export const KIT_HREF = "/kit";
+
 export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
+  { href: KIT_HREF, label: "기념품 안내" },
   { href: "/directions", label: "오시는길" },
   { href: "/faq", label: "FAQ" },
   { href: "/notices", label: "공지사항" },

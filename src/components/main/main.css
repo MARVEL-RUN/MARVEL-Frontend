@@ -2525,6 +2525,14 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   margin-top: 1.2rem;
 }
 
+.kit-page .kit-gallery {
+  margin-top: 0;
+}
+
+.kit-page .btn {
+  margin-top: 1.6rem;
+}
+
 .kit-gallery__pane {
   display: flex;
   flex-direction: column;
