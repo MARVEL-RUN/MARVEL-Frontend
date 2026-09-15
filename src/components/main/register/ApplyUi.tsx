@@ -196,10 +196,10 @@ export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
   const locked = !course;
   const chip = course ? courseHasTimingChip(course.id) : false;
   const items = [
-    course ? `${course.distance} 메달` : "메달",
-    "스카프",
-    "배번호",
-    locked ? "기록칩" : chip ? "기록칩" : "기록칩 없음",
+    { id: "medal", label: course ? `${course.distance} 메달` : "메달", on: !locked },
+    { id: "scarf", label: "스카프", on: !locked },
+    { id: "bib", label: "배번호", on: !locked },
+    { id: "chip", label: "기록칩", on: chip },
   ];
 
   return (
@@ -207,13 +207,13 @@ export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
       <div className="seg seg--fixed">
         {items.map((item) => (
           <button
-            key={item}
+            key={item.id}
             type="button"
-            className={locked ? undefined : "is-on"}
-            disabled={locked}
+            className={item.on ? "is-on" : undefined}
+            disabled={locked || !item.on}
             tabIndex={-1}
           >
-            {item}
+            {item.label}
           </button>
         ))}
       </div>

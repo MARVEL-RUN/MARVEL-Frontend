@@ -860,6 +860,23 @@
   pointer-events: none;
 }
 
+.kit-fixed .seg {
+  display: grid;
+  grid-template-columns: 8.4rem repeat(3, 5.6rem);
+  justify-content: start;
+}
+
+.kit-fixed .seg button {
+  width: 100%;
+  min-width: 0;
+  padding: 0 0.4rem;
+  white-space: nowrap;
+}
+
+.kit-fixed .form-row__hint {
+  min-height: 2.4em;
+}
+
 .apply-terms {
   width: min(860px, 100%);
   margin-inline: auto;
@@ -2035,6 +2052,10 @@
   }
   .seg button {
     min-height: var(--tap);
+  }
+  .kit-fixed .seg {
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+    width: 100%;
   }
   .party input,
   .party select {
