@@ -83,7 +83,7 @@ export function InquiryViewPage() {
                     post.answer ? "post__status" : "post__status is-wait"
                   }
                 >
-                  {post.answer ? "답변" : "대기"}
+                  {post.answer ? "답변완료" : "답변대기"}
                 </span>
                 <span>{post.name}</span>
                 <time dateTime={toDateTimeAttr(post.date)}>{post.date}</time>

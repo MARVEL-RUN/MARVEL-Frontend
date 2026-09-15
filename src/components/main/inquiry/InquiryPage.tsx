@@ -60,6 +60,7 @@ export function InquiryPage() {
         <div className="board board--qna">
           <div className="board__head">
             <span>번호</span>
+            <span>상태</span>
             <span>제목</span>
             <span>작성자</span>
             <span>등록일</span>
@@ -79,19 +80,21 @@ export function InquiryPage() {
                 onClick={() => openPost(item.id)}
               >
                 <span className="board__no">{nos.get(item.id)}</span>
+                <span
+                  className={
+                    item.answer ? "board__badge" : "board__badge is-wait"
+                  }
+                >
+                  {item.answer ? "답변완료" : "답변대기"}
+                </span>
                 <span className="board__subject">
-                  <span
-                    className={
-                      item.answer ? "board__badge" : "board__badge is-wait"
-                    }
-                  >
-                    {item.answer ? "답변" : "대기"}
-                  </span>
                   <Lock className="board__lock" size={14} aria-hidden />
                   <strong className="board__title">{INQUIRY_PUBLIC_TITLE}</strong>
                 </span>
-                <span className="board__name">{item.name}</span>
-                <time dateTime={toDateTimeAttr(item.date)}>{item.date}</time>
+                <span className="board__meta">
+                  <span className="board__name">{item.name}</span>
+                  <time dateTime={toDateTimeAttr(item.date)}>{item.date}</time>
+                </span>
               </button>
             ))
           )}
