@@ -1346,8 +1346,32 @@ html.is-live .hero__actions {
 }
 
 .time-table-wrap {
+  position: relative;
   margin-top: 2rem;
   overflow-x: auto;
+}
+
+.time-table-wrap--tba {
+  overflow: hidden;
+  max-height: 13rem;
+}
+
+.time-table-wrap--tba::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 2.4rem;
+  background: linear-gradient(transparent, var(--navy));
+  pointer-events: none;
+}
+
+.time-table-wrap--tba .time-table {
+  filter: blur(7px);
+  user-select: none;
+  pointer-events: none;
 }
 
 .time-table {
@@ -1412,6 +1436,36 @@ html.is-live .hero__actions {
 .time-table__gate {
   color: var(--marvel);
   font-weight: 800;
+}
+
+.time-table__tba {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0.8rem 1rem 1.2rem;
+  background: rgba(5, 6, 26, 0.42);
+  pointer-events: none;
+}
+
+.time-table__tba .kicker {
+  margin-bottom: 0;
+}
+
+.time-table__tba-title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.7rem, 4.2vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow: 0 2px 24px rgba(5, 6, 26, 0.85);
+  transform: skewX(-10deg);
 }
 
 .time-mark {
@@ -7597,6 +7651,11 @@ button.course {
   .home-pop,
   .home-pop.home-pop--sheet {
     animation: none;
+  }
+
+  .time-table-wrap--tba .time-table {
+    filter: none;
+    opacity: 0.14;
   }
 }
 
