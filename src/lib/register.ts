@@ -219,6 +219,8 @@ export const GUARDIAN_BIRTH_FROM = nextYmd(shiftYmd(EVENT.raceYmd, -14));
 
 export const CHILD_AGE_NOTE = `어린이 나이: 만 6세 ~ 만 12세 (${ymdKo(CHILD_BIRTH_FROM)} 이후 출생자)`;
 export const GUARDIAN_AGE_NOTE = `법정대리인 동의: 만 14세 미만 (${ymdKo(GUARDIAN_BIRTH_FROM)} 이후 출생자)`;
+export const TIMING_CHIP_NOTE =
+  "배번호 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.";
 
 export type AgeBand = "tooYoung" | "child" | "teen" | "adult";
 
@@ -492,8 +494,8 @@ function assertParticipant(
   if (!p.gender) throw new Error(`${prefix}성별을 선택하세요.`);
   if (!p.phone.trim()) throw new Error(`${prefix}연락처를 입력하세요.`);
   if (!p.categoryId) throw new Error(`${prefix}참가종목을 선택하세요.`);
-  if (!p.souvenirId) throw new Error(`${prefix}기념품을 선택하세요.`);
-  if (!p.selectedSize) throw new Error(`${prefix}기념품 사이즈를 선택하세요.`);
+  if (!p.souvenirId) throw new Error(`${prefix}티셔츠 옵션을 불러오지 못했습니다.`);
+  if (!p.selectedSize) throw new Error(`${prefix}티셔츠 사이즈를 선택하세요.`);
 }
 
 function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {

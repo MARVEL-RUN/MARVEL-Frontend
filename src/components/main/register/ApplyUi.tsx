@@ -167,11 +167,13 @@ export function ShirtPick({
   value,
   onChange,
   sizes = SHIRT_SIZES,
+  enabled,
   disabled,
 }: {
   value: string;
   onChange: (next: string) => void;
   sizes?: readonly string[];
+  enabled?: readonly string[];
   disabled?: boolean;
 }) {
   return (
@@ -181,7 +183,7 @@ export function ShirtPick({
           key={size}
           type="button"
           className={value === size ? "is-on" : undefined}
-          disabled={disabled}
+          disabled={disabled || (enabled ? !enabled.includes(size) : false)}
           onClick={() => onChange(size)}
         >
           {size}
@@ -217,15 +219,6 @@ export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
           </button>
         ))}
       </div>
-      {course ? (
-        <p className="form-row__hint">
-          {chip
-            ? "배번호 뒷면에 기록칩이 부착되어 있습니다."
-            : "2.3 Km 부문에는 기록칩이 없습니다."}
-        </p>
-      ) : (
-        <p className="form-row__hint">종목을 먼저 선택하세요</p>
-      )}
     </div>
   );
 }

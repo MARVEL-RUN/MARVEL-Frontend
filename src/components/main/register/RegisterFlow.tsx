@@ -6,6 +6,7 @@ import {
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
   GUARDIAN_AGE_NOTE,
+  TIMING_CHIP_NOTE,
   applyCourseForBirth,
   ageBand,
   courseById,
@@ -44,6 +45,7 @@ import { DockNav } from "@/components/main/DockNav";
 import { ApplyTerms } from "./ApplyTerms";
 import {
   AddressField,
+  ApplyHint,
   ApplyNotice,
   BirthPick,
   CoursePick,
@@ -387,6 +389,9 @@ function IndividualFlow({
           </FormSec>
 
           <FormSec kicker="05 / ENTRY" title="신청 정보">
+            <ApplyHint>
+              <p>{TIMING_CHIP_NOTE}</p>
+            </ApplyHint>
             <FormRow label="참가종목" required>
               <CoursePick
                 value={draft.courseId}
