@@ -27,7 +27,10 @@ export function KitMedalPane() {
 
   return (
     <section className="kit-gallery__pane">
-      <h3>메달</h3>
+      <header className="kit-gallery__head">
+        <p className="kit-gallery__index">01 / MEDAL</p>
+        <h3>피니셔 메달</h3>
+      </header>
       <ul className="kit-gallery__lineup" aria-label="코스별 메달">
         {lineup.map((c) => (
           <li key={c.id}>
@@ -122,7 +125,10 @@ export function KitMedalPane() {
 export function KitShirtPane() {
   return (
     <section className="kit-gallery__pane">
-      <h3>공식 티셔츠</h3>
+      <header className="kit-gallery__head">
+        <p className="kit-gallery__index">02 / SHIRT</p>
+        <h3>공식 티셔츠</h3>
+      </header>
       <ul className="kit-gallery__shirts">
         <li>
           <figure>
@@ -161,7 +167,10 @@ export function KitShirtPane() {
 export function KitBibPane() {
   return (
     <section className="kit-gallery__pane kit-gallery__pane--bib">
-      <h3>배번표</h3>
+      <header className="kit-gallery__head">
+        <p className="kit-gallery__index">03 / BIB</p>
+        <h3>배번표</h3>
+      </header>
       <figure className="kit-gallery__bib">
         <span className="kit-gallery__frame kit-gallery__frame--bib">
           <Image
@@ -184,7 +193,10 @@ export function KitBibPane() {
 export function KitScarfPane() {
   return (
     <section className="kit-gallery__pane">
-      <h3>스카프</h3>
+      <header className="kit-gallery__head">
+        <p className="kit-gallery__index">04 / SCARF</p>
+        <h3>스카프</h3>
+      </header>
       <ul className="kit-gallery__scarves">
         <li>
           <figure>
