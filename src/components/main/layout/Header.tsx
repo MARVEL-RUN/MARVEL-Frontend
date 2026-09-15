@@ -9,6 +9,23 @@ import { SPONSOR_MAILTO } from "@/lib/legal";
 import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
 import { pinToHeader } from "@/lib/pin-header";
 
+function hrefPath(href: string) {
+  return href.split("#")[0];
+}
+
+function childOn(pathname: string, hash: string, childHref: string, parentHref: string) {
+  const id = childHref.split("#")[1];
+  if (id) return pathname.startsWith(parentHref) && hash === "#" + id;
+  const path = hrefPath(childHref);
+  return pathname === path || pathname.startsWith(`${path}/`);
+}
+
+function itemOn(pathname: string, item: (typeof NAV_ITEMS)[number]) {
+  if (pathname.startsWith(item.href)) return true;
+  if (!("children" in item)) return false;
+  return item.children.some((child) => childOn(pathname, "", child.href, item.href));
+}
+
 function SponsorInquiry({ className }: { className?: string }) {
   return (
     <a
@@ -128,7 +145,7 @@ export function Header() {
 
         <nav className="site-header__nav" aria-label="주요 메뉴">
           {NAV_ITEMS.map((item) => {
-            const active = pathname.startsWith(item.href);
+            const active = itemOn(pathname, item);
             const kids = "children" in item ? item.children : undefined;
             const link = (
               <Link
@@ -195,7 +212,7 @@ export function Header() {
               <Link
                 href={item.href}
                 className={
-                  pathname.startsWith(item.href)
+                  itemOn(pathname, item)
                     ? "site-header__drawer-link is-active"
                     : "site-header__drawer-link"
                 }
@@ -222,8 +239,7 @@ export function Header() {
                 </div>
                 {expanded
                   ? kids.map((child) => {
-                      const id = child.href.split("#")[1];
-                      const on = pathname.startsWith(item.href) && hash === "#" + id;
+                      const on = childOn(pathname, hash, child.href, item.href);
                       return (
                         <Link
                           key={child.href}

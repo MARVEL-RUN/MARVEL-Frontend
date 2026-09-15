@@ -18,12 +18,16 @@ export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href !== "/guide#
 
 export const KIT_HREF = "/kit";
 
+export const BOARD_SECTIONS = [
+  { href: "/faq", label: "FAQ" },
+  { href: "/notices", label: "공지사항" },
+] as const;
+
 export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
   { href: KIT_HREF, label: "기념품 안내" },
   { href: "/directions", label: "오시는길" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/notices", label: "공지사항" },
+  { href: BOARD_SECTIONS[0].href, label: "게시판", children: BOARD_SECTIONS },
   { href: "/inquiry", label: "문의사항" },
   { href: "/virtual", label: "버추얼런" },
 ] as const;
