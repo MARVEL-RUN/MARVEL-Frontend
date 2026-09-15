@@ -101,6 +101,7 @@ export function VirtualRunPage() {
           className="virtual-soon-bg__img is-left"
           sizes="70vw"
           priority
+          draggable={false}
         />
         <Image
           src={MAIN_ASSETS.virtualSoonBg}
@@ -109,6 +110,7 @@ export function VirtualRunPage() {
           className="virtual-soon-bg__img is-mid"
           sizes="70vw"
           priority
+          draggable={false}
         />
         <Image
           src={MAIN_ASSETS.virtualSoonBg}
@@ -117,11 +119,18 @@ export function VirtualRunPage() {
           className="virtual-soon-bg__img is-right"
           sizes="70vw"
           priority
+          draggable={false}
         />
       </div>
 
       <header className="virtual-header">
-        <Link href="/" className="virtual-header__brand" aria-label="MARVEL RUN 홈">
+        <Link
+          href="/"
+          className="virtual-header__brand"
+          aria-label="MARVEL RUN 홈"
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        >
           <Image
             src={COMING_SOON_ASSETS.logo}
             alt="MARVEL RUN 2026 KOREA"
@@ -130,6 +139,7 @@ export function VirtualRunPage() {
             className="virtual-header__logo"
             sizes="(max-width: 720px) 40vw, 173px"
             priority
+            draggable={false}
           />
         </Link>
       </header>
@@ -152,6 +162,7 @@ export function VirtualRunPage() {
                 className="virtual-soon-hero__img"
                 sizes="(max-width: 720px) min(92vw, 420px), 520px"
                 priority
+                draggable={false}
               />
             </div>
             <div className="virtual-card__body">
@@ -177,6 +188,7 @@ export function VirtualRunPage() {
                           : "virtual-hosts__logo"
                       }
                       sizes="160px"
+                      draggable={false}
                     />
                   ))}
                 </div>

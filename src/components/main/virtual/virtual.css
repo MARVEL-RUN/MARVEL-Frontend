@@ -42,12 +42,15 @@
   display: block;
   width: fit-content;
   margin-inline: auto;
+  -webkit-user-drag: none;
 }
 
 .virtual-header__logo {
   display: block;
   width: min(10.8rem, 40vw);
   height: auto;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .virtual-stage {
@@ -217,6 +220,9 @@
   object-fit: cover;
   object-position: center top;
   opacity: 0.7;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .virtual.is-soon .virtual-soon-bg__img.is-left {
@@ -331,12 +337,16 @@
   position: relative;
   width: min(520px, 92vw);
   filter: drop-shadow(0 0 28px color-mix(in srgb, var(--virtual-accent) 42%, transparent));
+  -webkit-user-drag: none;
 }
 
 .virtual.is-soon .virtual-soon-hero__img {
   display: block;
   width: 100%;
   height: auto;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .virtual.is-soon .virtual-card__body {
