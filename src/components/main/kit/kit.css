@@ -22,6 +22,14 @@
   margin-top: 1.6rem;
 }
 
+.kit-page__sponsor-more {
+  margin: 1.1rem 0 0;
+  color: var(--note);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
 .kit-gallery__pane {
   display: flex;
   flex-direction: column;

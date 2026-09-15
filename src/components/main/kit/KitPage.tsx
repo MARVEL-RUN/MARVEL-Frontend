@@ -19,6 +19,7 @@ export function KitPage() {
         <Link href={REGISTER_HREF} className="btn btn--red">
           {registerUiOpen ? "참가신청" : "접수 안내"}
         </Link>
+        <p className="kit-page__sponsor-more">{EVENT.sponsorMore}</p>
       </div>
     </main>
   );

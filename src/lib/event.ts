@@ -244,5 +244,6 @@ export const EVENT = {
     { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
   ],
+  sponsorMore: "and many more...",
   copyright: "©2026 MARVEL",
 } as const;
