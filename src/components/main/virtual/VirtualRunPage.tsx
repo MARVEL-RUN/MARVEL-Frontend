@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import "./virtual.css";
 
+/* 차수 확정 전 — 1·2·3차 구분 없이 COMING SOON
 const ROUNDS = [
   {
     id: "1",
@@ -57,8 +58,12 @@ const ROUNDS = [
     ],
   },
 ] as const;
+*/
 
-type RoundId = (typeof ROUNDS)[number]["id"];
+const SOON = {
+  accent: "#3dff7a",
+  panel: "#020805",
+} as const;
 
 const HOSTS = [
   {
@@ -78,19 +83,43 @@ const HOSTS = [
 ] as const;
 
 export function VirtualRunPage() {
-  const [roundId, setRound] = useState<RoundId>("1");
-  const round = ROUNDS.find((item) => item.id === roundId) ?? ROUNDS[0];
-
   return (
     <div
-      className="virtual"
+      className="virtual is-soon"
       style={
         {
-          "--virtual-accent": round.accent,
-          "--virtual-panel": round.panel,
+          "--virtual-accent": SOON.accent,
+          "--virtual-panel": SOON.panel,
         } as CSSProperties
       }
     >
+      <div className="virtual-soon-bg" aria-hidden>
+        <Image
+          src={MAIN_ASSETS.virtualSoonBg}
+          alt=""
+          fill
+          className="virtual-soon-bg__img is-left"
+          sizes="70vw"
+          priority
+        />
+        <Image
+          src={MAIN_ASSETS.virtualSoonBg}
+          alt=""
+          fill
+          className="virtual-soon-bg__img is-mid"
+          sizes="70vw"
+          priority
+        />
+        <Image
+          src={MAIN_ASSETS.virtualSoonBg}
+          alt=""
+          fill
+          className="virtual-soon-bg__img is-right"
+          sizes="70vw"
+          priority
+        />
+      </div>
+
       <header className="virtual-header">
         <Link href="/" className="virtual-header__brand" aria-label="MARVEL RUN 홈">
           <Image
@@ -109,61 +138,29 @@ export function VirtualRunPage() {
         <section className="virtual-hero">
           <h1 className="virtual-hero__title">버추얼런 안내</h1>
           <p className="virtual-hero__lead">러닝이 가능한 전국 원하는 곳 어디든</p>
-          <div className="virtual-hero__rounds" role="tablist" aria-label="차수">
-            {ROUNDS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={roundId === item.id}
-                className={roundId === item.id ? "virtual-round is-on" : "virtual-round"}
-                onClick={() => setRound(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-          <p className="virtual-hero__slogan">{round.slogan}</p>
-          <p className="virtual-hero__line">{round.line}</p>
+          <p className="virtual-hero__soon">COMING SOON</p>
         </section>
 
-        <section className="virtual-sheet" aria-labelledby="virtual-round-title">
+        <section className="virtual-sheet" aria-labelledby="virtual-soon-title">
           <article className="virtual-card">
-            <div className="virtual-card__visual">
-              {ROUNDS.map((item) => (
-                <Image
-                  key={item.id}
-                  src={item.image}
-                  alt={item.alt}
-                  width={582}
-                  height={328}
-                  className={
-                    roundId === item.id
-                      ? "virtual-card__img is-on"
-                      : "virtual-card__img"
-                  }
-                  sizes="(max-width: 860px) calc(100vw - 2rem), 640px"
-                  priority={item.id === "1"}
-                />
-              ))}
+            <div className="virtual-soon-hero">
+              <Image
+                src={MAIN_ASSETS.virtualSoonHero}
+                alt="마블 히어로들과 어벤져스 엠블럼"
+                width={353}
+                height={377}
+                className="virtual-soon-hero__img"
+                sizes="(max-width: 720px) min(92vw, 420px), 520px"
+                priority
+              />
             </div>
             <div className="virtual-card__body">
-              <h2 id="virtual-round-title" className="virtual-card__title">
-                {round.label} 버추얼런
+              <h2 id="virtual-soon-title" className="virtual-card__title">
+                버추얼런
               </h2>
-              <dl className="virtual-info">
-                {round.rows.map((row) => (
-                  <div key={row.label} className="virtual-info__row">
-                    <dt>{row.label}</dt>
-                    <dd>
-                      <span className="virtual-info__date">{row.date}</span>
-                      {"time" in row && row.time ? (
-                        <span className="virtual-info__time">{row.time}</span>
-                      ) : null}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <p className="virtual-soon__copy">
+                일정과 신청 안내는 추후 공개됩니다.
+              </p>
               <div className="virtual-hosts">
                 <p className="virtual-hosts__label">주최 및 주관</p>
                 <div className="virtual-hosts__logos">
@@ -191,3 +188,9 @@ export function VirtualRunPage() {
     </div>
   );
 }
+
+/* 정식 오픈 시 — 1·2·3차 탭 + 일정
+export function VirtualRunPageLive() {
+  ...
+}
+*/
