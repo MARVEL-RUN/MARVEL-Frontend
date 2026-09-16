@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
 import { LOOKUP_HREF, NAV_ITEMS } from "@/lib/mode";
@@ -25,31 +25,6 @@ function itemOn(pathname: string, item: (typeof NAV_ITEMS)[number]) {
   if (pathname.startsWith(item.href)) return true;
   if (!("children" in item)) return false;
   return item.children.some((child) => childOn(pathname, "", child.href, item.href));
-}
-
-const PHONE_NAV = "(max-width: 960px)";
-const NAV_PAD = 16;
-
-function navPacked(
-  bar: HTMLElement,
-  brand: HTMLElement,
-  nav: HTMLElement,
-  actions: HTMLElement,
-) {
-  if (window.matchMedia(PHONE_NAV).matches) return false;
-  const barW = bar.clientWidth;
-  const navW = nav.offsetWidth;
-  if (!barW || !navW) return false;
-  const lockImg = actions.querySelector(".locked-cta__img");
-  let extra = 0;
-  if (lockImg instanceof HTMLElement) {
-    const lock = lockImg.parentElement;
-    extra = Math.max(0, (lockImg.offsetWidth - (lock?.offsetWidth ?? 0)) / 2);
-  }
-  const navLeft = (barW - navW) / 2;
-  const navRight = navLeft + navW;
-  const actionsLeft = barW - actions.offsetWidth - extra;
-  return navLeft < brand.offsetWidth + NAV_PAD || navRight > actionsLeft - NAV_PAD;
 }
 
 function SponsorInquiry({ className }: { className?: string }) {
@@ -80,13 +55,8 @@ export function Header() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [closedDrop, setClosedDrop] = useState<string | null>(null);
-  const [packed, setPacked] = useState(false);
   const [hash, setHash] = useState("");
   const home = pathname === "/";
-  const barRef = useRef<HTMLDivElement>(null);
-  const brandRef = useRef<HTMLAnchorElement>(null);
-  const navRef = useRef<HTMLElement>(null);
-  const actionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -128,42 +98,14 @@ export function Header() {
     };
   }, [open]);
 
-  useLayoutEffect(() => {
-    const bar = barRef.current;
-    const brand = brandRef.current;
-    const nav = navRef.current;
-    const actions = actionsRef.current;
-    if (!bar || !brand || !nav || !actions) return;
-
-    function measure() {
-      setPacked(navPacked(bar, brand, nav, actions));
-    }
-
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(bar);
-    ro.observe(brand);
-    ro.observe(nav);
-    ro.observe(actions);
-    window.addEventListener("resize", measure);
-    window.visualViewport?.addEventListener("resize", measure);
-    let gone = false;
-    document.fonts?.ready.then(() => {
-      if (!gone) measure();
-    });
-    return () => {
-      gone = true;
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-      window.visualViewport?.removeEventListener("resize", measure);
-    };
-  }, []);
-
   useEffect(() => {
-    if (packed) return;
-    if (window.matchMedia(PHONE_NAV).matches) return;
-    setOpen(false);
-  }, [packed]);
+    const mq = window.matchMedia("(max-width: 1200px)");
+    const onChange = () => {
+      if (!mq.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   function closeDrop(href: string) {
     setClosedDrop(href);
@@ -196,13 +138,11 @@ export function Header() {
         "site-header",
         home ? "site-header--home" : "",
         scrolled || open ? "is-solid" : "",
-        packed ? "is-packed" : "",
       ].join(" ")}
     >
-      <div className="site-header__bar" ref={barRef}>
+      <div className="site-header__bar">
         <Link
           href="/"
-          ref={brandRef}
           className="site-header__brand"
           aria-label="MARVEL RUN 홈"
           draggable={false}
@@ -219,13 +159,7 @@ export function Header() {
           />
         </Link>
 
-        <nav
-          className="site-header__nav"
-          aria-label="주요 메뉴"
-          aria-hidden={packed || undefined}
-          inert={packed || undefined}
-          ref={navRef}
-        >
+        <nav className="site-header__nav" aria-label="주요 메뉴">
           {NAV_ITEMS.map((item) => {
             const active = itemOn(pathname, item);
             const kids = "children" in item ? item.children : undefined;
@@ -280,7 +214,7 @@ export function Header() {
         </nav>
 
         <div className="site-header__tools">
-          <div className="site-header__actions" ref={actionsRef}>
+          <div className="site-header__actions">
             <RegisterCta className="btn btn--red site-header__cta" compact />
             <Link
               href={LOOKUP_HREF}
