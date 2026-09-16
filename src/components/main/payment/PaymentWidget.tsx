@@ -5,7 +5,6 @@ import type { TossPaymentsWidgets } from "@tosspayments/tosspayments-sdk";
 import { formatFee } from "@/lib/register";
 import { createPaymentWidgets } from "@/lib/payment/toss";
 import type { PaymentOrder } from "@/lib/payment/session";
-import { DockNav } from "@/components/main/DockNav";
 
 type Props = {
   registration: PaymentOrder;
@@ -100,20 +99,25 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
 
   return (
     <section className="block payment-panel">
-      <h2>결제하기</h2>
-      <p className="sec__body">
-        {registration.orderName}
-        <br />
-        결제금액 <strong>{formatFee(registration.paymentAmount)}</strong>
-      </p>
-      <p className="form__note">주문번호 {registration.orderId}</p>
+      <div className="payment-panel__main">
+        <h2>결제하기</h2>
+        <p className="sec__body">
+          {registration.orderName}
+          <br />
+          결제금액 <strong>{formatFee(registration.paymentAmount)}</strong>
+        </p>
+        <p className="form__note">주문번호 {registration.orderId}</p>
 
-      {bootError ? <p className="form__err">{bootError}</p> : null}
+        {bootError ? <p className="form__err">{bootError}</p> : null}
 
-      <div id={methodId} className="payment-panel__widget payment-panel__widget--method" />
-      <div id={agreeId} className="payment-panel__widget" />
+        <div
+          id={methodId}
+          className="payment-panel__widget payment-panel__widget--method"
+        />
+        <div id={agreeId} className="payment-panel__widget" />
+      </div>
 
-      <DockNav>
+      <div className="flow__nav">
         <button
           type="button"
           className="btn btn--red"
@@ -122,7 +126,7 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
         >
           {busy ? "결제창 여는 중..." : ready ? "결제하기" : "결제수단 준비 중..."}
         </button>
-      </DockNav>
+      </div>
     </section>
   );
 }

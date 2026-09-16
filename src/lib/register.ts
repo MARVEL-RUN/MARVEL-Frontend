@@ -2,7 +2,16 @@ import { EVENT } from "./event";
 import type { ConsentId } from "./legal";
 
 export type CourseId = (typeof EVENT.courses)[number]["id"];
-export type ShirtSize = "XS" | "S" | "M" | "L" | "XL" | "2XL";
+export type ShirtSize =
+  | "S"
+  | "M"
+  | "L"
+  | "XL"
+  | "2XL"
+  | "3XL"
+  | "4XL"
+  | "130"
+  | "150";
 export type Gender = "male" | "female" | "none";
 export type ApplyKind = "individual" | "group";
 export type TicketKind = "adult" | "child";
@@ -122,7 +131,24 @@ export type GroupLookupQuery = {
 
 export const MAX_GROUP_SIZE = 20;
 
-export const SHIRT_SIZES: ShirtSize[] = ["XS", "S", "M", "L", "XL", "2XL"];
+export const ADULT_SHIRT_SIZES: ShirtSize[] = [
+  "S",
+  "M",
+  "L",
+  "XL",
+  "2XL",
+  "3XL",
+  "4XL",
+];
+export const CHILD_SHIRT_SIZES: ShirtSize[] = ["130", "150"];
+export const SHIRT_SIZES: ShirtSize[] = [
+  ...CHILD_SHIRT_SIZES,
+  ...ADULT_SHIRT_SIZES,
+];
+
+export function shirtSizesForTicket(ticket: TicketKind): ShirtSize[] {
+  return ticket === "child" ? [...CHILD_SHIRT_SIZES] : [...ADULT_SHIRT_SIZES];
+}
 
 export const GENDERS: { id: Exclude<Gender, "none">; label: string }[] = [
   { id: "male", label: "남성" },
@@ -214,11 +240,12 @@ export function ymdKo(ymd: string) {
 
 /* 만 N세 미만 = 대회일-N년 다음날 이후 출생(당일 포함) */
 export const CHILD_BIRTH_FROM = nextYmd(shiftYmd(EVENT.raceYmd, -13));
-export const CHILD_BIRTH_UNTIL = shiftYmd(EVENT.raceYmd, -6);
 export const GUARDIAN_BIRTH_FROM = nextYmd(shiftYmd(EVENT.raceYmd, -14));
 
-export const CHILD_AGE_NOTE = `어린이 나이: 만 6세 ~ 만 12세 (${ymdKo(CHILD_BIRTH_FROM)} 이후 출생자)`;
-export const GUARDIAN_AGE_NOTE = `법정대리인 동의: 만 14세 미만 (${ymdKo(GUARDIAN_BIRTH_FROM)} 이후 출생자)`;
+export const CHILD_AGE_NOTE = `어린이 나이: 만 0세 ~ 만 12세 (${ymdKo(CHILD_BIRTH_FROM)} 이후 출생자)`;
+export const CHILD_ACCOMPANY_NOTE =
+  "만 12세 이하는 보호자 동행이 필요합니다.";
+export const GUARDIAN_AGE_NOTE = `만 14세 미만 (${ymdKo(GUARDIAN_BIRTH_FROM)} 이후 출생자)`;
 export const TIMING_CHIP_NOTE =
   "배번호 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.";
 
@@ -227,7 +254,6 @@ export type AgeBand = "tooYoung" | "child" | "teen" | "adult";
 export function ageBand(birth: string): AgeBand | null {
   if (!/^\d{8}$/.test(birth)) return null;
   if (birth > EVENT.raceYmd) return "tooYoung";
-  if (birth > CHILD_BIRTH_UNTIL) return "tooYoung";
   if (birth >= CHILD_BIRTH_FROM) return "child";
   if (birth >= GUARDIAN_BIRTH_FROM) return "teen";
   return "adult";
@@ -275,8 +301,8 @@ export function applyCourseForBirth(
 
 export function courseClosedReason(birth: string) {
   const band = ageBand(birth);
-  if (band === "tooYoung") return "만 6세 미만은 참가할 수 없습니다.";
-  if (band === "child") return "어린이 참가 불가";
+  if (band === "tooYoung") return "대회일 이후 출생자는 참가할 수 없습니다.";
+  if (band === "child") return "만 12세 이하 참가 불가";
   return "";
 }
 
@@ -425,10 +451,10 @@ function assertAgeTicket(
 ) {
   const band = ageBand(birth);
   if (band === "tooYoung") {
-    throw new Error(`${prefix}만 6세 미만은 참가할 수 없습니다.`);
+    throw new Error(`${prefix}대회일 이후 출생자는 참가할 수 없습니다.`);
   }
   if (!courseOpenForBirth(course, birth)) {
-    throw new Error(`${prefix}이 코스는 어린이 참가가 불가합니다.`);
+    throw new Error(`${prefix}이 코스는 만 12세 이하 참가가 불가합니다.`);
   }
   const expected = courseAllowsChild(course) ? ticketForBirth(birth) : "adult";
   if (ticket !== expected) {
@@ -489,7 +515,7 @@ function assertParticipant(
     throw new Error(`${prefix}생년월일을 입력하세요.`);
   }
   if (ageBand(p.birth) === "tooYoung") {
-    throw new Error(`${prefix}만 6세 미만은 참가할 수 없습니다.`);
+    throw new Error(`${prefix}대회일 이후 출생자는 참가할 수 없습니다.`);
   }
   if (!p.gender) throw new Error(`${prefix}성별을 선택하세요.`);
   if (!p.phone.trim()) throw new Error(`${prefix}연락처를 입력하세요.`);

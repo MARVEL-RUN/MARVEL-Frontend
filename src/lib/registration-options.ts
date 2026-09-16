@@ -7,10 +7,12 @@ import {
   ageBand,
   courseAllowsChild,
   feeAmount,
+  shirtSizesForTicket,
   ticketFee,
   ticketForBirth,
   type CourseId,
   type GroupDraft,
+  type TicketKind,
 } from "./register";
 
 export function sortedCategories(categories: RegistrationCategory[]) {
@@ -44,10 +46,12 @@ export function shirtSouvenir(category: RegistrationCategory | undefined) {
 export function shirtAssignment(
   category: RegistrationCategory | undefined,
   selectedSize = "",
+  birth = "",
 ) {
   const souvenir = shirtSouvenir(category);
   if (!souvenir) return { souvenirId: "", selectedSize: "" };
-  const sizes = souvenirSizes(souvenir);
+  const ticket = birth ? ticketForBirth(birth) : "adult";
+  const sizes = souvenirSizes(souvenir, ticket);
   const keep = sizes.includes(selectedSize) ? selectedSize : "";
   return {
     souvenirId: souvenir.souvenirId,
@@ -61,9 +65,15 @@ export function categoryLabel(category: RegistrationCategory) {
   return unique.join(" / ") || category.categoryId;
 }
 
-export function souvenirSizes(souvenir: RegistrationSouvenir | undefined) {
+export function souvenirSizes(
+  souvenir: RegistrationSouvenir | undefined,
+  ticket: TicketKind = "adult",
+): string[] {
+  const allowed = shirtSizesForTicket(ticket);
   const sizes = souvenir?.sizes ?? [];
-  return sizes.length ? sizes : ["FREE"];
+  if (!sizes.length) return allowed;
+  const hit = allowed.filter((size) => sizes.includes(size));
+  return hit.length ? hit : allowed;
 }
 
 function compactDistance(value: string) {
@@ -115,8 +125,8 @@ export function categoryClosedReason(
   birth: string,
 ) {
   const band = ageBand(birth);
-  if (band === "tooYoung") return "만 6세 미만";
-  if (band === "child") return "어린이 참가 불가";
+  if (band === "tooYoung") return "대회일 이후 출생";
+  if (band === "child") return "만 12세 이하 참가 불가";
   if (band && /어린이/.test(categoryText(category))) return "성인 참가 불가";
   return "";
 }

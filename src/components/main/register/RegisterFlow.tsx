@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
+  CHILD_ACCOMPANY_NOTE,
   GUARDIAN_AGE_NOTE,
   TIMING_CHIP_NOTE,
   applyCourseForBirth,
@@ -157,7 +158,7 @@ function IndividualFlow({
         return { ...prev, souvenirId: "", selectedSize: "" };
       }
       const category = categoryForCourse(categories, prev.courseId, prev.birth);
-      const next = shirtAssignment(category, prev.selectedSize);
+      const next = shirtAssignment(category, prev.selectedSize, prev.birth);
       if (
         next.souvenirId === prev.souvenirId &&
         next.selectedSize === prev.selectedSize
@@ -197,7 +198,7 @@ function IndividualFlow({
     if (!draft.name.trim()) return fail("이름을 입력하세요.");
     if (!/^\d{8}$/.test(draft.birth)) return fail("생년월일을 선택하세요.");
     if (ageBand(draft.birth) === "tooYoung") {
-      return fail("만 6세 미만은 참가할 수 없습니다.");
+      return fail("대회일 이후 출생자는 참가할 수 없습니다.");
     }
     if (draft.gender !== "male" && draft.gender !== "female") {
       return fail("성별을 선택하세요.");
@@ -279,7 +280,7 @@ function IndividualFlow({
     ? categoryForCourse(categories, draft.courseId, draft.birth)
     : undefined;
   const souvenir = findSouvenir(selectedCategory, draft.souvenirId);
-  const sizes = souvenirSizes(souvenir);
+  const sizes = souvenirSizes(souvenir, draft.ticket);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
 
   return (
@@ -323,7 +324,7 @@ function IndividualFlow({
                   patch({
                     birth,
                     ...next,
-                    ...shirtAssignment(category, draft.selectedSize),
+                    ...shirtAssignment(category, draft.selectedSize, birth),
                   });
                 }}
               />
@@ -385,6 +386,11 @@ function IndividualFlow({
                 onChange={(emergency) => patch({ emergency })}
                 required={needsGuardian(draft.birth)}
               />
+              {needsGuardian(draft.birth) ? (
+                <p className="form-row__hint">
+                  만 14세 미만은 보호자 연락처를 입력해야 신청할 수 있습니다.
+                </p>
+              ) : null}
             </FormRow>
           </FormSec>
 
@@ -403,10 +409,14 @@ function IndividualFlow({
                     ...shirtAssignment(
                       categoryForCourse(categories, courseId, draft.birth),
                       draft.selectedSize,
+                      draft.birth,
                     ),
                   })
                 }
               />
+              {ageBand(draft.birth) === "child" ? (
+                <p className="form-row__hint">{CHILD_ACCOMPANY_NOTE}</p>
+              ) : null}
             </FormRow>
             {optionsError ? (
               <p className="form__err">{optionsError}</p>

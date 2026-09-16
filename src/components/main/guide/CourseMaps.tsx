@@ -45,7 +45,7 @@ export function CourseMaps() {
             </div>
             <div>
               <dt>어린이</dt>
-              <dd>{"childFee" in course ? course.childFee : "어린이 참가 불가"}</dd>
+              <dd>{"childFee" in course ? course.childFee : "만 12세 이하 참가 불가"}</dd>
             </div>
           </dl>
         </div>

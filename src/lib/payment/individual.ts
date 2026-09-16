@@ -27,7 +27,7 @@ export function toRegistrationCreateRequest(
   const souvenir = shirtSouvenir(category);
   const size = draft.selectedSize.trim();
   if (!souvenir) throw new Error("티셔츠 옵션을 불러오지 못했습니다.");
-  if (!size || !souvenirSizes(souvenir).includes(size)) {
+  if (!size || !souvenirSizes(souvenir, draft.ticket).includes(size)) {
     throw new Error("티셔츠 사이즈를 선택하세요.");
   }
 
