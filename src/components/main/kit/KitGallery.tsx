@@ -212,20 +212,20 @@ export function KitBibPane() {
     <section className="kit-gallery__pane kit-gallery__pane--bib">
       <header className="kit-gallery__head">
         <p className="kit-gallery__index">03 / BIB</p>
-        <h3>배번표</h3>
+        <h3>배번호</h3>
       </header>
       <figure className="kit-gallery__bib">
         <span className="kit-gallery__frame kit-gallery__frame--bib">
           <Image
             src={MAIN_ASSETS.kitBib}
-            alt="배번표"
+            alt="배번호"
             fill
             sizes="(max-width: 720px) 100vw, 640px"
           />
         </span>
       </figure>
       <p className="kit-gallery__note">
-        ※ 배번표 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.
+        ※ 배번호 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.
       </p>
     </section>
   );
@@ -236,7 +236,7 @@ export function KitScarfPane() {
     <section className="kit-gallery__pane">
       <header className="kit-gallery__head">
         <p className="kit-gallery__index">04 / SCARF</p>
-        <h3>스카프</h3>
+        <h3>응원스카프</h3>
       </header>
       <ul className="kit-gallery__scarves">
         <li>
@@ -244,7 +244,7 @@ export function KitScarfPane() {
             <span className="kit-gallery__frame kit-gallery__frame--scarf-front">
               <Image
                 src={MAIN_ASSETS.kitScarfFront}
-                alt="스카프 앞면"
+                alt="응원스카프 앞면"
                 fill
                 sizes="(max-width: 720px) 100vw, 1100px"
               />
@@ -257,7 +257,7 @@ export function KitScarfPane() {
             <span className="kit-gallery__frame kit-gallery__frame--scarf-back">
               <Image
                 src={MAIN_ASSETS.kitScarfBack}
-                alt="스카프 뒷면"
+                alt="응원스카프 뒷면"
                 fill
                 sizes="(max-width: 720px) 100vw, 1100px"
               />
