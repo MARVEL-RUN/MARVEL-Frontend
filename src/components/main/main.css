@@ -109,16 +109,14 @@ html.is-intro {
 
 .btn--locked {
   gap: 0.4rem;
-  opacity: 0.48;
-  cursor: default;
-  pointer-events: none;
+  opacity: 0.55;
+  cursor: pointer;
 }
 
-.btn--locked:hover,
-.btn--locked:disabled {
+.btn--locked:hover {
   transform: none;
   filter: none;
-  opacity: 0.48;
+  opacity: 0.72;
   color: #fff;
 }
 
@@ -147,6 +145,10 @@ html.is-intro {
 
 .locked-cta {
   display: inline-flex;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
   vertical-align: middle;
   line-height: 0;
   overflow: visible;
@@ -678,6 +680,207 @@ button.course {
   padding: 1.2rem;
   overflow: hidden;
   box-sizing: border-box;
+}
+
+/* 접수 전 참가신청 모달 */
+.register-standby {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  width: calc(100dvw / var(--site-zoom, 1));
+  height: calc(100dvh / var(--site-zoom, 1));
+  max-width: calc(100dvw / var(--site-zoom, 1));
+  max-height: calc(100dvh / var(--site-zoom, 1));
+  padding: 1.25rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.register-standby__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(4, 8, 20, 0.72);
+  cursor: pointer;
+}
+
+.register-standby__panel {
+  position: relative;
+  z-index: 1;
+  width: min(28rem, 100%);
+  max-height: 100%;
+  padding: 1.25rem 1.35rem 1.15rem;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.05) 0.7px, transparent 1px) 0 0 / 5px 5px,
+    linear-gradient(165deg, #1a2238 0%, #0d1324 58%, #12101c 100%);
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  box-shadow: 6px 6px 0 rgba(237, 29, 36, 0.55);
+}
+
+.register-standby__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.register-standby__head .kicker {
+  margin: 0;
+}
+
+.register-standby__panel h2 {
+  margin: 0.7rem 0 0.85rem;
+  font-size: 1.22rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+.register-standby__x {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.15rem -0.2rem 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.register-standby__x:hover {
+  color: #fff;
+}
+
+.register-standby__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55em;
+  margin: 0 0 1.05rem;
+  padding: 0.42rem 0.95rem 0.4rem 1rem;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.register-standby__chip i {
+  align-self: center;
+  width: 2px;
+  height: 0.7em;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+.register-standby__count {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.22rem;
+  margin: 0 0 1.05rem;
+}
+
+.register-standby__tick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.62rem 0.12rem 0.48rem;
+  background: rgba(5, 8, 20, 0.72);
+  text-align: center;
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+
+.register-standby__colon {
+  flex: none;
+  align-self: center;
+  padding-bottom: 0.72rem;
+  color: var(--marvel);
+  font-size: 1.15rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  animation: standbyColon 1s steps(1) infinite;
+}
+
+.register-standby__digit {
+  display: block;
+  overflow: hidden;
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  animation: standbyTick 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.register-standby__tick em {
+  display: block;
+  margin-top: 0.38em;
+  color: var(--gold);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.register-standby__when {
+  margin: 0 0 0.4rem;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+
+.register-standby__desc {
+  margin: 0 0 1rem;
+  color: var(--silver);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.register-standby__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.register-standby__actions .btn {
+  min-width: 5.5rem;
+  min-height: 2.4rem;
+  padding: 0 1.1rem;
+  font-size: 0.84rem;
+}
+
+@keyframes standbyColon {
+  50% {
+    opacity: 0.22;
+  }
+}
+
+@keyframes standbyTick {
+  from {
+    transform: translateY(28%);
+    opacity: 0.35;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-standby__colon,
+  .register-standby__digit {
+    animation: none;
+  }
 }
 
 /* 문의사항 비밀글 모달 */

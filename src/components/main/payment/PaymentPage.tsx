@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { readPendingPayment, type PendingPayment } from "@/lib/payment/session";
-import { registerUiOpen } from "@/lib/mode";
+import { registrationOpen } from "@/lib/mode";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { SideBanner } from "../layout/SideBanner";
 import { RegisterClosed } from "../register/RegisterClosed";
@@ -23,7 +23,7 @@ export function PaymentPage() {
     <main className="page">
       <SideBanner kicker="PAY" title="결제" en="CHECKOUT" />
       <div className="page__body wrap">
-        {!registerUiOpen ? (
+        {!registrationOpen ? (
           <RegisterClosed body="접수가 아직 열리지 않아 결제할 신청이 없습니다." />
         ) : (
         <div className="flow">
