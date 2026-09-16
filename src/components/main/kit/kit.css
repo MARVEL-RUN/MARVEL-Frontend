@@ -30,17 +30,32 @@
   text-align: center;
 }
 
+.kit-page__sponsor-more-notices {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.85rem;
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
 .kit-page__sponsor-more-label {
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.85rem, 4.2vw, 2.55rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .kit-page__sponsor-more-note {
-  color: rgba(164, 165, 180, 0.78);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  margin: 0;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   line-height: 1.45;
   word-break: keep-all;
 }
