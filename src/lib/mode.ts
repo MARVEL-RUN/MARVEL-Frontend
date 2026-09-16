@@ -21,6 +21,7 @@ export const KIT_HREF = "/kit";
 export const BOARD_SECTIONS = [
   { href: "/faq", label: "FAQ" },
   { href: "/notices", label: "공지사항" },
+  { href: "/inquiry", label: "문의사항" },
 ] as const;
 
 export const BOARD_HREF = "/notices";
@@ -30,7 +31,6 @@ export const NAV_ITEMS = [
   { href: KIT_HREF, label: "기념품" },
   { href: "/directions", label: "오시는길" },
   { href: BOARD_HREF, label: "게시판", children: BOARD_SECTIONS },
-  { href: "/inquiry", label: "문의사항" },
   { href: "/virtual", label: "버추얼런" },
 ] as const;
 
