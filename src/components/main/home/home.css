@@ -1092,79 +1092,6 @@ html.is-live .hero__actions {
   bottom: -10%;
 }
 
-.assemble__ghost {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  color: rgba(0, 0, 0, 0.16);
-  font-size: clamp(4rem, 18vw, 12rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  transform: translate(-50%, -50%) skewX(-12deg);
-  white-space: nowrap;
-  pointer-events: none;
-  animation: assemblePulse 5.2s ease-in-out infinite;
-}
-
-.assemble__inner {
-  position: relative;
-}
-
-.assemble h2 {
-  margin: 0.4rem 0 1.15rem;
-  font-size: clamp(1.6rem, 4vw, 2.6rem);
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.assemble__count {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 0.28rem;
-  width: min(26rem, 100%);
-  margin: 0 auto 1.8rem;
-}
-
-.assemble__tick {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 0.72rem 0.2rem 0.55rem;
-  background: var(--navy);
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-}
-
-.assemble__count i {
-  flex: none;
-  align-self: center;
-  padding-bottom: 0.85rem;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: clamp(1.1rem, 3.2vw, 1.55rem);
-  font-style: normal;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.assemble__count strong {
-  display: block;
-  font-size: clamp(1.45rem, 4.6vw, 2.25rem);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
-.assemble__count em {
-  display: block;
-  margin-top: 0.4em;
-  color: var(--gold);
-  font-size: 0.58rem;
-  font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
 .board-sec {
   background:
     radial-gradient(rgba(255, 255, 255, 0.05) 0.8px, transparent 1px) 0 0 / 6px 6px,
@@ -1673,53 +1600,6 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
     height: 96%;
     right: -6%;
     bottom: -10%;
-  }
-
-  .assemble {
-    padding: 3.4rem var(--gutter) 3.6rem;
-  }
-
-  .assemble__ghost {
-    font-size: clamp(3.4rem, 24vw, 6rem);
-  }
-
-  .assemble h2 {
-    margin: 0.35rem 0 1rem;
-    font-size: clamp(1.35rem, 6vw, 1.75rem);
-    word-break: keep-all;
-  }
-
-  .assemble__count {
-    width: 100%;
-    gap: 0.22rem;
-    margin: 0 auto 1.35rem;
-  }
-
-  .assemble__tick {
-    padding: 0.7rem 0.08rem 0.5rem;
-  }
-
-  .assemble__count i {
-    font-size: 1.05rem;
-    padding-bottom: 0.7rem;
-  }
-
-  .assemble__count strong {
-    font-size: clamp(1.25rem, 6.2vw, 1.55rem);
-  }
-
-  .assemble__count em {
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
-  }
-
-  .assemble__inner .btn {
-    width: min(20rem, 100%);
-  }
-
-  .assemble__inner .locked-cta {
-    width: auto;
-    max-width: 12rem;
   }
 
   .board-switch {
