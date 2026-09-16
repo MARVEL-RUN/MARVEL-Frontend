@@ -1,7 +1,13 @@
 import { Fragment } from "react";
-import type { StandbySlots } from "./standby";
 
-export function RegisterStandbyCount({ slots }: { slots: StandbySlots }) {
+type Slots = {
+  d: string;
+  h: string;
+  m: string;
+  s: string;
+};
+
+export function RegisterStandbyCount({ slots }: { slots: Slots }) {
   const units = [
     [slots.d, "DAY"],
     [slots.h, "HR"],

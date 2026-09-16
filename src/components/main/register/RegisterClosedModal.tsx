@@ -1,23 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
+import { EVENT } from "@/lib/event";
 import { openLeftNow, useOpenLeft } from "../home/OpenCountdown";
-import { RegisterClosedModalV1 } from "./RegisterClosedModalV1";
-import { RegisterClosedModalV2 } from "./RegisterClosedModalV2";
+import { RegisterStandbyCount } from "./RegisterStandbyCount";
 
 type Props = {
   open: boolean;
   onClose: () => void;
 };
 
-type Version = 1 | 2;
-
-const STORAGE_KEY = "register-standby-version";
-
 export function RegisterClosedModal({ open, onClose }: Props) {
+  const titleId = useId();
   const [mounted, setMounted] = useState(false);
-  const [version, setVersion] = useState<Version>(2);
   const { left } = useOpenLeft(open);
   const live = left ?? (open ? openLeftNow() : null);
   const slots = live ?? { d: "00", h: "00", m: "00", s: "00" };
@@ -29,8 +26,6 @@ export function RegisterClosedModal({ open, onClose }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    const saved = Number(window.localStorage.getItem(STORAGE_KEY));
-    if (saved === 1 || saved === 2) setVersion(saved);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (event: KeyboardEvent) => {
@@ -43,19 +38,7 @@ export function RegisterClosedModal({ open, onClose }: Props) {
     };
   }, [open, onClose]);
 
-  function pick(next: Version) {
-    setVersion(next);
-    window.localStorage.setItem(STORAGE_KEY, String(next));
-  }
-
   if (!open || !mounted) return null;
-
-  const panel =
-    version === 1 ? (
-      <RegisterClosedModalV1 dday={dday} slots={slots} onClose={onClose} />
-    ) : (
-      <RegisterClosedModalV2 dday={dday} slots={slots} onClose={onClose} />
-    );
 
   return createPortal(
     <div className="register-standby" role="presentation">
@@ -65,26 +48,39 @@ export function RegisterClosedModal({ open, onClose }: Props) {
         onClick={onClose}
         aria-label="닫기"
       />
-      <div className="register-standby__stack">
-        {panel}
-        <div className="register-standby__pick" role="tablist" aria-label="모달 버전">
+      <div
+        className="standby-v1"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+      >
+        <header className="standby-v1__head">
+          <p className="kicker">STANDBY</p>
           <button
             type="button"
-            role="tab"
-            aria-selected={version === 1}
-            className={version === 1 ? "is-on" : ""}
-            onClick={() => pick(1)}
+            className="standby-v1__x"
+            onClick={onClose}
+            aria-label="닫기"
           >
-            버전 1
+            <X size={20} strokeWidth={2.25} />
           </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={version === 2}
-            className={version === 2 ? "is-on" : ""}
-            onClick={() => pick(2)}
-          >
-            버전 2
+        </header>
+        <h2 id={titleId}>아직 접수 기간이 아닙니다</h2>
+        <p className="standby-v1__chip">
+          <span>접수 OPEN</span>
+          <i aria-hidden />
+          <span>{dday}</span>
+        </p>
+        <RegisterStandbyCount slots={slots} />
+        <p className="standby-v1__when">
+          {EVENT.openNoticeDate} · {EVENT.openNoticeTime}
+        </p>
+        <p className="standby-v1__desc">
+          오픈 시각에 개인 또는 단체 신청을 할 수 있습니다.
+        </p>
+        <div className="standby-v1__actions">
+          <button type="button" className="btn btn--red" onClick={onClose}>
+            확인
           </button>
         </div>
       </div>
