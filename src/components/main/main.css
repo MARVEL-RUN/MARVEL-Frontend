@@ -715,250 +715,6 @@ button.course {
   width: min(38rem, 100%);
 }
 
-.register-standby__panel {
-  position: relative;
-  width: 100%;
-  max-height: calc(100% - 3.4rem);
-  padding: 1.7rem 1.85rem 1.55rem;
-  overflow: hidden;
-  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
-}
-
-.register-standby__panel--v1 {
-  overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background:
-    radial-gradient(rgba(255, 255, 255, 0.05) 0.7px, transparent 1px) 0 0 / 5px 5px,
-    linear-gradient(165deg, #1a2238 0%, #0d1324 58%, #12101c 100%);
-  box-shadow: 8px 8px 0 rgba(237, 29, 36, 0.55);
-}
-
-.register-standby__panel--v2 {
-  background: var(--marvel);
-  text-align: center;
-  box-shadow: 8px 8px 0 var(--navy);
-}
-
-.register-standby__ghost {
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  color: rgba(0, 0, 0, 0.14);
-  font-size: clamp(3.4rem, 14vw, 5.6rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  transform: translate(-50%, -50%) skewX(-12deg);
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.register-standby__panel--v1 .register-standby__ghost,
-.register-standby__panel--v1 .register-standby__dday,
-.register-standby__panel--v2 .register-standby__chip {
-  display: none;
-}
-
-.register-standby__head {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  min-height: 2rem;
-}
-
-.register-standby__panel--v1 .register-standby__head {
-  justify-content: space-between;
-}
-
-.register-standby__panel--v2 .register-standby__head {
-  justify-content: center;
-}
-
-.register-standby__head .kicker {
-  margin: 0;
-}
-
-.register-standby__dday {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 0.92rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-
-.register-standby__panel h2 {
-  position: relative;
-  margin: 1rem 0 1.15rem;
-  font-size: 1.55rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.25;
-}
-
-.register-standby__panel--v1 h2 {
-  margin: 0.85rem 0 1.05rem;
-}
-
-.register-standby__x {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.register-standby__panel--v1 .register-standby__x {
-  color: var(--note);
-}
-
-.register-standby__panel--v2 .register-standby__x {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.35rem;
-  color: rgba(255, 255, 255, 0.78);
-}
-
-.register-standby__x:hover {
-  color: #fff;
-}
-
-.register-standby__chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.55em;
-  margin: 0 0 1.25rem;
-  padding: 0.52rem 1.15rem 0.5rem 1.2rem;
-  background: var(--gold);
-  color: var(--navy);
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-}
-
-.register-standby__chip i {
-  align-self: center;
-  width: 2px;
-  height: 0.7em;
-  background: currentColor;
-  opacity: 0.45;
-}
-
-.register-standby__count {
-  position: relative;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 0.28rem;
-  margin: 0 0 1.15rem;
-}
-
-.register-standby__tick {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 0.85rem 0.2rem 0.65rem;
-  background: var(--navy);
-  text-align: center;
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-}
-
-.register-standby__panel--v1 .register-standby__tick {
-  background: rgba(5, 8, 20, 0.72);
-}
-
-.register-standby__colon {
-  flex: none;
-  align-self: center;
-  padding-bottom: 0.9rem;
-  color: #fff;
-  font-size: 1.45rem;
-  font-style: normal;
-  font-weight: 800;
-  line-height: 1;
-  animation: standbyColon 1s steps(1) infinite;
-}
-
-.register-standby__panel--v1 .register-standby__colon {
-  color: var(--marvel);
-}
-
-.register-standby__digit {
-  display: block;
-  overflow: hidden;
-  font-size: 2rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  animation: standbyTick 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.register-standby__tick em {
-  display: block;
-  margin-top: 0.42em;
-  color: var(--gold);
-  font-size: 0.68rem;
-  font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.register-standby__when {
-  position: relative;
-  margin: 0 0 0.45rem;
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.4;
-}
-
-.register-standby__panel--v1 .register-standby__when {
-  font-size: 1.02rem;
-}
-
-.register-standby__desc {
-  position: relative;
-  margin: 0 0 1.25rem;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.register-standby__panel--v1 .register-standby__desc {
-  color: var(--silver);
-}
-
-.register-standby__actions {
-  position: relative;
-  display: flex;
-}
-
-.register-standby__panel--v1 .register-standby__actions {
-  justify-content: flex-end;
-}
-
-.register-standby__panel--v2 .register-standby__actions {
-  justify-content: center;
-}
-
-.register-standby__actions .btn {
-  min-width: 8.5rem;
-  min-height: 2.8rem;
-  padding: 0 1.4rem;
-  font-size: 0.9rem;
-}
-
-.register-standby__panel--v1 .register-standby__actions .btn {
-  min-width: 6.2rem;
-  min-height: 2.7rem;
-}
-
 .register-standby__pick {
   display: flex;
   gap: 0.3rem;
@@ -986,6 +742,274 @@ button.course {
   color: var(--navy);
 }
 
+.standby-count {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.28rem;
+  margin: 0 0 1.15rem;
+}
+
+.standby-count__tick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.85rem 0.2rem 0.65rem;
+  background: var(--navy);
+  text-align: center;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.standby-count__colon {
+  flex: none;
+  align-self: center;
+  padding-bottom: 0.9rem;
+  color: #fff;
+  font-size: 1.45rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  animation: standbyColon 1s steps(1) infinite;
+}
+
+.standby-count__digit {
+  display: block;
+  overflow: hidden;
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  animation: standbyTick 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.standby-count__tick em {
+  display: block;
+  margin-top: 0.42em;
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* 접수 모달 버전 1 */
+.standby-v1 {
+  position: relative;
+  width: 100%;
+  max-height: calc(100% - 3.4rem);
+  padding: 1.7rem 1.85rem 1.55rem;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.05) 0.7px, transparent 1px) 0 0 / 5px 5px,
+    linear-gradient(165deg, #1a2238 0%, #0d1324 58%, #12101c 100%);
+  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+  box-shadow: 8px 8px 0 rgba(237, 29, 36, 0.55);
+}
+
+.standby-v1__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.standby-v1__head .kicker {
+  margin: 0;
+}
+
+.standby-v1 h2 {
+  margin: 0.85rem 0 1.05rem;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+.standby-v1__x {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.standby-v1__x:hover {
+  color: #fff;
+}
+
+.standby-v1__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55em;
+  margin: 0 0 1.25rem;
+  padding: 0.52rem 1.15rem 0.5rem 1.2rem;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.standby-v1__chip i {
+  align-self: center;
+  width: 2px;
+  height: 0.7em;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+.standby-v1 .standby-count__tick {
+  background: rgba(5, 8, 20, 0.72);
+}
+
+.standby-v1 .standby-count__colon {
+  color: var(--marvel);
+}
+
+.standby-v1__when {
+  margin: 0 0 0.45rem;
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+
+.standby-v1__desc {
+  margin: 0 0 1.25rem;
+  color: var(--silver);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.standby-v1__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.standby-v1__actions .btn {
+  min-width: 6.2rem;
+  min-height: 2.7rem;
+  padding: 0 1.25rem;
+  font-size: 0.9rem;
+}
+
+/* 접수 모달 버전 2 */
+.standby-v2 {
+  position: relative;
+  width: 100%;
+  max-height: calc(100% - 3.4rem);
+  padding: 1.7rem 1.85rem 1.55rem;
+  overflow: hidden;
+  background: var(--marvel);
+  text-align: center;
+  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+  box-shadow: 8px 8px 0 var(--navy);
+}
+
+.standby-v2__ghost {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  color: rgba(0, 0, 0, 0.14);
+  font-size: clamp(3.4rem, 14vw, 5.6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  transform: translate(-50%, -50%) skewX(-12deg);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.standby-v2__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  min-height: 2rem;
+}
+
+.standby-v2__head .kicker {
+  margin: 0;
+}
+
+.standby-v2__dday {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.standby-v2 h2 {
+  position: relative;
+  margin: 1rem 0 1.15rem;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+.standby-v2__x {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.35rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+}
+
+.standby-v2__x:hover {
+  color: #fff;
+}
+
+.standby-v2__when {
+  position: relative;
+  margin: 0 0 0.45rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+
+.standby-v2__desc {
+  position: relative;
+  margin: 0 0 1.25rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.standby-v2__actions {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.standby-v2__actions .btn {
+  min-width: 8.5rem;
+  min-height: 2.8rem;
+  padding: 0 1.4rem;
+  font-size: 0.9rem;
+}
+
 @keyframes standbyColon {
   50% {
     opacity: 0.22;
@@ -1005,8 +1029,8 @@ button.course {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .register-standby__colon,
-  .register-standby__digit {
+  .standby-count__colon,
+  .standby-count__digit {
     animation: none;
   }
 }
