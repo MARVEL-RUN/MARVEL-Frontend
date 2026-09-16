@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
+import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import "./virtual.css";
 
 /* 차수 확정 전 — 1·2·3차 구분 없이 COMING SOON
@@ -164,6 +165,7 @@ export function VirtualRunPage() {
                 priority
                 draggable={false}
               />
+              <KeyVisualCopyright />
             </div>
             <div className="virtual-card__body">
               <h2 id="virtual-soon-title" className="virtual-card__title">

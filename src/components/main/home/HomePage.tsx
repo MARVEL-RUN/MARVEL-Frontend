@@ -13,6 +13,7 @@ import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown, OpenDday } from "./OpenCountdown";
 import { HomeBoard } from "./HomeBoard";
 import { HomePopup } from "./HomePopup";
+import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import { SideDock } from "./SideDock";
 
 const TICKER = [
@@ -156,9 +157,12 @@ export function HomePage() {
             {EVENT.venueEn}
           </p>
           <div className="hero__actions">
-            <Link href="/guide" className="btn btn--ghost">
-              대회안내
-            </Link>
+            <div className="hero__guide">
+              <Link href="/guide" className="btn btn--ghost">
+                대회안내
+              </Link>
+              <KeyVisualCopyright />
+            </div>
             <Link href={REGISTER_HREF} className="btn btn--red">
               {cta}
             </Link>
