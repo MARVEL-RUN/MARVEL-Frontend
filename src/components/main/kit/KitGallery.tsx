@@ -4,7 +4,29 @@ import Image from "next/image";
 import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
-import { SHIRT_SIZES, type CourseId } from "@/lib/register";
+import { type CourseId } from "@/lib/register";
+
+const SHIRT_SPEC_KIDS = ["130", "150"] as const;
+const SHIRT_SPEC_ADULT = ["S", "M", "L", "XL", "2XL", "3XL", "4XL"] as const;
+
+const SHIRT_SPEC_ROWS: {
+  label: string;
+  kids: [string, string];
+  adult: [string, string, string, string, string, string, string];
+  delta: string;
+}[] = [
+  { label: "총장", kids: ["47.5", "55.5"], adult: ["64", "67", "70", "73", "76", "79", "82"], delta: "3" },
+  { label: "가슴둘레", kids: ["42.5", "47.5"], adult: ["55.5", "58", "60.5", "63", "65.5", "68", "70.5"], delta: "2.5" },
+  { label: "밑단둘레", kids: ["41.5", "46.5"], adult: ["54", "56.5", "59", "61.5", "64", "66.5", "69"], delta: "2.5" },
+  { label: "어깨너비", kids: ["40", "44"], adult: ["48", "50", "52", "54", "56", "58", "60"], delta: "2" },
+  { label: "소매통", kids: ["16.5", "18.5"], adult: ["23", "24", "25", "26", "27", "28", "29"], delta: "1" },
+  { label: "소매길이", kids: ["16.5", "19.5"], adult: ["20", "21.5", "23", "24.5", "26", "27.5", "29"], delta: "1.5" },
+  { label: "소매부리", kids: ["16", "18"], adult: ["21", "21.5", "22", "22.5", "23", "23.5", "24"], delta: "0.5" },
+  { label: "옆목너비", kids: ["17", "18"], adult: ["18", "18.5", "19", "19.5", "20", "20.5", "21"], delta: "0.5" },
+  { label: "앞목깊이", kids: ["7.5", "8.5"], adult: ["8", "8.5", "9", "9.5", "10", "10.5", "11"], delta: "0.5" },
+  { label: "앞넘김", kids: ["", ""], adult: ["2", "2", "2", "2", "2", "2", "2"], delta: "" },
+  { label: "에리 림", kids: ["1.5", "1.5"], adult: ["2", "2", "2", "2", "2", "2", "2"], delta: "" },
+];
 
 export function KitGallery() {
   return (
@@ -132,7 +154,55 @@ export function KitShirtPane() {
           </figure>
         </li>
       </ul>
-      <p className="kit-gallery__note">사이즈 {SHIRT_SIZES.join(" · ")}</p>
+      <div className="kit-spec">
+        <h4 className="kit-spec__title">티셔츠 조견표</h4>
+        <p className="kit-spec__caption">SIZE SPEC (단면기준)</p>
+        <div className="kit-spec__scroll">
+          <table className="kit-spec__table">
+            <thead>
+              <tr>
+                <th rowSpan={2} colSpan={2}>
+                  구분(단면기준)
+                </th>
+                <th colSpan={SHIRT_SPEC_KIDS.length}>어린이</th>
+                <th colSpan={SHIRT_SPEC_ADULT.length + 1}>일반</th>
+              </tr>
+              <tr>
+                {SHIRT_SPEC_KIDS.map((size) => (
+                  <th key={size}>{size}</th>
+                ))}
+                {SHIRT_SPEC_ADULT.map((size) => (
+                  <th key={size}>{size}</th>
+                ))}
+                <th>편차</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SHIRT_SPEC_ROWS.map((row, i) => (
+                <tr key={row.label}>
+                  {i === 0 ? (
+                    <th rowSpan={SHIRT_SPEC_ROWS.length} scope="row">
+                      상의
+                    </th>
+                  ) : null}
+                  <th scope="row">{row.label}</th>
+                  {row.kids.map((value, k) => (
+                    <td key={SHIRT_SPEC_KIDS[k]}>{value}</td>
+                  ))}
+                  {row.adult.map((value, k) => (
+                    <td key={SHIRT_SPEC_ADULT[k]}>{value}</td>
+                  ))}
+                  <td>{row.delta}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="kit-spec__notes">
+          <p>※ 주의사항</p>
+          <p>제품 원단의 특성에 따라 편차 범위 안에서 실측과 다를 수 있습니다.</p>
+        </div>
+      </div>
     </section>
   );
 }
