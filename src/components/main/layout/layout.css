@@ -666,11 +666,6 @@ body:has(.sheet-modal) .side-dock {
   bottom: 0.85rem;
 }
 
-.virtual.is-soon .virtual-soon-bg .kv-copy {
-  top: clamp(11rem, 28vh, 16rem);
-  left: max(1.25rem, calc((100% - min(1200px, calc(100% - 2.5rem))) / 2));
-}
-
 .page-hero__inner {
   position: relative;
   z-index: 1;

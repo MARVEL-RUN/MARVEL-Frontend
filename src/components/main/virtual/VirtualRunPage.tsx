@@ -122,7 +122,6 @@ export function VirtualRunPage() {
           priority
           draggable={false}
         />
-        <KeyVisualCopyright />
       </div>
 
       <header className="virtual-header">
@@ -166,6 +165,7 @@ export function VirtualRunPage() {
                 priority
                 draggable={false}
               />
+              <KeyVisualCopyright />
             </div>
             <div className="virtual-card__body">
               <h2 id="virtual-soon-title" className="virtual-card__title">

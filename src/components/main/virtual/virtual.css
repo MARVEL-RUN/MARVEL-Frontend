@@ -5,26 +5,22 @@
   flex-direction: column;
   min-height: 100svh;
   background:
-    radial-gradient(
-      ellipse 88% 58% at 50% -8%,
+    radial-gradient(ellipse 88% 58% at 50% -8%,
       color-mix(in srgb, var(--virtual-accent) 34%, transparent),
-      transparent 68%
-    ),
+      transparent 68%),
     radial-gradient(ellipse 70% 38% at 50% 6%, rgba(237, 29, 36, 0.12), transparent 58%),
     radial-gradient(ellipse 90% 35% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 70%),
     radial-gradient(1.2px 1.2px at 14% 4%, rgba(255, 255, 255, 0.5), transparent),
     radial-gradient(1px 1px at 72% 3%, rgba(255, 255, 255, 0.35), transparent),
     radial-gradient(1.1px 1.1px at 38% 9%, rgba(255, 255, 255, 0.28), transparent),
     radial-gradient(1px 1px at 86% 7%, rgba(255, 255, 255, 0.32), transparent),
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       color-mix(in srgb, var(--navy) 42%, var(--virtual-panel)) 0%,
       color-mix(in srgb, var(--navy) 22%, var(--virtual-panel)) 18%,
       var(--virtual-panel) 38%,
       var(--virtual-panel) 68%,
       color-mix(in srgb, var(--virtual-panel) 55%, var(--navy)) 88%,
-      var(--navy) 100%
-    );
+      var(--navy) 100%);
   transition: background 0.35s ease;
 }
 
@@ -32,9 +28,7 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  padding: calc(1.5rem + env(safe-area-inset-top, 0px))
-    max(1.5rem, env(safe-area-inset-right, 0px)) 1.1rem
-    max(1.5rem, env(safe-area-inset-left, 0px));
+  padding: calc(1.5rem + env(safe-area-inset-top, 0px)) max(1.5rem, env(safe-area-inset-right, 0px)) 1.1rem max(1.5rem, env(safe-area-inset-left, 0px));
   background: transparent;
 }
 
@@ -252,15 +246,13 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       rgba(0, 0, 0, 0.78) 0%,
       rgba(0, 0, 0, 0.52) 18%,
       rgba(0, 0, 0, 0.22) 36%,
       transparent 52%,
       transparent 70%,
-      rgba(0, 0, 0, 0.7) 100%
-    ),
+      rgba(0, 0, 0, 0.7) 100%),
     radial-gradient(ellipse 72% 48% at 50% 28%, rgba(0, 0, 0, 0.35), transparent 70%);
 }
 
@@ -340,6 +332,12 @@
   -webkit-user-drag: none;
 }
 
+.virtual.is-soon .virtual-soon-hero .kv-copy {
+  left: -20rem;
+  bottom: -13rem;
+  z-index: 2;
+}
+
 .virtual.is-soon .virtual-soon-hero__img {
   display: block;
   width: 100%;
@@ -395,12 +393,10 @@
   inset: -14% -16%;
   z-index: 0;
   background:
-    radial-gradient(
-      ellipse 72% 68% at 50% 50%,
+    radial-gradient(ellipse 72% 68% at 50% 50%,
       color-mix(in srgb, var(--virtual-accent) 62%, transparent),
       color-mix(in srgb, var(--virtual-accent) 22%, transparent) 52%,
-      transparent 74%
-    );
+      transparent 74%);
   filter: blur(22px);
   pointer-events: none;
   transition: background 0.35s ease;
@@ -544,8 +540,7 @@
   }
 
   .virtual-hero {
-    padding: 0.5rem max(1.1rem, env(safe-area-inset-right, 0px)) 1.15rem
-      max(1.1rem, env(safe-area-inset-left, 0px));
+    padding: 0.5rem max(1.1rem, env(safe-area-inset-right, 0px)) 1.15rem max(1.1rem, env(safe-area-inset-left, 0px));
   }
 
   .virtual-hero__title {
@@ -583,8 +578,7 @@
   }
 
   .virtual-sheet {
-    padding: 0.85rem max(1.1rem, env(safe-area-inset-right, 0px)) 2.4rem
-      max(1.1rem, env(safe-area-inset-left, 0px));
+    padding: 0.85rem max(1.1rem, env(safe-area-inset-right, 0px)) 2.4rem max(1.1rem, env(safe-area-inset-left, 0px));
   }
 
   .virtual-card {
@@ -616,15 +610,22 @@
 }
 
 @media (max-width: 720px) {
+  .virtual.is-soon {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  .virtual.is-soon .virtual-card,
+  .virtual.is-soon .virtual-soon-hero {
+    overflow: visible;
+  }
+
   .virtual-header {
-    padding: calc(0.7rem + env(safe-area-inset-top, 0px))
-      max(var(--gutter, 1rem), env(safe-area-inset-right, 0px)) 0.7rem
-      max(var(--gutter, 1rem), env(safe-area-inset-left, 0px));
+    padding: calc(0.7rem + env(safe-area-inset-top, 0px)) max(var(--gutter, 1rem), env(safe-area-inset-right, 0px)) 0.7rem max(var(--gutter, 1rem), env(safe-area-inset-left, 0px));
   }
 
   .virtual-hero {
-    padding: 0.4rem max(var(--gutter, 1rem), env(safe-area-inset-right, 0px)) 1rem
-      max(var(--gutter, 1rem), env(safe-area-inset-left, 0px));
+    padding: 0.4rem max(var(--gutter, 1rem), env(safe-area-inset-right, 0px)) 1rem max(var(--gutter, 1rem), env(safe-area-inset-left, 0px));
   }
 
   .virtual-hero__rounds {
@@ -648,8 +649,7 @@
   }
 
   .virtual-sheet {
-    padding: 0.75rem max(var(--gutter, 1rem), env(safe-area-inset-right, 0px)) 2.2rem
-      max(var(--gutter, 1rem), env(safe-area-inset-left, 0px));
+    padding: 0.75rem max(var(--gutter, 1rem), env(safe-area-inset-right, 0px)) 2.2rem max(var(--gutter, 1rem), env(safe-area-inset-left, 0px));
   }
 
   .virtual-info__row {
@@ -700,11 +700,12 @@
 
   .virtual.is-soon .virtual-soon-hero {
     width: min(360px, 92vw);
+    margin-bottom: 4.5rem;
   }
 
-  .virtual.is-soon .virtual-soon-bg .kv-copy {
-    top: clamp(9.5rem, 24vh, 13rem);
-    left: 2.6vw;
+  .virtual.is-soon .virtual-soon-hero .kv-copy {
+    left: 0;
+    bottom: 1rem;
     font-size: 0.58rem;
   }
 }
