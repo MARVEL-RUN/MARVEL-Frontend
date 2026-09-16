@@ -31,13 +31,13 @@
 }
 
 .kit-page__sponsor-more-notices {
-  display: grid;
-  gap: 0.35rem;
+  align-self: stretch;
   margin: 0 0 0.85rem;
   color: var(--note);
   font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.55;
+  text-align: left;
   word-break: keep-all;
 }
 
