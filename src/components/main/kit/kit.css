@@ -19,16 +19,29 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 0.75rem;
+  gap: 0.45rem;
   margin: 2.4rem 0 0;
   color: var(--note);
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
   text-align: center;
 }
 
+.kit-page__sponsor-more-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.kit-page__sponsor-more-note {
+  color: rgba(164, 165, 180, 0.78);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
 .kit-page__sponsor-more-line {
+  margin-top: 0.3rem;
   display: block;
   width: 1px;
   height: 3.25rem;
@@ -441,6 +454,110 @@
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   line-height: 1.5;
+}
+
+.kit-spec {
+  min-width: 0;
+  margin-top: 0.5rem;
+  padding-top: 1.85rem;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kit-spec__title {
+  margin: 0 0 0.2rem;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.kit-spec__caption {
+  margin: 0 0 1.35rem;
+  color: var(--note);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-align: center;
+}
+
+.kit-spec__scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kit-spec__table {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.kit-spec__table th,
+.kit-spec__table td {
+  padding: 0.48rem 0.32rem;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.kit-spec__table thead th {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--note);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.kit-spec__table thead tr:last-child th {
+  color: #fff;
+  border-bottom: 2px solid var(--marvel);
+}
+
+.kit-spec__table th:last-child,
+.kit-spec__table td:last-child {
+  border-right: 0;
+}
+
+.kit-spec__table tbody tr:last-child th,
+.kit-spec__table tbody tr:last-child td,
+.kit-spec__table tbody th[rowspan] {
+  border-bottom: 0;
+}
+
+.kit-spec__table tbody th {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--note);
+  font-weight: 700;
+}
+
+.kit-spec__table td {
+  color: var(--silver);
+  font-variant-numeric: tabular-nums;
+}
+
+.kit-spec__notes {
+  margin-top: 0.7rem;
+  color: var(--note);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.kit-spec__notes p {
+  margin: 0;
+  font-weight: 400;
+}
+
+.kit-spec__notes p:first-child {
+  margin-bottom: 0.25rem;
+  color: #fff;
+  font-weight: 700;
 }
 
 .kit-gallery__lineup {

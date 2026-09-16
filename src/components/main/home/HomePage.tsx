@@ -250,7 +250,7 @@ export function HomePage() {
                   </div>
                   <div>
                     <dt>어린이</dt>
-                    <dd>{"childFee" in c ? c.childFee : "어린이 참가 불가"}</dd>
+                    <dd>{"childFee" in c ? c.childFee : "만 12세 이하 참가 불가"}</dd>
                   </div>
                 </dl>
               </li>

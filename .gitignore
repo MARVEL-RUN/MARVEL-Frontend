@@ -10,4 +10,3 @@ out/
 *.tsbuildinfo
 .env
 .env.*
-!.env.example

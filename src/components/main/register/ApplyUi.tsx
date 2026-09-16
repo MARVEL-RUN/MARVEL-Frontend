@@ -6,7 +6,7 @@ import {
   EMAIL_CUSTOM,
   EMAIL_DOMAINS,
   GENDERS,
-  SHIRT_SIZES,
+  ADULT_SHIRT_SIZES,
   courseAllowsChild,
   courseById,
   courseClosedReason,
@@ -166,7 +166,7 @@ export function GenderPick({
 export function ShirtPick({
   value,
   onChange,
-  sizes = SHIRT_SIZES,
+  sizes = ADULT_SHIRT_SIZES,
   enabled,
   disabled,
 }: {
@@ -199,12 +199,16 @@ export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
     return <p className="kit-fixed kit-fixed--empty">—</p>;
   }
 
-  const chip = courseHasTimingChip(course.id);
   const items = [
     { id: "medal", label: `${course.distance} 메달`, on: true },
     { id: "scarf", label: "스카프", on: true },
-    { id: "bib", label: "배번호", on: true },
-    { id: "chip", label: "기록칩", on: chip },
+    {
+      id: "bib",
+      label: courseHasTimingChip(course.id)
+        ? "배번호(기록칩 포함)"
+        : "배번호",
+      on: true,
+    },
   ];
 
   return (
@@ -321,6 +325,8 @@ export function CourseFeeTable({
         <div className="course-pick__fees-body">
           {EVENT.courses.map((c) => {
             const on = value === c.id;
+            const childOn = on && ticket === "child" && courseAllowsChild(c);
+            const adultOn = on && !childOn;
             return (
               <div key={c.id} className="course-pick__fees-row">
                 <span className={on ? "is-on" : undefined}>{c.distance}</span>
@@ -329,10 +335,26 @@ export function CourseFeeTable({
                 >
                   {c.code}
                 </span>
-                <span className={on && ticket !== "child" ? "is-on" : undefined}>
+                <span
+                  className={
+                    adultOn
+                      ? "is-on"
+                      : childOn
+                        ? "is-on is-dim"
+                        : undefined
+                  }
+                >
                   {feeDigits(c.fee)}
                 </span>
-                <span className={on && ticket === "child" ? "is-on" : undefined}>
+                <span
+                  className={
+                    childOn
+                      ? "is-on is-fee-child"
+                      : on
+                        ? "is-dim"
+                        : undefined
+                  }
+                >
                   {courseNote(c)}
                 </span>
               </div>

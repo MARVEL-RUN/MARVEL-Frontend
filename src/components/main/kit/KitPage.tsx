@@ -11,7 +11,12 @@ export function KitPage() {
       <div className="page__body wrap kit-page">
         <KitGallery />
         <p className="kit-page__sponsor-more">
-          <span>{EVENT.sponsorMore}</span>
+          <span className="kit-page__sponsor-more-label">
+            {EVENT.sponsorMore}
+          </span>
+          <span className="kit-page__sponsor-more-note">
+            {EVENT.sponsorMoreNote}
+          </span>
           <span className="kit-page__sponsor-more-line" aria-hidden="true" />
         </p>
         <Link href={REGISTER_HREF} className="btn btn--red">

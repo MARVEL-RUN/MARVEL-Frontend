@@ -3,7 +3,7 @@ import { MAIN_ASSETS } from "./assets";
 export const EVENT = {
   title: "MARVEL RUN 2026 KOREA",
   tagline: "ASSEMBLE. RUN.",
-  lead: "RACE TO HERO",
+  lead: "RACE TO A HERO",
   openNoticeDate: "2026. 09. 22. 화요일",
   openNoticeTime: "오후 2시",
   openNoticeAction: "접수 OPEN",
@@ -236,6 +236,7 @@ export const EVENT = {
     { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
   ],
-  sponsorMore: "and many more...",
+  sponsorMore: "and many more... ?",
+  sponsorMoreNote: "(스폰서 패키지 추후 공개 예정)",
   copyright: "©2026 MARVEL",
 } as const;

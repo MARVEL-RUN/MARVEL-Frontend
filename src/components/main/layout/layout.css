@@ -20,6 +20,7 @@ html.is-live .site-header {
   width: min(1200px, calc(100% - 2rem));
   height: var(--header-h);
   margin-inline: auto;
+  overflow: visible;
 }
 
 .site-header__brand {
@@ -88,8 +89,8 @@ html.is-live .site-header {
   height: var(--header-h);
 }
 
-.site-header:has(.site-header__item:hover),
-.site-header:has(.site-header__item:focus-within) {
+.site-header:has(.site-header__item:hover:not(.is-closed)),
+.site-header:has(.site-header__item:focus-within:not(.is-closed)) {
   background: var(--navy);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -108,8 +109,8 @@ html.is-live .site-header {
   pointer-events: none;
 }
 
-.site-header:has(.site-header__item:hover)::after,
-.site-header:has(.site-header__item:focus-within)::after {
+.site-header:has(.site-header__item:hover:not(.is-closed))::after,
+.site-header:has(.site-header__item:focus-within:not(.is-closed))::after {
   opacity: 1;
   visibility: visible;
 }
@@ -118,7 +119,7 @@ html.is-live .site-header {
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -138,7 +139,7 @@ html.is-live .site-header {
   width: 300vw;
   background: var(--navy);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
-  z-index: -1;
+  z-index: 0;
 }
 
 .site-header__item:hover .site-header__drop,
@@ -148,7 +149,17 @@ html.is-live .site-header {
   pointer-events: auto;
 }
 
+.site-header__item.is-closed .site-header__drop,
+.site-header__item.is-closed:hover .site-header__drop,
+.site-header__item.is-closed:focus-within .site-header__drop {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .site-header__drop-link {
+  position: relative;
+  z-index: 1;
   color: var(--silver);
   font-size: 0.86rem;
   font-weight: 600;
@@ -173,6 +184,45 @@ html.is-live .site-header {
   min-height: 2.5rem;
   padding-inline: 1.15rem;
   font-size: 0.88rem;
+}
+
+/*
+  단체신청(btn--ghost)과 같은 위·아래 흰 줄 + 사선.
+  clip-path+inset는 고정 헤더에서 윗줄이 잘려서, 테두리만 따로 그림.
+*/
+.site-header__lookup.btn {
+  position: relative;
+  clip-path: none;
+  box-shadow: none;
+  border: 0;
+  overflow: visible;
+  white-space: nowrap;
+  transform: skewX(-14deg);
+  background-color: transparent;
+  background-image:
+    linear-gradient(#fff, #fff),
+    linear-gradient(#fff, #fff);
+  background-repeat: no-repeat;
+  background-size: 100% 1.5px, 100% 1.5px;
+  /* 고정 헤더에서 border-top 0은 잘림 — 1px 안쪽에 그림 */
+  background-position: 0 1px, 0 calc(100% - 1px);
+}
+
+.site-header__lookup.btn > span {
+  display: inline-block;
+  transform: skewX(14deg);
+  white-space: nowrap;
+}
+
+.site-header__lookup.btn:hover {
+  transform: skewX(-14deg) translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.08);
+  background-image:
+    linear-gradient(#fff, #fff),
+    linear-gradient(#fff, #fff);
+  background-repeat: no-repeat;
+  background-size: 100% 1.5px, 100% 1.5px;
+  background-position: 0 1px, 0 calc(100% - 1px);
 }
 
 .site-header__spon {

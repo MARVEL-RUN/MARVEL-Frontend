@@ -176,7 +176,9 @@ html.is-intro {
   position: fixed;
   inset: 0 0 auto;
   z-index: 40;
-  transition: background 0.2s ease, border-color 0.2s ease, opacity 0.45s ease;
+  overflow: visible;
+  /* 드롭다운 호버 시 배경은 즉시 */
+  transition: opacity 0.45s ease;
 }
 /* 홈 오른쪽 바로가기 */
 .side-dock {
@@ -281,6 +283,32 @@ html.is-intro {
 /* inner pages */
 .page {
   padding-top: var(--header-h);
+}
+
+.site--lost {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.page--lost {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page--bare {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding-top: 0;
+}
+
+.page--lost .page__body,
+.page--bare .page__body {
+  padding-block: 2rem;
 }
 
 .block+.block {
@@ -562,8 +590,9 @@ button.course {
   position: fixed;
   inset: 0;
   z-index: 80;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: calc(100dvw / var(--site-zoom, 1));
   height: calc(100dvh / var(--site-zoom, 1));
   max-width: calc(100dvw / var(--site-zoom, 1));

@@ -29,13 +29,13 @@ import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
 import {
   CHILD_AGE_NOTE,
+  CHILD_ACCOMPANY_NOTE,
   TIMING_CHIP_NOTE,
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
   GUARDIAN_AGE_NOTE,
   GENDERS,
   MAX_GROUP_SIZE,
-  SHIRT_SIZES,
   ageBand,
   formatFee,
   genderLabel,
@@ -43,6 +43,7 @@ import {
   orgAccountError,
   orgPasswordError,
   requiredConsentsOk,
+  ticketForBirth,
   type Consents,
   type Gender,
   type GroupDraft,
@@ -170,6 +171,7 @@ export function GroupFlow({
         const next = shirtAssignment(
           findCategory(categories, p.categoryId),
           p.selectedSize,
+          p.birth,
         );
         if (
           next.souvenirId === p.souvenirId &&
@@ -257,7 +259,7 @@ export function GroupFlow({
         }
         if (!p.phone.trim()) throw new Error(`참가자 ${n}: 연락처를 입력하세요.`);
         if (ageBand(p.birth) === "tooYoung") {
-          throw new Error(`참가자 ${n}: 만 6세 미만은 참가할 수 없습니다.`);
+          throw new Error(`참가자 ${n}: 대회일 이후 출생자는 참가할 수 없습니다.`);
         }
         if (!p.gender) throw new Error(`참가자 ${n}: 성별을 선택하세요.`);
         const category = findCategory(categories, p.categoryId);
@@ -274,7 +276,7 @@ export function GroupFlow({
         if (!souvenir) {
           throw new Error(`참가자 ${n}: 티셔츠 옵션을 불러오지 못했습니다.`);
         }
-        if (!souvenirSizes(souvenir).includes(p.selectedSize)) {
+        if (!souvenirSizes(souvenir, ticketForBirth(p.birth)).includes(p.selectedSize)) {
           throw new Error(`참가자 ${n}: 티셔츠 사이즈를 선택하세요.`);
         }
       });
@@ -446,6 +448,7 @@ export function GroupFlow({
                 {`*(한번에 최대 ${MAX_GROUP_SIZE}명까지만 신청 가능하며, 초과 인원은 별도의 단체로 신청 해주시기 바랍니다.)`}
               </p>
               <p>{CHILD_AGE_NOTE}</p>
+              <p>{CHILD_ACCOMPANY_NOTE}</p>
               <p>{GUARDIAN_AGE_NOTE}</p>
               <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
               <p>{TIMING_CHIP_NOTE}</p>
@@ -497,7 +500,10 @@ export function GroupFlow({
                   {draft.participants.map((p, i) => {
                     const category = findCategory(categories, p.categoryId);
                     const souvenir = shirtSouvenir(category);
-                    const sizes = souvenirSizes(souvenir);
+                    const sizes = souvenirSizes(
+                      souvenir,
+                      ticketForBirth(p.birth),
+                    );
                     const courseId = category
                       ? (courseForCategory(category)?.id ?? "")
                       : "";
@@ -535,12 +541,16 @@ export function GroupFlow({
                                 keep
                                   ? {
                                       birth,
-                                      ...shirtAssignment(current, p.selectedSize),
+                                      ...shirtAssignment(
+                                        current,
+                                        p.selectedSize,
+                                        birth,
+                                      ),
                                     }
                                   : {
                                       birth,
                                       categoryId: "",
-                                      ...shirtAssignment(undefined),
+                                      ...shirtAssignment(undefined, "", birth),
                                     },
                               );
                             }}
@@ -611,6 +621,7 @@ export function GroupFlow({
                                 ...shirtAssignment(
                                   findCategory(categories, categoryId),
                                   p.selectedSize,
+                                  p.birth,
                                 ),
                               });
                             }}
@@ -644,8 +655,7 @@ export function GroupFlow({
                         <td data-label="사이즈">
                           <ShirtPick
                             value={p.selectedSize}
-                            sizes={SHIRT_SIZES}
-                            enabled={souvenir ? sizes : []}
+                            sizes={sizes}
                             disabled={!souvenir}
                             onChange={(selectedSize) =>
                               patchMember(i, { selectedSize })
