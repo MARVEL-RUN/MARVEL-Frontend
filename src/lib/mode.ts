@@ -17,12 +17,6 @@ export const GUIDE_SECTIONS = [
 export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href !== "/guide#overview");
 
 export const KIT_HREF = "/kit";
-export const PACKAGE_HREF = "/package";
-
-export const KIT_SECTIONS = [
-  { href: KIT_HREF, label: "기념품 안내" },
-  { href: PACKAGE_HREF, label: "PACKAGE" },
-] as const;
 
 export const BOARD_SECTIONS = [
   { href: "/faq", label: "FAQ" },
@@ -33,7 +27,7 @@ export const BOARD_HREF = "/notices";
 
 export const NAV_ITEMS = [
   { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
-  { href: KIT_HREF, label: "기념품", children: KIT_SECTIONS },
+  { href: KIT_HREF, label: "기념품" },
   { href: "/directions", label: "오시는길" },
   { href: BOARD_HREF, label: "게시판", children: BOARD_SECTIONS },
   { href: "/inquiry", label: "문의사항" },
