@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
-import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import { LOOKUP_HREF, NAV_ITEMS } from "@/lib/mode";
+import { RegisterCta } from "../register/RegisterCta";
 import { pinToHeader } from "@/lib/pin-header";
 
 function hrefPath(href: string) {
@@ -97,7 +98,14 @@ export function Header() {
     };
   }, [open]);
 
-  const cta = registerUiOpen ? "참가신청" : "접수 안내";
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1200px)");
+    const onChange = () => {
+      if (!mq.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   function closeDrop(href: string) {
     setClosedDrop(href);
@@ -155,10 +163,16 @@ export function Header() {
           {NAV_ITEMS.map((item) => {
             const active = itemOn(pathname, item);
             const kids = "children" in item ? item.children : undefined;
-            const link = (
+            const pick = "pickChild" in item && item.pickChild;
+            const linkClass = active ? "site-header__link is-active" : "site-header__link";
+            const link = pick ? (
+              <button type="button" className={linkClass} aria-haspopup="true">
+                {item.label}
+              </button>
+            ) : (
               <Link
                 href={item.href}
-                className={active ? "site-header__link is-active" : "site-header__link"}
+                className={linkClass}
                 onClick={() => closeDrop(item.href)}
               >
                 {item.label}
@@ -199,31 +213,31 @@ export function Header() {
           })}
         </nav>
 
-        <div className="site-header__actions">
-          <Link href={REGISTER_HREF} className="btn btn--red site-header__cta">
-            {cta}
-          </Link>
-          <Link
-            href={LOOKUP_HREF}
-            className="btn btn--ghost site-header__cta site-header__lookup"
-          >
-            <span>신청조회</span>
-          </Link>
-          <SponsorInquiry className="site-header__spon" />
-        </div>
+        <div className="site-header__tools">
+          <div className="site-header__actions">
+            <RegisterCta className="btn btn--red site-header__cta" compact />
+            <Link
+              href={LOOKUP_HREF}
+              className="btn btn--ghost site-header__cta site-header__lookup"
+            >
+              <span>신청조회</span>
+            </Link>
+            <SponsorInquiry className="site-header__spon" />
+          </div>
 
-        <button
-          type="button"
-          className={open ? "site-header__burger is-open" : "site-header__burger"}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+          <button
+            type="button"
+            className={open ? "site-header__burger is-open" : "site-header__burger"}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
 
       <div
@@ -234,21 +248,32 @@ export function Header() {
         <nav className="site-header__drawer-nav" aria-label="모바일 메뉴">
           {NAV_ITEMS.map((item) => {
             const kids = "children" in item ? item.children : undefined;
-            const parent = (
+            const pick = "pickChild" in item && item.pickChild;
+            const expanded = openGroup === item.href;
+            const parentClass = itemOn(pathname, item)
+              ? "site-header__drawer-link is-active"
+              : "site-header__drawer-link";
+            const parent = pick ? (
+              <button
+                type="button"
+                className={parentClass}
+                aria-expanded={expanded}
+                onClick={() =>
+                  setOpenGroup((v) => (v === item.href ? null : item.href))
+                }
+              >
+                {item.label}
+              </button>
+            ) : (
               <Link
                 href={item.href}
-                className={
-                  itemOn(pathname, item)
-                    ? "site-header__drawer-link is-active"
-                    : "site-header__drawer-link"
-                }
+                className={parentClass}
                 onClick={() => setOpen(false)}
               >
                 {item.label}
               </Link>
             );
             if (!kids) return <span key={item.href}>{parent}</span>;
-            const expanded = openGroup === item.href;
             return (
               <div key={item.href} className="site-header__drawer-group">
                 <div className="site-header__drawer-row">
@@ -265,33 +290,31 @@ export function Header() {
                 </div>
                 {expanded
                   ? kids.map((child) => {
-                      const on = childOn(pathname, hash, child.href, item.href);
-                      return (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className={
-                            on
-                              ? "site-header__drawer-sub is-active"
-                              : "site-header__drawer-sub"
-                          }
-                          onClick={(event) =>
-                            goSection(event, child.href, item.href, true)
-                          }
-                        >
-                          {child.label}
-                        </Link>
-                      );
-                    })
+                    const on = childOn(pathname, hash, child.href, item.href);
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={
+                          on
+                            ? "site-header__drawer-sub is-active"
+                            : "site-header__drawer-sub"
+                        }
+                        onClick={(event) =>
+                          goSection(event, child.href, item.href, true)
+                        }
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })
                   : null}
               </div>
             );
           })}
         </nav>
         <div className="site-header__drawer-actions">
-          <Link href={REGISTER_HREF} className="btn btn--red">
-            {cta}
-          </Link>
+          <RegisterCta className="btn btn--red" plain />
           <Link
             href={LOOKUP_HREF}
             className="btn btn--ghost site-header__lookup"

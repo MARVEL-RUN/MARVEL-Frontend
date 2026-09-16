@@ -10,8 +10,13 @@
   margin-top: 0;
 }
 
-.kit-page .btn {
+.kit-page .btn,
+.kit-page .locked-cta {
   margin-top: 1.6rem;
+}
+
+.kit-page .locked-cta__img {
+  width: 8rem;
 }
 
 .kit-page__sponsor-more {
@@ -20,22 +25,37 @@
   align-items: center;
   width: 100%;
   gap: 0.45rem;
-  margin: 2.4rem 0 0;
+  margin: 4rem 0 0;
   color: var(--note);
   text-align: center;
 }
 
+.kit-page__sponsor-more-notices {
+  align-self: stretch;
+  margin: 0 0 2.4rem;
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.55;
+  text-align: left;
+  word-break: keep-all;
+}
+
 .kit-page__sponsor-more-label {
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.85rem, 4.2vw, 2.55rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .kit-page__sponsor-more-note {
-  color: rgba(164, 165, 180, 0.78);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  margin: 0;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   line-height: 1.45;
   word-break: keep-all;
 }
@@ -56,14 +76,17 @@
     clip-path: inset(0 0 100% 0);
     opacity: 0.35;
   }
+
   42% {
     clip-path: inset(0 0 0 0);
     opacity: 0.7;
   }
+
   68% {
     clip-path: inset(0 0 0 0);
     opacity: 0.7;
   }
+
   100% {
     clip-path: inset(0 0 100% 0);
     opacity: 0.35;
@@ -381,6 +404,10 @@
 }
 
 @media (min-width: 721px) {
+  .kit-page.wrap {
+    width: min(58rem, calc(100% - 8rem));
+  }
+
   .kit-gallery__frame--bib {
     width: min(100%, 40rem);
   }
@@ -451,7 +478,7 @@
 .kit-gallery__note {
   margin: 0.15rem 0 0;
   color: var(--note);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.04em;
   line-height: 1.5;
 }
@@ -543,7 +570,7 @@
 .kit-spec__notes {
   margin-top: 0.7rem;
   color: var(--note);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.02em;
   line-height: 1.55;
   word-break: keep-all;
@@ -618,53 +645,70 @@
   .kit-gallery {
     gap: 2rem;
   }
+
   .kit-gallery__pane {
     padding: 0 0 0.35rem;
     border-top: 0;
     background: none;
   }
+
   .kit-gallery__head {
     padding-bottom: 0.7rem;
     border-bottom-color: rgba(255, 255, 255, 0.16);
   }
+
   .kit-gallery__pane h3 {
     font-size: 1.05rem;
   }
+
   .kit-gallery__lineup {
     gap: 0.55rem 0.7rem;
     margin-bottom: 1rem;
     padding: 0;
   }
+
   .kit-gallery__picks button {
     min-height: var(--tap);
     font-size: 0.86rem;
   }
+
   .kit-gallery__frame,
   .kit-gallery__frame--bib {
     background: none;
   }
+
   .kit-gallery__frame img,
   .medal-3d__still {
     padding: 0;
   }
+
   .kit-gallery__medals {
     grid-template-columns: 1fr 1fr;
   }
+
   .kit-gallery__medals--3d>li:first-child {
     grid-column: 1 / -1;
   }
+
   .medal-3d__expand {
     width: var(--tap);
     height: var(--tap);
   }
+
   .medal-3d-preview .course-preview__sheet {
     height: calc(100dvh - 1.4rem);
     max-height: calc(100dvh - 1.4rem);
   }
+
   .medal-3d__hint-desk {
     display: none;
   }
+
   .medal-3d__hint-mob {
     display: inline;
+  }
+
+  .kit-page .locked-cta__img {
+    width: 6.8rem;
   }
 }

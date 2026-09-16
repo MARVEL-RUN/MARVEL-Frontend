@@ -201,7 +201,7 @@ export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
 
   const items = [
     { id: "medal", label: `${course.distance} 메달`, on: true },
-    { id: "scarf", label: "스카프", on: true },
+    { id: "scarf", label: "응원스카프", on: true },
     {
       id: "bib",
       label: courseHasTimingChip(course.id)

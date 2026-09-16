@@ -67,6 +67,17 @@ html.is-live .site-header {
   white-space: nowrap;
 }
 
+button.site-header__link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
 .site-header__link:hover,
 .site-header__link.is-active {
   color: #fff;
@@ -171,6 +182,16 @@ html.is-live .site-header {
   color: #fff;
 }
 
+.site-header__tools {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+
 .site-header__actions {
   position: relative;
   z-index: 1;
@@ -178,6 +199,12 @@ html.is-live .site-header {
   flex-shrink: 0;
   align-items: center;
   gap: 0.45rem;
+  overflow: visible;
+}
+
+.site-header__actions .locked-cta {
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .site-header__cta {
@@ -256,6 +283,8 @@ html.is-live .site-header {
 
 .site-header__burger {
   display: none;
+  position: relative;
+  z-index: 2;
   width: 2.4rem;
   height: 2.4rem;
   padding: 0;
@@ -287,6 +316,118 @@ html.is-live .site-header {
 
 .site-header__drawer {
   display: none;
+  flex-direction: column;
+  position: fixed;
+  inset: var(--header-h) 0 0;
+  z-index: 39;
+  gap: 1.1rem;
+  padding: 1rem 1.25rem 2rem;
+  overflow: auto;
+  background: var(--navy);
+}
+
+.site-header__drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.site-header__drawer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.site-header__drawer-row {
+  display: flex;
+  align-items: center;
+}
+
+.site-header__drawer-row .site-header__drawer-link {
+  flex: 1;
+  min-width: 0;
+}
+
+.site-header__drawer-caret {
+  flex-shrink: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-right: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.site-header__drawer-caret::after {
+  content: "";
+  display: block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin: 0.15rem auto 0;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.site-header__drawer-caret[aria-expanded="true"]::after {
+  margin-top: 0.35rem;
+  transform: rotate(225deg);
+}
+
+.site-header__drawer-sub {
+  display: flex;
+  align-items: center;
+  min-height: 2.4rem;
+  color: var(--silver);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-header__drawer-sub.is-active {
+  color: #fff;
+}
+
+.site-header__drawer-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.7rem;
+  margin-top: auto;
+  padding-top: 1.1rem;
+}
+
+.site-header__drawer-actions .btn,
+.site-header__drawer .site-header__spon {
+  align-self: stretch;
+  width: 100%;
+  min-height: 2.8rem;
+  justify-content: center;
+}
+
+.site-header__drawer-link {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+button.site-header__drawer-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+
+.site-header__drawer-link.is-active {
+  color: var(--marvel);
 }
 
 html.is-intro .side-dock {
@@ -693,17 +834,25 @@ body:has(.sheet-modal) .side-dock {
   padding: 3.5rem 0 6rem;
 }
 
-@media (max-width: 960px) {
-
-  .site-header__nav,
-  .site-header__actions {
+@media (max-width: 1200px) {
+  .site-header__nav {
     display: none;
   }
 
   .site-header__burger {
     display: block;
-    margin-left: auto;
   }
+
+  .site-header__drawer.is-open {
+    display: flex;
+  }
+
+  .site-header__drawer-actions {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
 
   .side-dock button,
   .side-dock a {
@@ -718,109 +867,6 @@ body:has(.sheet-modal) .side-dock {
     font-size: 0.7rem;
   }
 
-  .site-header__drawer {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    inset: var(--header-h) 0 0;
-    gap: 1.1rem;
-    padding: 1rem 1.25rem 2rem;
-    overflow: auto;
-    background: var(--navy);
-  }
-
-  .site-header__drawer[hidden] {
-    display: none;
-  }
-
-  .site-header__drawer-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-  }
-
-  .site-header__drawer-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-  }
-
-  .site-header__drawer-row {
-    display: flex;
-    align-items: center;
-  }
-
-  .site-header__drawer-row .site-header__drawer-link {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .site-header__drawer-caret {
-    flex-shrink: 0;
-    width: 2.4rem;
-    height: 2.4rem;
-    margin-right: 0.35rem;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    cursor: pointer;
-  }
-
-  .site-header__drawer-caret::after {
-    content: "";
-    display: block;
-    width: 0.45rem;
-    height: 0.45rem;
-    margin: 0.15rem auto 0;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(45deg);
-  }
-
-  .site-header__drawer-caret[aria-expanded="true"]::after {
-    margin-top: 0.35rem;
-    transform: rotate(225deg);
-  }
-
-  .site-header__drawer-sub {
-    display: flex;
-    align-items: center;
-    min-height: 2.4rem;
-    color: var(--silver);
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .site-header__drawer-sub.is-active {
-    color: #fff;
-  }
-
-  .site-header__drawer-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.7rem;
-  }
-
-  .site-header__drawer-link {
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 700;
-    text-decoration: none;
-  }
-
-  .site-header__drawer-link.is-active {
-    color: var(--marvel);
-  }
-
-  .site-header__drawer .site-header__spon {
-    align-self: flex-start;
-    min-height: 2.8rem;
-    font-size: 1.05rem;
-  }
-
   .site-footer__facts {
     grid-template-columns: 1fr;
   }
@@ -828,6 +874,14 @@ body:has(.sheet-modal) .side-dock {
 
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+
+  .site-header__actions {
+    display: none;
+  }
+
+  .site-header__drawer-actions {
+    display: flex;
+  }
 
   html.is-main .wrap,
   html.is-main .wrap--narrow,

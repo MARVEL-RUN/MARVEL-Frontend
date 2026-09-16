@@ -20,11 +20,16 @@ function parts(now: number): Left | null {
   };
 }
 
-export function useOpenLeft() {
+export function openLeftNow() {
+  return parts(Date.now());
+}
+
+export function useOpenLeft(enabled = true) {
   const [left, setLeft] = useState<Left | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
     const tick = () => {
       setLeft(parts(Date.now()));
       setReady(true);
@@ -32,7 +37,7 @@ export function useOpenLeft() {
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [enabled]);
 
   return { left, ready };
 }

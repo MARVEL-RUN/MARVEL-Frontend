@@ -1,0 +1,333 @@
+/* 접수 전 모달 */
+.register-standby {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  width: calc(100dvw / var(--site-zoom, 1));
+  height: calc(100dvh / var(--site-zoom, 1));
+  max-width: calc(100dvw / var(--site-zoom, 1));
+  max-height: calc(100dvh / var(--site-zoom, 1));
+  padding: 1.25rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.register-standby__dim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(4, 8, 20, 0.72);
+  cursor: pointer;
+}
+
+.standby-count {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0 0 1.15rem;
+}
+
+.standby-count__tick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.82rem 0.25rem 0.62rem;
+  background: var(--navy);
+  text-align: center;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.standby-count__colon {
+  flex: none;
+  align-self: center;
+  padding-bottom: 0.9rem;
+  color: #fff;
+  font-size: 1.45rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  animation: standbyColon 1s steps(1) infinite;
+}
+
+.standby-count__digit {
+  display: block;
+  overflow: hidden;
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  animation: standbyTick 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.standby-count__tick em {
+  display: block;
+  margin-top: 0.42em;
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.standby-v1 {
+  position: relative;
+  z-index: 1;
+  width: min(40rem, 100%);
+  max-height: 100%;
+  padding: 1.85rem 2.5rem 1.7rem;
+  overflow: auto;
+  border: 1.5px solid rgba(224, 195, 106, 0.72);
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.05) 0.7px, transparent 1px) 0 0 / 5px 5px,
+    linear-gradient(165deg, #1a2238 0%, #0d1324 58%, #12101c 100%);
+  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 22px 56px rgba(0, 0, 0, 0.55),
+    8px 8px 0 var(--gold);
+}
+
+.standby-v1::before,
+.standby-v1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--gold);
+}
+
+.standby-v1::before {
+  top: 0;
+}
+
+.standby-v1::after {
+  bottom: 0;
+}
+
+.standby-v1__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.standby-v1__head .kicker {
+  margin: 0;
+}
+
+.standby-v1 h2 {
+  margin: 0.7rem 0 0.95rem;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+.standby-v1__x {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.standby-v1__x:hover {
+  color: #fff;
+}
+
+.standby-v1__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55em;
+  margin: 0 0 1.1rem;
+  padding: 0.52rem 1.15rem 0.5rem 1.2rem;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.standby-v1__chip i {
+  align-self: center;
+  width: 2px;
+  height: 0.7em;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+.standby-v1 .standby-count__tick {
+  background: rgba(5, 8, 20, 0.72);
+}
+
+.standby-v1 .standby-count__colon {
+  color: var(--marvel);
+}
+
+.standby-v1__when {
+  margin: 0 0 1.2rem;
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+
+.standby-v1__actions {
+  display: flex;
+  justify-content: center;
+}
+
+.standby-v1__actions .btn {
+  min-width: 6.2rem;
+  min-height: 2.7rem;
+  padding: 0 1.25rem;
+  font-size: 0.9rem;
+}
+
+@keyframes standbyColon {
+  50% {
+    opacity: 0.22;
+  }
+}
+
+@keyframes standbyTick {
+  from {
+    transform: translateY(28%);
+    opacity: 0.35;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .standby-count__colon,
+  .standby-count__digit {
+    animation: none;
+  }
+}
+
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .register-standby {
+    padding: 0.85rem;
+    padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .standby-v1 {
+    padding: 1.45rem 1.15rem 1.3rem 1.25rem;
+    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 16px 40px rgba(0, 0, 0, 0.55),
+      5px 5px 0 var(--gold);
+  }
+
+  .standby-v1 h2 {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 1.22rem;
+    word-break: keep-all;
+  }
+
+  .standby-v1__x {
+    width: var(--tap);
+    height: var(--tap);
+    margin: -0.55rem -0.55rem 0 0;
+  }
+
+  .standby-v1__chip {
+    margin: 0 0 0.85rem;
+    padding: 0.42rem 0.8rem 0.4rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .standby-count {
+    gap: 0.16rem;
+    margin: 0 0 0.9rem;
+  }
+
+  .standby-count__tick {
+    padding: 0.58rem 0.06rem 0.42rem;
+    clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+  }
+
+  .standby-count__digit {
+    font-size: 1.4rem;
+  }
+
+  .standby-count__colon {
+    font-size: 1rem;
+    padding-bottom: 0.65rem;
+  }
+
+  .standby-count__tick em {
+    margin-top: 0.32em;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+  }
+
+  .standby-v1__when {
+    margin: 0 0 0.95rem;
+    font-size: 0.86rem;
+    word-break: keep-all;
+  }
+
+  .standby-v1__actions .btn {
+    min-width: 8rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .standby-v1 h2 {
+    font-size: 1.12rem;
+  }
+
+  .standby-count__digit {
+    font-size: 1.22rem;
+  }
+
+  .standby-v1__when {
+    font-size: 0.8rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .standby-v1 {
+    padding: 1.05rem 1.2rem 0.95rem;
+  }
+
+  .standby-v1 h2 {
+    margin: 0.3rem 0 0.5rem;
+    font-size: 1.08rem;
+  }
+
+  .standby-v1__chip,
+  .standby-count,
+  .standby-v1__when {
+    margin-bottom: 0.55rem;
+  }
+
+  .standby-count__tick {
+    padding: 0.38rem 0.04rem 0.28rem;
+  }
+
+  .standby-count__digit {
+    font-size: 1.15rem;
+  }
+}

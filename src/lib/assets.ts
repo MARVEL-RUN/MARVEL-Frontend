@@ -12,6 +12,7 @@ export const MAIN_ASSETS = {
   headerLogo: "/images/main/header-logo.svg",
   footerLogo: "/images/main/ft_logo.svg",
   loadingLogo: "/images/main/loading-logo.png",
+  registerLocked: "/images/main/register-locked.png",
   hero: "/images/main/hero-characters.png",
   sideBanner: "/images/main/sidebanner.svg",
   sideBannerMobile: "/images/main/sidebanner-mobile.png",

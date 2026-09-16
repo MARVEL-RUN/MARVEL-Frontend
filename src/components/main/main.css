@@ -1,11 +1,12 @@
 @import "./fx/fx.css";
 @import "./layout/layout.css";
 @import "./home/home.css";
+@import "./home/assemble.css";
 @import "./guide/guide.css";
 @import "./kit/kit.css";
-@import "./package/package.css";
 @import "./directions/directions.css";
 @import "./register/register.css";
+@import "./register/standby.css";
 @import "./board/board.css";
 @import "./legal/legal.css";
 
@@ -107,6 +108,23 @@ html.is-intro {
   filter: brightness(1.08);
 }
 
+.btn--locked {
+  gap: 0.4rem;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.btn--locked:hover {
+  transform: none;
+  filter: none;
+  opacity: 0.72;
+  color: #fff;
+}
+
+.btn--locked::after {
+  display: none;
+}
+
 .btn--ghost {
   background: transparent;
   box-shadow: inset 0 0 0 1.5px #fff;
@@ -125,6 +143,53 @@ html.is-intro {
   background: var(--navy);
   color: #fff;
 }
+
+.locked-cta {
+  display: inline-flex;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  vertical-align: middle;
+  line-height: 0;
+  overflow: visible;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.locked-cta:hover {
+  transform: translateY(-1px);
+}
+
+.locked-cta__img {
+  display: block;
+  width: 11.2rem;
+  height: auto;
+  max-width: 100%;
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.15s ease;
+}
+
+.locked-cta:hover .locked-cta__img {
+  filter: brightness(1.08);
+}
+
+.locked-cta--compact {
+  position: relative;
+  width: 6.6rem;
+  height: 2.5rem;
+}
+
+.locked-cta--compact .locked-cta__img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7.6rem;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
+
 /* mark */
 .mark {
   display: inline-flex;
@@ -171,6 +236,7 @@ html.is-intro {
 .mark--compact .mark__run {
   font-size: 1.2rem;
 }
+
 /* header */
 .site-header {
   position: fixed;
@@ -180,6 +246,7 @@ html.is-intro {
   /* 드롭다운 호버 시 배경은 즉시 */
   transition: opacity 0.45s ease;
 }
+
 /* 홈 오른쪽 바로가기 */
 .side-dock {
   position: fixed;
@@ -192,20 +259,24 @@ html.is-intro {
   gap: 0.32rem;
   transform: translateY(-50%);
 }
+
 #hero,
 #assemble {
   scroll-margin-top: calc(var(--header-h) + 0.5rem);
 }
+
 #courses,
 #venue {
   scroll-margin-top: 0.2rem;
 }
+
 /* footer */
 .site-footer {
   background: #00010f;
   padding: 3.4rem 0 2.6rem;
   font-family: var(--font-korean), system-ui, sans-serif;
 }
+
 /* hero */
 .hero {
   position: relative;
@@ -215,6 +286,7 @@ html.is-intro {
   overflow: hidden;
   padding: 7rem 0 10.5rem;
 }
+
 /* ticker */
 .ticker {
   position: relative;
@@ -224,6 +296,7 @@ html.is-intro {
   overflow: hidden;
   transform: skewY(-1.4deg);
 }
+
 /* sections */
 .sec {
   padding: 6.5rem 0;
@@ -272,14 +345,7 @@ html.is-intro {
   list-style: none;
   margin: 0;
 }
-/* assemble */
-.assemble {
-  position: relative;
-  overflow: hidden;
-  padding: 6rem 1.25rem;
-  background: var(--marvel);
-  text-align: center;
-}
+
 /* inner pages */
 .page {
   padding-top: var(--header-h);
@@ -345,6 +411,7 @@ html.is-intro {
   color: var(--note);
   font-size: 0.78rem;
 }
+
 #overview.guide-sec {
   padding-bottom: 2.4rem;
   scroll-margin-top: var(--header-h);
@@ -405,6 +472,7 @@ html.is-intro {
   font-size: 0.88rem;
   font-weight: 500;
 }
+
 fieldset.field {
   border: 0;
   padding: 0;
@@ -511,7 +579,7 @@ fieldset.field {
   margin-top: 1.4rem;
 }
 
-.member-list > li {
+.member-list>li {
   display: grid;
   gap: 0.2rem;
   padding-bottom: 0.7rem;
@@ -522,11 +590,13 @@ fieldset.field {
   color: var(--silver);
   font-size: 0.86rem;
 }
+
 /* ①항 다음 줄이 번호 밑으로 붙지 않게 */
 .legal__clause {
   padding-left: 1.35em;
   text-indent: -1.35em;
 }
+
 /* zoom 1.1이면 100dvh가 화면보다 커짐 */
 .legal-modal {
   position: fixed;
@@ -577,6 +647,7 @@ fieldset.field {
   color: var(--gold);
   border-bottom-color: var(--gold);
 }
+
 button.course {
   width: 100%;
   border: 0;
@@ -585,6 +656,7 @@ button.course {
   text-align: left;
   cursor: pointer;
 }
+
 /* zoom 1.1이면 100dvh가 화면보다 커져서, 보이는 높이로 나눈다 */
 .sheet-modal {
   position: fixed;
@@ -601,6 +673,7 @@ button.course {
   overflow: hidden;
   box-sizing: border-box;
 }
+
 /* 문의사항 비밀글 모달 */
 .inquiry-secret {
   position: fixed;
@@ -766,6 +839,7 @@ button.course {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
+
   html.is-main.is-typing {
     position: fixed;
     left: 0;
@@ -776,11 +850,13 @@ button.course {
     scroll-padding-bottom: 0;
     overflow-anchor: none;
   }
+
   html.is-main input,
   html.is-main textarea,
   html.is-main select {
     touch-action: manipulation;
   }
+
   html.is-main input[type="text"],
   html.is-main input[type="email"],
   html.is-main input[type="tel"],
@@ -793,36 +869,44 @@ button.course {
   html.is-main select {
     font-size: 16px;
   }
+
   html.is-main,
   html.is-main body,
   html.is-main .site {
     overflow-x: clip;
   }
+
   html.is-main .btn {
     min-height: var(--tap);
     font-size: 0.95rem;
     letter-spacing: 0.04em;
   }
+
   html.is-main .kicker {
     font-size: 0.7rem;
     letter-spacing: 0.14em;
   }
+
   html.is-main .site-header {
     padding-top: env(safe-area-inset-top, 0px);
   }
+
   html.is-main .site-header__bar {
     height: 3.4rem;
     gap: 0.75rem;
   }
+
   html.is-main .site-header__logo {
     height: 2rem;
     max-width: 9.6rem;
   }
+
   html.is-main .site-header__burger {
     width: var(--tap);
     height: var(--tap);
     margin-right: -0.45rem;
   }
+
   html.is-main .site-header__drawer {
     position: fixed;
     inset: var(--header-h) 0 0;
@@ -831,9 +915,11 @@ button.course {
     overflow: auto;
     background: var(--navy);
   }
+
   html.is-main .site-header__drawer-nav {
     gap: 0;
   }
+
   html.is-main .site-header__drawer-link {
     display: flex;
     align-items: center;
@@ -842,15 +928,18 @@ button.course {
     font-size: 1.125rem;
     letter-spacing: -0.02em;
   }
+
   html.is-main .site-header__drawer-group {
     gap: 0;
     padding-bottom: 0.2rem;
   }
+
   html.is-main .site-header__drawer-caret {
     width: var(--tap);
     height: var(--tap);
     margin-right: calc(var(--gutter) - 0.55rem);
   }
+
   html.is-main .site-header__drawer-sub {
     display: flex;
     align-items: center;
@@ -862,26 +951,31 @@ button.course {
     letter-spacing: -0.02em;
     text-decoration: none;
   }
+
   html.is-main .site-header__drawer-sub.is-active {
     color: #fff;
   }
+
   html.is-main .guide-tabs__inner {
     justify-content: flex-start;
     width: 100%;
     padding-inline: calc(var(--gutter) - 0.35rem);
     gap: 0;
   }
+
   html.is-main .guide-tabs__btn {
     min-height: 2.4rem;
     padding: 0 0.75rem;
     font-size: 0.84rem;
   }
+
   html.is-main .site-header__drawer-actions {
     margin-top: auto;
     align-items: stretch;
     gap: 0.55rem;
     padding: 1.1rem var(--gutter) 0;
   }
+
   html.is-main .site-header__drawer .btn,
   html.is-main .site-header__drawer .site-header__spon {
     align-self: stretch;
@@ -890,42 +984,53 @@ button.course {
     justify-content: center;
     font-size: 1rem;
   }
+
   html.is-main .side-dock {
     display: none;
   }
+
   html.is-main .home-pop__bar {
     min-height: var(--tap);
   }
+
   html.is-main .home-pop__bar label,
   html.is-main .home-pop__close {
     font-size: 0.88rem;
   }
+
   html.is-main .home-pop__bar input {
     width: 1.1rem;
     height: 1.1rem;
   }
+
   html.is-main .page--post .wrap--narrow,
   html.is-main .page--faq .wrap--narrow {
     width: min(720px, calc(100% - 3.25rem));
   }
+
   html.is-main .page--post .page__body {
     padding: 4.75rem 0 5.5rem;
   }
+
   .sec {
     padding: 3.4rem 0;
   }
+
   .sec__title {
     font-size: clamp(1.65rem, 8vw, 2.15rem);
     word-break: keep-all;
   }
+
   .sec__body {
     font-size: 0.98rem;
     line-height: 1.7;
   }
+
   #overview.guide-sec {
     padding-bottom: 1.6rem;
     scroll-margin-top: var(--header-h);
   }
+
   button.course {
     width: 100%;
   }

@@ -1,0 +1,149 @@
+/* 홈 접수 OPEN 섹션 */
+
+.assemble {
+  position: relative;
+  overflow: hidden;
+  padding: 3.6rem 1.25rem 3.4rem;
+  background: var(--marvel);
+  text-align: center;
+}
+
+.assemble__ghost {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: rgba(0, 0, 0, 0.16);
+  font-size: clamp(3.2rem, 14vw, 8.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  transform: translate(-50%, -50%) skewX(-12deg);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: assemblePulse 5.2s ease-in-out infinite;
+}
+
+.assemble__inner {
+  position: relative;
+}
+
+.assemble h2 {
+  margin: 0.3rem 0 0.85rem;
+  font-size: clamp(1.45rem, 3.6vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.assemble__count {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.28rem;
+  width: min(22rem, 100%);
+  margin: 0 auto 1.15rem;
+}
+
+.assemble__tick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.55rem 0.2rem 0.42rem;
+  background: var(--navy);
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.assemble__count i {
+  flex: none;
+  align-self: center;
+  padding-bottom: 0.7rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1rem, 2.8vw, 1.35rem);
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.assemble__count strong {
+  display: block;
+  font-size: clamp(1.25rem, 3.8vw, 1.85rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.assemble__count em {
+  display: block;
+  margin-top: 0.35em;
+  color: var(--gold);
+  font-size: 0.55rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.assemble__inner .locked-cta {
+  --lock-h: 3.35rem;
+  position: relative;
+  width: calc(var(--lock-h) * 233 / 117);
+  height: var(--lock-h);
+}
+
+.assemble__inner .locked-cta__img {
+  position: absolute;
+  left: calc(var(--lock-h) * -53 / 117);
+  top: calc(var(--lock-h) * -20 / 117);
+  height: calc(var(--lock-h) * 155 / 117);
+  width: auto;
+  max-width: none;
+}
+
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .assemble {
+    padding: 2.4rem var(--gutter) 2.5rem;
+  }
+
+  .assemble__ghost {
+    font-size: clamp(2.8rem, 22vw, 5.2rem);
+  }
+
+  .assemble h2 {
+    margin: 0.25rem 0 0.75rem;
+    font-size: clamp(1.25rem, 5.6vw, 1.55rem);
+    word-break: keep-all;
+  }
+
+  .assemble__count {
+    width: 100%;
+    gap: 0.18rem;
+    margin: 0 auto 1rem;
+  }
+
+  .assemble__tick {
+    padding: 0.5rem 0.08rem 0.38rem;
+  }
+
+  .assemble__count i {
+    font-size: 0.95rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .assemble__count strong {
+    font-size: clamp(1.12rem, 5.6vw, 1.35rem);
+  }
+
+  .assemble__count em {
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+  }
+
+  .assemble__inner .btn {
+    width: min(20rem, 100%);
+  }
+
+  .assemble__inner .locked-cta {
+    --lock-h: 2.9rem;
+    width: calc(var(--lock-h) * 233 / 117);
+    max-width: none;
+  }
+}

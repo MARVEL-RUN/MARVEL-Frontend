@@ -15,7 +15,7 @@ npm run dev                  # 커밍순
 npm run dev:main             # 본사이트 + 신청 화면 미리보기
 ```
 
-`npm run dev:main`은 `NEXT_PUBLIC_REGISTER_PREVIEW=1`을 켠다. 배포 빌드에는 넣지 않는다.
+`npm run dev:main`은 본사이트를 연다. 접수는 `NEXT_PUBLIC_REGISTRATION_OPEN`으로 조절한다.
 
 관리자는 모드와 관계없이 `/admin` (로그인 `/admin/login`).
 
@@ -26,7 +26,7 @@ npm run dev:main             # 본사이트 + 신청 화면 미리보기
 | 변수 | 용도 |
 |------|------|
 | `NEXT_PUBLIC_APP_MODE` | `coming-soon` \| `main` |
-| `NEXT_PUBLIC_REGISTER_PREVIEW` | `1`이면 접수 오픈 전에도 `/register` UI를 연다 |
+| `NEXT_PUBLIC_REGISTRATION_OPEN` | `0` 강제 닫기, `1` 강제 오픈, `3` 접수 시각 자동 |
 | `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제 API |
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 (`test_gck_…`) |
 | `NEXT_PUBLIC_API_BASE_URL_ADMIN` | 관리자 API |
@@ -87,8 +87,8 @@ public/images/
 ## 일정에 맞춘 사용
 
 - **9/10** 커밍순 오픈 → `coming-soon` 모드로 빌드·배포
-- **9/17** 본페이지 오픈 → `main` 모드. 접수는 `registrationOpen` / preview로 조절
-- **9/22** 접수 오픈 → `registrationOpen` true + API·토스 키로 `/register` 결제 연동
+- **9/17** 본페이지 오픈 → `main` 모드. 접수는 `NEXT_PUBLIC_REGISTRATION_OPEN`으로 조절 (`0` 닫기, `1` 열기, `3` 일정)
+- **9/22** 접수 오픈 → `3`이면 시각에 자동 오픈. `1`로 강제 오픈해도 됨. API·토스 키로 `/register` 결제 연동
 
 ## 실행
 

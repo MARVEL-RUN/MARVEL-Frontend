@@ -70,6 +70,10 @@ export const EVENT = {
       label: "접수일정",
       value: "2026년 9월 22일 화요일 오후 2시",
     },
+    {
+      label: "부문",
+      value: "10km / 5km / 2.3km",
+    },
   ],
   stats: [
     { value: "3", unit: "", label: "COURSES" },
@@ -202,9 +206,9 @@ export const EVENT = {
   ],
   kit: [
     "공식 티셔츠",
-    "배번표",
+    "배번호",
     "피니셔 메달",
-    "스카프",
+    "응원스카프",
   ],
   notices: [
     {
@@ -236,7 +240,8 @@ export const EVENT = {
     { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
   ],
-  sponsorMore: "and many more... ?",
-  sponsorMoreNote: "(스폰서 패키지 추후 공개 예정)",
+  sponsorMoreNotice: "※ 위 기념품 이미지는 예시이며, 실제품과 상이할 수 있습니다.",
+  sponsorMore: "+??",
+  sponsorMoreNote: "스폰서 패키지 추후 공개 예정",
   copyright: "ⓒ2026 MARVEL",
 } as const;
