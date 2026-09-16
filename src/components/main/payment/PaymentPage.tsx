@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { readPendingPayment, type PendingPayment } from "@/lib/payment/session";
-import { registrationOpen } from "@/lib/mode";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { SideBanner } from "../layout/SideBanner";
 import { RegisterClosed } from "../register/RegisterClosed";
 import { PaymentWidget } from "./PaymentWidget";
+import { useRegistrationOpen } from "../register/useRegistrationOpen";
 
 export function PaymentPage() {
+  const registrationOpen = useRegistrationOpen();
   const [pending, setPending] = useState<PendingPayment | null | undefined>(
     undefined,
   );

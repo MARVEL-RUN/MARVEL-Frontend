@@ -1,3 +1,5 @@
+import { EVENT } from "./event";
+
 export type AppMode = "coming-soon" | "main";
 
 /** `coming-soon` | `main` — NEXT_PUBLIC_APP_MODE로 전환 */
@@ -43,11 +45,16 @@ export const LOOKUP_HREF = "/lookup";
 /** 인스타 — URL 확정 후 채움 */
 export const INSTAGRAM_URL = "";
 
-/** 참가신청 UI 오픈. 공식 일정은 9/22 */
-export const registrationOpen = false;
+/** `1` 강제 오픈, `0` 강제 닫기. 없으면 접수 시각 */
+export const registrationForced: boolean | null =
+  process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "1" ||
+  process.env.NEXT_PUBLIC_REGISTER_PREVIEW === "1"
+    ? true
+    : process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "0"
+      ? false
+      : null;
 
-/** 퍼블리싱에서 신청 화면을 열어 봄. 배포 빌드에는 넣지 않음. */
-export const registerPreview =
-  process.env.NEXT_PUBLIC_REGISTER_PREVIEW === "1";
-
-export const registerUiOpen = registrationOpen || registerPreview;
+export function isRegistrationOpen(now = Date.now()) {
+  if (registrationForced !== null) return registrationForced;
+  return now >= Date.parse(EVENT.openAt);
+}

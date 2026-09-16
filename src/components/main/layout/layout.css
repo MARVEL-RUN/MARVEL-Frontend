@@ -853,6 +853,7 @@ body:has(.sheet-modal) .side-dock {
 }
 
 @media (max-width: 960px) {
+
   .side-dock button,
   .side-dock a {
     min-height: 2.1rem;

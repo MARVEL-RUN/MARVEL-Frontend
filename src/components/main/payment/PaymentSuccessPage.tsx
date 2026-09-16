@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
-import { registrationOpen } from "@/lib/mode";
+import { useRegistrationOpen } from "@/components/main/register/useRegistrationOpen";
 import { formatFee } from "@/lib/register";
 import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
@@ -50,6 +50,7 @@ function authFromParams(params: { get: (key: string) => string | null }) {
 }
 
 export function PaymentSuccessPage() {
+  const registrationOpen = useRegistrationOpen();
   const params = useSearchParams();
   const [phase, setPhase] = useState<Phase>(() =>
     authFromParams(params) ? "loading" : "error",

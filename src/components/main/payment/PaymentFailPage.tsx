@@ -5,10 +5,11 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { readPendingPayment } from "@/lib/payment/session";
-import { registrationOpen } from "@/lib/mode";
+import { useRegistrationOpen } from "@/components/main/register/useRegistrationOpen";
 import { RegisterClosed } from "@/components/main/register/RegisterClosed";
 
 export function PaymentFailPage() {
+  const registrationOpen = useRegistrationOpen();
   const params = useSearchParams();
   const code = params.get("code") ?? "";
   const message = params.get("message") ?? "결제가 취소되었거나 실패했습니다.";

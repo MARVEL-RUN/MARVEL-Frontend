@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Lock } from "lucide-react";
 import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
-import { REGISTER_HREF, registrationOpen } from "@/lib/mode";
+import { REGISTER_HREF } from "@/lib/mode";
 import { RegisterClosedModal } from "./RegisterClosedModal";
+import { useRegistrationOpen } from "./useRegistrationOpen";
 
 type Props = {
   className?: string;
@@ -16,6 +17,7 @@ type Props = {
 
 export function RegisterCta({ className, compact, plain }: Props) {
   const [open, setOpen] = useState(false);
+  const registrationOpen = useRegistrationOpen();
 
   if (registrationOpen) {
     return (
