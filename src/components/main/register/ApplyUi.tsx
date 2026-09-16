@@ -206,9 +206,10 @@ export function KitFixed({ courseId }: { courseId: CourseId | "" }) {
       id: "bib",
       label: courseHasTimingChip(course.id)
         ? "배번호(기록칩 포함)"
-        : "배번호",
+        : "배번호(기록칩 미포함)",
       on: true,
     },
+    { id: "shirt", label: "티셔츠", on: true },
   ];
 
   return (

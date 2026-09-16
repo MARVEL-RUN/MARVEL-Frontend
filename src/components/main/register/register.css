@@ -657,6 +657,31 @@
   border-spacing: 0;
 }
 
+/* 1245~721: 표 고정 + 가로 스크롤 */
+@media (max-width: 1245px) {
+  .form,
+  .form-sec,
+  .form-sec__body,
+  .party-wrap {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .party-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .party {
+    width: 72rem;
+    min-width: 72rem;
+  }
+
+  .party .kit-fixed {
+    flex-wrap: nowrap;
+  }
+}
+
 .party th,
 .party td {
   padding: 0.65rem 0.55rem;
@@ -946,7 +971,12 @@
 
 .party .kit-fixed {
   justify-content: flex-start;
-  font-size: 0.78rem;
+  flex-wrap: nowrap;
+  font-size: 0.76rem;
+}
+
+.party .kit-fixed li + li::before {
+  margin: 0 0.28rem;
 }
 
 .apply-terms {
@@ -1791,6 +1821,7 @@
   .form-sec__head h2 {
     font-size: 1.05rem;
   }
+
   .party-bar {
     flex-direction: column;
     align-items: stretch;
@@ -1810,6 +1841,7 @@
     border: 0;
   }
   .party {
+    width: 100%;
     min-width: 0;
     display: block;
     table-layout: auto;
@@ -1962,6 +1994,16 @@
   .party tr.is-open td[data-label="패키지"],
   .party tr.is-open td[data-label="참가비"] {
     grid-column: 1 / -1;
+  }
+  .party .kit-fixed {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-size: 0.78rem;
+  }
+  .party .kit-fixed li {
+    display: inline;
+    white-space: normal;
   }
   .party tr.party__info.is-open td[data-label="참가비"] {
     border-bottom: 0;
