@@ -53,6 +53,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [closedDrop, setClosedDrop] = useState<string | null>(null);
   const [hash, setHash] = useState("");
   const home = pathname === "/";
 
@@ -97,6 +98,13 @@ export function Header() {
   }, [open]);
 
   const cta = registerUiOpen ? "참가신청" : "접수 안내";
+
+  function closeDrop(href: string) {
+    setClosedDrop(href);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }
 
   function goSection(
     event: MouseEvent<HTMLAnchorElement>,
@@ -151,13 +159,25 @@ export function Header() {
               <Link
                 href={item.href}
                 className={active ? "site-header__link is-active" : "site-header__link"}
+                onClick={() => closeDrop(item.href)}
               >
                 {item.label}
               </Link>
             );
             if (!kids) return <span key={item.href}>{link}</span>;
             return (
-              <div key={item.href} className="site-header__item">
+              <div
+                key={item.href}
+                className={[
+                  "site-header__item",
+                  closedDrop === item.href ? "is-closed" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onMouseLeave={() => {
+                  if (closedDrop === item.href) setClosedDrop(null);
+                }}
+              >
                 {link}
                 <div className="site-header__drop">
                   {kids.map((child) => (
@@ -165,7 +185,10 @@ export function Header() {
                       key={child.href}
                       href={child.href}
                       className="site-header__drop-link"
-                      onClick={(event) => goSection(event, child.href, item.href, false)}
+                      onClick={(event) => {
+                        closeDrop(item.href);
+                        goSection(event, child.href, item.href, false);
+                      }}
                     >
                       {child.label}
                     </Link>
@@ -180,8 +203,11 @@ export function Header() {
           <Link href={REGISTER_HREF} className="btn btn--red site-header__cta">
             {cta}
           </Link>
-          <Link href={LOOKUP_HREF} className="btn btn--ghost site-header__cta">
-            신청조회
+          <Link
+            href={LOOKUP_HREF}
+            className="btn btn--ghost site-header__cta site-header__lookup"
+          >
+            <span>신청조회</span>
           </Link>
           <SponsorInquiry className="site-header__spon" />
         </div>
@@ -266,8 +292,11 @@ export function Header() {
           <Link href={REGISTER_HREF} className="btn btn--red">
             {cta}
           </Link>
-          <Link href={LOOKUP_HREF} className="btn btn--ghost">
-            신청조회
+          <Link
+            href={LOOKUP_HREF}
+            className="btn btn--ghost site-header__lookup"
+          >
+            <span>신청조회</span>
           </Link>
           <SponsorInquiry className="site-header__spon" />
         </div>

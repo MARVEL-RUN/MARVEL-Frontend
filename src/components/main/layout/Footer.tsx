@@ -2,23 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { EVENT } from "@/lib/event";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { LEGAL_DOCS, OFFICE } from "@/lib/legal";
 import { useLegalModal } from "../legal/LegalModal";
-
-const SPONSOR_LOGOS = {
-  주최: {
-    src: MAIN_ASSETS.footerHost,
-    width: 4786,
-    height: 1320,
-  },
-  주관: {
-    src: MAIN_ASSETS.footerOrganizer,
-    width: 1601,
-    height: 220,
-  },
-} as const;
 
 const OFFICE_FACTS = [
   { label: "주소", value: OFFICE.address },
@@ -42,26 +28,6 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <ul className="site-footer__hosts">
-          {EVENT.sponsors.map((s) => {
-            const logo = SPONSOR_LOGOS[s.role];
-
-            return (
-              <li key={s.role}>
-                <p className="site-footer__host-role">{s.role}</p>
-                <span className="site-footer__host-logo">
-                  <Image
-                    src={logo.src}
-                    alt={s.name}
-                    width={logo.width}
-                    height={logo.height}
-                  />
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-
         <div className="site-footer__info">
           <nav className="site-footer__nav" aria-label="약관">
             {LEGAL_DOCS.map((item) => (

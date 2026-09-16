@@ -3,7 +3,7 @@ import { MAIN_ASSETS } from "./assets";
 export const EVENT = {
   title: "MARVEL RUN 2026 KOREA",
   tagline: "ASSEMBLE. RUN.",
-  lead: "RACE TO HERO",
+  lead: "RACE TO A HERO",
   openNoticeDate: "2026. 09. 22. 화요일",
   openNoticeTime: "오후 2시",
   openNoticeAction: "접수 OPEN",

@@ -651,7 +651,7 @@
 
 .party {
   width: 100%;
-  min-width: 58rem;
+  min-width: 64rem;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
@@ -720,7 +720,7 @@
 }
 
 .party__c-birth {
-  width: 16.5rem;
+  width: 20rem;
 }
 
 .party__c-phone {
@@ -770,8 +770,9 @@
 }
 
 .party td[data-label="사이즈"] .seg {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 0.35rem;
 }
 
 .party td[data-label="패키지"] {
@@ -779,9 +780,9 @@
 }
 
 .party .seg button {
-  min-height: 2.1rem;
-  padding: 0 0.55rem;
-  font-size: 0.75rem;
+  min-height: 2.15rem;
+  padding: 0 0.5rem;
+  font-size: 0.78rem;
 }
 
 .party tbody tr:last-child td,
