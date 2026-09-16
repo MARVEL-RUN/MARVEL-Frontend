@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLayoutEffect, useRef, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
+import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 
 /* prev면 이전 패널 5장 */
 const INTRO_PANELS = "current" as "prev" | "current";
@@ -119,6 +120,7 @@ export function OpeningIntro() {
           priority
         />
       </div>
+      <KeyVisualCopyright />
       <button type="button" className="intro__skip" onClick={closeIntro}>
         SKIP
       </button>

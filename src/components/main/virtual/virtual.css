@@ -701,4 +701,10 @@
   .virtual.is-soon .virtual-soon-hero {
     width: min(360px, 92vw);
   }
+
+  .virtual.is-soon .virtual-soon-bg .kv-copy {
+    top: clamp(9.5rem, 24vh, 13rem);
+    left: 2.6vw;
+    font-size: 0.58rem;
+  }
 }

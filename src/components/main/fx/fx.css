@@ -683,6 +683,12 @@ html.is-intro .fx-letterbox span {
     letter-spacing: 0.14em;
   }
 
+  .intro .kv-copy {
+    left: 2.6vw;
+    bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    font-size: 0.58rem;
+  }
+
   .assemble__ghost {
     animation: assemblePulse-m 4.2s ease-in-out infinite;
   }

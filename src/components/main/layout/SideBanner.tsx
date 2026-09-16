@@ -1,5 +1,6 @@
 import { MAIN_ASSETS } from "@/lib/assets";
 import { MOBILE_MQ } from "@/lib/viewport";
+import { KeyVisualCopyright } from "./KeyVisualCopyright";
 
 export function SideBanner({
   kicker,
@@ -33,6 +34,7 @@ export function SideBanner({
         <h1 className="side-banner__title">{title}</h1>
         <p className="side-banner__en">{en}</p>
       </div>
+      <KeyVisualCopyright />
     </section>
   );
 }

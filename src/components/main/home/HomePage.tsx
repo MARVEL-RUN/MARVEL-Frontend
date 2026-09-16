@@ -13,6 +13,7 @@ import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown, OpenDday } from "./OpenCountdown";
 import { HomeBoard } from "./HomeBoard";
 import { HomePopup } from "./HomePopup";
+import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import { SideDock } from "./SideDock";
 
 const TICKER = [
@@ -124,6 +125,7 @@ export function HomePage() {
         <span className="hero__spot" aria-hidden />
         <span className="hero__sweep" aria-hidden />
         <span className="hero__slash" aria-hidden />
+        <KeyVisualCopyright />
 
         <div className="hero__copy">
           <Image
