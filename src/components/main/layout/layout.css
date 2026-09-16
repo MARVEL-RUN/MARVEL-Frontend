@@ -67,6 +67,17 @@ html.is-live .site-header {
   white-space: nowrap;
 }
 
+button.site-header__link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
 .site-header__link:hover,
 .site-header__link.is-active {
   color: #fff;
@@ -825,6 +836,18 @@ body:has(.sheet-modal) .side-dock {
     font-size: 1.2rem;
     font-weight: 700;
     text-decoration: none;
+  }
+
+  button.site-header__drawer-link {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    line-height: inherit;
+    text-align: left;
+    cursor: pointer;
+    appearance: none;
   }
 
   .site-header__drawer-link.is-active {

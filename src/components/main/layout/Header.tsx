@@ -154,10 +154,16 @@ export function Header() {
           {NAV_ITEMS.map((item) => {
             const active = itemOn(pathname, item);
             const kids = "children" in item ? item.children : undefined;
-            const link = (
+            const pick = "pickChild" in item && item.pickChild;
+            const linkClass = active ? "site-header__link is-active" : "site-header__link";
+            const link = pick ? (
+              <button type="button" className={linkClass} aria-haspopup="true">
+                {item.label}
+              </button>
+            ) : (
               <Link
                 href={item.href}
-                className={active ? "site-header__link is-active" : "site-header__link"}
+                className={linkClass}
                 onClick={() => closeDrop(item.href)}
               >
                 {item.label}
@@ -231,21 +237,32 @@ export function Header() {
         <nav className="site-header__drawer-nav" aria-label="모바일 메뉴">
           {NAV_ITEMS.map((item) => {
             const kids = "children" in item ? item.children : undefined;
-            const parent = (
+            const pick = "pickChild" in item && item.pickChild;
+            const expanded = openGroup === item.href;
+            const parentClass = itemOn(pathname, item)
+              ? "site-header__drawer-link is-active"
+              : "site-header__drawer-link";
+            const parent = pick ? (
+              <button
+                type="button"
+                className={parentClass}
+                aria-expanded={expanded}
+                onClick={() =>
+                  setOpenGroup((v) => (v === item.href ? null : item.href))
+                }
+              >
+                {item.label}
+              </button>
+            ) : (
               <Link
                 href={item.href}
-                className={
-                  itemOn(pathname, item)
-                    ? "site-header__drawer-link is-active"
-                    : "site-header__drawer-link"
-                }
+                className={parentClass}
                 onClick={() => setOpen(false)}
               >
                 {item.label}
               </Link>
             );
             if (!kids) return <span key={item.href}>{parent}</span>;
-            const expanded = openGroup === item.href;
             return (
               <div key={item.href} className="site-header__drawer-group">
                 <div className="site-header__drawer-row">
