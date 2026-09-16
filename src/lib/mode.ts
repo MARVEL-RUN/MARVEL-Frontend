@@ -47,11 +47,11 @@ export const INSTAGRAM_URL = "";
 
 /** `1` 강제 오픈, `0` 강제 닫기. 없으면 접수 시각 */
 export const registrationForced: boolean | null =
-  process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "1" ||
-  process.env.NEXT_PUBLIC_REGISTER_PREVIEW === "1"
-    ? true
-    : process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "0"
-      ? false
+  process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "0"
+    ? false
+    : process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "1" ||
+        process.env.NEXT_PUBLIC_REGISTER_PREVIEW === "1"
+      ? true
       : null;
 
 export function isRegistrationOpen(now = Date.now()) {
