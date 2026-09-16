@@ -299,7 +299,19 @@ html.is-live .hero__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  align-items: flex-start;
   margin-top: 1.6rem;
+}
+
+.hero__guide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.hero__guide .kv-copy {
+  position: static;
 }
 
 .ticker__track {
@@ -1523,6 +1535,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.55rem;
+    align-items: start;
     margin-top: 1.25rem;
   }
 
@@ -1533,9 +1546,12 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
     font-size: 0.92rem;
   }
 
-  .hero .kv-copy {
-    left: 2.6vw;
-    bottom: 4.8rem;
+  .hero__guide {
+    gap: 2.5rem;
+    min-width: 0;
+  }
+
+  .hero__guide .kv-copy {
     font-size: 0.58rem;
   }
 

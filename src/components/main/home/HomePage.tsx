@@ -125,7 +125,6 @@ export function HomePage() {
         <span className="hero__spot" aria-hidden />
         <span className="hero__sweep" aria-hidden />
         <span className="hero__slash" aria-hidden />
-        <KeyVisualCopyright />
 
         <div className="hero__copy">
           <Image
@@ -158,9 +157,12 @@ export function HomePage() {
             {EVENT.venueEn}
           </p>
           <div className="hero__actions">
-            <Link href="/guide" className="btn btn--ghost">
-              대회안내
-            </Link>
+            <div className="hero__guide">
+              <Link href="/guide" className="btn btn--ghost">
+                대회안내
+              </Link>
+              <KeyVisualCopyright />
+            </div>
             <Link href={REGISTER_HREF} className="btn btn--red">
               {cta}
             </Link>
