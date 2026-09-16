@@ -303,6 +303,32 @@ html.is-live .hero__actions {
   margin-top: 1.6rem;
 }
 
+.hero__cta-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* 잠금 PNG 빨간 면(233×117, 원점 53,20)을 대회안내 버튼 높이에 맞춤 */
+.hero__cta-row .locked-cta {
+  --lock-h: 3rem;
+  position: relative;
+  z-index: 2;
+  width: calc(var(--lock-h) * 233 / 117);
+  height: var(--lock-h);
+  flex-shrink: 0;
+}
+
+.hero__cta-row .locked-cta__img {
+  position: absolute;
+  left: calc(var(--lock-h) * -53 / 117);
+  top: calc(var(--lock-h) * -20 / 117);
+  height: calc(var(--lock-h) * 155 / 117);
+  width: auto;
+  max-width: none;
+  transform: none;
+}
+
 .hero__guide {
   display: flex;
   flex-direction: column;
@@ -1532,18 +1558,22 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   }
 
   .hero__actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.55rem;
-    align-items: start;
     margin-top: 1.25rem;
   }
 
-  .hero__actions .btn {
-    width: 100%;
+  .hero__cta-row {
+    gap: 1.5rem;
+  }
+
+  .hero__cta-row .btn {
     min-height: var(--tap);
-    padding: 0 0.6rem;
+    min-width: calc(var(--tap) * 233 / 117);
+    padding: 0 1.2rem;
     font-size: 0.92rem;
+  }
+
+  .hero__cta-row .locked-cta {
+    --lock-h: var(--tap);
   }
 
   .hero__guide {
@@ -1685,6 +1715,11 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
   .assemble__inner .btn {
     width: min(20rem, 100%);
+  }
+
+  .assemble__inner .locked-cta {
+    width: auto;
+    max-width: 12rem;
   }
 
   .board-switch {

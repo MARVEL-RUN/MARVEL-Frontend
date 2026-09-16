@@ -178,6 +178,12 @@ html.is-live .site-header {
   flex-shrink: 0;
   align-items: center;
   gap: 0.45rem;
+  overflow: visible;
+}
+
+.site-header__actions .locked-cta {
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .site-header__cta {

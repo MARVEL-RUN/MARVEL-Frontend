@@ -50,7 +50,7 @@ export const LOOKUP_HREF = "/lookup";
 export const INSTAGRAM_URL = "";
 
 /** 참가신청 UI 오픈. 공식 일정은 9/22 */
-export const registrationOpen = true;
+export const registrationOpen = false;
 
 /** 퍼블리싱에서 신청 화면을 열어 봄. 배포 빌드에는 넣지 않음. */
 export const registerPreview =

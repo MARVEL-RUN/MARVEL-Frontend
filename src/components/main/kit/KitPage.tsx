@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { EVENT } from "@/lib/event";
-import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import { RegisterCta } from "../register/RegisterCta";
 import { SideBanner } from "../layout/SideBanner";
 import { KitGallery } from "./KitGallery";
 
@@ -19,9 +18,7 @@ export function KitPage() {
           </span>
           <span className="kit-page__sponsor-more-line" aria-hidden="true" />
         </p>
-        <Link href={REGISTER_HREF} className="btn btn--red">
-          {registerUiOpen ? "참가신청" : "접수 안내"}
-        </Link>
+        <RegisterCta className="btn btn--red" />
       </div>
     </main>
   );

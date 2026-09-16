@@ -10,8 +10,13 @@
   margin-top: 0;
 }
 
-.kit-page .btn {
+.kit-page .btn,
+.kit-page .locked-cta {
   margin-top: 1.6rem;
+}
+
+.kit-page .locked-cta__img {
+  width: 8rem;
 }
 
 .kit-page__sponsor-more {
@@ -666,5 +671,9 @@
   }
   .medal-3d__hint-mob {
     display: inline;
+  }
+
+  .kit-page .locked-cta__img {
+    width: 6.8rem;
   }
 }

@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
-import { LOOKUP_HREF, NAV_ITEMS, REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import { LOOKUP_HREF, NAV_ITEMS } from "@/lib/mode";
+import { RegisterCta } from "../register/RegisterCta";
 import { pinToHeader } from "@/lib/pin-header";
 
 function hrefPath(href: string) {
@@ -96,8 +97,6 @@ export function Header() {
       document.body.style.overflow = "";
     };
   }, [open]);
-
-  const cta = registerUiOpen ? "참가신청" : "접수 안내";
 
   function closeDrop(href: string) {
     setClosedDrop(href);
@@ -200,9 +199,7 @@ export function Header() {
         </nav>
 
         <div className="site-header__actions">
-          <Link href={REGISTER_HREF} className="btn btn--red site-header__cta">
-            {cta}
-          </Link>
+          <RegisterCta className="btn btn--red site-header__cta" compact />
           <Link
             href={LOOKUP_HREF}
             className="btn btn--ghost site-header__cta site-header__lookup"
@@ -289,9 +286,7 @@ export function Header() {
           })}
         </nav>
         <div className="site-header__drawer-actions">
-          <Link href={REGISTER_HREF} className="btn btn--red">
-            {cta}
-          </Link>
+          <RegisterCta className="btn btn--red" plain />
           <Link
             href={LOOKUP_HREF}
             className="btn btn--ghost site-header__lookup"

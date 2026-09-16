@@ -125,6 +125,38 @@ html.is-intro {
   background: var(--navy);
   color: #fff;
 }
+
+.locked-cta {
+  display: inline-flex;
+  vertical-align: middle;
+  line-height: 0;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.locked-cta__img {
+  display: block;
+  width: 11.2rem;
+  height: auto;
+  max-width: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.locked-cta--compact {
+  position: relative;
+  width: 6.6rem;
+  height: 2.5rem;
+}
+
+.locked-cta--compact .locked-cta__img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7.6rem;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
 /* mark */
 .mark {
   display: inline-flex;

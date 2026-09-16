@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
-import { REGISTER_HREF, registerUiOpen } from "@/lib/mode";
+import { RegisterCta } from "../register/RegisterCta";
 import { MOBILE_MQ } from "@/lib/viewport";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
@@ -33,7 +33,6 @@ export function HomePage() {
   const [venuePrev, setVenuePrev] = useState(0);
   const [venueFx, setVenueFx] = useState(0);
   const preview = EVENT.courses.find((c) => c.id === previewId);
-  const cta = registerUiOpen ? "참가신청" : "9.22 접수 OPEN";
 
   function goAssemble(e: MouseEvent<HTMLAnchorElement>) {
     const el = document.getElementById("assemble");
@@ -158,14 +157,14 @@ export function HomePage() {
           </p>
           <div className="hero__actions">
             <div className="hero__guide">
-              <Link href="/guide" className="btn btn--ghost">
-                대회안내
-              </Link>
+              <div className="hero__cta-row">
+                <Link href="/guide" className="btn btn--ghost">
+                  대회안내
+                </Link>
+                <RegisterCta className="btn btn--red" />
+              </div>
               <KeyVisualCopyright />
             </div>
-            <Link href={REGISTER_HREF} className="btn btn--red">
-              {cta}
-            </Link>
           </div>
         </div>
       </section>
@@ -344,9 +343,7 @@ export function HomePage() {
             {EVENT.openNoticeTime} {EVENT.openNoticeAction}
           </h2>
           <OpenCountdown />
-          <Link href={REGISTER_HREF} className="btn btn--on-red">
-            {cta}
-          </Link>
+          <RegisterCta className="btn btn--on-red" />
         </div>
       </section>
       <HomeBoard />
