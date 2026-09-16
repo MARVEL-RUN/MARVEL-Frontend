@@ -5,12 +5,9 @@ import { useEffect, useState } from "react";
 import { readPendingPayment, type PendingPayment } from "@/lib/payment/session";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { SideBanner } from "../layout/SideBanner";
-import { RegisterClosed } from "../register/RegisterClosed";
 import { PaymentWidget } from "./PaymentWidget";
-import { useRegistrationOpen } from "../register/useRegistrationOpen";
 
 export function PaymentPage() {
-  const registrationOpen = useRegistrationOpen();
   const [pending, setPending] = useState<PendingPayment | null | undefined>(
     undefined,
   );
@@ -24,9 +21,6 @@ export function PaymentPage() {
     <main className="page">
       <SideBanner kicker="PAY" title="결제" en="CHECKOUT" />
       <div className="page__body wrap">
-        {!registrationOpen ? (
-          <RegisterClosed body="접수가 아직 열리지 않아 결제할 신청이 없습니다." />
-        ) : (
         <div className="flow">
           {pending === undefined ? (
             <p className="sec__body">결제 정보를 확인하는 중...</p>
@@ -46,7 +40,6 @@ export function PaymentPage() {
             </section>
           )}
         </div>
-        )}
       </div>
     </main>
   );
