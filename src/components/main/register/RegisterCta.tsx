@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Lock } from "lucide-react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { REGISTER_HREF, registrationOpen } from "@/lib/mode";
 
@@ -22,7 +23,8 @@ export function RegisterCta({ className, compact, plain }: Props) {
 
   if (plain) {
     return (
-      <button type="button" className={className} aria-disabled="true">
+      <button type="button" className={`${className} btn--locked`} disabled>
+        <Lock size={16} strokeWidth={2.4} aria-hidden />
         참가신청
       </button>
     );

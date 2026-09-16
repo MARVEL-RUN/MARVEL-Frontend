@@ -262,24 +262,24 @@ export function Header() {
                 </div>
                 {expanded
                   ? kids.map((child) => {
-                      const on = childOn(pathname, hash, child.href, item.href);
-                      return (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className={
-                            on
-                              ? "site-header__drawer-sub is-active"
-                              : "site-header__drawer-sub"
-                          }
-                          onClick={(event) =>
-                            goSection(event, child.href, item.href, true)
-                          }
-                        >
-                          {child.label}
-                        </Link>
-                      );
-                    })
+                    const on = childOn(pathname, hash, child.href, item.href);
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={
+                          on
+                            ? "site-header__drawer-sub is-active"
+                            : "site-header__drawer-sub"
+                        }
+                        onClick={(event) =>
+                          goSection(event, child.href, item.href, true)
+                        }
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })
                   : null}
               </div>
             );

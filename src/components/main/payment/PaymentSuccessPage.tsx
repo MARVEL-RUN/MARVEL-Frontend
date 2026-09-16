@@ -6,12 +6,14 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
+import { registerUiOpen } from "@/lib/mode";
 import { formatFee } from "@/lib/register";
 import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
+import { RegisterClosed } from "@/components/main/register/RegisterClosed";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -128,6 +130,10 @@ export function PaymentSuccessPage() {
     <main className="page">
       <SideBanner kicker="PAYMENT" title="결제" en="CHECKOUT" />
       <div className="page__body wrap">
+        {!registerUiOpen ? (
+          <RegisterClosed body="접수가 아직 열리지 않아 결제할 신청이 없습니다." />
+        ) : (
+        <>
         {phase === "loading" ? (
           <section className="ticket ticket--wait" aria-busy="true" aria-live="polite">
             <p className="kicker">PAYMENT</p>
@@ -247,6 +253,8 @@ export function PaymentSuccessPage() {
             </div>
           </section>
         ) : null}
+        </>
+        )}
       </div>
     </main>
   );
