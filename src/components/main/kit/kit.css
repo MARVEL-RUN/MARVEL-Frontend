@@ -478,7 +478,7 @@
 .kit-gallery__note {
   margin: 0.15rem 0 0;
   color: var(--note);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.04em;
   line-height: 1.5;
 }
@@ -570,7 +570,7 @@
 .kit-spec__notes {
   margin-top: 0.7rem;
   color: var(--note);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.02em;
   line-height: 1.55;
   word-break: keep-all;
