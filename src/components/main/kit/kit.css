@@ -25,14 +25,14 @@
   align-items: center;
   width: 100%;
   gap: 0.45rem;
-  margin: 2.4rem 0 0;
+  margin: 4rem 0 0;
   color: var(--note);
   text-align: center;
 }
 
 .kit-page__sponsor-more-notices {
   align-self: stretch;
-  margin: 0 0 0.85rem;
+  margin: 0 0 2.4rem;
   color: var(--note);
   font-size: 0.78rem;
   font-weight: 500;
