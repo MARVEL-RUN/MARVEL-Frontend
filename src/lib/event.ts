@@ -70,6 +70,10 @@ export const EVENT = {
       label: "접수일정",
       value: "2026년 9월 22일 화요일 오후 2시",
     },
+    {
+      label: "부문",
+      value: "10km / 5km / 2.3km",
+    },
   ],
   stats: [
     { value: "3", unit: "", label: "COURSES" },

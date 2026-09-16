@@ -9,7 +9,7 @@ export const isMain = APP_MODE === "main";
 
 /** 헤더 내비 (본페이지) */
 export const GUIDE_SECTIONS = [
-  { href: "/guide#overview", label: "한눈에 보기" },
+  { href: "/guide#overview", label: "대회개요" },
   { href: "/guide#timeline", label: "타임라인" },
   { href: "/guide#course", label: "코스" },
 ] as const;
