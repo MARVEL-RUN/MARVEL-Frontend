@@ -75,9 +75,6 @@ export function RegisterClosedModal({ open, onClose }: Props) {
         <p className="standby-v1__when">
           {EVENT.openNoticeDate} · {EVENT.openNoticeTime}
         </p>
-        <p className="standby-v1__desc">
-          오픈 시각에 개인 또는 단체 신청을 할 수 있습니다.
-        </p>
         <div className="standby-v1__actions">
           <button type="button" className="btn btn--red" onClick={onClose}>
             확인
