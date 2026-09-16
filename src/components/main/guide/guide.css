@@ -88,6 +88,25 @@
   height: 1.05rem;
 }
 
+.guide-sec .spec>div {
+  align-items: center;
+}
+
+.guide-sec .spec dt,
+.guide-sec .spec dd {
+  line-height: 1.45;
+}
+
+.spec__hosts-logo {
+  display: block;
+  width: auto;
+  height: 1.7rem;
+}
+
+.spec__hosts-logo--organizer {
+  height: 1.05rem;
+}
+
 .guide-rule {
   height: 1px;
   margin: 0;
