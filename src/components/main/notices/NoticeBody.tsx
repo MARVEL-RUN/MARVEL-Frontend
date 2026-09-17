@@ -1,31 +1,48 @@
-/* ==문구== 형광펜 / ■ 소제목 */
+/* ==문구== 형광펜 / ■ 소제목 / 1. → ① */
 
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
+
+const CIRCLE = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳";
 
 export function NoticeBody({ text }: { text: string }) {
   return (
-    <span className="notice-body">
-      {text.split("\n").map((line, i) => (
-        <Fragment key={i}>
-          {i > 0 ? "\n" : null}
-          {renderLine(line, i)}
-        </Fragment>
-      ))}
-    </span>
+    <div className="notice-body">
+      {text.split("\n").map((line, i) => {
+        if (line === "") return <div key={i} className="notice-gap" />;
+
+        const numbered = /^(\d+)\.\s+(.*)$/.exec(line);
+        if (numbered) {
+          return (
+            <div key={i} className="notice-ol">
+              <span className="notice-ol__no">{circleNo(Number(numbered[1]))}</span>
+              <span className="notice-ol__text">{renderMarks(numbered[2], i)}</span>
+            </div>
+          );
+        }
+
+        const heading = /^■\s*(.+)$/.exec(line);
+        if (heading) {
+          return (
+            <div key={i} className="notice-line">
+              ■{" "}
+              <mark className="notice-hl notice-hl--head">{heading[1]}</mark>
+            </div>
+          );
+        }
+
+        return (
+          <div key={i} className="notice-line">
+            {renderMarks(line, i)}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
-function renderLine(line: string, lineKey: number) {
-  const heading = /^■\s*(.+)$/.exec(line);
-  if (heading) {
-    return (
-      <>
-        ■{" "}
-        <mark className="notice-hl notice-hl--head">{heading[1]}</mark>
-      </>
-    );
-  }
-  return renderMarks(line, lineKey);
+function circleNo(n: number) {
+  if (n >= 1 && n <= CIRCLE.length) return CIRCLE[n - 1];
+  return `${n}.`;
 }
 
 function renderMarks(text: string, lineKey: number) {

@@ -41,9 +41,9 @@ export function BoardFold({
               <span className="board-fold__chev" aria-hidden="true" />
             </button>
             {open ? (
-              <p className="board-fold__body">
+              <div className="board-fold__body">
                 <NoticeBody text={item.body} />
-              </p>
+              </div>
             ) : null}
           </li>
         );

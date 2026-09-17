@@ -332,8 +332,32 @@
 }
 
 .notice-body {
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-noto), "Noto Sans KR", "맑은 고딕", sans-serif;
   color: #fff;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.notice-gap {
+  height: 0.85em;
+}
+
+.notice-ol {
+  display: grid;
+  grid-template-columns: 1.55em minmax(0, 1fr);
+  column-gap: 0.4em;
+  align-items: start;
+}
+
+.notice-ol__no {
+  text-align: center;
+}
+
+.notice-ol__text {
+  min-width: 0;
 }
 
 .notice-hl {
