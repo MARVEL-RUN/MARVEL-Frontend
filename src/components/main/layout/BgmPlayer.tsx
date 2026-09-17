@@ -45,8 +45,10 @@ export function BgmPlayer() {
 
     async function play() {
       if (!wantedRef.current) return;
+      const audio = audioRef.current;
+      if (!audio) return;
       try {
-        await el.play();
+        await audio.play();
       } catch {
         /* 첫 제스처까지 대기 */
       }
