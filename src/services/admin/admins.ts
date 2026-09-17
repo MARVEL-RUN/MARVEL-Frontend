@@ -1,4 +1,4 @@
-import type { AdminUser } from "@/types/admin";
+import type { AdminUser } from "@/types/admin/admin";
 
 const delay = () => new Promise((r) => setTimeout(r, 80));
 

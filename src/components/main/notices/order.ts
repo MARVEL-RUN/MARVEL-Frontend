@@ -1,4 +1,4 @@
-import type { AdminNotice } from "@/types/admin";
+import type { AdminNotice } from "@/types/admin/admin";
 
 export function orderNotices(rows: AdminNotice[]) {
   return [...rows].sort((a, b) => {

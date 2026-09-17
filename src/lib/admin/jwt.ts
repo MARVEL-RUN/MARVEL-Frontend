@@ -1,4 +1,4 @@
-import { ADMIN_ROLES } from "@/types/admin";
+import { ADMIN_ROLES } from "@/types/admin/admin";
 
 function decodeBase64Url(value: string) {
   const binary = atob(value.replace(/-/g, "+").replace(/_/g, "/"));

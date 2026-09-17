@@ -9,7 +9,7 @@ import {
   type NoticeCategory,
 } from "@/lib/admin/noticeCategories";
 import { deleteAdminNotice, listAdminNotices } from "@/services/admin/notices";
-import type { AdminNotice } from "@/types/admin";
+import type { AdminNotice } from "@/types/admin/admin";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";

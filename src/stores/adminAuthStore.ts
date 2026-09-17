@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { AdminUser } from "@/types/admin";
+import type { AdminUser } from "@/types/admin/admin";
 
 type Tokens = {
   accessToken: string;

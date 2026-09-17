@@ -5,13 +5,22 @@ import { useEffect, useId, useState } from "react";
 
 type Props = {
   open: boolean;
+  error?: string;
   onClose: () => void;
   onConfirm: (password: string) => void;
+  onClearError?: () => void;
 };
 
-export function InquirySecretModal({ open, onClose, onConfirm }: Props) {
+export function InquirySecretModal({
+  open,
+  error = "",
+  onClose,
+  onConfirm,
+  onClearError,
+}: Props) {
   const titleId = useId();
   const inputId = useId();
+  const errorId = useId();
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
 
@@ -19,6 +28,7 @@ export function InquirySecretModal({ open, onClose, onConfirm }: Props) {
     if (!open) return;
     setPassword("");
     setShow(false);
+    onClearError?.();
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (event: KeyboardEvent) => {
@@ -29,7 +39,7 @@ export function InquirySecretModal({ open, onClose, onConfirm }: Props) {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -64,46 +74,69 @@ export function InquirySecretModal({ open, onClose, onConfirm }: Props) {
         <p className="inquiry-secret__desc">
           이 글은 비밀글로 설정되어 있어 작성자만 볼 수 있습니다.
         </p>
-        <label className="inquiry-secret__field" htmlFor={inputId}>
-          <span>비밀번호</span>
-          <span className="inquiry-secret__control">
-            <input
-              id={inputId}
-              type={show ? "text" : "password"}
-              value={password}
-              placeholder="비밀번호를 입력해주세요"
-              autoFocus
-              autoComplete="current-password"
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  onConfirm(password);
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="inquiry-secret__eye"
-              aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
-              onClick={() => setShow((v) => !v)}
+        <form
+          className="inquiry-secret__form"
+          autoComplete="off"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onConfirm(password);
+          }}
+        >
+          <label className="inquiry-secret__field" htmlFor={inputId}>
+            <span>비밀번호</span>
+            <span
+              className={
+                error
+                  ? "inquiry-secret__control is-error"
+                  : "inquiry-secret__control"
+              }
             >
-              {show ? <EyeOff size={18} /> : <Eye size={18} />}
+              <input
+                id={inputId}
+                name="inquiry-secret-pass"
+                type={show ? "text" : "password"}
+                value={password}
+                placeholder="비밀번호를 입력해주세요"
+                autoFocus
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
+                data-form-type="other"
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? errorId : undefined}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) onClearError?.();
+                }}
+              />
+              <button
+                type="button"
+                className="inquiry-secret__eye"
+                aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
+                onClick={() => setShow((v) => !v)}
+              >
+                {show ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </span>
+            {error ? (
+              <p id={errorId} className="inquiry-secret__error" role="alert">
+                {error}
+              </p>
+            ) : null}
+          </label>
+          <div className="inquiry-secret__actions">
+            <button type="button" className="btn btn--ghost" onClick={onClose}>
+              취소
             </button>
-          </span>
-        </label>
-        <div className="inquiry-secret__actions">
-          <button type="button" className="btn btn--ghost" onClick={onClose}>
-            취소
-          </button>
-          <button
-            type="button"
-            className="btn btn--red"
-            onClick={() => onConfirm(password)}
-          >
-            확인
-          </button>
-        </div>
+            <button type="submit" className="btn btn--red">
+              확인
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

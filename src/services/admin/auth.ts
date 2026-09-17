@@ -2,7 +2,7 @@ import { ADMIN_API_BASE, hasAdminApi } from "@/lib/admin/config";
 import { decodeToken, extractRoles } from "@/lib/admin/jwt";
 import { adminToken } from "@/lib/admin/token";
 import { useAdminAuthStore } from "@/stores";
-import type { AdminUser } from "@/types/admin";
+import type { AdminUser } from "@/types/admin/admin";
 
 type LoginInput = {
   account: string;

@@ -1,40 +1,38 @@
 "use client";
 
-import { createInquiry, getInquiry, updateInquiry } from "@/services/main/inquiries";
+import { DEFAULT_EVENT_ID } from "@/lib/main/config";
+import {
+  createPublicQuestion,
+  getPublicQuestionDetail,
+  updatePublicQuestion,
+} from "@/services/main/questions";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { mainToast, useMainAlert } from "../feedback/MainFeedback";
 import { SideBanner } from "../layout/SideBanner";
 import { PasswordField } from "../register/ApplyUi";
-import { isInquiryUnlocked, unlockInquiry } from "./order";
+import {
+  getInquiryPassword,
+  isInquiryUnlocked,
+  unlockInquiry,
+} from "./order";
 
-const ATTACH_ACCEPT =
-  ".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,image/jpeg,image/png,application/pdf";
-const ATTACH_MAX = 10;
-const ATTACH_NAME_MAX = 80;
-const ATTACH_NOTES = [
-  "텍스트 에디터 내 이미지: JPG, PNG (크기 조절 가능)",
-  "첨부파일: JPG, PNG, PDF, DOC, XLS, XLSX",
-  "첨부파일 이름이 너무 길면 등록이 실패할 수 있습니다",
-];
-
-type AttachFile = {
-  id: string;
-  name: string;
-  size: number;
-};
-
-function formatSize(size: number) {
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+function pickCreatedId(res: unknown): string | null {
+  if (typeof res === "string" && res.trim()) return res.trim();
+  if (res && typeof res === "object") {
+    const row = res as Record<string, unknown>;
+    if (typeof row.id === "string" && row.id) return row.id;
+    if (typeof row.questionId === "string" && row.questionId) return row.questionId;
+  }
+  return null;
 }
 
 export function InquiryWritePage() {
   const router = useRouter();
   const editId = useSearchParams().get("id") ?? "";
   const editing = Boolean(editId);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const { alert: showAlert, modal: alertModal } = useMainAlert();
   const [ready, setReady] = useState(!editing);
   const [missing, setMissing] = useState(false);
   const [name, setName] = useState("");
@@ -42,9 +40,12 @@ export function InquiryWritePage() {
   const [body, setBody] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [agree, setAgree] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [files, setFiles] = useState<AttachFile[]>([]);
+  const [secret, setSecret] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [editId, ready]);
 
   useEffect(() => {
     if (!editId) {
@@ -56,44 +57,26 @@ export function InquiryWritePage() {
       router.replace(`/inquiry/view?id=${editId}`);
       return;
     }
-    void getInquiry(editId).then((row) => {
-      if (!row) {
+    const savedPassword = getInquiryPassword(editId);
+    void getPublicQuestionDetail(editId, savedPassword)
+      .then((detail) => {
+        const q = detail.questionDetail;
+        if (detail.answerDetail?.content) {
+          router.replace(`/inquiry/view?id=${editId}`);
+          return;
+        }
+        setName(q.author);
+        setTitle(q.title);
+        setBody(q.content);
+        setSecret(q.secret);
+        setPassword(savedPassword);
+        setReady(true);
+      })
+      .catch(() => {
         setMissing(true);
         setReady(true);
-        return;
-      }
-      if (row.answer) {
-        router.replace(`/inquiry/view?id=${editId}`);
-        return;
-      }
-      setName(row.name);
-      setTitle(row.title);
-      setBody(row.body);
-      setFiles(row.attachments?.map((file) => ({ ...file })) ?? []);
-      setAgree(true);
-      setReady(true);
-    });
+      });
   }, [editId, router]);
-
-  const onPickFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const picked = Array.from(event.target.files ?? []);
-    event.target.value = "";
-    if (picked.length === 0) return;
-
-    setFiles((prev) => {
-      const next = [...prev];
-      for (const file of picked) {
-        if (next.length >= ATTACH_MAX) break;
-        if (file.name.length > ATTACH_NAME_MAX) continue;
-        next.push({
-          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-          name: file.name,
-          size: file.size,
-        });
-      }
-      return next;
-    });
-  };
 
   const cancelHref = editing ? `/inquiry/view?id=${editId}` : "/inquiry";
 
@@ -130,66 +113,69 @@ export function InquiryWritePage() {
       <div className="page__body wrap">
         <form
           className="board-write"
+          noValidate
           onSubmit={async (e) => {
             e.preventDefault();
             if (!name.trim() || !title.trim() || !body.trim()) {
-              alert("작성자, 제목, 내용을 입력해 주세요.");
+              showAlert("작성자, 제목, 내용을 입력해 주세요.", "입력 확인");
               return;
             }
             if (!editing) {
               if (password.trim().length < 4) {
-                alert("비밀번호는 4자 이상 입력해 주세요.");
+                showAlert("비밀번호는 4자 이상 입력해 주세요.", "입력 확인");
                 return;
               }
               if (password !== passwordConfirm) {
-                alert("비밀번호가 일치하지 않습니다.");
+                showAlert("비밀번호가 일치하지 않습니다.", "입력 확인");
                 return;
               }
-            } else if (password.trim() || passwordConfirm.trim()) {
-              if (password.trim().length < 4) {
-                alert("비밀번호는 4자 이상 입력해 주세요.");
-                return;
-              }
-              if (password !== passwordConfirm) {
-                alert("비밀번호가 일치하지 않습니다.");
-                return;
-              }
-            }
-            if (!agree) {
-              alert("개인정보 수집·이용에 동의해 주세요.");
-              return;
             }
             setSaving(true);
             try {
-              const attachments = files.map(({ id, name, size }) => ({
-                id,
-                name,
-                size,
-              }));
-              const row = editing
-                ? await updateInquiry(editId, {
-                    name,
-                    title,
-                    body,
-                    attachments,
-                    password: password.trim() || undefined,
-                  })
-                : await createInquiry({
-                    name,
-                    title,
-                    body,
-                    password,
-                    attachments,
-                  });
-              unlockInquiry(row.id);
-              router.replace(`/inquiry/view?id=${row.id}`);
+              if (editing) {
+                const savedPassword = getInquiryPassword(editId) || password;
+                if (!savedPassword) {
+                  showAlert(
+                    "비밀번호 확인 후 다시 시도해 주세요.",
+                    "수정 실패",
+                  );
+                  return;
+                }
+                await updatePublicQuestion(editId, {
+                  patch: {
+                    title: title.trim(),
+                    content: body.trim(),
+                    secret,
+                  },
+                  password: savedPassword,
+                });
+                unlockInquiry(editId, savedPassword);
+                mainToast.success("문의가 수정되었습니다.");
+                router.replace(`/inquiry/view?id=${editId}`);
+                return;
+              }
+
+              const created = await createPublicQuestion(DEFAULT_EVENT_ID, {
+                post: {
+                  title: title.trim(),
+                  content: body.trim(),
+                  secret: true,
+                },
+                nickName: name.trim(),
+                password: password.trim(),
+              });
+              const id = pickCreatedId(created);
+              if (id) unlockInquiry(id, password.trim());
+              mainToast.success("문의가 등록되었습니다.");
+              router.replace("/inquiry");
             } catch (error) {
-              alert(
+              showAlert(
                 error instanceof Error
                   ? error.message
                   : editing
                     ? "수정에 실패했습니다."
                     : "등록에 실패했습니다.",
+                editing ? "수정 실패" : "등록 실패",
               );
             } finally {
               setSaving(false);
@@ -213,6 +199,7 @@ export function InquiryWritePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
+                disabled={editing}
               />
             </div>
           </div>
@@ -242,115 +229,57 @@ export function InquiryWritePage() {
             </div>
           </div>
 
-          <div className="form-row">
-            <span className="form-row__label">
-              비밀번호 {editing ? null : <em>*</em>}
-            </span>
-            <div className="form-row__ctrl">
-              <PasswordField
-                value={password}
-                onChange={setPassword}
-                required={!editing}
-                label="문의 비밀번호"
-                placeholder={
-                  editing
-                    ? "변경할 때만 입력 (4자 이상)"
-                    : "글 확인용 비밀번호 (4자 이상)"
-                }
-                autoComplete="new-password"
-              />
+          {editing ? (
+            <div className="form-row">
+              <span className="form-row__label">비밀번호</span>
+              <div className="form-row__ctrl">
+                <PasswordField
+                  value={password}
+                  onChange={() => {}}
+                  label="문의 비밀번호"
+                  placeholder="••••••••"
+                  autoComplete="off"
+                  minLength={0}
+                  disabled
+                />
+                <p className="board-write__hint">비밀번호는 수정할 수 없습니다.</p>
+              </div>
             </div>
-          </div>
-          <div className="form-row">
-            <span className="form-row__label">
-              비밀번호 확인 {editing ? null : <em>*</em>}
-            </span>
-            <div className="form-row__ctrl">
-              <PasswordField
-                name="passwordConfirm"
-                value={passwordConfirm}
-                onChange={setPasswordConfirm}
-                required={!editing}
-                label="문의 비밀번호 확인"
-                placeholder={
-                  editing
-                    ? "변경할 때만 다시 입력"
-                    : "비밀번호를 다시 입력하세요."
-                }
-                autoComplete="new-password"
-              />
-            </div>
-          </div>
-
-          <div className="form-row is-top">
-            <span className="form-row__label">첨부파일</span>
-            <div className="form-row__ctrl board-attach">
-              <div className="board-attach__head">
-                <button
-                  type="button"
-                  className="btn btn--ghost board-attach__upload"
-                  onClick={() => {
-                    if (files.length >= ATTACH_MAX) return;
-                    fileRef.current?.click();
-                  }}
-                >
-                  첨부파일 업로드
-                </button>
-                <span>
-                  {files.length}개 / {ATTACH_MAX}개
+          ) : (
+            <>
+              <div className="form-row">
+                <span className="form-row__label">
+                  비밀번호 <em>*</em>
                 </span>
+                <div className="form-row__ctrl">
+                  <PasswordField
+                    value={password}
+                    onChange={setPassword}
+                    label="문의 비밀번호"
+                    placeholder="글 확인용 비밀번호 (4자 이상)"
+                    autoComplete="new-password"
+                    minLength={0}
+                  />
+                </div>
               </div>
-              <input
-                ref={fileRef}
-                type="file"
-                className="board-attach__input"
-                accept={ATTACH_ACCEPT}
-                multiple
-                onChange={onPickFiles}
-              />
-              <div className={`board-attach__box${files.length ? " has-files" : ""}`}>
-                {files.length === 0 ? (
-                  <p className="board-attach__empty">등록된 파일이 없습니다.</p>
-                ) : (
-                  <ul className="board-attach__list">
-                    {files.map((file) => (
-                      <li key={file.id}>
-                        <span className="board-attach__name">{file.name}</span>
-                        <span className="board-attach__size">{formatSize(file.size)}</span>
-                        <button
-                          type="button"
-                          className="board-attach__remove"
-                          aria-label={`${file.name} 삭제`}
-                          onClick={() =>
-                            setFiles((prev) => prev.filter((f) => f.id !== file.id))
-                          }
-                        >
-                          삭제
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              <div className="form-row">
+                <span className="form-row__label">
+                  비밀번호 확인 <em>*</em>
+                </span>
+                <div className="form-row__ctrl">
+                  <PasswordField
+                    name="passwordConfirm"
+                    value={passwordConfirm}
+                    onChange={setPasswordConfirm}
+                    label="문의 비밀번호 확인"
+                    placeholder="비밀번호를 다시 입력하세요."
+                    autoComplete="new-password"
+                    minLength={0}
+                  />
+                </div>
               </div>
-              <ul className="board-attach__notes">
-                {ATTACH_NOTES.map((note) => (
-                  <li key={note}>{note}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <label className="board-write__agree">
-            <input
-              type="checkbox"
-              checked={agree}
-              onChange={(e) => setAgree(e.target.checked)}
-            />
-            <span>
-              문의 접수 및 답변을 위해 작성자·문의내용을 수집·이용하는 데
-              동의합니다.
-            </span>
-          </label>
+            </>
+          )}
 
           <div className="board-write__actions">
             <Link href="/inquiry" className="btn btn--ghost">
@@ -373,6 +302,7 @@ export function InquiryWritePage() {
           </div>
         </form>
       </div>
+      {alertModal}
     </main>
   );
 }

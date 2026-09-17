@@ -3,7 +3,7 @@
 import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { adminToast } from "@/components/admin/Toast";
 import { listPopups, savePopups } from "@/services/admin/popups";
-import type { AdminPopup } from "@/types/popup";
+import type { AdminPopup } from "@/types/admin/popup";
 import { useEffect, useState } from "react";
 import { PopupCard } from "./PopupCard";
 import { PopupPreview } from "./PopupPreview";

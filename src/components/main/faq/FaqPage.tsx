@@ -2,7 +2,7 @@
 
 import { FAQ_CATEGORIES, type FaqCategory } from "@/lib/admin/faqCategories";
 import { listFaqs } from "@/services/admin/faqs";
-import type { AdminFaq } from "@/types/boards";
+import type { AdminFaq } from "@/types/admin/boards";
 import { useEffect, useMemo, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 

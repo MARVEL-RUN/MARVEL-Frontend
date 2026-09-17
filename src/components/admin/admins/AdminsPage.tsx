@@ -6,7 +6,7 @@ import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
 import { listAdmins, resetAdminPassword } from "@/services/admin/admins";
 import { useAdminAuthStore } from "@/stores";
-import type { AdminUser } from "@/types/admin";
+import type { AdminUser } from "@/types/admin/admin";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function AdminsPage() {
