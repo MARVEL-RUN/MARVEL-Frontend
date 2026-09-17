@@ -109,6 +109,7 @@
   white-space: nowrap;
 }
 
+.board--notice .board__no,
 .board__row.is-pin .board__no {
   color: var(--marvel);
   font-weight: 800;

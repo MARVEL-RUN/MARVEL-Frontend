@@ -11,7 +11,7 @@ import {
   type BoardSort,
 } from "../board/BoardSearch";
 import { SideBanner } from "../layout/SideBanner";
-import { noticeNo, orderNotices } from "./order";
+import { orderNotices } from "./order";
 
 export function NoticesPage() {
   const [items, setItems] = useState<AdminNotice[]>([]);
@@ -27,7 +27,6 @@ export function NoticesPage() {
     });
   }, []);
 
-  const nos = useMemo(() => noticeNo(items), [items]);
   const shown = useMemo(() => {
     const filtered = items.filter((n) => matchQuery([n.title], applied));
     return [...filtered].sort((a, b) => {
@@ -69,7 +68,7 @@ export function NoticesPage() {
                 href={`/notices/view?id=${n.id}`}
                 className={n.pinned ? "board__row is-pin" : "board__row"}
               >
-                <span className="board__no">{n.pinned ? "공지" : nos.get(n.id)}</span>
+                <span className="board__no">공지</span>
                 <strong className="board__title">{n.title}</strong>
                 <time dateTime={n.date.replaceAll(".", "-")}>{n.date}</time>
               </Link>
