@@ -5,6 +5,7 @@ import type { AdminNotice } from "@/types/admin";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { NoticeBody } from "./NoticeBody";
 import { orderNotices } from "./order";
 
 export function NoticeDetailPage() {
@@ -52,7 +53,9 @@ export function NoticeDetailPage() {
                 <time dateTime={post.date.replaceAll(".", "-")}>{post.date}</time>
               </p>
             </header>
-            <div className="post__body">{post.body}</div>
+            <div className="post__body">
+              <NoticeBody text={post.body} />
+            </div>
             <nav className="post__nav" aria-label="이전·다음 글">
               <NavRow label="다음글" item={next} />
               <NavRow label="이전글" item={prev} />

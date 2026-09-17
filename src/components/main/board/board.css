@@ -331,6 +331,19 @@
   white-space: pre-wrap;
 }
 
+.notice-hl {
+  padding: 0.04em 0.16em 0.06em;
+  background: color-mix(in srgb, var(--gold) 28%, transparent);
+  color: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.notice-hl--head {
+  font-weight: 700;
+  background: color-mix(in srgb, var(--marvel) 26%, transparent);
+}
+
 .post__unlock {
   display: grid;
   gap: 0.9rem;
