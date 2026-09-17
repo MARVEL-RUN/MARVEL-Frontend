@@ -1,7 +1,7 @@
 import { EVENT } from "@/lib/event";
 import { nextId, readStore, todayStamp, wait, writeStore } from "@/lib/admin/store";
 import { isNoticeCategory } from "@/lib/admin/noticeCategories";
-import type { AdminNotice } from "@/types/admin/admin";
+import type { AdminNotice } from "@/types/admin";
 
 const KEY = "mr-admin-notices-v4";
 

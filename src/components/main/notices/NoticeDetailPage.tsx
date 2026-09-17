@@ -1,7 +1,7 @@
 "use client";
 
 import { getAdminNotice, listAdminNotices } from "@/services/admin/notices";
-import type { AdminNotice } from "@/types/admin/admin";
+import type { AdminNotice } from "@/types/admin";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
