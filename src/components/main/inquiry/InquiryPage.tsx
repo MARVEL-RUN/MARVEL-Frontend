@@ -17,7 +17,7 @@ import { BoardSearch, type BoardSort } from "../board/BoardSearch";
 import { SideBanner } from "../layout/SideBanner";
 import { InquirySecretModal } from "./InquirySecretModal";
 import {
-  formatInquiryDate,
+  inquiryDateParts,
   toDateTimeAttr,
   unlockInquiry,
 } from "./order";
@@ -136,7 +136,7 @@ export function InquiryPage() {
             <span>상태</span>
             <span>제목</span>
             <span>작성자</span>
-            <span>등록일</span>
+            <span>날짜</span>
           </div>
           {!ready ? (
             <p className="board__empty">불러오는 중...</p>
@@ -150,6 +150,7 @@ export function InquiryPage() {
             items.map((item) => {
               const q = item.questionHeader;
               const answered = q.answered || Boolean(item.answerHeader);
+              const when = inquiryDateParts(q.createdAt);
               return (
                 <button
                   key={q.id}
@@ -176,7 +177,10 @@ export function InquiryPage() {
                   <span className="board__meta">
                     <span className="board__name">{q.authorName}</span>
                     <time dateTime={toDateTimeAttr(q.createdAt)}>
-                      {formatInquiryDate(q.createdAt)}
+                      <span className="board__day">{when.day}</span>
+                      {when.time ? (
+                        <span className="board__clock"> {when.time}</span>
+                      ) : null}
                     </time>
                   </span>
                 </button>
