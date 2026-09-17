@@ -543,6 +543,48 @@ body:has(.sheet-modal) .side-dock {
   animation: none;
 }
 
+.bgm-toggle {
+  position: fixed;
+  right: 1.1rem;
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #07081c;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.28), 0 4px 0 rgba(0, 0, 0, 0.28);
+}
+
+.bgm-toggle svg {
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.bgm-toggle:hover,
+.bgm-toggle.is-on {
+  background: var(--marvel);
+  color: #fff;
+}
+
+html.is-intro .bgm-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body:has(.site-header__drawer.is-open) .bgm-toggle,
+body:has(.course-preview) .bgm-toggle,
+body:has(.sheet-modal) .bgm-toggle {
+  display: none;
+}
+
 .site-footer__inner {
   width: min(1200px, calc(100% - 2.5rem));
   margin-inline: auto;
@@ -881,6 +923,19 @@ body:has(.sheet-modal) .side-dock {
 
   .site-header__drawer-actions {
     display: flex;
+  }
+
+  .bgm-toggle {
+    right: max(0.85rem, env(safe-area-inset-right, 0px));
+    bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    width: 2.15rem;
+    height: 2.15rem;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28), 0 3px 0 rgba(0, 0, 0, 0.28);
+  }
+
+  .bgm-toggle svg {
+    width: 0.95rem;
+    height: 0.95rem;
   }
 
   html.is-main .wrap,

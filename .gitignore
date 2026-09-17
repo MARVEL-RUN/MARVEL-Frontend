@@ -10,3 +10,12 @@ out/
 *.tsbuildinfo
 .env
 .env.*
+
+# 루트에 받아 둔 원본
+/KakaoTalk_*
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+/*.mp3
+/*.m4a

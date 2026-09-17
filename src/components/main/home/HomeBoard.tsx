@@ -1,30 +1,77 @@
 "use client";
 
 import { listFaqs } from "@/services/admin/faqs";
-import { listAdminNotices } from "@/services/admin/notices";
-import { useEffect, useState } from "react";
-import { BoardFold } from "../board/BoardFold";
+import {
+  getPublicNoticeDetail,
+  listPublicNotices,
+  mergeNoticeList,
+} from "@/services/main/notices";
+import { useCallback, useEffect, useState } from "react";
+import { BoardFold, type BoardFoldItem } from "../board/BoardFold";
 import { BoardSwitch, type BoardTabId } from "../board/BoardSwitch";
-import { orderNotices } from "../notices/order";
+
+async function withNoticeBodies(rows: BoardFoldItem[]) {
+  return Promise.all(
+    rows.map(async (row) => {
+      try {
+        const detail = await getPublicNoticeDetail(row.id);
+        return { ...row, body: detail.content ?? "" };
+      } catch {
+        return { ...row, body: "" };
+      }
+    }),
+  );
+}
 
 export function HomeBoard() {
   const [tab, setTab] = useState<BoardTabId>("notices");
-  const [notices, setNotices] = useState<{ id: string; title: string; body: string }[]>(
-    [],
-  );
-  const [faqs, setFaqs] = useState<{ id: string; title: string; body: string }[]>([]);
+  const [notices, setNotices] = useState<BoardFoldItem[]>([]);
+  const [faqs, setFaqs] = useState<BoardFoldItem[]>([]);
+
+  const loadNoticeBody = useCallback((id: string) => {
+    void getPublicNoticeDetail(id)
+      .then((detail) => {
+        setNotices((rows) =>
+          rows.map((row) =>
+            row.id === id ? { ...row, body: detail.content ?? "" } : row,
+          ),
+        );
+      })
+      .catch(() => {
+        setNotices((rows) =>
+          rows.map((row) => (row.id === id ? { ...row, body: "" } : row)),
+        );
+      });
+  }, []);
 
   useEffect(() => {
-    void listAdminNotices().then((rows) => {
-      setNotices(
-        orderNotices(rows).map((row) => ({
+    let cancelled = false;
+
+    void listPublicNotices({
+      page: 0,
+      size: 5,
+      limit: 5,
+      sort: "LATEST",
+    })
+      .then(async (result) => {
+        const rows = mergeNoticeList(
+          result.pinnedNoticeList,
+          result.noticePage.content ?? [],
+        ).map((row) => ({
           id: row.id,
           title: row.title,
-          body: row.body,
-        })),
-      );
-    });
+        }));
+        if (cancelled) return;
+        setNotices(rows);
+        const filled = await withNoticeBodies(rows);
+        if (!cancelled) setNotices(filled);
+      })
+      .catch(() => {
+        if (!cancelled) setNotices([]);
+      });
+
     void listFaqs().then((rows) => {
+      if (cancelled) return;
       setFaqs(
         rows.map((row) => ({
           id: row.id,
@@ -33,6 +80,10 @@ export function HomeBoard() {
         })),
       );
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const items = tab === "notices" ? notices : faqs;
@@ -60,6 +111,7 @@ export function HomeBoard() {
           items={items}
           empty={empty}
           mark={tab === "faq" ? "Q." : undefined}
+          onExpand={tab === "notices" ? loadNoticeBody : undefined}
         />
       </div>
     </section>
