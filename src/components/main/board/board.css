@@ -67,6 +67,11 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.board--notice .board__head,
+.board--notice .board__row {
+  grid-template-columns: 5.2rem minmax(0, 1fr) 7rem;
+}
+
 .board__head {
   color: var(--note);
   font-size: 0.78rem;
@@ -109,9 +114,18 @@
   white-space: nowrap;
 }
 
-.board--notice .board__no,
-.board__row.is-pin .board__no {
+.board--notice .board__no.is-must {
   color: var(--marvel);
+  font-weight: 800;
+}
+
+.board--notice .board__no.is-offi {
+  color: #fff;
+  font-weight: 800;
+}
+
+.board--notice .board__no.is-plain {
+  color: var(--note);
   font-weight: 800;
 }
 
@@ -444,6 +458,22 @@
   border-color: rgba(255, 255, 255, 0.42);
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
+}
+
+.post__cat {
+  font-weight: 800;
+}
+
+.post__cat.is-must {
+  color: var(--marvel);
+}
+
+.post__cat.is-offi {
+  color: #fff;
+}
+
+.post__cat.is-plain {
+  color: var(--note);
 }
 
 .post__body {

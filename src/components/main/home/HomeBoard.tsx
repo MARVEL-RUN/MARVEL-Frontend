@@ -1,29 +1,40 @@
 "use client";
 
 import { listFaqs } from "@/services/admin/faqs";
-import { listAdminNotices } from "@/services/admin/notices";
+import {
+  getPublicNoticeDetail,
+  listPublicNotices,
+  mergeNoticeList,
+} from "@/services/main/notices";
 import { useEffect, useState } from "react";
-import { BoardFold } from "../board/BoardFold";
+import { BoardFold, type BoardFoldItem } from "../board/BoardFold";
 import { BoardSwitch, type BoardTabId } from "../board/BoardSwitch";
-import { orderNotices } from "../notices/order";
 
 export function HomeBoard() {
   const [tab, setTab] = useState<BoardTabId>("notices");
-  const [notices, setNotices] = useState<{ id: string; title: string; body: string }[]>(
-    [],
-  );
-  const [faqs, setFaqs] = useState<{ id: string; title: string; body: string }[]>([]);
+  const [notices, setNotices] = useState<BoardFoldItem[]>([]);
+  const [faqs, setFaqs] = useState<BoardFoldItem[]>([]);
 
   useEffect(() => {
-    void listAdminNotices().then((rows) => {
-      setNotices(
-        orderNotices(rows).map((row) => ({
-          id: row.id,
-          title: row.title,
-          body: row.body,
-        })),
-      );
-    });
+    void listPublicNotices({
+      page: 0,
+      size: 5,
+      limit: 5,
+      sort: "LATEST",
+    })
+      .then((result) => {
+        setNotices(
+          mergeNoticeList(
+            result.pinnedNoticeList,
+            result.noticePage.content ?? [],
+          ).map((row) => ({
+            id: row.id,
+            title: row.title,
+          })),
+        );
+      })
+      .catch(() => setNotices([]));
+
     void listFaqs().then((rows) => {
       setFaqs(
         rows.map((row) => ({
@@ -60,6 +71,29 @@ export function HomeBoard() {
           items={items}
           empty={empty}
           mark={tab === "faq" ? "Q." : undefined}
+          onExpand={
+            tab === "notices"
+              ? (id) => {
+                  void getPublicNoticeDetail(id)
+                    .then((detail) => {
+                      setNotices((rows) =>
+                        rows.map((row) =>
+                          row.id === id
+                            ? { ...row, body: detail.content ?? "" }
+                            : row,
+                        ),
+                      );
+                    })
+                    .catch(() => {
+                      setNotices((rows) =>
+                        rows.map((row) =>
+                          row.id === id ? { ...row, body: "" } : row,
+                        ),
+                      );
+                    });
+                }
+              : undefined
+          }
         />
       </div>
     </section>

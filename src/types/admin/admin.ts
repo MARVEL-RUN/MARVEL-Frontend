@@ -13,12 +13,3 @@ export type AdminPayStatus =
   | "pending"
   | "refund_requested"
   | "refunded";
-
-export type AdminNotice = {
-  id: string;
-  date: string;
-  tag: string;
-  title: string;
-  pinned: boolean;
-  body: string;
-};
