@@ -219,3 +219,6 @@ export const EVENT = {
   sponsorMoreNote: "스폰서 패키지 추후 공개 예정",
   copyright: "ⓒ2026 MARVEL",
 } as const;
+
+export const OG_TITLE = "2026 MARVEL RUN";
+export const OG_DESCRIPTION = `${EVENT.lead}. 10월 31일 ${EVENT.venue}.`;
