@@ -543,6 +543,42 @@ body:has(.sheet-modal) .side-dock {
   animation: none;
 }
 
+.bgm-toggle {
+  position: fixed;
+  right: 1.1rem;
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #07081c;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.28), 0 4px 0 rgba(0, 0, 0, 0.28);
+}
+
+.bgm-toggle:hover,
+.bgm-toggle.is-on {
+  background: var(--marvel);
+  color: #fff;
+}
+
+html.is-intro .bgm-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body:has(.site-header__drawer.is-open) .bgm-toggle,
+body:has(.course-preview) .bgm-toggle,
+body:has(.sheet-modal) .bgm-toggle {
+  display: none;
+}
+
 .site-footer__inner {
   width: min(1200px, calc(100% - 2.5rem));
   margin-inline: auto;
@@ -881,6 +917,13 @@ body:has(.sheet-modal) .side-dock {
 
   .site-header__drawer-actions {
     display: flex;
+  }
+
+  .bgm-toggle {
+    right: var(--gutter, 1.25rem);
+    bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    width: var(--tap);
+    height: var(--tap);
   }
 
   html.is-main .wrap,
