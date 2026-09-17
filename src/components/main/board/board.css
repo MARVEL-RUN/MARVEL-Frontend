@@ -333,15 +333,16 @@
 
 .notice-hl {
   padding: 0.04em 0.16em 0.06em;
-  background: color-mix(in srgb, var(--gold) 28%, transparent);
-  color: inherit;
+  background: color-mix(in srgb, var(--gold) 52%, transparent);
+  color: #fff;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 
 .notice-hl--head {
   font-weight: 700;
-  background: color-mix(in srgb, var(--marvel) 26%, transparent);
+  background: color-mix(in srgb, var(--marvel) 48%, transparent);
+  color: #fff;
 }
 
 .post__unlock {
