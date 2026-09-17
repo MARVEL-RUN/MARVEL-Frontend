@@ -20,13 +20,16 @@ export function BoardFold({
   mark?: string;
   onExpand?: (id: string) => void;
 }) {
-  const [openId, setOpenId] = useState<string | null>(items[0]?.id ?? null);
+  const [openId, setOpenId] = useState<string | null>(
+    items[0]?.body != null ? items[0].id : null,
+  );
 
   useEffect(() => {
     setOpenId((cur) => {
       if (items.length === 0) return null;
       if (cur && items.some((item) => item.id === cur)) return cur;
-      return items[0].id;
+      const first = items[0];
+      return first.body != null ? first.id : null;
     });
   }, [items]);
 
