@@ -4,70 +4,108 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
+import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { noticeCategoryTone } from "@/lib/noticeCategories";
 import {
-  NOTICE_CATEGORY_FILTER_OPTIONS,
-  type NoticeCategory,
-} from "@/lib/admin/noticeCategories";
-import { deleteAdminNotice, listAdminNotices } from "@/services/admin/notices";
-import type { AdminNotice } from "@/types/admin/admin";
+  deleteAdminNotice,
+  listAdminNotices,
+} from "@/services/admin/boards/notices";
+import { mergeNoticeList } from "@/services/main/notices";
+import type { AdminNoticeSearchTarget } from "@/services/admin/boards/notices.types";
+import type { NoticeRow } from "@/types/main/notices";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-type CategoryFilter = "all" | NoticeCategory;
+type SearchField = "all" | "title" | "content";
+
+const FIELD_OPTIONS = [
+  { value: "all" as const, label: "전체" },
+  { value: "title" as const, label: "제목" },
+  { value: "content" as const, label: "내용" },
+];
 
 type Applied = {
   q: string;
-  category: CategoryFilter;
+  field: SearchField;
 };
 
-const INITIAL: Applied = { q: "", category: "all" };
+const INITIAL: Applied = { q: "", field: "all" };
+const PAGE_SIZE = 10;
+
+function toTarget(field: SearchField): AdminNoticeSearchTarget {
+  if (field === "title") return "TITLE";
+  if (field === "content") return "CONTENT";
+  return "ALL";
+}
 
 export function NoticesAdminPage() {
   const queryClient = useQueryClient();
-  const { data = [], isLoading } = useQuery({
-    queryKey: ["admin", "notices"],
-    queryFn: listAdminNotices,
-  });
   const [q, setQ] = useState("");
-  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [field, setField] = useState<SearchField>("all");
   const [applied, setApplied] = useState<Applied>(INITIAL);
+  const [page, setPage] = useState(1);
   const { confirm, modal } = useAdminConfirm();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "notices", applied, page],
+    queryFn: () =>
+      listAdminNotices({
+        target: toTarget(applied.field),
+        keyword: applied.q.trim() || undefined,
+        page: page - 1,
+        size: PAGE_SIZE,
+        sort: "LATEST",
+      }),
+  });
+
   const remove = useMutation({
     mutationFn: deleteAdminNotice,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "notices"] });
+      const remaining = (data?.noticePage.numberOfElements ?? 1) - 1;
+      if (remaining <= 0 && page > 1) setPage((p) => p - 1);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "notices"] });
       adminToast.success("공지가 삭제되었습니다.");
     },
     onError: () => adminToast.error("공지 삭제에 실패했습니다."),
   });
 
-  const rows = useMemo(() => {
-    const keyword = applied.q.trim().toLowerCase();
-    return data.filter((row) => {
-      if (applied.category !== "all" && row.tag !== applied.category) return false;
-      if (!keyword) return true;
-      return [row.title, row.tag, row.body].join(" ").toLowerCase().includes(keyword);
-    });
-  }, [data, applied]);
+  const rows = mergeNoticeList(
+    data?.pinnedNoticeList,
+    data?.noticePage.content,
+  );
+  const totalCount = data?.noticePage.totalElements ?? 0;
+  const pageCount = Math.max(1, data?.noticePage.totalPages ?? 1);
 
-  const runSearch = () => setApplied({ q, category });
+  const placeholder =
+    field === "title" ? "제목 검색" : field === "content" ? "내용 검색" : "제목 · 내용 검색";
+
+  const runSearch = () => {
+    setPage(1);
+    setApplied({ q, field });
+  };
 
   const resetSearch = () => {
     setQ("");
-    setCategory("all");
+    setField("all");
+    setPage(1);
     setApplied(INITIAL);
   };
 
   return (
     <div className="admin-page">
-      <AdminTableShell<AdminNotice>
+      <AdminTableShell<NoticeRow>
         title="공지사항"
         rows={rows}
         loading={isLoading}
         empty="등록된 공지가 없습니다."
         rowKey={(row) => row.id}
+        page={page}
+        pageCount={pageCount}
+        totalCount={totalCount}
+        onPage={setPage}
+        pageUnit="게시물"
         actions={
           <Link href="/admin/boards/notice/write" className="admin-btn admin-btn--red">
             등록하기
@@ -76,13 +114,14 @@ export function NoticesAdminPage() {
         tools={
           <>
             <AdminSelect
-              value={category}
-              options={NOTICE_CATEGORY_FILTER_OPTIONS}
+              value={field}
+              options={FIELD_OPTIONS}
               onChange={(value) => {
-                setCategory(value);
-                setApplied((prev) => ({ ...prev, category: value }));
+                setField(value);
+                setPage(1);
+                setApplied((prev) => ({ ...prev, field: value }));
               }}
-              ariaLabel="카테고리"
+              ariaLabel="검색 대상"
               width={112}
             />
             <input
@@ -92,7 +131,7 @@ export function NoticesAdminPage() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") runSearch();
               }}
-              placeholder="제목 · 내용 검색"
+              placeholder={placeholder}
             />
             <button type="button" className="admin-btn admin-btn--primary admin-toolbar__btn" onClick={runSearch}>
               검색
@@ -109,7 +148,11 @@ export function NoticesAdminPage() {
           </>
         }
         columns={[
-          { key: "tag", header: "카테고리", render: (row) => row.tag },
+          { key: "category", header: "카테고리", render: (row) => (
+              <span className={`admin-badge admin-badge--${noticeCategoryTone(row.category)}`}>
+                {row.category}
+              </span>
+            ) },
           {
             key: "title",
             header: "제목",
@@ -117,8 +160,11 @@ export function NoticesAdminPage() {
               <Link href={`/admin/boards/notice/edit?id=${row.id}`}>{row.title}</Link>
             ),
           },
-          { key: "pinned", header: "고정", render: (row) => (row.pinned ? "Y" : "") },
-          { key: "date", header: "등록일", render: (row) => row.date },
+          {
+            key: "date",
+            header: "등록일",
+            render: (row) => formatAdminBoardDate(row.createdAt),
+          },
           {
             key: "actions",
             header: "",
@@ -126,7 +172,8 @@ export function NoticesAdminPage() {
               <button
                 type="button"
                 className="admin-btn admin-btn--text"
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   if (await confirm("이 공지를 삭제할까요?")) remove.mutate(row.id);
                 }}
               >
