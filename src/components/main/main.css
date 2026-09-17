@@ -865,13 +865,31 @@ button.course {
 
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  /* 입력 포커스 때 100dvw가 가로로 넘침 */
   .inquiry-secret {
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
     padding: 0.85rem;
     padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0px), var(--kb, 0px));
   }
 
   .inquiry-secret__panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding: 1.2rem 1.05rem 1.1rem;
+    overflow-x: hidden;
+  }
+
+  .inquiry-secret__head,
+  .inquiry-secret__form,
+  .inquiry-secret__field,
+  .inquiry-secret__control,
+  .inquiry-secret__actions {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .inquiry-secret__head {
@@ -892,15 +910,17 @@ button.course {
   .inquiry-secret__eye {
     width: var(--tap);
     height: var(--tap);
+    flex-shrink: 0;
   }
 
   .inquiry-secret__x {
-    margin: -0.35rem -0.4rem 0 0;
+    margin: 0;
   }
 
   .inquiry-secret__desc {
     margin: 0.8rem 0 1rem;
     font-size: 0.88rem;
+    overflow-wrap: anywhere;
   }
 
   .inquiry-secret__control {
