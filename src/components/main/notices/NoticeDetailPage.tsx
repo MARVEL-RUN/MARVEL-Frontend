@@ -1,40 +1,70 @@
 "use client";
 
-import { getAdminNotice, listAdminNotices } from "@/services/admin/notices";
-import type { AdminNotice } from "@/types/admin/admin";
+import { noticeCategoryTone } from "@/lib/noticeCategories";
+import {
+  getPublicNoticeDetail,
+  listPublicNotices,
+  mergeNoticeList,
+} from "@/services/main/notices";
+import type { NoticeRow, PublicNoticeDetail } from "@/types/main/notices";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NoticeBody } from "./NoticeBody";
-import { orderNotices } from "./order";
+import { fileNameFromUrl, formatNoticeDate, toDateTimeAttr } from "./order";
 
 export function NoticeDetailPage() {
   const id = useSearchParams().get("id") ?? "";
-  const [post, setPost] = useState<AdminNotice | null | undefined>(undefined);
-  const [prev, setPrev] = useState<AdminNotice | null>(null);
-  const [next, setNext] = useState<AdminNotice | null>(null);
+  const [post, setPost] = useState<PublicNoticeDetail | null | undefined>(
+    undefined,
+  );
+  const [category, setCategory] = useState("");
+  const [prev, setPrev] = useState<NoticeRow | null>(null);
+  const [next, setNext] = useState<NoticeRow | null>(null);
 
   useEffect(() => {
     if (!id) {
       setPost(null);
       setPrev(null);
       setNext(null);
+      setCategory("");
       return;
     }
-    void Promise.all([getAdminNotice(id), listAdminNotices()]).then(([found, rows]) => {
-      const ordered = orderNotices(rows);
-      const i = ordered.findIndex((row) => row.id === id);
-      setPost(found);
-      setNext(i > 0 ? ordered[i - 1] : null);
-      setPrev(i >= 0 && i < ordered.length - 1 ? ordered[i + 1] : null);
-    });
+
+    setPost(undefined);
+
+    void getPublicNoticeDetail(id)
+      .then((detail) => setPost(detail))
+      .catch(() => setPost(null));
+
+    void listPublicNotices({
+      page: 0,
+      size: 50,
+      sort: "LATEST",
+    })
+      .then((result) => {
+        const rows = mergeNoticeList(
+          result.pinnedNoticeList,
+          result.noticePage.content ?? [],
+        );
+        const i = rows.findIndex((row) => row.id === id);
+        setCategory(i >= 0 ? rows[i].category : "");
+        setNext(i > 0 ? rows[i - 1] : null);
+        setPrev(i >= 0 && i < rows.length - 1 ? rows[i + 1] : null);
+      })
+      .catch(() => {
+        setPrev(null);
+        setNext(null);
+      });
   }, [id]);
 
   return (
     <main className="page page--post">
       <div className="page__body wrap wrap--narrow">
         {post === undefined ? (
-          <p className="board__empty">불러오는 중...</p>
+          <div className="post post--loading" aria-busy="true">
+            <p className="board__empty">불러오는 중...</p>
+          </div>
         ) : post === null ? (
           <div className="post">
             <p className="board__empty">글을 찾을 수 없습니다.</p>
@@ -49,13 +79,39 @@ export function NoticeDetailPage() {
             <header className="post__head">
               <h2 className="post__title">{post.title}</h2>
               <p className="post__meta">
-                <span>{post.tag}</span>
-                <time dateTime={post.date.replaceAll(".", "-")}>{post.date}</time>
+                {category ? (
+                  <span className={`post__cat is-${noticeCategoryTone(category)}`}>
+                    {category}
+                  </span>
+                ) : null}
+                <span>{post.author}</span>
+                <time dateTime={toDateTimeAttr(post.createdAt)}>
+                  {formatNoticeDate(post.createdAt)}
+                </time>
               </p>
             </header>
             <div className="post__body">
-              <NoticeBody text={post.body} />
+              <NoticeBody text={post.content} />
             </div>
+            {post.attachmentUrls?.length ? (
+              <section className="post__files">
+                <p className="post__files-label">첨부파일</p>
+                <ul className="post__files-list">
+                  {post.attachmentUrls.map((url) => (
+                    <li key={url}>
+                      <a
+                        className="post__files-name"
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {fileNameFromUrl(url)}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
             <nav className="post__nav" aria-label="이전·다음 글">
               <NavRow label="다음글" item={next} />
               <NavRow label="이전글" item={prev} />
@@ -77,7 +133,7 @@ function NavRow({
   item,
 }: {
   label: string;
-  item: AdminNotice | null;
+  item: NoticeRow | null;
 }) {
   if (!item) {
     return (

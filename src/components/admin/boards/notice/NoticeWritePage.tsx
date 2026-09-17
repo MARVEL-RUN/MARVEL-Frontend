@@ -1,18 +1,15 @@
 "use client";
 
-import { AdminAttachFiles, type AdminAttachFile } from "@/components/admin/AttachFiles";
 import { AdminSelect } from "@/components/admin/Select";
 import { adminToast } from "@/components/admin/Toast";
-import {
-  isNoticeCategory,
-  NOTICE_CATEGORY_OPTIONS,
-  type NoticeCategory,
-} from "@/lib/admin/noticeCategories";
+import { AdminHttpError } from "@/lib/admin/fetch";
+import { isNoticeCategoryName } from "@/lib/noticeCategories";
 import {
   createAdminNotice,
   getAdminNotice,
+  listAdminNoticeCategories,
   updateAdminNotice,
-} from "@/services/admin/notices";
+} from "@/services/admin/boards/notices";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,32 +24,57 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
     queryFn: () => getAdminNotice(id),
     enabled: editing && Boolean(id),
   });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["admin", "notice-categories"],
+    queryFn: listAdminNoticeCategories,
+  });
   const [title, setTitle] = useState("");
-  const [tag, setTag] = useState<NoticeCategory>("공지");
+  const [categoryId, setCategoryId] = useState("");
   const [body, setBody] = useState("");
-  const [pinned, setPinned] = useState(false);
-  const [files, setFiles] = useState<AdminAttachFile[]>([]);
 
   useEffect(() => {
     if (!data) return;
     setTitle(data.title);
-    setTag(isNoticeCategory(data.tag) ? data.tag : "공지");
-    setBody(data.body);
-    setPinned(data.pinned);
+    setCategoryId(data.noticeCategoryId);
+    setBody(data.content);
   }, [data]);
 
+  useEffect(() => {
+    if (categoryId) return;
+    const fallback =
+      categories.find((row) => row.name === "공지") ??
+      categories.find((row) => isNoticeCategoryName(row.name));
+    if (fallback) setCategoryId(fallback.id);
+  }, [categories, categoryId]);
+
+  const categoryOptions = categories
+    .filter((row) => isNoticeCategoryName(row.name) || row.id === categoryId)
+    .map((row) => ({
+      value: row.id,
+      label: row.name,
+    }));
+
   const save = useMutation({
-    mutationFn: () => {
-      const payload = { title, tag, body, pinned };
-      return editing ? updateAdminNotice(id, payload) : createAdminNotice(payload);
+    mutationFn: async () => {
+      const payload = {
+        title: title.trim(),
+        content: body.trim(),
+        categoryId,
+      };
+      if (editing) {
+        await updateAdminNotice(id, payload);
+        return;
+      }
+      await createAdminNotice(payload);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "notices"] });
       adminToast.success(editing ? "공지가 수정되었습니다." : "공지가 등록되었습니다.");
       router.replace("/admin/boards/notice");
     },
-    onError: () => {
-      adminToast.error(editing ? "공지 수정에 실패했습니다." : "공지 등록에 실패했습니다.");
+    onError: (err) => {
+      const fallback = editing ? "공지 수정에 실패했습니다." : "공지 등록에 실패했습니다.";
+      adminToast.error(err instanceof AdminHttpError ? err.message : fallback);
     },
   });
 
@@ -70,6 +92,10 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
               alert("제목과 본문을 입력해 주세요.");
               return;
             }
+            if (!categoryId) {
+              alert("카테고리를 선택해 주세요.");
+              return;
+            }
             save.mutate();
           }}
         >
@@ -77,21 +103,18 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
             <label className="admin-form__category">
               카테고리
               <AdminSelect
-                value={tag}
-                options={NOTICE_CATEGORY_OPTIONS}
-                onChange={setTag}
+                value={categoryId || categoryOptions[0]?.value || ""}
+                options={
+                  categoryOptions.length
+                    ? categoryOptions
+                    : [{ value: "", label: "불러오는 중..." }]
+                }
+                onChange={setCategoryId}
                 ariaLabel="카테고리"
                 width={140}
               />
             </label>
-            <label className="admin-form__check">
-              <input
-                type="checkbox"
-                checked={pinned}
-                onChange={(e) => setPinned(e.target.checked)}
-              />
-              상단 고정
-            </label>
+            <p className="admin-form__hint">필독을 선택하면 목록 상단에 고정됩니다.</p>
           </div>
           <label>
             제목
@@ -106,7 +129,6 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
               placeholder="공지 내용"
             />
           </label>
-          <AdminAttachFiles files={files} onChange={setFiles} />
           <div className="admin-form__actions">
             <button
               type="button"

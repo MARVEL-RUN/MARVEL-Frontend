@@ -1562,6 +1562,21 @@ html.admin-mode body {
   color: #175cd3;
 }
 
+.admin-badge--must {
+  background: #fde8e8;
+  color: #c81e1e;
+}
+
+.admin-badge--offi {
+  background: #eef2f7;
+  color: #1f2937;
+}
+
+.admin-badge--plain {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 .admin-pagination {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -2021,6 +2036,13 @@ html.admin-mode body {
   min-height: 38px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.admin-form__hint {
+  margin: 0 0 2px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .admin-form__actions {
