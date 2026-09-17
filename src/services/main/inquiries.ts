@@ -121,47 +121,5 @@ export async function updateInquiry(
 
 export async function verifyInquiryPassword(id: string, _password: string) {
   await wait();
-  // 임시: 비밀번호 검증 생략 — 글만 있으면 통과
   return load().some((item) => item.id === id);
-}
-
-export async function answerInquiry(id: string, answer: string) {
-  await wait();
-  const rows = load().map((row) =>
-    row.id === id
-      ? { ...row, answer: answer.trim(), answeredAt: nowStamp() }
-      : row,
-  );
-  save(rows);
-  return rows.find((row) => row.id === id) ?? null;
-}
-
-export async function deleteInquiry(id: string) {
-  await wait();
-  save(load().filter((row) => row.id !== id));
-}
-
-export async function resetInquiryPassword(id: string, password: string) {
-  await wait();
-  const next = password.trim();
-  if (next.length < 4) {
-    throw new Error("비밀번호는 4자 이상이어야 합니다.");
-  }
-  const rows = load();
-  if (!rows.some((row) => row.id === id)) {
-    throw new Error("문의를 찾을 수 없습니다.");
-  }
-  save(rows.map((row) => (row.id === id ? { ...row, password: next } : row)));
-}
-
-export async function deleteAnswer(id: string) {
-  await wait();
-  const rows = load().map((row) => {
-    if (row.id !== id) return row;
-    const next = { ...row };
-    delete next.answer;
-    delete next.answeredAt;
-    return next;
-  });
-  save(rows);
 }

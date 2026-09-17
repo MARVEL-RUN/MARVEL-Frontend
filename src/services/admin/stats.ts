@@ -2,8 +2,9 @@ import {
   ADMIN_RACE_EVENTS,
   type AdminRaceEventId,
 } from "@/lib/admin/raceEvents";
+import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { listAllApplications, type AdminApplicationRow } from "./applications";
-import { listInquiries } from "./inquiries";
+import { listAdminQuestions } from "./boards/inquiries";
 
 export type EventIntakeStats = {
   eventId: AdminRaceEventId;
@@ -41,9 +42,15 @@ function intakeFor(rows: AdminApplicationRow[]): Omit<EventIntakeStats, "eventId
 }
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const [applications, inquiries] = await Promise.all([
+  const [applications, unanswered] = await Promise.all([
     listAllApplications(),
-    listInquiries(),
+    listAdminQuestions({
+      eventId: DEFAULT_EVENT_ID,
+      isAnswered: false,
+      page: 0,
+      size: 1,
+      sort: "LATEST",
+    }).catch(() => ({ totalElements: 0 })),
   ]);
 
   const cancellationPending = applications.filter(
@@ -51,7 +58,7 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
   );
 
   return {
-    unansweredCount: inquiries.filter((row) => !row.answer).length,
+    unansweredCount: unanswered.totalElements,
     cancellationPendingCount: cancellationPending.length,
     cancellationPendingEventId: cancellationPending[0]?.eventId ?? null,
     events: ADMIN_RACE_EVENTS.map((event) => ({

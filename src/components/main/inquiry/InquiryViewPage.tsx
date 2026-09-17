@@ -4,7 +4,7 @@ import {
   getInquiry,
   INQUIRY_PUBLIC_TITLE,
   listInquiries,
-} from "@/services/admin/inquiries";
+} from "@/services/main/inquiries";
 import type { AdminInquiry } from "@/types/boards";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";

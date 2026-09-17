@@ -1,6 +1,6 @@
 "use client";
 
-import { INQUIRY_PUBLIC_TITLE, listInquiries } from "@/services/admin/inquiries";
+import { INQUIRY_PUBLIC_TITLE, listInquiries } from "@/services/main/inquiries";
 import type { AdminInquiry } from "@/types/boards";
 import { Lock } from "lucide-react";
 import Link from "next/link";

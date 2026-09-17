@@ -1,6 +1,6 @@
 "use client";
 
-import { createInquiry, getInquiry, updateInquiry } from "@/services/admin/inquiries";
+import { createInquiry, getInquiry, updateInquiry } from "@/services/main/inquiries";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
