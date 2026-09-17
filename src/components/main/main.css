@@ -657,6 +657,18 @@ button.course {
   cursor: pointer;
 }
 
+button.course:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+  filter: grayscale(0.4);
+  transform: none;
+}
+
+button.course:disabled:hover {
+  transform: none;
+  filter: grayscale(0.4);
+}
+
 /* zoom 1.1이면 100dvh가 화면보다 커져서, 보이는 높이로 나눈다 */
 .sheet-modal {
   position: fixed;
