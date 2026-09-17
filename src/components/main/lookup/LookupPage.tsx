@@ -13,6 +13,7 @@ import {
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 import { PasswordField, PhoneField } from "../register/ApplyUi";
+import { useRegistrationOpen } from "../register/useRegistrationOpen";
 
 type View = "form" | "hit" | "miss";
 
@@ -21,13 +22,19 @@ const LOOKUP_LEAD =
 
 export function LookupPage() {
   const [kind, setKind] = useState<ApplyKind | "">("");
+  const lookupOpen = useRegistrationOpen();
 
   return (
     <main className="page">
       <SideBanner kicker="INTEL" title="신청조회" en="FIND YOUR ENTRY" />
       <div className="page__body wrap wrap--narrow">
-        {!kind ? (
-          <ApplyKindPick heading="조회 유형을 선택하세요" lookup onPick={setKind} />
+        {!lookupOpen || !kind ? (
+          <ApplyKindPick
+            heading="조회 유형을 선택하세요"
+            lookup
+            disabled={!lookupOpen}
+            onPick={setKind}
+          />
         ) : kind === "group" ? (
           <GroupLookup onBack={() => setKind("")} />
         ) : (
