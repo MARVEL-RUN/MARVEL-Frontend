@@ -165,15 +165,15 @@ export function InquiryPage() {
                   >
                     {answered ? "답변완료" : "답변대기"}
                   </span>
-                  <span className="board__qna-sub">
-                    <span className="board__subject">
-                      {q.secret ? (
-                        <Lock className="board__lock" size={14} aria-hidden />
-                      ) : null}
-                      <strong className="board__title">
-                        {q.secret ? INQUIRY_PUBLIC_TITLE : q.title}
-                      </strong>
-                    </span>
+                  <span className="board__subject">
+                    {q.secret ? (
+                      <Lock className="board__lock" size={14} aria-hidden />
+                    ) : null}
+                    <strong className="board__title">
+                      {q.secret ? INQUIRY_PUBLIC_TITLE : q.title}
+                    </strong>
+                  </span>
+                  <span className="board__meta">
                     <span className="board__name">{q.authorName}</span>
                     <time dateTime={toDateTimeAttr(q.createdAt)}>
                       {formatInquiryDate(q.createdAt)}
