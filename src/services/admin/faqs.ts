@@ -2,7 +2,7 @@ import { isFaqCategory } from "@/lib/admin/faqCategories";
 import { nextId, readStore, todayStamp, wait, writeStore } from "@/lib/admin/store";
 import type { AdminFaq } from "@/types/admin/boards";
 
-const KEY = "mr-admin-faqs-v2";
+const KEY = "mr-admin-faqs-v3";
 
 const SEED: AdminFaq[] = [
   {
@@ -115,7 +115,7 @@ const SEED: AdminFaq[] = [
   },
   {
     id: "faq-10",
-    category: "기타",
+    category: "기념품",
     question: "기념품 수령 방법은 어떻게 되나요?",
     answer: [
       "본 접수 참가자 : 대회 1주일 전 택배 수령",
@@ -175,7 +175,7 @@ const SEED: AdminFaq[] = [
   },
   {
     id: "faq-15",
-    category: "기타",
+    category: "보험",
     question: "참가자 보험 가입 및 보상범위는 어떻게 되나요?",
     answer: [
       "사무국은 부상, 사고 등을 대비하여 참가자를 위해 보험에 가입합니다.",
@@ -192,7 +192,7 @@ const SEED: AdminFaq[] = [
   },
   {
     id: "faq-16",
-    category: "기타",
+    category: "기념품",
     question: "참가자 기념품 및 수령방법은 어떻게 되나요?",
     answer: [
       "기념품은 참가신청 시 입력하신 주소로 대회 전 배송됩니다.",
