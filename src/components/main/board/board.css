@@ -342,7 +342,7 @@
 }
 
 .notice-gap {
-  height: 0.85em;
+  height: 1.85em;
 }
 
 .notice-ol {
@@ -834,48 +834,58 @@
     justify-content: flex-end;
     gap: 0.4rem;
   }
+
   .board-write__actions .btn {
     min-height: var(--tap);
     padding: 0 1rem;
     font-size: 0.9rem;
     letter-spacing: 0.04em;
   }
+
   .board-attach__upload {
     min-height: var(--tap);
     padding: 0 0.9rem;
     font-size: 0.88rem;
   }
+
   .board-attach__head {
     flex-wrap: wrap;
     gap: 0.45rem 0.75rem;
   }
+
   .bulletin {
     --bulletin-tag: 3.1rem;
     --bulletin-gap: 0.7rem;
   }
+
   .bulletin li {
     padding: 0.95rem 0;
   }
+
   .bulletin__btn {
     min-height: var(--tap);
     align-items: start;
   }
+
   .bulletin__btn strong {
     white-space: normal;
     line-height: 1.4;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
+
   .bulletin time {
     padding-top: 0.15rem;
     white-space: nowrap;
   }
+
   .bulletin__body {
     grid-column: 2;
     margin-left: 0;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
+
   .board__head,
   .board__row {
     grid-template-columns: 3.2rem minmax(0, 1fr) 5.6rem;
@@ -883,9 +893,11 @@
     align-items: start;
     padding: 0.95rem 0.15rem;
   }
+
   .board--qna .board__head {
     grid-template-columns: 2.4rem 4.2rem minmax(0, 1fr);
   }
+
   .board--qna .board__row {
     grid-template-columns: 2.4rem 4.2rem minmax(0, 1fr);
     grid-template-rows: auto auto;
@@ -893,24 +905,29 @@
     align-items: start;
     padding: 0.95rem 0.1rem;
   }
+
   .board--qna .board__no {
     grid-row: 1 / span 2;
     align-self: start;
     padding-top: 0.2rem;
   }
+
   .board--qna .board__badge {
     grid-column: 2;
     grid-row: 1;
     font-size: 0.68rem;
     letter-spacing: 0.02em;
   }
+
   .board--qna .board__subject {
     grid-column: 3;
     grid-row: 1;
   }
+
   .board--qna .board__lock {
     margin-right: 0.2rem;
   }
+
   .board--qna .board__meta {
     display: flex;
     flex-wrap: wrap;
@@ -923,6 +940,7 @@
     font-size: 0.76rem;
     line-height: 1.35;
   }
+
   .board--qna .board__name {
     display: inline;
     overflow: hidden;
@@ -931,6 +949,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   .board--qna .board__row time {
     padding-top: 0;
     font-size: inherit;
@@ -938,18 +957,22 @@
     text-align: left;
     white-space: nowrap;
   }
+
   .board--qna .board__row time::before {
     content: "·";
     margin-right: 0.45rem;
   }
+
   .board__name,
   .board--qna .board__head span:nth-child(4),
   .board--qna .board__head span:nth-child(5) {
     display: none;
   }
+
   .board--qna .board__name {
     display: inline;
   }
+
   .board__title {
     white-space: normal;
     overflow: visible;
@@ -958,15 +981,18 @@
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
+
   .board__no,
   .board__row time {
     padding-top: 0.15rem;
     font-size: 0.8rem;
   }
+
   .board-search__find {
     flex: 1 1 100%;
     max-width: none;
   }
+
   .board-search__input,
   .board-search__btn,
   .board-search__sort,
@@ -974,45 +1000,54 @@
     min-height: var(--tap);
     height: var(--tap);
   }
+
   .board-search__sort {
     flex: 1 1 7rem;
   }
+
   .post__title {
     font-size: 1.2rem;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
+
   .page--post .post__title {
     font-size: 1.35rem;
   }
+
   .post__meta {
     flex-wrap: wrap;
     gap: 0.35rem 0.85rem;
   }
+
   .post__body,
   .post__reply p {
     overflow-x: auto;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
+
   .post__body img,
   .post__reply img {
     display: block;
     max-width: 100%;
     height: auto;
   }
+
   .post__body table {
     display: block;
     width: max-content;
     max-width: 100%;
     overflow-x: auto;
   }
+
   .post__nav-row {
     min-height: var(--tap);
     align-items: start;
     padding: 0.85rem 0.1rem;
     grid-template-columns: 3.4rem minmax(0, 1fr);
   }
+
   .post__nav-row strong {
     white-space: normal;
     overflow: visible;
@@ -1020,44 +1055,55 @@
     line-height: 1.4;
     word-break: keep-all;
   }
+
   .post__foot {
     flex-wrap: wrap;
   }
+
   .post__foot .btn {
     min-height: var(--tap);
   }
+
   .post__files-name {
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
     word-break: break-all;
   }
+
   .faq__tab {
     min-height: var(--tap);
     font-size: 0.84rem;
   }
+
   .faq__btn {
     min-height: var(--tap);
     align-items: start;
   }
+
   .faq__question {
     font-size: 0.95rem;
     overflow-wrap: anywhere;
   }
+
   .faq__a {
     overflow-wrap: anywhere;
   }
+
   .board-write__head {
     flex-wrap: wrap;
     gap: 0.6rem;
   }
+
   .board-write__head .btn {
     min-height: var(--tap);
   }
+
   .board-write__agree {
     min-height: var(--tap);
     align-items: center;
   }
+
   .board__row time {
     flex-shrink: 0;
   }
@@ -1065,34 +1111,41 @@
 
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+
   .board-write__head .btn,
   .board-write__actions .btn,
   .board-attach__upload,
   .board-attach__remove {
     min-height: var(--tap);
   }
+
   .board-write__agree input {
     width: 1.25rem;
     height: 1.25rem;
     margin-top: 0;
   }
+
   .board-write__actions {
     flex-wrap: wrap;
     justify-content: flex-end;
   }
+
   .board-attach__list li {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.35rem 0.7rem;
   }
+
   .board-attach__name {
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
     word-break: break-all;
   }
+
   .board-attach__size {
     grid-column: 1;
   }
+
   .board-attach__remove {
     grid-column: 2;
     grid-row: 1 / span 2;
