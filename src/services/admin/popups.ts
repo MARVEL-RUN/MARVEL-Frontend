@@ -21,8 +21,8 @@ const SEED: AdminPopup[] = [
     endAt: "2026-10-31T23:59",
     device: "MOBILE",
     orderNo: 2,
-    imageUrl: "/images/main/sidebanner.svg",
-    imageName: "sidebanner.svg",
+    imageUrl: "/images/main/sidebanner.png",
+    imageName: "sidebanner.png",
   },
 ];
 
