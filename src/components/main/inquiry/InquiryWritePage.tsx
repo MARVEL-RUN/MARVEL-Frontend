@@ -236,9 +236,10 @@ export function InquiryWritePage() {
                 <PasswordField
                   value={password}
                   onChange={() => {}}
+                  name="inquiry-unlock"
                   label="문의 비밀번호"
                   placeholder="••••••••"
-                  autoComplete="off"
+                  hideManager
                   minLength={0}
                   disabled
                 />
@@ -255,9 +256,10 @@ export function InquiryWritePage() {
                   <PasswordField
                     value={password}
                     onChange={setPassword}
+                    name="inquiry-unlock"
                     label="문의 비밀번호"
                     placeholder="글 확인용 비밀번호 (4자 이상)"
-                    autoComplete="new-password"
+                    hideManager
                     minLength={0}
                   />
                 </div>
@@ -268,12 +270,12 @@ export function InquiryWritePage() {
                 </span>
                 <div className="form-row__ctrl">
                   <PasswordField
-                    name="passwordConfirm"
+                    name="inquiry-unlock-confirm"
                     value={passwordConfirm}
                     onChange={setPasswordConfirm}
                     label="문의 비밀번호 확인"
                     placeholder="비밀번호를 다시 입력하세요."
-                    autoComplete="new-password"
+                    hideManager
                     minLength={0}
                   />
                 </div>

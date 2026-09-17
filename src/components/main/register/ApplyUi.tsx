@@ -529,6 +529,7 @@ export function PasswordField({
   placeholder = "신청조회용 비밀번호 (4자 이상)",
   minLength = 4,
   autoComplete = "new-password",
+  hideManager = false,
 }: {
   value: string;
   onChange: (next: string) => void;
@@ -539,22 +540,32 @@ export function PasswordField({
   placeholder?: string;
   minLength?: number;
   autoComplete?: string;
+  hideManager?: boolean;
 }) {
   const [show, setShow] = useState(false);
+  const ignore = hideManager || autoComplete === "off";
 
   return (
     <div className={`password-pick${disabled ? " is-disabled" : ""}`}>
       <input
-        type={show ? "text" : "password"}
+        type={ignore ? "text" : show ? "text" : "password"}
         name={name}
         placeholder={placeholder}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
-        autoComplete={autoComplete}
+        autoComplete={ignore ? "off" : autoComplete}
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
         minLength={minLength}
         required={required}
         disabled={disabled}
         aria-label={label}
+        className={ignore && !show ? "is-mask" : undefined}
+        data-lpignore={ignore ? "true" : undefined}
+        data-1p-ignore={ignore ? "true" : undefined}
+        data-bwignore={ignore ? "true" : undefined}
+        data-form-type={ignore ? "other" : undefined}
       />
       <button
         type="button"
