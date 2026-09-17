@@ -6,6 +6,7 @@ import { Footer } from "./Footer";
 import { KeyboardInset } from "./KeyboardInset";
 import { CinematicFX } from "../fx/CinematicFX";
 import { LegalModalProvider } from "../legal/LegalModal";
+import { MainToastHost } from "../feedback/MainFeedback";
 
 export function MainShell({ children }: { children: React.ReactNode }) {
   const virtual = usePathname().startsWith("/virtual");
@@ -17,6 +18,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
           <KeyboardInset />
           {children}
           <Footer />
+          <MainToastHost />
         </div>
       </LegalModalProvider>
     );
@@ -30,6 +32,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
         <Header />
         {children}
         <Footer />
+        <MainToastHost />
       </div>
     </LegalModalProvider>
   );

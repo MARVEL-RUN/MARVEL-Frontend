@@ -13,7 +13,7 @@ import {
   formatAmount,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
-import type { AdminPayStatus } from "@/types/admin";
+import type { AdminPayStatus } from "@/types/admin/admin";
 import { useEffect, useState, type ReactNode } from "react";
 
 type Props = {

@@ -4,7 +4,7 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
 import { deleteFaq, listFaqs } from "@/services/admin/faqs";
-import type { AdminFaq } from "@/types/boards";
+import type { AdminFaq } from "@/types/admin/boards";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";

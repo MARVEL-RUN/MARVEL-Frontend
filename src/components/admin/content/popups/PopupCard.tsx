@@ -1,7 +1,7 @@
 "use client";
 
 import { AdminSelect } from "@/components/admin/Select";
-import type { AdminPopup, PopupDevice } from "@/types/popup";
+import type { AdminPopup, PopupDevice } from "@/types/admin/popup";
 import { ChevronDown, ChevronUp, Minus, Plus, X } from "lucide-react";
 import { useRef, type ChangeEvent, type MouseEvent } from "react";
 

@@ -2193,6 +2193,14 @@ html.admin-mode body {
   font-weight: 600;
 }
 
+.admin-root .admin-btn--danger-text {
+  color: #ed1d24;
+}
+
+.admin-root .admin-btn--danger-text:hover {
+  color: #c4161c;
+}
+
 .admin-section-card {
   background: #fff;
   border: 1px solid var(--admin-line);

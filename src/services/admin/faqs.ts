@@ -1,6 +1,6 @@
 import { isFaqCategory, type FaqCategory } from "@/lib/admin/faqCategories";
 import { nextId, readStore, todayStamp, wait, writeStore } from "@/lib/admin/store";
-import type { AdminFaq } from "@/types/boards";
+import type { AdminFaq } from "@/types/admin/boards";
 
 const KEY = "mr-admin-faqs";
 

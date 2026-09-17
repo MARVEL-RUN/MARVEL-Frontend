@@ -523,6 +523,7 @@ export function PasswordField({
   value,
   onChange,
   required,
+  disabled,
   name = "password",
   label = "신청 비밀번호",
   placeholder = "신청조회용 비밀번호 (4자 이상)",
@@ -532,6 +533,7 @@ export function PasswordField({
   value: string;
   onChange: (next: string) => void;
   required?: boolean;
+  disabled?: boolean;
   name?: string;
   label?: string;
   placeholder?: string;
@@ -541,7 +543,7 @@ export function PasswordField({
   const [show, setShow] = useState(false);
 
   return (
-    <div className="password-pick">
+    <div className={`password-pick${disabled ? " is-disabled" : ""}`}>
       <input
         type={show ? "text" : "password"}
         name={name}
@@ -551,6 +553,7 @@ export function PasswordField({
         autoComplete={autoComplete}
         minLength={minLength}
         required={required}
+        disabled={disabled}
         aria-label={label}
       />
       <button
@@ -558,6 +561,7 @@ export function PasswordField({
         className="password-pick__eye"
         onClick={() => setShow((v) => !v)}
         aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
+        disabled={disabled}
       >
         {show ? <EyeOff size={18} /> : <Eye size={18} />}
       </button>
