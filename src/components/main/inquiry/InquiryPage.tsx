@@ -87,11 +87,11 @@ export function InquiryPage() {
                 >
                   {item.answer ? "답변완료" : "답변대기"}
                 </span>
-                <span className="board__subject">
-                  <Lock className="board__lock" size={14} aria-hidden />
-                  <strong className="board__title">{INQUIRY_PUBLIC_TITLE}</strong>
-                </span>
-                <span className="board__meta">
+                <span className="board__qna-sub">
+                  <span className="board__subject">
+                    <Lock className="board__lock" size={14} aria-hidden />
+                    <strong className="board__title">{INQUIRY_PUBLIC_TITLE}</strong>
+                  </span>
                   <span className="board__name">{item.name}</span>
                   <time dateTime={toDateTimeAttr(item.date)}>{item.date}</time>
                 </span>
