@@ -62,13 +62,13 @@ export function InquiryPage() {
           apiPage === page - 1
             ? first
             : await listPublicQuestions({
-                eventId: DEFAULT_EVENT_ID,
-                target: "ALL",
-                keyword: applied.trim() || undefined,
-                page: apiPage,
-                size: PAGE_SIZE,
-                sort: "LATEST",
-              });
+              eventId: DEFAULT_EVENT_ID,
+              target: "ALL",
+              keyword: applied.trim() || undefined,
+              page: apiPage,
+              size: PAGE_SIZE,
+              sort: "LATEST",
+            });
         if (cancelled) return;
 
         const rows = result.content ?? [];
@@ -107,10 +107,6 @@ export function InquiryPage() {
     <main className="page">
       <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
       <div className="page__body wrap">
-        <p className="board__notice">
-          문의는 비밀글로 등록되어 제목이 [문의]로만 보입니다. 내 글은
-          작성자 이름으로 검색해 주세요.
-        </p>
         <BoardSearch
           query={query}
           sort={sort}
@@ -134,6 +130,11 @@ export function InquiryPage() {
             글쓰기
           </Link>
         </BoardSearch>
+        <p className="board__notice">
+          <span className="board__notice-mark">※</span> 문의는 비밀글로
+          등록되어 제목이 [문의]로만 보입니다. 내 글은 작성자 이름으로 검색해
+          주세요.
+        </p>
         <div className="board board--qna">
           <div className="board__head">
             <span>번호</span>
