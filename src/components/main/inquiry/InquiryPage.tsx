@@ -131,9 +131,13 @@ export function InquiryPage() {
           </Link>
         </BoardSearch>
         <p className="board__notice">
-          <span className="board__notice-mark">※</span> 문의는 비밀글로
-          등록되어 제목이 [문의]로만 보입니다. 내 글은 작성자 이름으로 검색해
-          주세요.
+          <span className="board__notice-mark">※</span>
+          <span className="board__notice-body">
+            문의는 비밀글로 등록되어 제목이 [문의]로만 보입니다.{" "}
+            <span className="board__notice-break">
+              내 글은 작성자 이름으로 검색해 주세요.
+            </span>
+          </span>
         </p>
         <div className="board board--qna">
           <div className="board__head">

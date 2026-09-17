@@ -126,6 +126,8 @@
 }
 
 .board__notice {
+  display: flex;
+  gap: 0.4rem;
   margin: 0 0 0.7rem;
   color: var(--note);
   font-size: 0.86rem;
@@ -134,9 +136,13 @@
 }
 
 .board__notice-mark {
-  margin-right: 0.4rem;
+  flex: 0 0 auto;
   color: var(--marvel);
   font-weight: 700;
+}
+
+.board__notice-body {
+  min-width: 0;
 }
 
 .board-pager {
@@ -1122,6 +1128,10 @@
   .board__notice {
     margin-bottom: 0.85rem;
     font-size: 0.76rem;
+  }
+
+  .board__notice-break {
+    display: block;
   }
 
   .board-search__input,
