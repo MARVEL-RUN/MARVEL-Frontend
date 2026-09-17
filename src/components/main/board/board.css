@@ -394,11 +394,18 @@
 .post__meta {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   gap: 0.65rem 0.85rem;
   margin-top: 0.7rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.post__meta time {
   color: var(--note);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
+  font-weight: 500;
 }
 
 .post__status {
@@ -553,22 +560,40 @@
 }
 
 .post__reply {
-  padding: 1.4rem 0 2.2rem;
+  padding: 1.8rem 0 2.4rem;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .post__reply-label {
-  margin-bottom: 0.7rem;
-  color: var(--marvel);
+  margin: 0 0 1rem;
+  color: #fff;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.12em;
 }
 
-.post__reply p {
+.post__reply-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  margin: 0 0 1.15rem;
+  color: var(--note);
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.post__reply-meta time {
+  font-size: 0.78rem;
+}
+
+.post__reply-body,
+.post__reply .is-wait {
   margin: 0;
   color: var(--silver);
-  line-height: 1.75;
+  font-size: 0.98rem;
+  line-height: 1.85;
   white-space: pre-wrap;
 }
 
@@ -613,10 +638,10 @@
 }
 
 .page--post .post__reply {
-  padding: 1.8rem 0 2.6rem;
+  padding: 2rem 0 2.8rem;
 }
 
-.page--post .post__reply p {
+.page--post .post__reply-body {
   line-height: 1.85;
 }
 
@@ -1073,7 +1098,7 @@
     gap: 0.35rem 0.85rem;
   }
   .post__body,
-  .post__reply p {
+  .post__reply-body {
     overflow-x: auto;
     word-break: keep-all;
     overflow-wrap: anywhere;

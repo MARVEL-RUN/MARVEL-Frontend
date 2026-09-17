@@ -166,7 +166,15 @@ export function InquiryViewPage() {
             <section className="post__reply">
               <p className="post__reply-label">답변</p>
               {answered ? (
-                <p>{answer?.content}</p>
+                <>
+                  <p className="post__reply-meta">
+                    <span>{answer?.author}</span>
+                    <time dateTime={toDateTimeAttr(answer?.createdAt ?? "")}>
+                      {formatInquiryDate(answer?.createdAt)}
+                    </time>
+                  </p>
+                  <p className="post__reply-body">{answer?.content}</p>
+                </>
               ) : (
                 <p className="is-wait">답변 준비 중입니다.</p>
               )}

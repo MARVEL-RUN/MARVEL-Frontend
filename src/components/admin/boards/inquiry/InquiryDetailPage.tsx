@@ -113,17 +113,6 @@ export function InquiryDetailPage() {
               />
             </label>
             <div className="admin-form__actions">
-              {answerDetail?.id ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost"
-                  onClick={async () => {
-                    if (await confirm("답변을 삭제할까요?")) clear.mutate();
-                  }}
-                >
-                  답변 삭제
-                </button>
-              ) : null}
               <button
                 type="button"
                 className="admin-btn admin-btn--ghost"
@@ -131,6 +120,17 @@ export function InquiryDetailPage() {
               >
                 목록
               </button>
+              {answerDetail?.id ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                  onClick={async () => {
+                    if (await confirm("답변을 삭제할까요?")) clear.mutate();
+                  }}
+                >
+                  답변 삭제
+                </button>
+              ) : null}
               <button type="submit" className="admin-btn admin-btn--red" disabled={save.isPending}>
                 {save.isPending
                   ? "저장 중..."
