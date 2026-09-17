@@ -62,7 +62,9 @@ export function NoticeDetailPage() {
     <main className="page page--post">
       <div className="page__body wrap wrap--narrow">
         {post === undefined ? (
-          <p className="board__empty">불러오는 중...</p>
+          <div className="post post--loading" aria-busy="true">
+            <p className="board__empty">불러오는 중...</p>
+          </div>
         ) : post === null ? (
           <div className="post">
             <p className="board__empty">글을 찾을 수 없습니다.</p>

@@ -702,8 +702,21 @@
   color: var(--note);
 }
 
+.page--post {
+  min-height: calc(100svh - var(--header-h, 4.5rem));
+}
+
 .page--post .page__body {
   padding: 4.75rem 0 6.5rem;
+}
+
+.page--post .post--loading {
+  min-height: max(28rem, calc(100svh - var(--header-h, 4.5rem) - 14rem));
+}
+
+.page--post .post--loading .board__empty {
+  border-bottom: 0;
+  padding-top: 6rem;
 }
 
 .page--post .post__head {
