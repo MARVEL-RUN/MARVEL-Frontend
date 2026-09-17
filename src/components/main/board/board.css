@@ -324,6 +324,12 @@
   text-align: center;
 }
 
+.board--qna .board__badge {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
 .board__meta {
   display: contents;
 }
@@ -1035,6 +1041,7 @@
     grid-row: auto;
     font-size: 0.6rem;
     letter-spacing: 0.02em;
+    text-align: center;
   }
 
   .board--qna .board__subject {
@@ -1044,7 +1051,7 @@
   }
 
   .board--qna .board__title {
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -1052,9 +1059,9 @@
   }
 
   .board--qna .board__lock {
-    width: 0.72rem;
-    height: 0.72rem;
-    margin-right: 0.15rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-right: 0.18rem;
   }
 
   .board--qna .board__name {
