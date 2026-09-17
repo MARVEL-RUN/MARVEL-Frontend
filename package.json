@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:main": "NEXT_PUBLIC_APP_MODE=main NEXT_PUBLIC_REGISTER_PREVIEW=1 next dev --turbopack",
+    "dev:main": "NEXT_PUBLIC_APP_MODE=main next dev --turbopack",
     "build": "next build",
     "build:main": "NEXT_PUBLIC_APP_MODE=main next build",
     "start": "next start",
@@ -14,6 +14,7 @@
     "@eslint/eslintrc": "^3.3.7",
     "@tailwindcss/postcss": "^4.3.3",
     "@tanstack/react-query": "^5.102.8",
+    "@tosspayments/tosspayments-sdk": "^2.8.1",
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

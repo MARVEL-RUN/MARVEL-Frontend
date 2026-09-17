@@ -1,79 +1,200 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
+import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
-import { deleteInquiry, listInquiries } from "@/services/admin/inquiries";
-import type { AdminInquiry } from "@/types/boards";
+import { adminToast } from "@/components/admin/Toast";
+import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { DEFAULT_EVENT_ID } from "@/lib/main/config";
+import {
+  deleteAdminQuestion,
+  listAdminQuestions,
+} from "@/services/admin/boards/inquiries";
+import type {
+  AdminQuestionListItem,
+  AdminQuestionSearchTarget,
+} from "@/services/admin/boards/inquiries.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { RotateCcw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+type SearchField = "all" | "name" | "title";
+type StatusFilter = "all" | "open" | "done";
+
+const FIELD_OPTIONS = [
+  { value: "all" as const, label: "전체" },
+  { value: "name" as const, label: "작성자명" },
+  { value: "title" as const, label: "게시글명" },
+];
+
+const STATUS_OPTIONS = [
+  { value: "all" as const, label: "전체" },
+  { value: "open" as const, label: "미답변" },
+  { value: "done" as const, label: "답변완료" },
+];
+
+type Applied = {
+  q: string;
+  field: SearchField;
+  status: StatusFilter;
+};
+
+const INITIAL: Applied = { q: "", field: "all", status: "all" };
+const PAGE_SIZE = 10;
+
+function toTarget(field: SearchField): AdminQuestionSearchTarget {
+  if (field === "name") return "AUTHOR";
+  if (field === "title") return "TITLE";
+  return "ALL";
+}
+
+function toIsAnswered(status: StatusFilter): boolean | undefined {
+  if (status === "open") return false;
+  if (status === "done") return true;
+  return undefined;
+}
 
 export function InquiryListPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const { data = [], isLoading } = useQuery({
-    queryKey: ["admin", "inquiries"],
-    queryFn: listInquiries,
-  });
+  const { confirm, modal } = useAdminConfirm();
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState<"all" | "open" | "done">("all");
-  const remove = useMutation({
-    mutationFn: deleteInquiry,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "inquiries"] }),
+  const [field, setField] = useState<SearchField>("all");
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [applied, setApplied] = useState<Applied>(INITIAL);
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "inquiries", applied, page],
+    queryFn: () =>
+      listAdminQuestions({
+        eventId: DEFAULT_EVENT_ID,
+        target: toTarget(applied.field),
+        keyword: applied.q.trim() || undefined,
+        isAnswered: toIsAnswered(applied.status),
+        page: page - 1,
+        size: PAGE_SIZE,
+        sort: "LATEST",
+      }),
   });
 
-  const rows = useMemo(() => {
-    const keyword = q.trim().toLowerCase();
-    return data.filter((row) => {
-      if (status === "open" && row.answer) return false;
-      if (status === "done" && !row.answer) return false;
-      if (!keyword) return true;
-      return [row.name, row.title, row.body].join(" ").toLowerCase().includes(keyword);
-    });
-  }, [data, q, status]);
+  const remove = useMutation({
+    mutationFn: deleteAdminQuestion,
+    onSuccess: () => {
+      const remaining = (data?.numberOfElements ?? 1) - 1;
+      if (remaining <= 0 && page > 1) setPage((p) => p - 1);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "inquiries"] });
+      adminToast.success("문의가 삭제되었습니다.");
+    },
+    onError: () => adminToast.error("문의 삭제에 실패했습니다."),
+  });
+
+  const rows = data?.content ?? [];
+  const totalCount = data?.totalElements ?? 0;
+  const pageCount = Math.max(1, data?.totalPages ?? 1);
+
+  const placeholder =
+    field === "name" ? "작성자명 검색" : field === "title" ? "게시글명 검색" : "이름 · 제목 검색";
+
+  const runSearch = () => {
+    setPage(1);
+    setApplied({ q, field, status });
+  };
+
+  const resetSearch = () => {
+    setQ("");
+    setField("all");
+    setStatus("all");
+    setPage(1);
+    setApplied(INITIAL);
+  };
 
   return (
     <div className="admin-page">
-      <AdminTableShell<AdminInquiry>
+      <AdminTableShell<AdminQuestionListItem>
         title="문의사항"
         rows={rows}
         loading={isLoading}
         empty="등록된 문의가 없습니다."
-        rowKey={(row) => row.id}
+        rowKey={(row) => row.questionId}
+        page={page}
+        pageCount={pageCount}
+        totalCount={totalCount}
+        onPage={setPage}
+        pageUnit="게시물"
+        onRowClick={(row) =>
+          router.push(`/admin/boards/inquiry/detail?id=${row.questionId}`)
+        }
         tools={
           <>
+            <AdminSelect
+              value={field}
+              options={FIELD_OPTIONS}
+              onChange={(value) => {
+                setField(value);
+                setPage(1);
+                setApplied((prev) => ({ ...prev, field: value }));
+              }}
+              ariaLabel="검색 대상"
+            />
+            <AdminSelect
+              value={status}
+              options={STATUS_OPTIONS}
+              onChange={(value) => {
+                setStatus(value);
+                setPage(1);
+                setApplied((prev) => ({ ...prev, status: value }));
+              }}
+              ariaLabel="답변 상태"
+              width={120}
+            />
             <input
+              className="admin-toolbar__search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="이름 · 제목 검색"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") runSearch();
+              }}
+              placeholder={placeholder}
             />
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as typeof status)}
+            <button type="button" className="admin-btn admin-btn--primary admin-toolbar__btn" onClick={runSearch}>
+              검색
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost admin-toolbar__iconbtn"
+              aria-label="검색 초기화"
+              title="초기화"
+              onClick={resetSearch}
             >
-              <option value="all">전체</option>
-              <option value="open">미답변</option>
-              <option value="done">답변완료</option>
-            </select>
+              <RotateCcw size={24} strokeWidth={2.5} />
+            </button>
           </>
         }
         columns={[
           {
             key: "title",
             header: "제목",
-            render: (row) => (
-              <Link href={`/admin/boards/inquiry/detail?id=${row.id}`}>{row.title}</Link>
-            ),
+            render: (row) => row.questionTitle,
           },
-          { key: "name", header: "작성자", render: (row) => row.name },
+          { key: "name", header: "작성자", render: (row) => row.authorName },
           {
             key: "status",
             header: "상태",
             render: (row) => (
-              <span className={`admin-badge ${row.answer ? "admin-badge--paid" : "admin-badge--pending"}`}>
-                {row.answer ? "답변" : "미답변"}
+              <span
+                className={`admin-badge ${row.answered ? "admin-badge--paid" : "admin-badge--pending"}`}
+              >
+                {row.answered ? "답변" : "미답변"}
               </span>
             ),
           },
-          { key: "date", header: "등록일", render: (row) => row.date },
+          {
+            key: "date",
+            header: "등록일",
+            render: (row) => formatAdminBoardDate(row.questionCreatedAt),
+          },
           {
             key: "actions",
             header: "",
@@ -81,8 +202,11 @@ export function InquiryListPage() {
               <button
                 type="button"
                 className="admin-btn admin-btn--text"
-                onClick={() => {
-                  if (confirm("이 문의를 삭제할까요?")) remove.mutate(row.id);
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (await confirm("이 문의를 삭제할까요? 답변도 함께 삭제됩니다.")) {
+                    remove.mutate(row.questionId);
+                  }
                 }}
               >
                 삭제
@@ -91,6 +215,7 @@ export function InquiryListPage() {
           },
         ]}
       />
+      {modal}
     </div>
   );
 }

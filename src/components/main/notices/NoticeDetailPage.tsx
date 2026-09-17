@@ -1,11 +1,11 @@
 "use client";
 
 import { getAdminNotice, listAdminNotices } from "@/services/admin/notices";
-import type { AdminNotice } from "@/types/admin";
+import type { AdminNotice } from "@/types/admin/admin";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { SideBanner } from "../layout/SideBanner";
+import { NoticeBody } from "./NoticeBody";
 import { orderNotices } from "./order";
 
 export function NoticeDetailPage() {
@@ -31,9 +31,8 @@ export function NoticeDetailPage() {
   }, [id]);
 
   return (
-    <main className="page">
-      <SideBanner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
-      <div className="page__body wrap">
+    <main className="page page--post">
+      <div className="page__body wrap wrap--narrow">
         {post === undefined ? (
           <p className="board__empty">불러오는 중...</p>
         ) : post === null ? (
@@ -54,7 +53,9 @@ export function NoticeDetailPage() {
                 <time dateTime={post.date.replaceAll(".", "-")}>{post.date}</time>
               </p>
             </header>
-            <div className="post__body">{post.body}</div>
+            <div className="post__body">
+              <NoticeBody text={post.body} />
+            </div>
             <nav className="post__nav" aria-label="이전·다음 글">
               <NavRow label="다음글" item={next} />
               <NavRow label="이전글" item={prev} />

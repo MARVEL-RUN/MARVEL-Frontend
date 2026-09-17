@@ -16,11 +16,8 @@ export const ADMIN_NAV: AdminNavItem[] = [
   {
     key: "applications",
     name: "참가신청",
-    href: "/admin/applications/individual",
-    children: [
-      { name: "개인 신청", href: "/admin/applications/individual" },
-      { name: "단체 신청", href: "/admin/applications/group" },
-    ],
+    href: "/admin/applications",
+    children: [{ name: "신청자관리", href: "/admin/applications" }],
   },
   {
     key: "boards",
@@ -35,9 +32,9 @@ export const ADMIN_NAV: AdminNavItem[] = [
   {
     key: "content",
     name: "콘텐츠",
-    href: "/admin/content/sponsors",
+    href: "/admin/content/popups",
     children: [
-      { name: "스폰서", href: "/admin/content/sponsors" },
+      { name: "팝업", href: "/admin/content/popups" },
       { name: "이용약관", href: "/admin/legal/terms" },
       { name: "개인정보처리방침", href: "/admin/legal/privacy" },
     ],
@@ -53,12 +50,21 @@ export const ADMIN_SETTINGS: AdminNavItem = {
 
 export function findAdminNav(pathname: string) {
   const path = pathname.replace(/\/+$/, "") || "/";
+  const groups: AdminNavItem[] = [...ADMIN_NAV, ADMIN_SETTINGS];
 
   if (path === "/admin") {
     return { item: null, child: null, home: true as const };
   }
 
-  const groups: AdminNavItem[] = [...ADMIN_NAV, ADMIN_SETTINGS];
+  if (path.startsWith("/admin/applications")) {
+    const applications = groups.find((nav) => nav.key === "applications") ?? null;
+    return {
+      item: applications,
+      child: applications?.children[0] ?? null,
+      home: false as const,
+    };
+  }
+
   const item =
     groups.find(
       (nav) =>
