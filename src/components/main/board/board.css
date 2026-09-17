@@ -331,6 +331,11 @@
   white-space: pre-wrap;
 }
 
+.notice-body {
+  font-family: var(--font-noto), "Noto Sans KR", "맑은 고딕", sans-serif;
+  color: #fff;
+}
+
 .notice-hl {
   padding: 0.04em 0.16em 0.06em;
   background: color-mix(in srgb, var(--gold) 52%, transparent);

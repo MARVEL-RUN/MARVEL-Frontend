@@ -3,12 +3,16 @@
 import { Fragment, type ReactNode } from "react";
 
 export function NoticeBody({ text }: { text: string }) {
-  return text.split("\n").map((line, i) => (
-    <Fragment key={i}>
-      {i > 0 ? "\n" : null}
-      {renderLine(line, i)}
-    </Fragment>
-  ));
+  return (
+    <span className="notice-body">
+      {text.split("\n").map((line, i) => (
+        <Fragment key={i}>
+          {i > 0 ? "\n" : null}
+          {renderLine(line, i)}
+        </Fragment>
+      ))}
+    </span>
+  );
 }
 
 function renderLine(line: string, lineKey: number) {
