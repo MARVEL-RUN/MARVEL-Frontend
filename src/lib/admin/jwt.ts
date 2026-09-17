@@ -1,11 +1,16 @@
 import { ADMIN_ROLES } from "@/types/admin";
 
+function decodeBase64Url(value: string) {
+  const binary = atob(value.replace(/-/g, "+").replace(/_/g, "/"));
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
 export function decodeToken(token: string): Record<string, unknown> | null {
   try {
     const payload = token.split(".")[1];
     if (!payload) return null;
-    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(json) as Record<string, unknown>;
+    return JSON.parse(decodeBase64Url(payload)) as Record<string, unknown>;
   } catch {
     return null;
   }
