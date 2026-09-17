@@ -15,7 +15,7 @@ export function SideDock() {
   const [active, setActive] = useState<string>("hero");
   const jumping = useRef(false);
   const { left, ready } = useOpenLeft();
-  const dday = !ready ? "D--" : left ? `D-${Number(left.d)}` : null;
+  const dday = !ready ? "D--" : left ? `D-${left.n}` : null;
 
   useEffect(() => {
     const onScroll = () => {

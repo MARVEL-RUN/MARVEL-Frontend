@@ -18,7 +18,7 @@ export function RegisterClosedModal({ open, onClose }: Props) {
   const { left } = useOpenLeft(open);
   const live = left ?? (open ? openLeftNow() : null);
   const slots = live ?? { d: "00", h: "00", m: "00", s: "00" };
-  const dday = live ? `D - ${Number(live.d)}` : "OPEN";
+  const dday = live ? `D - ${live.n}` : "OPEN";
 
   useEffect(() => {
     setMounted(true);
