@@ -58,9 +58,14 @@ export function useOpenLeft(enabled = true) {
   return { left, ready };
 }
 
+export function ddayLabel(n: number, spaced = false) {
+  if (n <= 0) return spaced ? "D - DAY" : "D-DAY";
+  return spaced ? `D - ${n}` : `D-${n}`;
+}
+
 export function OpenDday({ className }: { className?: string }) {
   const { left, ready } = useOpenLeft();
-  const label = !ready ? "D - --" : left ? `D - ${left.n}` : "OPEN";
+  const label = !ready ? "D - --" : left ? ddayLabel(left.n, true) : "OPEN";
 
   return <span className={className}>{label}</span>;
 }
