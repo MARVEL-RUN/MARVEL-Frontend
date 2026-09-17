@@ -1366,8 +1366,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
   .about .wrap,
   .venue__grid,
-  .courses__grid,
-  .directions__row {
+  .courses__grid {
     grid-template-columns: 1fr;
   }
 
