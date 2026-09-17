@@ -361,8 +361,11 @@
 }
 
 .notice-hl {
-  padding: 0.04em 0.16em 0.06em;
-  background: color-mix(in srgb, var(--gold) 52%, transparent);
+  padding: 0 0.08em;
+  background: linear-gradient(transparent 0.42em,
+      color-mix(in srgb, var(--gold) 40%, transparent) 0.42em,
+      color-mix(in srgb, var(--gold) 40%, transparent) calc(100% - 0.28em),
+      transparent calc(100% - 0.28em));
   color: #fff;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
