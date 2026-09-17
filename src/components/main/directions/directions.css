@@ -126,6 +126,11 @@
 }
 
 @media (max-width: 960px) {
+  .directions__row {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
   .venue-copy {
     min-height: 0;
   }
@@ -133,11 +138,16 @@
 
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .directions__row {
+    gap: 1.35rem;
+  }
+
   .kakao-map {
     aspect-ratio: 16 / 10;
-    min-height: 12.5rem;
+    min-height: 14rem;
     clip-path: none;
   }
+
   .directions {
     gap: 1.35rem;
   }

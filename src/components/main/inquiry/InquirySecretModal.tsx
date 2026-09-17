@@ -2,6 +2,7 @@
 
 import { Eye, EyeOff, Lock, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   open: boolean;
@@ -23,6 +24,11 @@ export function InquirySecretModal({
   const errorId = useId();
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -41,9 +47,9 @@ export function InquirySecretModal({
     };
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="inquiry-secret" role="presentation">
       <button
         type="button"
@@ -138,6 +144,7 @@ export function InquirySecretModal({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
