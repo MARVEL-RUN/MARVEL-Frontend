@@ -33,10 +33,12 @@ export function ApplyKindPick({
   heading,
   onPick,
   lookup = false,
+  disabled = false,
 }: {
   heading: string;
   onPick: (kind: ApplyKind) => void;
   lookup?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <section className="block">
@@ -47,6 +49,7 @@ export function ApplyKindPick({
             <button
               type="button"
               className={`course course--${k.tone}`}
+              disabled={disabled}
               onClick={() => onPick(k.id)}
             >
               <p className="course__code">{k.code}</p>
