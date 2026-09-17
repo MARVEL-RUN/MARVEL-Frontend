@@ -4,7 +4,7 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { EVENT } from "@/lib/event";
-import { openLeftNow, useOpenLeft } from "../home/OpenCountdown";
+import { ddayLabel, openLeftNow, useOpenLeft } from "../home/OpenCountdown";
 import { RegisterStandbyCount } from "./RegisterStandbyCount";
 
 type Props = {
@@ -18,7 +18,7 @@ export function RegisterClosedModal({ open, onClose }: Props) {
   const { left } = useOpenLeft(open);
   const live = left ?? (open ? openLeftNow() : null);
   const slots = live ?? { d: "00", h: "00", m: "00", s: "00" };
-  const dday = live ? `D - ${Number(live.d)}` : "OPEN";
+  const dday = live ? ddayLabel(live.n, true) : "OPEN";
 
   useEffect(() => {
     setMounted(true);

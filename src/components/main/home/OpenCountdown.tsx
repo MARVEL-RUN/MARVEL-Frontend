@@ -5,7 +5,22 @@ import { EVENT } from "@/lib/event";
 
 const OPEN_AT = Date.parse(EVENT.openAt);
 
-type Left = { d: string; h: string; m: string; s: string };
+type Left = { n: number; d: string; h: string; m: string; s: string };
+
+function kstYmd(ms: number) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(ms);
+}
+
+function calendarDaysLeft(now: number) {
+  const from = Date.parse(`${kstYmd(now)}T00:00:00+09:00`);
+  const to = Date.parse(`${kstYmd(OPEN_AT)}T00:00:00+09:00`);
+  return Math.max(0, Math.round((to - from) / 86_400_000));
+}
 
 function parts(now: number): Left | null {
   const ms = OPEN_AT - now;
@@ -13,6 +28,7 @@ function parts(now: number): Left | null {
   const sec = Math.floor(ms / 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
   return {
+    n: calendarDaysLeft(now),
     d: pad(Math.floor(sec / 86400)),
     h: pad(Math.floor((sec % 86400) / 3600)),
     m: pad(Math.floor((sec % 3600) / 60)),
@@ -42,9 +58,14 @@ export function useOpenLeft(enabled = true) {
   return { left, ready };
 }
 
+export function ddayLabel(n: number, spaced = false) {
+  if (n <= 0) return spaced ? "D - DAY" : "D-DAY";
+  return spaced ? `D - ${n}` : `D-${n}`;
+}
+
 export function OpenDday({ className }: { className?: string }) {
   const { left, ready } = useOpenLeft();
-  const label = !ready ? "D - --" : left ? `D - ${Number(left.d)}` : "OPEN";
+  const label = !ready ? "D - --" : left ? ddayLabel(left.n, true) : "OPEN";
 
   return <span className={className}>{label}</span>;
 }

@@ -3,7 +3,7 @@ import { nextId, readStore, todayStamp, wait, writeStore } from "@/lib/admin/sto
 import { isNoticeCategory } from "@/lib/admin/noticeCategories";
 import type { AdminNotice } from "@/types/admin/admin";
 
-const KEY = "mr-admin-notices";
+const KEY = "mr-admin-notices-v4";
 
 const TAG_MAP: Record<string, string> = {
   NOTICE: "공지",

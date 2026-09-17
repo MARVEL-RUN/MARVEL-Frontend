@@ -12,8 +12,8 @@ export type LegalDocDraft = {
 };
 
 const KEYS: Record<LegalDocKind, string> = {
-  terms: "mr-admin-legal-terms",
-  privacy: "mr-admin-legal-privacy",
+  terms: "mr-admin-legal-terms-v2",
+  privacy: "mr-admin-legal-privacy-v2",
 };
 
 function seed(kind: LegalDocKind): LegalDocDraft {

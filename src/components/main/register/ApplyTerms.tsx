@@ -3,8 +3,6 @@
 import { useRef, useState } from "react";
 import {
   APPLY_ALL_AGREE,
-  APPLY_NOTICE_POINTS,
-  APPLY_SAFETY,
   APPLY_TERMS_LEAD,
   APPLY_TERMS_TITLE,
   REGISTER_CONSENTS,
@@ -21,6 +19,7 @@ import {
 import { useStickyDock } from "@/lib/sticky-dock";
 import { LegalBlocks } from "../legal/LegalBlocks";
 
+const RULES = REGISTER_CONSENTS.find((item) => item.id === "rules")!;
 const OTHER_CONSENTS = REGISTER_CONSENTS.filter((item) => item.id !== "rules");
 
 function Toggle({
@@ -53,9 +52,7 @@ export function ApplyTerms({
   onPick: (kind: ApplyKind) => void;
 }) {
   const [openNotice, setOpenNotice] = useState(true);
-  const [open, setOpen] = useState<Partial<Record<ConsentId, boolean>>>({
-    privacy: true,
-  });
+  const [open, setOpen] = useState<Partial<Record<ConsentId, boolean>>>({});
   const [error, setError] = useState("");
   const slotRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
@@ -94,19 +91,7 @@ export function ApplyTerms({
         </div>
         {openNotice ? (
           <div className="apply-terms__detail apply-terms__detail--notice">
-            <div className="apply-terms__points">
-              {APPLY_NOTICE_POINTS.map((item) => (
-                <div key={item.title}>
-                  <p className="apply-terms__point-title">{item.title}</p>
-                  <p>{item.body}</p>
-                </div>
-              ))}
-            </div>
-            <div className="apply-terms__points">
-              <p className="apply-terms__safety-title">{APPLY_SAFETY.title}</p>
-              <p>{APPLY_SAFETY.body}</p>
-              <p className="apply-terms__safety-note">{APPLY_SAFETY.note}</p>
-            </div>
+            <LegalBlocks nodes={RULES.nodes} />
           </div>
         ) : null}
       </section>

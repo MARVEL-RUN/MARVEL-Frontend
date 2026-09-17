@@ -17,7 +17,7 @@ import { BoardSearch, type BoardSort } from "../board/BoardSearch";
 import { SideBanner } from "../layout/SideBanner";
 import { InquirySecretModal } from "./InquirySecretModal";
 import {
-  formatInquiryDate,
+  inquiryDateParts,
   toDateTimeAttr,
   unlockInquiry,
 } from "./order";
@@ -62,13 +62,13 @@ export function InquiryPage() {
           apiPage === page - 1
             ? first
             : await listPublicQuestions({
-                eventId: DEFAULT_EVENT_ID,
-                target: "ALL",
-                keyword: applied.trim() || undefined,
-                page: apiPage,
-                size: PAGE_SIZE,
-                sort: "LATEST",
-              });
+              eventId: DEFAULT_EVENT_ID,
+              target: "ALL",
+              keyword: applied.trim() || undefined,
+              page: apiPage,
+              size: PAGE_SIZE,
+              sort: "LATEST",
+            });
         if (cancelled) return;
 
         const rows = result.content ?? [];
@@ -130,13 +130,22 @@ export function InquiryPage() {
             글쓰기
           </Link>
         </BoardSearch>
+        <p className="board__notice">
+          <span className="board__notice-mark">※</span>
+          <span className="board__notice-body">
+            문의는 비밀글로 등록되어 제목이 [문의]로만 보입니다.{" "}
+            <span className="board__notice-break">
+              내 글은 작성자 이름으로 검색해 주세요.
+            </span>
+          </span>
+        </p>
         <div className="board board--qna">
           <div className="board__head">
             <span>번호</span>
             <span>상태</span>
             <span>제목</span>
             <span>작성자</span>
-            <span>등록일</span>
+            <span>날짜</span>
           </div>
           {!ready ? (
             <p className="board__empty">불러오는 중...</p>
@@ -150,6 +159,7 @@ export function InquiryPage() {
             items.map((item) => {
               const q = item.questionHeader;
               const answered = q.answered || Boolean(item.answerHeader);
+              const when = inquiryDateParts(q.createdAt);
               return (
                 <button
                   key={q.id}
@@ -165,18 +175,21 @@ export function InquiryPage() {
                   >
                     {answered ? "답변완료" : "답변대기"}
                   </span>
-                  <span className="board__qna-sub">
-                    <span className="board__subject">
-                      {q.secret ? (
-                        <Lock className="board__lock" size={14} aria-hidden />
-                      ) : null}
-                      <strong className="board__title">
-                        {q.secret ? INQUIRY_PUBLIC_TITLE : q.title}
-                      </strong>
-                    </span>
+                  <span className="board__subject">
+                    {q.secret ? (
+                      <Lock className="board__lock" size={14} aria-hidden />
+                    ) : null}
+                    <strong className="board__title">
+                      {q.secret ? INQUIRY_PUBLIC_TITLE : q.title}
+                    </strong>
+                  </span>
+                  <span className="board__meta">
                     <span className="board__name">{q.authorName}</span>
                     <time dateTime={toDateTimeAttr(q.createdAt)}>
-                      {formatInquiryDate(q.createdAt)}
+                      <span className="board__day">{when.day}</span>
+                      {when.time ? (
+                        <span className="board__clock"> {when.time}</span>
+                      ) : null}
                     </time>
                   </span>
                 </button>

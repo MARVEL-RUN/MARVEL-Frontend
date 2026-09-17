@@ -1145,12 +1145,15 @@
 }
 
 .apply-terms__detail--notice {
-  max-height: none;
-  overflow: visible;
+  max-height: 24rem;
 }
 
 .apply-terms__detail .legal {
   color: #fff;
+}
+
+.apply-terms__detail .legal > :first-child {
+  margin-top: 0;
 }
 
 .apply-terms__detail h3 {

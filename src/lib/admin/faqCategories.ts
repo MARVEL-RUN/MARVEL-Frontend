@@ -1,4 +1,4 @@
-export const FAQ_CATEGORIES = ["참가 신청", "결제", "행사 운영", "기타"] as const;
+export const FAQ_CATEGORIES = ["참가 신청", "결제", "행사 운영", "기념품", "보험"] as const;
 
 export type FaqCategory = (typeof FAQ_CATEGORIES)[number];
 

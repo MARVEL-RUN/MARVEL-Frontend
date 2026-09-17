@@ -1,5 +1,6 @@
 "use client";
 
+import { NoticeBody } from "../notices/NoticeBody";
 import { useState } from "react";
 
 export type BoardFoldItem = {
@@ -39,7 +40,11 @@ export function BoardFold({
               <strong className="board-fold__title">{item.title}</strong>
               <span className="board-fold__chev" aria-hidden="true" />
             </button>
-            {open ? <p className="board-fold__body">{item.body}</p> : null}
+            {open ? (
+              <div className="board-fold__body">
+                <NoticeBody text={item.body} />
+              </div>
+            ) : null}
           </li>
         );
       })}

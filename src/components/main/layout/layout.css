@@ -916,22 +916,22 @@ body:has(.sheet-modal) .side-dock {
   }
 
   html.is-main .site-footer {
-    padding: 2rem 0 calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    padding: 1.55rem 0 calc(1.2rem + env(safe-area-inset-bottom, 0px));
   }
 
   html.is-main .site-footer__hosts {
     display: grid;
-    gap: 1.7rem;
-    padding-bottom: 1.8rem;
+    gap: 1.35rem;
+    padding-bottom: 1.4rem;
   }
 
   html.is-main .site-footer__host-role {
-    font-size: 0.95rem;
+    font-size: 0.74rem;
   }
 
   html.is-main .site-footer__host-logo {
-    width: 10.5rem;
-    height: 2.2rem;
+    width: 8.6rem;
+    height: 1.85rem;
   }
 
   html.is-main .site-footer__host-logo img {
@@ -939,46 +939,49 @@ body:has(.sheet-modal) .side-dock {
   }
 
   html.is-main .site-footer__info {
-    padding-top: 1.55rem;
+    padding-top: 1.2rem;
   }
 
   html.is-main .site-footer__office-name {
-    font-size: 1.02rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.84rem;
   }
 
   html.is-main .site-footer__facts {
     grid-template-columns: 1fr;
-    gap: 0.7rem;
+    gap: 0.48rem;
   }
 
   html.is-main .site-footer__facts>div {
-    grid-template-columns: 5.6rem minmax(0, 1fr);
-    gap: 0.7rem;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    gap: 0.45rem;
   }
 
   html.is-main .site-footer__facts dt,
   html.is-main .site-footer__facts dd {
-    font-size: 0.88rem;
+    font-size: 0.7rem;
+    line-height: 1.5;
   }
 
   html.is-main .site-footer__copy {
-    font-size: 0.78rem;
+    margin-top: 1.05rem;
+    font-size: 0.6rem;
   }
 
   html.is-main .site-footer__nav {
-    gap: 0 1.15rem;
-    margin-bottom: 1.35rem;
+    gap: 0 0.8rem;
+    margin-bottom: 0.95rem;
   }
 
   html.is-main .site-footer__nav a {
     display: inline-flex;
     align-items: center;
-    min-height: 2.5rem;
-    font-size: 0.88rem;
+    min-height: 1.8rem;
+    font-size: 0.7rem;
   }
 
   html.is-main .site-footer__logo {
-    margin-top: 2rem;
+    margin-top: 1.55rem;
   }
 
   .side-banner {

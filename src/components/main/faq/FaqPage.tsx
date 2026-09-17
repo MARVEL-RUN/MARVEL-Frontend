@@ -5,6 +5,7 @@ import { listFaqs } from "@/services/admin/faqs";
 import type { AdminFaq } from "@/types/admin/boards";
 import { useEffect, useMemo, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
+import { NoticeBody } from "../notices/NoticeBody";
 
 export function FaqPage() {
   const [items, setItems] = useState<AdminFaq[]>([]);
@@ -62,7 +63,11 @@ export function FaqPage() {
                     <strong className="faq__question">{item.question}</strong>
                     <span className="faq__chev" aria-hidden="true" />
                   </button>
-                  {open ? <p className="faq__a">{item.answer}</p> : null}
+                  {open ? (
+                    <div className="faq__a">
+                      <NoticeBody text={item.answer} />
+                    </div>
+                  ) : null}
                 </li>
               );
             })}
