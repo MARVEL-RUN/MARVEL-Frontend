@@ -12,7 +12,7 @@ export type LegalDocDraft = {
 };
 
 const KEYS: Record<LegalDocKind, string> = {
-  terms: "mr-admin-legal-terms",
+  terms: "mr-admin-legal-terms-v2",
   privacy: "mr-admin-legal-privacy-v2",
 };
 
