@@ -451,6 +451,15 @@
   margin: 0;
 }
 
+.kit-gallery__scarf-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
 .kit-gallery__frame--scarf-front,
 .kit-gallery__frame--scarf-back {
   flex: none;
@@ -481,6 +490,70 @@
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   line-height: 1.5;
+}
+
+.scarf-preview.course-preview {
+  width: calc(100dvw / var(--site-zoom, 1));
+  height: calc(100dvh / var(--site-zoom, 1));
+  max-width: calc(100dvw / var(--site-zoom, 1));
+  max-height: calc(100dvh / var(--site-zoom, 1));
+}
+
+.scarf-preview .course-preview__sheet {
+  width: min(1180px, 100%);
+  max-height: calc(100dvh / var(--site-zoom, 1) - 2rem);
+  grid-template-rows: auto auto auto auto;
+}
+
+.scarf-preview .course-preview__stage {
+  padding: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.scarf-preview__scroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: var(--marvel) #111;
+}
+
+.scarf-preview__pic {
+  --scarf-h: min(16.5rem, calc(38dvh / var(--site-zoom, 1)));
+  position: relative;
+  height: var(--scarf-h);
+  width: calc(var(--scarf-h) * 6237 / 284);
+}
+
+.scarf-preview__pic img {
+  object-fit: fill;
+}
+
+.scarf-preview__tools {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  background: #111;
+}
+
+.scarf-preview__tools button {
+  min-height: 2rem;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--note);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.scarf-preview__tools button.is-on {
+  border-color: var(--marvel);
+  background: var(--marvel);
+  color: #fff;
 }
 
 .kit-spec {
@@ -623,7 +696,7 @@
   height: 100%;
   object-fit: cover;
   object-position: center 100%;
-  transform: translateX(-8%) scale(1.12);
+  transform: translateX(-13%) scale(1.12);
   transform-origin: center bottom;
 }
 
@@ -710,5 +783,11 @@
 
   .kit-page .locked-cta__img {
     width: 6.8rem;
+  }
+
+  .scarf-preview__tools button {
+    min-height: var(--tap);
+    padding: 0 1.05rem;
+    font-size: 0.86rem;
   }
 }

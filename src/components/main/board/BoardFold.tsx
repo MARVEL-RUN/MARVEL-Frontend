@@ -1,7 +1,7 @@
 "use client";
 
 import { NoticeBody } from "../notices/NoticeBody";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type BoardFoldItem = {
   id: string;
@@ -20,7 +20,15 @@ export function BoardFold({
   mark?: string;
   onExpand?: (id: string) => void;
 }) {
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(items[0]?.id ?? null);
+
+  useEffect(() => {
+    setOpenId((cur) => {
+      if (items.length === 0) return null;
+      if (cur && items.some((item) => item.id === cur)) return cur;
+      return items[0].id;
+    });
+  }, [items]);
 
   if (items.length === 0) {
     return <p className="board__empty">{empty}</p>;

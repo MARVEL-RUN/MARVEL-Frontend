@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import { EVENT, OG_DESCRIPTION, OG_TITLE } from "@/lib/event";
-import { APP_MODE } from "@/lib/mode";
+import { APP_MODE, isMain } from "@/lib/mode";
+import { BgmPlayer } from "@/components/main/layout/BgmPlayer";
+import { BGM_SRC } from "@/lib/main/config";
 import { SiteZoom } from "@/components/main/layout/SiteZoom";
 import "./globals.css";
 import { GoogleAnalytics } from "./GoogleAnalytics";
@@ -79,6 +81,7 @@ export default function RootLayout({
         </Script>
         <SiteZoom />
         {children}
+        {isMain && BGM_SRC ? <BgmPlayer src={BGM_SRC} /> : null}
         <GoogleAnalytics measurementId={process.env.GA_MEASUREMENT_ID} />
         <NaverAnalytics waId={process.env.NAVER_ANALYTICS_ID} />
       </body>

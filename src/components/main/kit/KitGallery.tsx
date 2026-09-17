@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import { type CourseId } from "@/lib/register";
+import { ScarfPreview, type ScarfFace } from "./ScarfPreview";
 
 const SHIRT_SPEC_KIDS = ["130", "150"] as const;
 const SHIRT_SPEC_ADULT = ["S", "M", "L", "XL", "2XL", "3XL", "4XL"] as const;
@@ -232,6 +233,8 @@ export function KitBibPane() {
 }
 
 export function KitScarfPane() {
+  const [preview, setPreview] = useState<ScarfFace | null>(null);
+
   return (
     <section className="kit-gallery__pane">
       <header className="kit-gallery__head">
@@ -241,31 +244,47 @@ export function KitScarfPane() {
       <ul className="kit-gallery__scarves">
         <li>
           <figure>
-            <span className="kit-gallery__frame kit-gallery__frame--scarf-front">
-              <Image
-                src={MAIN_ASSETS.kitScarfFront}
-                alt="응원스카프 앞면"
-                fill
-                sizes="(max-width: 720px) 100vw, 1100px"
-              />
-            </span>
+            <button
+              type="button"
+              className="kit-gallery__scarf-open"
+              onClick={() => setPreview("front")}
+              aria-label="응원스카프 앞면 미리보기"
+            >
+              <span className="kit-gallery__frame kit-gallery__frame--scarf-front">
+                <Image
+                  src={MAIN_ASSETS.kitScarfFront}
+                  alt=""
+                  fill
+                  sizes="(max-width: 720px) 100vw, 1100px"
+                />
+              </span>
+            </button>
             <figcaption>앞면</figcaption>
           </figure>
         </li>
         <li>
           <figure>
-            <span className="kit-gallery__frame kit-gallery__frame--scarf-back">
-              <Image
-                src={MAIN_ASSETS.kitScarfBack}
-                alt="응원스카프 뒷면"
-                fill
-                sizes="(max-width: 720px) 100vw, 1100px"
-              />
-            </span>
+            <button
+              type="button"
+              className="kit-gallery__scarf-open"
+              onClick={() => setPreview("back")}
+              aria-label="응원스카프 뒷면 미리보기"
+            >
+              <span className="kit-gallery__frame kit-gallery__frame--scarf-back">
+                <Image
+                  src={MAIN_ASSETS.kitScarfBack}
+                  alt=""
+                  fill
+                  sizes="(max-width: 720px) 100vw, 1100px"
+                />
+              </span>
+            </button>
             <figcaption>뒷면</figcaption>
           </figure>
         </li>
       </ul>
+      <p className="kit-gallery__note">이미지를 누르면 크게 볼 수 있습니다.</p>
+      {preview ? <ScarfPreview face={preview} onClose={() => setPreview(null)} /> : null}
     </section>
   );
 }

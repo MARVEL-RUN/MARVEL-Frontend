@@ -23,8 +23,8 @@ export function SideBanner({
         <img
           src={MAIN_ASSETS.sideBanner}
           alt=""
-          width={1920}
-          height={270}
+          width={3099}
+          height={405}
           draggable={false}
           className="side-banner__art"
         />
