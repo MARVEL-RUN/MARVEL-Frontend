@@ -58,5 +58,4 @@ export const MAIN_ASSETS = {
   virtualDom: "/images/virtual/dom.svg",
   virtualSoonBg: "/images/virtual/soon-bg.png",
   virtualSoonHero: "/images/virtual/soon-hero.png",
-  bgm: "/audio/bgm.mp3",
 } as const;

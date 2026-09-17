@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { MAIN_ASSETS } from "@/lib/assets";
 
 function SpeakerOn() {
   return (
@@ -26,7 +25,7 @@ function SpeakerOff() {
   );
 }
 
-export function BgmPlayer() {
+export function BgmPlayer({ src }: { src: string }) {
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement>(null);
   const wantedRef = useRef(true);
@@ -96,7 +95,7 @@ export function BgmPlayer() {
     <>
       <audio
         ref={audioRef}
-        src={MAIN_ASSETS.bgm}
+        src={src}
         loop
         preload="auto"
         playsInline
