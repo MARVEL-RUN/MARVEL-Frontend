@@ -32,3 +32,10 @@ export async function getAdminQuestion(questionId: string) {
     `v1/admin/questions/${encodeURIComponent(questionId)}`,
   );
 }
+
+export async function deleteAdminQuestion(questionId: string) {
+  return adminFetch<void>(
+    `v1/question/${encodeURIComponent(questionId)}`,
+    { method: "DELETE" },
+  );
+}

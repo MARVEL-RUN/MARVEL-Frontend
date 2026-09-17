@@ -1,17 +1,22 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
+import { adminToast } from "@/components/admin/Toast";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { DEFAULT_EVENT_ID } from "@/lib/main/config";
-import { listAdminQuestions } from "@/services/admin/boards/inquiries";
+import {
+  deleteAdminQuestion,
+  listAdminQuestions,
+} from "@/services/admin/boards/inquiries";
 import type {
   AdminQuestionListItem,
   AdminQuestionSearchTarget,
 } from "@/services/admin/boards/inquiries.types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type SearchField = "all" | "name" | "title";
@@ -36,6 +41,7 @@ type Applied = {
 };
 
 const INITIAL: Applied = { q: "", field: "all", status: "all" };
+const PAGE_SIZE = 10;
 
 function toTarget(field: SearchField): AdminQuestionSearchTarget {
   if (field === "name") return "AUTHOR";
@@ -50,36 +56,57 @@ function toIsAnswered(status: StatusFilter): boolean | undefined {
 }
 
 export function InquiryListPage() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { confirm, modal } = useAdminConfirm();
   const [q, setQ] = useState("");
   const [field, setField] = useState<SearchField>("all");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [applied, setApplied] = useState<Applied>(INITIAL);
+  const [page, setPage] = useState(1);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin", "inquiries", applied],
+    queryKey: ["admin", "inquiries", applied, page],
     queryFn: () =>
       listAdminQuestions({
         eventId: DEFAULT_EVENT_ID,
         target: toTarget(applied.field),
         keyword: applied.q.trim() || undefined,
         isAnswered: toIsAnswered(applied.status),
-        page: 0,
-        size: 50,
+        page: page - 1,
+        size: PAGE_SIZE,
         sort: "LATEST",
       }),
   });
 
+  const remove = useMutation({
+    mutationFn: deleteAdminQuestion,
+    onSuccess: () => {
+      const remaining = (data?.numberOfElements ?? 1) - 1;
+      if (remaining <= 0 && page > 1) setPage((p) => p - 1);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "inquiries"] });
+      adminToast.success("문의가 삭제되었습니다.");
+    },
+    onError: () => adminToast.error("문의 삭제에 실패했습니다."),
+  });
+
   const rows = data?.content ?? [];
+  const totalCount = data?.totalElements ?? 0;
+  const pageCount = Math.max(1, data?.totalPages ?? 1);
 
   const placeholder =
     field === "name" ? "작성자명 검색" : field === "title" ? "게시글명 검색" : "이름 · 제목 검색";
 
-  const runSearch = () => setApplied({ q, field, status });
+  const runSearch = () => {
+    setPage(1);
+    setApplied({ q, field, status });
+  };
 
   const resetSearch = () => {
     setQ("");
     setField("all");
     setStatus("all");
+    setPage(1);
     setApplied(INITIAL);
   };
 
@@ -91,6 +118,14 @@ export function InquiryListPage() {
         loading={isLoading}
         empty="등록된 문의가 없습니다."
         rowKey={(row) => row.questionId}
+        page={page}
+        pageCount={pageCount}
+        totalCount={totalCount}
+        onPage={setPage}
+        pageUnit="게시물"
+        onRowClick={(row) =>
+          router.push(`/admin/boards/inquiry/detail?id=${row.questionId}`)
+        }
         tools={
           <>
             <AdminSelect
@@ -98,6 +133,7 @@ export function InquiryListPage() {
               options={FIELD_OPTIONS}
               onChange={(value) => {
                 setField(value);
+                setPage(1);
                 setApplied((prev) => ({ ...prev, field: value }));
               }}
               ariaLabel="검색 대상"
@@ -107,6 +143,7 @@ export function InquiryListPage() {
               options={STATUS_OPTIONS}
               onChange={(value) => {
                 setStatus(value);
+                setPage(1);
                 setApplied((prev) => ({ ...prev, status: value }));
               }}
               ariaLabel="답변 상태"
@@ -139,11 +176,7 @@ export function InquiryListPage() {
           {
             key: "title",
             header: "제목",
-            render: (row) => (
-              <Link href={`/admin/boards/inquiry/detail?id=${row.questionId}`}>
-                {row.questionTitle}
-              </Link>
-            ),
+            render: (row) => row.questionTitle,
           },
           { key: "name", header: "작성자", render: (row) => row.authorName },
           {
@@ -162,8 +195,27 @@ export function InquiryListPage() {
             header: "등록일",
             render: (row) => formatAdminBoardDate(row.questionCreatedAt),
           },
+          {
+            key: "actions",
+            header: "",
+            render: (row) => (
+              <button
+                type="button"
+                className="admin-btn admin-btn--text"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (await confirm("이 문의를 삭제할까요? 답변도 함께 삭제됩니다.")) {
+                    remove.mutate(row.questionId);
+                  }
+                }}
+              >
+                삭제
+              </button>
+            ),
+          },
         ]}
       />
+      {modal}
     </div>
   );
 }
