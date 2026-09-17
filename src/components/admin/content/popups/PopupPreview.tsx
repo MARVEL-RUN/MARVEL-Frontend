@@ -1,6 +1,6 @@
 "use client";
 
-import type { AdminPopup } from "@/types/popup";
+import type { AdminPopup } from "@/types/admin/popup";
 import { X } from "lucide-react";
 import { useMemo, useState } from "react";
 

@@ -1,5 +1,5 @@
 import { nextId, readStore, wait, writeStore } from "@/lib/admin/store";
-import type { AdminPopup } from "@/types/popup";
+import type { AdminPopup } from "@/types/admin/popup";
 
 const KEY = "mr-admin-popups-v2";
 

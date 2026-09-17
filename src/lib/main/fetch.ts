@@ -60,5 +60,9 @@ export async function mainFetch<T>(
 
   if (response.status === 204 || !text) return undefined as T;
 
-  return JSON.parse(text) as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return text as T;
+  }
 }

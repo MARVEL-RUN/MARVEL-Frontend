@@ -1,15 +1,9 @@
-import type { AdminInquiry } from "@/types/boards";
-
-export function orderInquiries(rows: AdminInquiry[]) {
-  return [...rows].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
-}
-
-export function inquiryNo(rows: AdminInquiry[]) {
-  return new Map(rows.map((row, i) => [row.id, String(rows.length - i)]));
-}
-
 export function inquiryUnlockKey(id: string) {
   return `mr-inquiry-unlock-${id}`;
+}
+
+function inquiryPasswordKey(id: string) {
+  return `mr-inquiry-password-${id}`;
 }
 
 export function isInquiryUnlocked(id: string) {
@@ -19,13 +13,32 @@ export function isInquiryUnlocked(id: string) {
   );
 }
 
-export function unlockInquiry(id: string) {
-  sessionStorage.setItem(inquiryUnlockKey(id), "1");
+export function getInquiryPassword(id: string) {
+  if (typeof window === "undefined") return "";
+  return sessionStorage.getItem(inquiryPasswordKey(id)) ?? "";
 }
 
-/** `2026.09.14 11:36` → `2026-09-14T11:36` */
-export function toDateTimeAttr(date: string) {
-  const [day, time] = date.split(" ");
+export function unlockInquiry(id: string, password = "") {
+  sessionStorage.setItem(inquiryUnlockKey(id), "1");
+  sessionStorage.setItem(inquiryPasswordKey(id), password);
+}
+
+export function clearInquirySession(id: string) {
+  sessionStorage.removeItem(inquiryUnlockKey(id));
+  sessionStorage.removeItem(inquiryPasswordKey(id));
+}
+
+export function formatInquiryDate(iso: string | null | undefined) {
+  if (!iso) return "-";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+export function toDateTimeAttr(isoOrStamp: string) {
+  if (isoOrStamp.includes("T")) return isoOrStamp;
+  const [day, time] = isoOrStamp.split(" ");
   const isoDay = day.replaceAll(".", "-");
   return time ? `${isoDay}T${time}` : isoDay;
 }

@@ -4,7 +4,7 @@ import {
   VIRTUAL_ROUND_LABEL,
 } from "@/lib/admin/raceEvents";
 import { courseById, type CourseId } from "@/lib/register";
-import type { AdminPayStatus } from "@/types/admin";
+import type { AdminPayStatus } from "@/types/admin/admin";
 
 export type ApplicationKind = "individual" | "group";
 

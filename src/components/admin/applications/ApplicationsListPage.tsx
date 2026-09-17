@@ -20,7 +20,7 @@ import {
   type AdminApplicationRow,
   type ApplicationKind,
 } from "@/services/admin/applications";
-import type { AdminPayStatus } from "@/types/admin";
+import type { AdminPayStatus } from "@/types/admin/admin";
 import { useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";

@@ -1,7 +1,7 @@
 "use client";
 
 import { listAdminNotices } from "@/services/admin/notices";
-import type { AdminNotice } from "@/types/admin";
+import type { AdminNotice } from "@/types/admin/admin";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -43,7 +43,10 @@ export function NoticesPage() {
         <BoardSearch
           query={query}
           sort={sort}
-          onQueryChange={setQuery}
+          onQueryChange={(value) => {
+            setQuery(value);
+            if (!value.trim() && applied) setApplied("");
+          }}
           onSortChange={setSort}
           onSearch={() => setApplied(query)}
         />
