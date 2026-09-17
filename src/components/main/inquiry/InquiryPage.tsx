@@ -107,6 +107,10 @@ export function InquiryPage() {
     <main className="page">
       <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
       <div className="page__body wrap">
+        <p className="board__notice">
+          문의는 비밀글로 등록되어 제목이 [문의]로만 보입니다. 내 글은
+          작성자 이름으로 검색해 주세요.
+        </p>
         <BoardSearch
           query={query}
           sort={sort}

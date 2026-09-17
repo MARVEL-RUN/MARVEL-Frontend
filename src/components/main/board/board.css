@@ -125,6 +125,14 @@
   text-align: center;
 }
 
+.board__notice {
+  margin: 0 0 1rem;
+  color: var(--note);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
 .board-pager {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1099,6 +1107,11 @@
   .board-search__find {
     flex: 1 1 100%;
     max-width: none;
+  }
+
+  .board__notice {
+    margin-bottom: 0.85rem;
+    font-size: 0.76rem;
   }
 
   .board-search__input,
