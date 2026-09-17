@@ -317,7 +317,7 @@
 
 .board--qna .board__head,
 .board--qna .board__row {
-  grid-template-columns: 4rem 5rem minmax(0, 1fr) 5.5rem 8.8rem;
+  grid-template-columns: 4rem 5rem minmax(0, 1fr) 6.2rem 9.6rem;
 }
 
 .board--qna .board__head span {
@@ -1016,23 +1016,24 @@
 
   .board--qna .board__head,
   .board--qna .board__row {
-    grid-template-columns: 2rem 3.6rem minmax(0, 1fr) 3.1rem 4.6rem;
+    grid-template-columns: 1.8rem 3.35rem minmax(0, 1fr) 3.7rem 6.1rem;
     grid-template-rows: auto;
-    gap: 0.3rem 0.28rem;
+    gap: 0.25rem 0.22rem;
     align-items: center;
-    padding: 0.85rem 0.05rem;
+    padding: 0.75rem 0.05rem;
   }
 
   .board--qna .board__no {
     grid-row: auto;
     align-self: center;
     padding-top: 0;
+    font-size: 0.72rem;
   }
 
   .board--qna .board__badge {
     grid-column: auto;
     grid-row: auto;
-    font-size: 0.64rem;
+    font-size: 0.6rem;
     letter-spacing: 0.02em;
   }
 
@@ -1043,30 +1044,30 @@
   }
 
   .board--qna .board__title {
+    font-size: 0.78rem;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .board--qna .board__lock {
-    margin-right: 0.2rem;
+    width: 0.72rem;
+    height: 0.72rem;
+    margin-right: 0.15rem;
   }
 
   .board--qna .board__name {
     display: block;
-    font-size: 0.72rem;
+    font-size: 0.64rem;
   }
 
   .board--qna .board__row time {
     padding-top: 0;
-    font-size: 0.72rem;
+    font-size: 0.64rem;
     line-height: 1.2;
     text-align: center;
     white-space: nowrap;
-  }
-
-  .board--qna .board__clock {
-    display: none;
   }
 
   .board:not(.board--qna) .board__name {
