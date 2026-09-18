@@ -22,6 +22,7 @@ function childOn(pathname: string, hash: string, childHref: string, parentHref: 
 }
 
 function itemOn(pathname: string, item: (typeof NAV_ITEMS)[number]) {
+  if (item.href === "/") return pathname === "/";
   if (pathname.startsWith(item.href)) return true;
   if (!("children" in item)) return false;
   return item.children.some((child) => childOn(pathname, "", child.href, item.href));
