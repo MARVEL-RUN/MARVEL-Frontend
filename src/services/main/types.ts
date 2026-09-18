@@ -48,7 +48,7 @@ export type RegistrationCreateResponse = {
 
 export type OrganizationAccount = {
   organizationName: string;
-  organizationAccount: string;
+  organizationLoginId: string;
   organizationPassword: string;
 };
 

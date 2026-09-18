@@ -15,7 +15,7 @@ export function toOrganizationRegistrationRequest(
   return {
     account: {
       organizationName: draft.groupName.trim(),
-      organizationAccount: draft.organizationAccount.trim(),
+      organizationLoginId: draft.organizationAccount.trim(),
       organizationPassword: draft.organizationPassword.trim(),
     },
     profile: {
