@@ -3,7 +3,10 @@ import { AdminLayout } from "@/layouts/admin/AdminLayout";
 import { Providers } from "./Providers";
 
 export const metadata: Metadata = {
-  title: "관리자 | MARVEL RUN 2026 KOREA",
+  title: {
+    default: "관리자 | MARVEL RUN 2026 KOREA",
+    template: "%s",
+  },
 };
 
 export default function AdminRootLayout({

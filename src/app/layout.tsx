@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
-import { EVENT, OG_DESCRIPTION, OG_TITLE, SITE_URL } from "@/lib/event";
+import { OG_DESCRIPTION, OG_TITLE, SEO_TITLE, SITE_URL } from "@/lib/event";
 import { APP_MODE, isMain } from "@/lib/mode";
 import { BgmPlayer } from "@/components/main/layout/BgmPlayer";
 import { BGM_SRC } from "@/lib/main/config";
@@ -22,7 +22,10 @@ const naverVerification = process.env.NAVER_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: EVENT.title,
+  title: {
+    default: SEO_TITLE,
+    template: "%s | 마블런 2026",
+  },
   description: OG_DESCRIPTION,
   formatDetection: {
     telephone: false,
@@ -35,7 +38,7 @@ export const metadata: Metadata = {
     title: OG_TITLE,
     description: OG_DESCRIPTION,
     url: SITE_URL,
-    siteName: EVENT.title,
+    siteName: "마블런 2026",
     locale: "ko_KR",
     type: "website",
     images: [
