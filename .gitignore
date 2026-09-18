@@ -10,6 +10,7 @@ out/
 *.tsbuildinfo
 .env
 .env.*
+!.env.example
 
 # 루트에 받아 둔 원본
 /KakaoTalk_*

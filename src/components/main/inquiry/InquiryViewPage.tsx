@@ -164,19 +164,21 @@ export function InquiryViewPage() {
             </header>
             <div className="post__body">{post.content}</div>
             <section className="post__reply">
-              <p className="post__reply-label">답변</p>
               {answered ? (
                 <>
-                  <p className="post__reply-meta">
-                    <span>{answer?.author}</span>
-                    <time dateTime={toDateTimeAttr(answer?.createdAt ?? "")}>
-                      {formatInquiryDate(answer?.createdAt)}
-                    </time>
-                  </p>
-                  <p className="post__reply-body">{answer?.content}</p>
+                  <header className="post__head">
+                    <p className="post__meta">
+                      <span className="post__status">답변</span>
+                      <span>{answer?.author}</span>
+                      <time dateTime={toDateTimeAttr(answer?.createdAt ?? "")}>
+                        {formatInquiryDate(answer?.createdAt)}
+                      </time>
+                    </p>
+                  </header>
+                  <div className="post__body post__reply-body">{answer?.content}</div>
                 </>
               ) : (
-                <p className="is-wait">답변 준비 중입니다.</p>
+                <p className="post__reply-wait">답변 준비 중입니다.</p>
               )}
             </section>
             <nav className="post__nav" aria-label="이전·다음 글">

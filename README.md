@@ -12,12 +12,8 @@
 ```bash
 cp .env.example .env.local   # 필요 시
 npm run dev                  # 커밍순
-npm run dev:main             # 본사이트 + 신청 화면 미리보기
+npm run dev:main             # 본사이트
 ```
-
-`npm run dev:main`은 본사이트를 연다. 접수는 `NEXT_PUBLIC_REGISTRATION_OPEN`으로 조절한다.
-
-관리자는 모드와 관계없이 `/admin` (로그인 `/admin/login`).
 
 ## 환경 변수
 
@@ -26,11 +22,16 @@ npm run dev:main             # 본사이트 + 신청 화면 미리보기
 | 변수 | 용도 |
 |------|------|
 | `NEXT_PUBLIC_APP_MODE` | `coming-soon` \| `main` |
-| `NEXT_PUBLIC_REGISTRATION_OPEN` | `0` 강제 닫기, `1` 강제 오픈, `3` 접수 시각 자동 |
-| `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제 API |
-| `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 (`test_gck_…`) |
+| `NEXT_PUBLIC_REGISTRATION_OPEN` | `0` 닫기, `1` 열기, `3` 접수 시각 자동 |
+| `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제·게시판 API |
 | `NEXT_PUBLIC_API_BASE_URL_ADMIN` | 관리자 API |
+| `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | 오시는길 지도 |
+| `NEXT_PUBLIC_BGM` | `off` 끄기, `on` 기본 음원 |
+| `GOOGLE_SITE_VERIFICATION` | 구글 사이트 인증 |
+| `NAVER_SITE_VERIFICATION` | 네이버 사이트 인증 |
+| `GA_MEASUREMENT_ID` | Google Analytics |
+| `NAVER_ANALYTICS_ID` | 네이버 애널리틱스 |
 
 ## 폴더
 
@@ -42,58 +43,53 @@ src/
     page.tsx                 # 모드에 따라 coming-soon | main home
     (main)/                  # 공개 본사이트 (URL에 그룹명 없음)
       guide/                 # 대회안내
+      kit/                   # 기념품
       directions/            # 오시는길
-      precautions/           # 대회유의사항
+      precautions/           # 참가자 유의사항
       lookup/                # 신청조회
       register/              # 참가신청
-      payment/               # 토스 결제 (모바일 풀페이지 · success/fail)
+      payment/               # 토스 결제 (success/fail)
       virtual/               # 버추얼런
-      notices/ faq/ inquiry/ # 게시판
+      notices/ faq/ inquiry/ # 커뮤니티
       terms/ privacy/        # 약관
     admin/
       login/
-      applications/          # 마블런 · 버추얼런 신청
+      applications/          # 신청자 관리
       boards/                # notice / inquiry / faq
       legal/                 # terms / privacy
-      content/sponsors/
+      content/popups/
       admins/
   components/
     coming-soon/
     main/                    # 공개 UI + main.css
-      register/              # 약관 · 개인/단체 신청
-      payment/               # 결제 위젯 · 완료/실패
-      guide/ lookup/ …
     admin/
   layouts/admin/
   lib/
-    event.ts legal.ts mode.ts register.ts
+    event.ts legal.ts privacy.ts mode.ts register.ts
     main/                    # 공개 API base · fetch
     payment/                 # 토스 · 세션 · 종목 매핑
     admin/
   services/
-    main/                    # 공개 신청·결제
-    admin/                   # 관리자 API 스텁
+    main/                    # 공개 신청·결제·게시판
+    admin/                   # 관리자 API
   types/
 
 public/images/
   coming-soon/
   main/
+  virtual/
 ```
 
 - 공통 상수·타입만 `src/lib/` 루트. 공개 API는 `lib/main` + `services/main`, 결제는 `lib/payment`.
 - 관리자 전용은 `lib/admin`, `services/admin`. 게시판은 `boards/{notice,inquiry,faq}`, 약관은 `admin/legal`.
 - 메인 UI를 관리자에 복사하지 않는다. 반대도 같다.
 
-## 일정에 맞춘 사용
-
-- **9/10** 커밍순 오픈 → `coming-soon` 모드로 빌드·배포
-- **9/17** 본페이지 오픈 → `main` 모드. 접수는 `NEXT_PUBLIC_REGISTRATION_OPEN`으로 조절 (`0` 닫기, `1` 열기, `3` 일정)
-- **9/22** 접수 오픈 → `3`이면 시각에 자동 오픈. `1`로 강제 오픈해도 됨. API·토스 키로 `/register` 결제 연동
-
 ## 실행
 
 ```bash
 npm install
-npm run dev
-npm run build   # 결과는 out/ (build.sh → output/)
+npm run dev          # 커밍순
+npm run dev:main     # 본사이트
+npm run build        # 결과는 out/ (build.sh → output/)
+npm run build:main   # 본사이트로 빌드
 ```

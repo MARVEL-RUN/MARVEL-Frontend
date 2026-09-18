@@ -356,9 +356,8 @@
   width: min(24rem, 100%);
 }
 
-.form-row .password-pick input {
-  width: 100%;
-  padding-right: 2.75rem;
+.password-pick input.is-mask {
+  -webkit-text-security: disc;
 }
 
 .password-pick__eye {

@@ -70,7 +70,6 @@ export function findAdminNav(pathname: string) {
       (nav) =>
         path.startsWith(`/admin/${nav.key}`) ||
         (path.startsWith("/admin/legal") && nav.key === "content") ||
-        (path.startsWith("/admin/notices") && nav.key === "boards") ||
         nav.children.some((child) => path.startsWith(child.href)),
     ) ?? null;
 
@@ -86,9 +85,7 @@ export function findAdminNav(pathname: string) {
       ? item.children.find((c) => c.href.includes("privacy"))
       : path.startsWith("/admin/legal/terms")
         ? item.children.find((c) => c.href.includes("terms"))
-        : path.startsWith("/admin/notices")
-          ? item.children[0]
-          : item.children[0]);
+        : item.children[0]);
 
   return { item, child, home: false as const };
 }

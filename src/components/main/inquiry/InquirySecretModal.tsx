@@ -99,12 +99,12 @@ export function InquirySecretModal({
             >
               <input
                 id={inputId}
-                name="inquiry-secret-pass"
-                type={show ? "text" : "password"}
+                name="inquiry-unlock"
+                type="text"
                 value={password}
                 placeholder="비밀번호를 입력해주세요"
                 autoFocus
-                autoComplete="new-password"
+                autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
@@ -112,6 +112,7 @@ export function InquirySecretModal({
                 data-1p-ignore="true"
                 data-bwignore="true"
                 data-form-type="other"
+                className={show ? undefined : "is-mask"}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? errorId : undefined}
                 onChange={(e) => {
