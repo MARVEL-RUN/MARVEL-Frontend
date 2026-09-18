@@ -709,6 +709,10 @@
   min-height: calc(100svh - var(--header-h, 4.5rem));
 }
 
+.page--post {
+  min-height: calc(100svh - var(--header-h, 4.5rem));
+}
+
 .page--post .page__body {
   padding: 4.75rem 0 6.5rem;
 }
