@@ -15,10 +15,6 @@ npm run dev                  # 커밍순
 npm run dev:main             # 본사이트
 ```
 
-접수는 `NEXT_PUBLIC_REGISTRATION_OPEN`으로 조절한다. `0` 닫기, `1` 열기, `3`(기본) 접수 시각 자동.
-
-관리자는 모드와 관계없이 `/admin` (로그인 `/admin/login`).
-
 ## 환경 변수
 
 `.env.example` 기준. 값을 바꾼 뒤에는 dev 서버를 다시 켠다.
@@ -87,10 +83,6 @@ public/images/
 - 공통 상수·타입만 `src/lib/` 루트. 공개 API는 `lib/main` + `services/main`, 결제는 `lib/payment`.
 - 관리자 전용은 `lib/admin`, `services/admin`. 게시판은 `boards/{notice,inquiry,faq}`, 약관은 `admin/legal`.
 - 메인 UI를 관리자에 복사하지 않는다. 반대도 같다.
-
-## 접수
-
-접수 오픈은 **2026. 9. 22. 14:00**. env가 `3`이면 이 시각에 자동으로 열린다. `1`로 강제 오픈해도 된다.
 
 ## 실행
 
