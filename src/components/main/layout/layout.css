@@ -52,7 +52,7 @@ html.is-live .site-header {
   align-items: center;
   gap: 1.75rem;
   height: var(--header-h);
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% - 2.5rem));
   white-space: nowrap;
 }
 

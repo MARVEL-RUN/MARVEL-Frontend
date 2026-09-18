@@ -29,6 +29,7 @@ export const BOARD_SECTIONS = [
 export const BOARD_HREF = "/notices";
 
 export const NAV_ITEMS = [
+  { href: "/", label: "마블런2026" },
   { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
   { href: KIT_HREF, label: "기념품" },
   { href: "/directions", label: "오시는길" },
