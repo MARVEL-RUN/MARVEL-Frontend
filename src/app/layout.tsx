@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
-import { EVENT, OG_DESCRIPTION, OG_TITLE } from "@/lib/event";
+import { EVENT, OG_DESCRIPTION, OG_TITLE, SITE_URL } from "@/lib/event";
 import { APP_MODE, isMain } from "@/lib/mode";
 import { BgmPlayer } from "@/components/main/layout/BgmPlayer";
 import { BGM_SRC } from "@/lib/main/config";
@@ -19,8 +19,6 @@ const notoSansKr = Noto_Sans_KR({
 
 const googleVerification = process.env.GOOGLE_SITE_VERIFICATION;
 const naverVerification = process.env.NAVER_SITE_VERIFICATION;
-
-const SITE_URL = "https://marvelrunkorea2026.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
