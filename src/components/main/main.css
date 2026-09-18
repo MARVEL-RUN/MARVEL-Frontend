@@ -823,8 +823,8 @@ button.course:disabled:hover {
   outline: none;
 }
 
-.inquiry-secret__control input::placeholder {
-  color: var(--note);
+.inquiry-secret__control input.is-mask {
+  -webkit-text-security: disc;
 }
 
 .inquiry-secret__eye {

@@ -679,27 +679,34 @@
 }
 
 .post__reply {
-  padding: 1.4rem 0 2.2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.post__reply-label {
-  margin-bottom: 0.7rem;
-  color: var(--marvel);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+.post__reply .post__head {
+  padding-top: 1.6rem;
 }
 
-.post__reply p {
+.post__reply .post__meta {
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.post__reply-body {
+  min-height: 4.5rem;
+  margin: 0 0 2.2rem;
+  padding: 1.1rem 1.15rem 1.2rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.post__reply-wait {
   margin: 0;
-  color: var(--silver);
+  padding: 1.8rem 0 2.2rem;
+  color: var(--note);
   line-height: 1.75;
-  white-space: pre-wrap;
 }
 
-.post__reply .is-wait {
-  color: var(--note);
+.page--post {
+  min-height: calc(100svh - var(--header-h, 4.5rem));
 }
 
 .page--post {
@@ -738,12 +745,14 @@
   line-height: 1.85;
 }
 
-.page--post .post__reply {
-  padding: 1.8rem 0 2.6rem;
+.page--post .post__reply .post__head {
+  padding-top: 1.8rem;
+  padding-bottom: 1.6rem;
 }
 
-.page--post .post__reply p {
-  line-height: 1.85;
+.page--post .post__reply .post__reply-body {
+  margin-bottom: 2.4rem;
+  padding: 1.2rem 1.25rem 1.3rem;
 }
 
 .page--post .post__foot {
@@ -1205,15 +1214,13 @@
     gap: 0.35rem 0.85rem;
   }
 
-  .post__body,
-  .post__reply p {
+  .post__body {
     overflow-x: auto;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
 
-  .post__body img,
-  .post__reply img {
+  .post__body img {
     display: block;
     max-width: 100%;
     height: auto;
