@@ -360,6 +360,10 @@ html.is-live .hero__actions {
   letter-spacing: 0.22em;
 }
 
+.ticker li.is-ko {
+  letter-spacing: 0.04em;
+}
+
 .ticker li::before {
   content: "★";
   margin-right: 2.4rem;
