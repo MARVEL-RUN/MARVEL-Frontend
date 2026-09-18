@@ -17,6 +17,7 @@ import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import { SideDock } from "./SideDock";
 
 const TICKER = [
+  "마블런2026",
   "MARVEL RUN 2026",
   "9.22 14:00 OPEN",
   "INJE SPEEDIUM",
@@ -174,7 +175,12 @@ export function HomePage() {
           {[0, 1].map((copy) => (
             <ul key={copy}>
               {TICKER.map((bit) => (
-                <li key={`${copy}-${bit}`}>{bit}</li>
+                <li
+                  key={`${copy}-${bit}`}
+                  className={/[가-힣]/.test(bit) ? "is-ko" : undefined}
+                >
+                  {bit}
+                </li>
               ))}
             </ul>
           ))}

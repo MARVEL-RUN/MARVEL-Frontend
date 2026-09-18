@@ -220,5 +220,7 @@ export const EVENT = {
   copyright: "ⓒ2026 MARVEL",
 } as const;
 
-export const OG_TITLE = "2026 MARVEL RUN";
-export const OG_DESCRIPTION = `${EVENT.lead}. 10월 31일 ${EVENT.venue}.`;
+export const SITE_URL = "https://marvelrunkorea2026.com";
+export const SEO_TITLE = "마블런 2026 인제 MARVEL RUN";
+export const OG_TITLE = SEO_TITLE;
+export const OG_DESCRIPTION = `마블런 2026, MARVEL RUN, ${EVENT.dateLong}, ${EVENT.venue}`;
