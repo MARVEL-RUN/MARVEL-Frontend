@@ -120,7 +120,7 @@ public/images/
 | `CANCELED` | 취소 완료 |
 | `EXPIRED` | 결제 만료 |
 | `UNKNOWN` | 확인 불가 |
-| (없음·미매핑) | 해당 사항 없음 |
+| (없음·미매핑) | 로그 확인 필요 |
 
 헬퍼: `registrationStatusLabel()`, `registrationStatusBadge()`, `canPrepareRegistrationPayment()`.
 
