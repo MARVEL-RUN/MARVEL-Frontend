@@ -20,19 +20,11 @@ export type EventIntakeStats = {
   roundCounts: [number, number, number];
 };
 
-export type DailyApplicantStat = {
-  date: string;
-  total: number;
-  individual: number;
-  group: number;
-};
-
 export type AdminDashboardStats = {
   unansweredCount: number;
   cancellationPendingCount: number;
   cancellationPendingEventId: string | null;
   events: EventIntakeStats[];
-  dailyApplicants: DailyApplicantStat[];
 };
 
 function intakeFor(
@@ -54,27 +46,6 @@ function intakeFor(
       individuals.length + groups.reduce((sum, row) => sum + (row.memberCount ?? 0), 0),
     roundCounts,
   };
-}
-
-/** appliedAt: `YYYY.MM.DD HH:mm` → `YYYY-MM-DD` */
-function dayKeyFromAppliedAt(appliedAt: string) {
-  const match = appliedAt.trim().match(/^(\d{4})\.(\d{2})\.(\d{2})/);
-  if (!match) return null;
-  return `${match[1]}-${match[2]}-${match[3]}`;
-}
-
-function dailyApplicantsFrom(rows: AdminApplicationRow[]): DailyApplicantStat[] {
-  const map = new Map<string, DailyApplicantStat>();
-  for (const row of rows) {
-    const date = dayKeyFromAppliedAt(row.appliedAt);
-    if (!date) continue;
-    const current = map.get(date) ?? { date, total: 0, individual: 0, group: 0 };
-    current.total += 1;
-    if (row.kind === "group") current.group += 1;
-    else current.individual += 1;
-    map.set(date, current);
-  }
-  return [...map.values()].sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
@@ -109,6 +80,5 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
         ...intakeFor(applications.filter((row) => row.eventId === key)),
       };
     }),
-    dailyApplicants: dailyApplicantsFrom(applications),
   };
 }

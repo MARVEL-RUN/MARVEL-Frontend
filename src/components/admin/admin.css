@@ -2464,52 +2464,9 @@ button.admin-pay-list__item:hover {
   font-variant-numeric: tabular-nums;
 }
 
-.admin-daily-table {
-  overflow: auto;
-  max-height: 320px;
-  background: #fff;
-  border: 1px solid var(--admin-line);
-}
-
-.admin-daily-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.admin-daily-table th,
-.admin-daily-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #eef1f5;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.admin-daily-table thead th {
-  position: sticky;
-  top: 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--admin-muted);
-  background: #fafbfc;
-}
-
-.admin-daily-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.admin-daily-table .is-num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
-.admin-daily-table thead .is-num {
-  font-weight: 700;
-}
-
 .admin-trend-grid {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -3986,10 +3943,6 @@ button.admin-pay-list__item:hover {
   .admin-task {
     flex: 0 1 280px;
     max-width: 300px;
-  }
-
-  .admin-trend-grid {
-    grid-template-columns: 1fr 1fr;
   }
 
   .admin-grid {

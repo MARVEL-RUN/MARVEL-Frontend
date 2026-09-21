@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 type Props = {
-  cancelHref: string;
   gaRealtimeUrl?: string;
 };
 
@@ -36,7 +35,7 @@ function GuideBlock({
   );
 }
 
-export function OpsGuide({ cancelHref, gaRealtimeUrl }: Props) {
+export function OpsGuide({ gaRealtimeUrl }: Props) {
   return (
     <section className="admin-dash__section">
       <h2>운영 가이드</h2>
@@ -51,10 +50,6 @@ export function OpsGuide({ cancelHref, gaRealtimeUrl }: Props) {
             {
               label: <Link href="/admin/boards/inquiry">미답변 문의</Link>,
               hint: "게시판 → 문의사항",
-            },
-            {
-              label: <Link href={cancelHref}>환불 대기</Link>,
-              hint: "참가신청 → 환불 대기 상태",
             },
             {
               label: (

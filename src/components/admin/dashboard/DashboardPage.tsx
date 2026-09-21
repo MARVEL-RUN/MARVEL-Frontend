@@ -1,7 +1,7 @@
 "use client";
 
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
-import { DailyApplicantsTable } from "@/components/admin/dashboard/DailyApplicantsTable";
+import { TrendPanel } from "@/components/admin/dashboard/TrendPanel";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
 import { adminApplicationsHref } from "@/lib/admin/eventLinks";
 import {
@@ -9,10 +9,8 @@ import {
   type EventIntakeStats,
 } from "@/services/admin/stats";
 import { useQuery } from "@tanstack/react-query";
-import { Ban, ChevronRight, MessageSquare } from "lucide-react";
+import { ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
-
-const APPS = "/admin/applications";
 
 function TaskLink({
   href,
@@ -104,13 +102,6 @@ export function DashboardPage({
     queryFn: getAdminDashboardStats,
   });
 
-  const cancelHref = data?.cancellationPendingEventId
-    ? adminApplicationsHref(
-        data.cancellationPendingEventId,
-        "status=CANCELLATION_PENDING",
-      )
-    : APPS;
-
   const intakeEvents = data?.events ?? [];
 
   return (
@@ -143,14 +134,6 @@ export function DashboardPage({
             count={data?.unansweredCount}
             loading={isLoading}
           />
-          <TaskLink
-            href={cancelHref}
-            tone="cancel"
-            icon={Ban}
-            label="환불 대기"
-            count={data?.cancellationPendingCount}
-            loading={isLoading}
-          />
         </div>
       </section>
 
@@ -169,12 +152,11 @@ export function DashboardPage({
         </div>
       </section>
 
-      <DailyApplicantsTable
-        rows={data?.dailyApplicants ?? []}
-        loading={isLoading}
-      />
+      <div className="admin-trend-grid">
+        <TrendPanel kind="applicant" title="날짜별 신청" unit="건" />
+      </div>
 
-      <OpsGuide cancelHref={cancelHref} gaRealtimeUrl={gaRealtimeUrl} />
+      <OpsGuide gaRealtimeUrl={gaRealtimeUrl} />
     </div>
   );
 }
