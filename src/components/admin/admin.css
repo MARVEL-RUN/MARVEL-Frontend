@@ -1633,6 +1633,11 @@ html.admin-mode body {
   width: 34%;
 }
 
+.admin-pay-log-table th.admin-pay-log-table__process,
+.admin-pay-log-table td.admin-pay-log-table__process {
+  text-align: center;
+}
+
 .admin-pay-log-table th:nth-child(3),
 .admin-pay-log-table td:nth-child(3) {
   width: 52px;

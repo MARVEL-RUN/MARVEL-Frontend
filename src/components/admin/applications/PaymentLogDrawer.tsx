@@ -40,7 +40,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
       <thead>
         <tr>
           <th>일시</th>
-          <th>처리</th>
+          <th className="admin-pay-log-table__process">처리</th>
           <th>출처</th>
         </tr>
       </thead>
@@ -48,7 +48,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
         {rows.map((log, index) => (
           <tr key={`${log.createdAt ?? "log"}-${index}`}>
             <td>{formatAdminBoardDate(log.createdAt)}</td>
-            <td>
+            <td className="admin-pay-log-table__process">
               {paymentLogProcessLabel(log.processType)}
               {log.errorCode || log.errorMessage ? (
                 <em className="admin-pay-log-table__error">
