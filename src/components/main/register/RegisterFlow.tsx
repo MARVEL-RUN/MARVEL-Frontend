@@ -444,6 +444,7 @@ function IndividualFlow({
             </FormRow>
             <FormRow label="보호자 동의" required={guardianRequired}>
               <GuardianConsentField
+                variant="button"
                 agreed={draft.guardianConsent}
                 onChange={(guardianConsent) => patch({ guardianConsent })}
               />
