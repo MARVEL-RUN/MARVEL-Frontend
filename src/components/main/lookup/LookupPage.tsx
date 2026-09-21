@@ -1,6 +1,13 @@
 "use client";
 
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
+import { genderLabel } from "@/lib/registration-gender";
+import {
+  closedRegistration,
+  paymentStatusInfo,
+  registrationStatusLabel,
+  statusKey,
+} from "@/lib/registration-status";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
 import { formatPhone, orgAccountError, orgPasswordError, type ApplyKind } from "@/lib/register";
 import {
@@ -166,23 +173,12 @@ function receiptSouvenirs(receipt: RegistrationReceipt) {
     );
 }
 
-function lookupGenderLabel(gender?: string | null) {
-  const key = (gender ?? "").trim().toUpperCase();
-  if (key === "M" || key === "MALE") return "남성";
-  if (key === "F" || key === "FEMALE") return "여성";
-  return (gender ?? "").trim();
-}
-
 function lookupBirthView(raw?: string | null) {
   const digits = (raw ?? "").replace(/\D/g, "");
   if (digits.length === 8) {
     return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
   }
   return (raw ?? "").trim();
-}
-
-function statusKey(value?: string | null) {
-  return (value ?? "").trim().toUpperCase();
 }
 
 function refundStatusLabel(status?: string | null) {
@@ -202,63 +198,6 @@ function paymentActionNote(action?: string | null) {
   if (key === "PAYMENT_CLOSED") return "결제 기한이 종료되었습니다.";
   if (key === "CONTACT_SUPPORT") return "운영 문의가 필요합니다.";
   return "";
-}
-
-const PAYMENT_STATUS: Record<string, { label: string; hint: string }> = {
-  UNPAID: {
-    label: "미결제",
-    hint: "결제가 아직 완료되지 않았습니다.",
-  },
-  COMPLETED: {
-    label: "결제완료",
-    hint: "",
-  },
-  MUST_CHECK: {
-    label: "확인 필요",
-    hint: "결제 상태를 확인하고 있습니다. 잠시 후 다시 조회해 주세요.",
-  },
-  NEED_PARTITIAL_REFUND: {
-    label: "차액 환불 요청",
-    hint: "차액 환불이 요청되었습니다.",
-  },
-  NEED_PARTIAL_REFUND: {
-    label: "차액 환불 요청",
-    hint: "차액 환불이 요청되었습니다.",
-  },
-  NEED_REFUND: {
-    label: "전액 환불 요청",
-    hint: "전액 환불이 요청되었습니다.",
-  },
-  REFUNDED: {
-    label: "전액 환불 완료",
-    hint: "참가비가 환불되었습니다.",
-  },
-};
-
-const REGISTRATION_STATUS_LABEL: Record<string, string> = {
-  PENDING: "결제 대기",
-  PAYMENT_PENDING: "결제 대기",
-  CONFIRMED: "확정",
-  ADDITIONAL_PAYMENT_REQUIRED: "추가 결제 필요",
-  PARTIAL_REFUND_REQUIRED: "부분 환불 필요",
-  CANCELLATION_PENDING: "취소 처리 중",
-  CANCELED: "취소",
-  EXPIRED: "만료",
-};
-
-function paymentStatusInfo(status?: string | null, apiLabel?: string | null) {
-  const key = statusKey(status);
-  const meta = key ? PAYMENT_STATUS[key] : undefined;
-  return {
-    label: apiLabel?.trim() || meta?.label || (status?.trim() ? status : "—"),
-    hint: meta ? meta.hint : status?.trim() ? "상태 안내는 운영 문의로 확인해 주세요." : "",
-  };
-}
-
-function registrationStatusLabel(status?: string) {
-  const key = statusKey(status);
-  if (!key) return "";
-  return REGISTRATION_STATUS_LABEL[key] || status || "";
 }
 
 function PaymentStatusValue({
@@ -407,10 +346,6 @@ function canPreparePayment(receipt: RegistrationReceipt) {
   return statusKey(receipt.paymentAction) === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
 }
 
-function closedRegistration(status?: string | null) {
-  return ["CANCELED", "EXPIRED", "CANCELLATION_PENDING"].includes(statusKey(status));
-}
-
 function hasRefundHistory(receipt: RegistrationReceipt) {
   const refund = statusKey(receipt.refundStatus);
   const payment = statusKey(receipt.paymentStatus);
@@ -525,7 +460,7 @@ function IndividualReceiptCard({
     "";
   const birth = lookupBirthView(receipt.birth);
   const phone = receipt.phNum ? formatPhone(receipt.phNum) : "";
-  const gender = lookupGenderLabel(receipt.gender);
+  const gender = genderLabel(receipt.gender);
   const address = receiptAddress(receipt);
   const registrationLabel = registrationStatusLabel(
     receipt.registrationStatus ?? undefined,

@@ -1,10 +1,12 @@
 "use client";
 
 import {
+  applicationPaymentBadge,
+  applicationPaymentLabel,
+  applicationStatusBadge,
+  applicationStatusLabel,
   applicationCourseLabel,
   applicationGenderLabel,
-  applicationPayBadge,
-  applicationPayLabel,
   formatAmount,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
@@ -41,10 +43,20 @@ export function ApplicationDetailDrawer({ row, loading, onClose }: Props) {
     { label: "주문번호", value: dash(row.orderNo) },
     { label: "결제방식", value: dash(row.cardPaymentInfo) },
     {
-      label: "결제여부",
+      label: "신청 상태",
       value: (
-        <span className={`admin-badge admin-badge--${applicationPayBadge(row.status)}`}>
-          {applicationPayLabel(row.status)}
+        <span className={`admin-badge admin-badge--${applicationStatusBadge(row.status)}`}>
+          {applicationStatusLabel(row.status)}
+        </span>
+      ),
+    },
+    {
+      label: "결제 상태",
+      value: (
+        <span
+          className={`admin-badge admin-badge--${applicationPaymentBadge(row.paymentStatus)}`}
+        >
+          {applicationPaymentLabel(row.paymentStatus)}
         </span>
       ),
     },

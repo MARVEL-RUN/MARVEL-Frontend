@@ -120,7 +120,7 @@ export function DashboardPage({
   });
 
   const cancelHref = data?.cancellationPendingEventId
-    ? applicationsHref(data.cancellationPendingEventId, "status=refund_requested")
+    ? applicationsHref(data.cancellationPendingEventId, "status=CANCELLATION_PENDING")
     : APPS;
 
   return (

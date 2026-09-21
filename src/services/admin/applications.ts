@@ -1,12 +1,27 @@
 import { adminFetch } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
+import {
+  paymentStatusBadge,
+  paymentStatusLabel,
+  registrationStatusBadge,
+  registrationStatusLabel,
+  statusKey,
+  type RegistrationStatus,
+} from "@/lib/registration-status";
+import {
+  kindFromRegistrationType,
+  registrationTypeFromKind,
+  type ApplicationKind,
+} from "@/lib/registration-type";
 import {
   type AdminRaceEventId,
   type VirtualRoundId,
   VIRTUAL_ROUND_LABEL,
 } from "@/lib/admin/raceEvents";
 import { courseById, type CourseId } from "@/lib/register";
-import type { AdminPayStatus } from "@/types/admin/admin";
+
+export type { ApplicationKind };
 
 type Page<T> = {
   content: T[];
@@ -19,8 +34,6 @@ type Page<T> = {
   empty: boolean;
   numberOfElements: number;
 };
-
-export type ApplicationKind = "individual" | "group";
 
 export type AdminEvent = {
   eventId: string;
@@ -57,6 +70,7 @@ export type AdminApplicationRow = {
   address: string;
   addressDetail: string;
   status: string;
+  paymentStatus: string;
   appliedAt: string;
   organizationId?: string;
 };
@@ -102,41 +116,11 @@ type RegistrationDetail = {
 export type RegistrationListParams = {
   eventId: string;
   type?: ApplicationKind | "";
-  status?: AdminPayStatus | "";
+  status?: RegistrationStatus | "";
   keyword?: string;
   eventCategoryId?: string;
   page: number;
   size: number;
-};
-
-const PAY_STATUSES: AdminPayStatus[] = [
-  "paid",
-  "pending",
-  "refund_requested",
-  "refunded",
-];
-
-const STATUS_FROM_API: Record<string, AdminPayStatus> = {
-  paid: "paid",
-  completed: "paid",
-  confirmed: "paid",
-  done: "paid",
-  pending: "pending",
-  unpaid: "pending",
-  ready: "pending",
-  waiting: "pending",
-  refund_requested: "refund_requested",
-  refundrequested: "refund_requested",
-  refunded: "refunded",
-  canceled: "refunded",
-  cancelled: "refunded",
-};
-
-const STATUS_TO_API: Record<AdminPayStatus, string> = {
-  paid: "PAID",
-  pending: "PENDING",
-  refund_requested: "REFUND_REQUESTED",
-  refunded: "REFUNDED",
 };
 
 function compactName(name: string) {
@@ -161,31 +145,10 @@ export function raceEventSlug(event: AdminEvent): AdminRaceEventId | null {
   return null;
 }
 
-function normalizeStatus(value?: string) {
-  if (!value) return "";
-  const key = value.trim().toLowerCase().replace(/[\s-]/g, "_");
-  return STATUS_FROM_API[key] ?? value.trim();
-}
-
 function consentYes(value?: string | boolean) {
   if (typeof value === "boolean") return value;
   const v = (value ?? "").trim().toLowerCase();
   return v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의";
-}
-
-function kindFromApi(type?: string): ApplicationKind {
-  const v = (type ?? "").trim().toUpperCase();
-  if (v === "ORGANIZATION" || v === "GROUP" || v === "ORG" || type === "단체") {
-    return "group";
-  }
-  return "individual";
-}
-
-function genderFromApi(value?: string): "male" | "female" | undefined {
-  const v = (value ?? "").trim().toLowerCase();
-  if (v === "m" || v === "male" || v === "남" || v === "남성") return "male";
-  if (v === "f" || v === "female" || v === "여" || v === "여성") return "female";
-  return undefined;
 }
 
 function displayName(kind: ApplicationKind, name: string, orgName: string) {
@@ -239,7 +202,7 @@ function asRegistrationPage(
 }
 
 function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow {
-  const kind = kindFromApi(item.type);
+  const kind = kindFromRegistrationType(item.type);
   const personName = item.name?.trim() ?? "";
   const groupName = item.orgName?.trim() ?? "";
   return {
@@ -259,13 +222,14 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     email: "",
     guardianPhone: "",
     guardianRelation: "",
-    gender: genderFromApi(item.gender),
+    gender: uiGenderFromApi(item.gender),
     marketingConsent: consentYes(item.marketingConsent),
     amount: 0,
     cardPaymentInfo: "",
     address: "",
     addressDetail: "",
-    status: normalizeStatus(item.status),
+    status: statusKey(item.status),
+    paymentStatus: "",
     appliedAt: formatAdminBoardDate(item.createdAt),
     organizationId: item.organizationId?.trim() || undefined,
   };
@@ -285,7 +249,7 @@ export function applyRegistrationDetail(
     courseName: detail.courseName?.trim() || row.courseName,
     souvenir: detail.souvenirName?.trim() || row.souvenir,
     size: detail.souvenirSize?.trim() || row.size,
-    gender: genderFromApi(detail.gender) ?? row.gender,
+    gender: uiGenderFromApi(detail.gender) ?? row.gender,
     birth: detail.birth?.trim() || row.birth,
     phone: detail.phoneNumber?.trim() || row.phone,
     email: detail.email?.trim() ?? row.email,
@@ -295,7 +259,7 @@ export function applyRegistrationDetail(
     amount: detail.amount ?? row.amount,
     orderNo: detail.orderId?.trim() || row.orderNo,
     cardPaymentInfo: detail.paymentMethod?.trim() || row.cardPaymentInfo,
-    status: normalizeStatus(detail.paymentStatus) || row.status,
+    paymentStatus: statusKey(detail.paymentStatus) || row.paymentStatus,
     address: detail.address?.trim() ?? row.address,
     addressDetail: detail.addressDetail?.trim() ?? row.addressDetail,
   };
@@ -311,9 +275,9 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
     page: String(params.page),
     size: String(params.size),
   });
-  if (params.type === "individual") query.set("type", "PERSONAL");
-  if (params.type === "group") query.set("type", "ORGANIZATION");
-  if (params.status) query.set("status", STATUS_TO_API[params.status]);
+  const apiType = registrationTypeFromKind(params.type ?? "");
+  if (apiType) query.set("type", apiType);
+  if (params.status) query.set("status", params.status);
   if (params.keyword?.trim()) query.set("keyword", params.keyword.trim());
   if (params.eventCategoryId) query.set("eventCategoryId", params.eventCategoryId);
 
@@ -359,10 +323,6 @@ export async function listAllApplications() {
   }
 }
 
-export function isPayStatus(value: string): value is AdminPayStatus {
-  return PAY_STATUSES.includes(value as AdminPayStatus);
-}
-
 export function applicationKindLabel(kind: ApplicationKind) {
   return kind === "individual" ? "개인" : "단체";
 }
@@ -380,22 +340,15 @@ export function applicationRoundLabel(row: AdminApplicationRow) {
 }
 
 export function applicationGenderLabel(gender?: "male" | "female") {
-  if (gender === "male") return "남성";
-  if (gender === "female") return "여성";
-  return "-";
+  return genderLabel(gender);
 }
 
-export function applicationPayLabel(status: string) {
-  if (status === "paid") return "결제완료";
-  if (status === "pending") return "미결제";
-  if (status === "refund_requested") return "환불 대기";
-  if (status === "refunded") return "환불완료";
-  return status || "-";
-}
-
-export function applicationPayBadge(status: string) {
-  return isPayStatus(status) ? status : "plain";
-}
+export {
+  paymentStatusBadge as applicationPaymentBadge,
+  paymentStatusLabel as applicationPaymentLabel,
+  registrationStatusBadge as applicationStatusBadge,
+  registrationStatusLabel as applicationStatusLabel,
+};
 
 export function formatAmount(amount: number) {
   return `${amount.toLocaleString("ko-KR")}원`;

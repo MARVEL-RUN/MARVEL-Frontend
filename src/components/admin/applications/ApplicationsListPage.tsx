@@ -9,11 +9,16 @@ import {
   type AdminRaceEventId,
 } from "@/lib/admin/raceEvents";
 import {
+  REGISTRATION_STATUSES,
+  registrationStatusFromParam,
+  registrationStatusBadge,
+  registrationStatusLabel,
+  type RegistrationStatus,
+} from "@/lib/registration-status";
+import {
   applicationCourseLabel,
   applicationGenderLabel,
   applicationKindLabel,
-  applicationPayBadge,
-  applicationPayLabel,
   applyRegistrationDetail,
   fetchAdminEvents,
   fetchAdminRegistration,
@@ -23,7 +28,6 @@ import {
   type AdminApplicationRow,
   type ApplicationKind,
 } from "@/services/admin/applications";
-import type { AdminPayStatus } from "@/types/admin/admin";
 import { useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
@@ -33,38 +37,24 @@ import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 10;
 
-const PAY_STATUSES: AdminPayStatus[] = [
-  "paid",
-  "pending",
-  "refund_requested",
-  "refunded",
-];
-
-function payStatusFromParam(value: string | null): AdminPayStatus | "" {
-  if (!value) return "";
-  return PAY_STATUSES.includes(value as AdminPayStatus)
-    ? (value as AdminPayStatus)
-    : "";
-}
-
 const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
   { value: "", label: "전체 유형" },
   { value: "individual", label: "개인" },
   { value: "group", label: "단체" },
 ];
 
-const STATUS_OPTIONS: { value: AdminPayStatus | ""; label: string }[] = [
+const STATUS_OPTIONS: { value: RegistrationStatus | ""; label: string }[] = [
   { value: "", label: "전체 상태" },
-  { value: "paid", label: "결제완료" },
-  { value: "pending", label: "대기" },
-  { value: "refund_requested", label: "환불 대기" },
-  { value: "refunded", label: "환불완료" },
+  ...REGISTRATION_STATUSES.map((status) => ({
+    value: status,
+    label: registrationStatusLabel(status),
+  })),
 ];
 
 type Applied = {
   q: string;
   kind: ApplicationKind | "";
-  status: AdminPayStatus | "";
+  status: RegistrationStatus | "";
 };
 
 function errorHint(error: unknown) {
@@ -78,8 +68,8 @@ function errorHint(error: unknown) {
 
 function StatusBadge({ status }: { status: string }) {
   return (
-    <span className={`admin-badge admin-badge--${applicationPayBadge(status)}`}>
-      {applicationPayLabel(status)}
+    <span className={`admin-badge admin-badge--${registrationStatusBadge(status)}`}>
+      {registrationStatusLabel(status)}
     </span>
   );
 }
@@ -91,11 +81,11 @@ type Props = {
 export function ApplicationsListPage({ slug }: Props) {
   const searchParams = useSearchParams();
   const queryEventId = searchParams.get("eventId")?.trim() ?? "";
-  const statusFromUrl = payStatusFromParam(searchParams.get("status"));
+  const statusFromUrl = registrationStatusFromParam(searchParams.get("status"));
 
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<ApplicationKind | "">("");
-  const [status, setStatus] = useState<AdminPayStatus | "">(statusFromUrl);
+  const [status, setStatus] = useState<RegistrationStatus | "">(statusFromUrl);
   const [applied, setApplied] = useState<Applied>({
     q: "",
     kind: "",
@@ -153,7 +143,7 @@ export function ApplicationsListPage({ slug }: Props) {
   });
 
   useEffect(() => {
-    const next = payStatusFromParam(searchParams.get("status"));
+    const next = registrationStatusFromParam(searchParams.get("status"));
     setStatus(next);
     setApplied((prev) => (prev.status === next ? prev : { ...prev, status: next }));
     setPage(1);

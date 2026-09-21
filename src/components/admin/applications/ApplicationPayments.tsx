@@ -3,11 +3,12 @@
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import {
-  applicationPayBadge,
-  applicationPayLabel,
-  formatAmount,
-  type AdminApplicationRow,
-} from "@/services/admin/applications";
+  paymentStatusBadge,
+  paymentStatusLabel,
+  registrationStatusBadge,
+  registrationStatusLabel,
+} from "@/lib/registration-status";
+import { formatAmount, type AdminApplicationRow } from "@/services/admin/applications";
 import {
   fetchPaymentLogs,
   fetchOrganizationPayments,
@@ -44,12 +45,22 @@ function fetchFinance(row: AdminApplicationRow, page: number) {
   return fetchPersonalPayments(row.eventId, row.id, page);
 }
 
-function Status({ value }: { value?: string }) {
+function PaymentStatus({ value }: { value?: string }) {
   const status = value?.trim() ?? "";
   if (!status) return <>-</>;
   return (
-    <span className={`admin-badge admin-badge--${applicationPayBadge(status)}`}>
-      {applicationPayLabel(status)}
+    <span className={`admin-badge admin-badge--${paymentStatusBadge(status)}`}>
+      {paymentStatusLabel(status)}
+    </span>
+  );
+}
+
+function RegistrationStatus({ value }: { value?: string }) {
+  const status = value?.trim() ?? "";
+  if (!status) return <>-</>;
+  return (
+    <span className={`admin-badge admin-badge--${registrationStatusBadge(status)}`}>
+      {registrationStatusLabel(status)}
     </span>
   );
 }
@@ -114,7 +125,7 @@ function PaymentCard({
           <p className="admin-pay__order">{dash(payment.orderId)}</p>
           <p className="admin-pay__meta">{dash(payment.orderName)}</p>
         </div>
-        <Status value={payment.paymentStatus} />
+        <PaymentStatus value={payment.paymentStatus} />
       </header>
       <dl className="admin-pay__facts">
         <div>
@@ -203,9 +214,15 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
               </dd>
             </div>
             <div>
-              <dt>결제상태</dt>
+              <dt>신청 상태</dt>
               <dd>
-                <Status value={data?.paymentStatus} />
+                <RegistrationStatus value={data?.registrationStatus} />
+              </dd>
+            </div>
+            <div>
+              <dt>결제 상태</dt>
+              <dd>
+                <PaymentStatus value={data?.paymentStatus} />
               </dd>
             </div>
           </dl>
