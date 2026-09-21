@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useLayoutEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
-import { PasswordField, PhoneField } from "../register/ApplyUi";
+import { BirthText, PasswordField, PhoneField } from "../register/ApplyUi";
 import { useRegistrationOpen } from "../register/useRegistrationOpen";
 import { scrollPageTop } from "@/lib/scroll-page";
 
@@ -643,14 +643,11 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       </label>
       <label className="field">
         <span>생년월일</span>
-        <input
+        <BirthText
           name="birth"
-          type="text"
-          inputMode="numeric"
-          placeholder="YYYYMMDD"
           autoComplete="bday"
           value={birth}
-          onChange={(e) => setBirth(e.target.value.replace(/\D/g, "").slice(0, 8))}
+          onChange={setBirth}
           required
         />
       </label>
