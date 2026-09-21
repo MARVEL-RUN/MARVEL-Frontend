@@ -19,6 +19,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
     href: "/admin/applications",
     children: [
       { name: "신청자관리", href: "/admin/applications" },
+      { name: "회원 관리", href: "/admin/members" },
       { name: "정원 현황", href: "/admin/capacities" },
     ],
   },
@@ -73,6 +74,15 @@ export function findAdminNav(pathname: string) {
     return {
       item: applications,
       child: applications?.children.find((c) => c.href === "/admin/applications") ?? null,
+      home: false as const,
+    };
+  }
+
+  if (path.startsWith("/admin/members")) {
+    const applications = groups.find((nav) => nav.key === "applications") ?? null;
+    return {
+      item: applications,
+      child: applications?.children.find((c) => c.href === "/admin/members") ?? null,
       home: false as const,
     };
   }
