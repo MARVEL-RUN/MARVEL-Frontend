@@ -621,8 +621,8 @@ export function PasswordField({
   disabled,
   name = "password",
   label = "신청 비밀번호",
-  placeholder = "신청조회용 비밀번호 (4자 이상)",
-  minLength = 4,
+  placeholder = "신청조회용 비밀번호 (6자 이상)",
+  minLength = 6,
   autoComplete = "new-password",
   hideManager = false,
 }: {

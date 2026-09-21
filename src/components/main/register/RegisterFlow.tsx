@@ -14,7 +14,7 @@ import {
   ageBand,
   courseById,
   emailOk,
-  entryPasswordError,
+  applicationPasswordError,
   genderLabel,
   needsGuardian,
   guardianRequiredFor,
@@ -78,9 +78,9 @@ const NOTICE = [
 
 function entryPasswordHint(value: string) {
   if (!value) {
-    return { text: "신청조회용 비밀번호 (4자 이상)", tone: "" as const };
+    return { text: "신청조회용 비밀번호 (6자 이상)", tone: "" as const };
   }
-  const err = entryPasswordError(value);
+  const err = applicationPasswordError(value);
   if (err) return { text: err, tone: "is-err" as const };
   return { text: "사용 가능한 비밀번호입니다.", tone: "is-ok" as const };
 }
@@ -250,7 +250,7 @@ function IndividualFlow({
     if (guardianErr) return fail(guardianErr);
     if (!draft.souvenirId) return fail("티셔츠 옵션을 불러오지 못했습니다.");
     if (!draft.selectedSize) return fail("티셔츠 사이즈를 선택하세요.");
-    const passwordErr = entryPasswordError(draft.password ?? "");
+    const passwordErr = applicationPasswordError(draft.password ?? "");
     if (passwordErr) return fail(passwordErr);
     if ((draft.password ?? "") !== (draft.passwordConfirm ?? "")) {
       return fail("신청 비밀번호가 일치하지 않습니다.");
