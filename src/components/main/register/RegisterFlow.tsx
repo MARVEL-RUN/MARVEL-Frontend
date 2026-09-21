@@ -58,6 +58,7 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  GuardianConsentField,
   KitFixed,
   PasswordField,
   PhoneField,
@@ -387,11 +388,12 @@ function IndividualFlow({
           >
             <FormRow label="보호자 이름" required={needsGuardian(draft.birth)}>
               <input
-                className="field"
+                type="text"
                 name="guardianName"
-                placeholder="보호자(학부모) 이름"
+                placeholder="띄어쓰기 없이 입력해주세요."
                 value={draft.guardianName}
                 onChange={(e) => patch({ guardianName: e.target.value })}
+                autoComplete="name"
                 required={needsGuardian(draft.birth)}
               />
             </FormRow>
@@ -411,17 +413,10 @@ function IndividualFlow({
             </FormRow>
             {needsGuardian(draft.birth) ? (
               <FormRow label="보호자 동의" required>
-                <label className="apply-terms__row">
-                  <input
-                    type="checkbox"
-                    checked={draft.guardianConsent}
-                    onChange={(e) => patch({ guardianConsent: e.target.checked })}
-                    required
-                  />
-                  <span>
-                    법정대리인(보호자)으로서 참가 신청·개인정보 처리에 동의합니다.
-                  </span>
-                </label>
+                <GuardianConsentField
+                  agreed={draft.guardianConsent}
+                  onChange={(guardianConsent) => patch({ guardianConsent })}
+                />
               </FormRow>
             ) : null}
           </FormSec>
