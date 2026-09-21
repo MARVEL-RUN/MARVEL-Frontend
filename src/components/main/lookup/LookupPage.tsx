@@ -31,6 +31,7 @@ import type {
   RegistrationReceiptSouvenir,
   RegistrationSettlementResult,
 } from "@/services/main/types";
+import { useAppHref } from "@/lib/main/useAppBasePath";
 import { useRouter } from "next/navigation";
 import { FormEvent, useLayoutEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
@@ -636,6 +637,7 @@ function LookupRefundDone({ onOther }: { onOther: () => void }) {
 
 function IndividualLookup({ onBack }: { onBack: () => void }) {
   const router = useRouter();
+  const paymentHref = useAppHref("/payment");
   const [view, setView] = useState<View>("form");
   const [panel, setPanel] = useState<"list" | "edit" | "cancel" | "done">("list");
   const [busy, setBusy] = useState(false);
@@ -722,7 +724,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         customerName: (receipt.name || receiptMembers(receipt)[0]?.name || name).trim(),
         savedAt: Date.now(),
       });
-      router.push("/payment");
+      router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
     } finally {
@@ -774,7 +776,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           savedAt: Date.now(),
         });
         setAccess(nextAccess);
-        router.push("/payment");
+        router.push(paymentHref);
         return;
       }
       await refreshIndividual(nextAccess);
@@ -939,6 +941,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
 
 function GroupLookup({ onBack }: { onBack: () => void }) {
   const router = useRouter();
+  const paymentHref = useAppHref("/payment");
   const [view, setView] = useState<View>("form");
   const [panel, setPanel] = useState<"list" | "edit" | "cancel" | "done">("list");
   const [busy, setBusy] = useState(false);
@@ -1017,7 +1020,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         customerName: (receipt.leaderName || receipt.organizationName || account).trim(),
         savedAt: Date.now(),
       });
-      router.push("/payment");
+      router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
     } finally {
@@ -1059,7 +1062,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           customerName: (active.leaderName || active.organizationName || account).trim(),
           savedAt: Date.now(),
         });
-        router.push("/payment");
+        router.push(paymentHref);
         return;
       }
       await refreshOrganization(body.access);

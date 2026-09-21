@@ -8,6 +8,7 @@ import {
   getAdminRaceEvent,
   type AdminRaceEventId,
 } from "@/lib/admin/raceEvents";
+import { formatPhone } from "@/lib/register";
 import {
   REGISTRATION_STATUSES,
   registrationStatusFromParam,
@@ -28,14 +29,14 @@ import {
   type AdminApplicationRow,
   type ApplicationKind,
 } from "@/services/admin/applications";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 
 const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
   { value: "", label: "전체 유형" },
@@ -67,11 +68,40 @@ function errorHint(error: unknown) {
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const tone = registrationStatusBadge(status);
   return (
-    <span className={`admin-badge admin-badge--${registrationStatusBadge(status)}`}>
+    <span className="admin-apps-list__status">
+      <span className={`admin-apps-list__status-dot admin-apps-list__status-dot--${tone}`} aria-hidden />
       {registrationStatusLabel(status)}
     </span>
   );
+}
+
+function KindBadge({ kind }: { kind: AdminApplicationRow["kind"] }) {
+  return <span className="admin-apps-list__kind-text">{applicationKindLabel(kind)}</span>;
+}
+
+function MarketingBadge({ consent }: { consent: boolean }) {
+  return (
+    <span
+      className={`admin-apps-list__yn-text${consent ? " is-yes" : " is-no"}`}
+      aria-label={consent ? "마케팅 동의" : "마케팅 미동의"}
+    >
+      {consent ? "Y" : "N"}
+    </span>
+  );
+}
+
+function CourseTag({ row }: { row: AdminApplicationRow }) {
+  const label = applicationCourseLabel(row);
+  if (!label || label === "-") return <>-</>;
+  return <span className="admin-apps-list__course-text">{label}</span>;
+}
+
+function displayPhone(value?: string | null) {
+  const raw = value?.trim();
+  if (!raw) return "-";
+  return formatPhone(raw);
 }
 
 type Props = {
@@ -134,6 +164,7 @@ export function ApplicationsListPage({ slug }: Props) {
       return mapRegistrationPage(raw, apiEventId);
     },
     enabled: hasAdminApi && Boolean(apiEventId),
+    placeholderData: keepPreviousData,
   });
 
   const detailQuery = useQuery({
@@ -203,61 +234,109 @@ export function ApplicationsListPage({ slug }: Props) {
           : "신청 내역이 없습니다.";
 
   const columns = [
-    { key: "no", header: "번호", render: (row: AdminApplicationRow) => row.no || "-" },
+    {
+      key: "no",
+      header: "번호",
+      className: "is-num",
+      width: "48px",
+      render: (row: AdminApplicationRow) => row.no || "-",
+    },
     {
       key: "kind",
       header: "유형",
-      render: (row: AdminApplicationRow) => applicationKindLabel(row.kind),
+      className: "is-kind",
+      width: "48px",
+      render: (row: AdminApplicationRow) => <KindBadge kind={row.kind} />,
     },
-    { key: "name", header: "이름/단체명", render: (row: AdminApplicationRow) => row.name || "-" },
+    {
+      key: "name",
+      header: "이름/단체명",
+      className: "is-name",
+      width: "11%",
+      render: (row: AdminApplicationRow) => (
+        <span className="admin-apps-list__name" title={row.name || undefined}>
+          {row.name || "-"}
+        </span>
+      ),
+    },
     {
       key: "birth",
       header: "생년월일",
+      className: "is-muted",
+      width: "96px",
       render: (row: AdminApplicationRow) => row.birth || "-",
     },
     {
       key: "gender",
       header: "성별",
+      className: "is-muted",
+      width: "56px",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
-      render: (row: AdminApplicationRow) => applicationCourseLabel(row),
+      className: "is-course",
+      width: "56px",
+      render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
       key: "souvenir",
       header: "기념품",
-      render: (row: AdminApplicationRow) => row.souvenir || "-",
+      className: "is-clip",
+      width: "11%",
+      render: (row: AdminApplicationRow) => (
+        <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
+          {row.souvenir || "-"}
+        </span>
+      ),
     },
     {
       key: "phone",
       header: "연락처",
-      render: (row: AdminApplicationRow) => row.phone || "-",
+      className: "is-phone",
+      width: "118px",
+      render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
       key: "marketing",
-      header: "마케팅동의",
-      render: (row: AdminApplicationRow) => (row.marketingConsent ? "Y" : "N"),
+      header: "마케팅",
+      className: "is-marketing",
+      width: "52px",
+      render: (row: AdminApplicationRow) => (
+        <MarketingBadge consent={Boolean(row.marketingConsent)} />
+      ),
     },
     {
       key: "status",
       header: "상태",
+      className: "is-status",
+      width: "108px",
       render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
     },
     {
       key: "appliedAt",
       header: "신청일시",
+      className: "is-date",
+      width: "132px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
 
+  const fixedTableHeight = hasAdminApi && Boolean(apiEventId) && listQuery.data !== undefined;
+  const listPageStyle = {
+    "--admin-apps-list-rows": PAGE_SIZE,
+  } as CSSProperties;
+
   return (
-    <div className="admin-page admin-apps-list">
+    <div
+      className={`admin-page admin-apps-list${fixedTableHeight ? " is-fixed-table" : ""}${listQuery.isFetching ? " is-fetching" : ""}`}
+      style={listPageStyle}
+    >
       <AdminTableShell<AdminApplicationRow>
         title={eventTitle}
         rows={rows}
-        loading={eventsQuery.isLoading || listQuery.isLoading}
+        loading={eventsQuery.isLoading || (listQuery.isLoading && !listQuery.data)}
         empty={empty}
         rowKey={(row) => row.id || String(row.no)}
         page={page}
@@ -269,8 +348,11 @@ export function ApplicationsListPage({ slug }: Props) {
           if (!row.id) return;
           setSelectedId(row.id);
         }}
+        isRowSelected={(row) => Boolean(selectedId && row.id === selectedId)}
+        minRows={fixedTableHeight ? PAGE_SIZE : undefined}
         actions={
-          <div className="admin-table-shell__actions">
+          <div className="admin-table-shell__actions admin-apps-list__head-actions">
+            <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
             <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
               대회 목록
             </Link>
@@ -278,30 +360,32 @@ export function ApplicationsListPage({ slug }: Props) {
         }
         tools={
           <>
-            <AdminSelect
-              value={kind}
-              options={KIND_OPTIONS}
-              onChange={(value) => {
-                setKind(value);
-                setApplied((prev) => ({ ...prev, kind: value }));
-                setPage(1);
-              }}
-              ariaLabel="신청 유형"
-              width={112}
-            />
-            <AdminSelect
-              value={status}
-              options={STATUS_OPTIONS}
-              onChange={(value) => {
-                setStatus(value);
-                setApplied((prev) => ({ ...prev, status: value }));
-                setPage(1);
-              }}
-              ariaLabel="상태"
-              width={112}
-            />
+            <div className="admin-apps-list__filter-group">
+              <AdminSelect
+                value={kind}
+                options={KIND_OPTIONS}
+                onChange={(value) => {
+                  setKind(value);
+                  setApplied((prev) => ({ ...prev, kind: value }));
+                  setPage(1);
+                }}
+                ariaLabel="신청 유형"
+                width={112}
+              />
+              <AdminSelect
+                value={status}
+                options={STATUS_OPTIONS}
+                onChange={(value) => {
+                  setStatus(value);
+                  setApplied((prev) => ({ ...prev, status: value }));
+                  setPage(1);
+                }}
+                ariaLabel="상태"
+                width={112}
+              />
+            </div>
             <input
-              className="admin-toolbar__search"
+              className="admin-toolbar__search admin-apps-list__search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => {
@@ -309,22 +393,24 @@ export function ApplicationsListPage({ slug }: Props) {
               }}
               placeholder="이름 · 단체명 · 연락처"
             />
-            <button
-              type="button"
-              className="admin-btn admin-btn--primary admin-toolbar__btn"
-              onClick={runSearch}
-            >
-              검색
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn--ghost admin-toolbar__iconbtn"
-              aria-label="검색 초기화"
-              title="초기화"
-              onClick={resetSearch}
-            >
-              <RotateCcw size={24} strokeWidth={2.5} />
-            </button>
+            <div className="admin-apps-list__search-actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn--primary admin-toolbar__btn"
+                onClick={runSearch}
+              >
+                검색
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost admin-toolbar__iconbtn"
+                aria-label="검색 초기화"
+                title="초기화"
+                onClick={resetSearch}
+              >
+                <RotateCcw size={18} strokeWidth={2.25} />
+              </button>
+            </div>
           </>
         }
         columns={columns}

@@ -5,6 +5,8 @@ import { AdminPagination } from "@/components/admin/Pagination";
 type Column<T> = {
   key: string;
   header: string;
+  className?: string;
+  width?: string;
   render: (row: T) => React.ReactNode;
 };
 
@@ -23,6 +25,8 @@ type Props<T> = {
   onPage?: (page: number) => void;
   pageUnit?: string;
   onRowClick?: (row: T) => void;
+  isRowSelected?: (row: T) => boolean;
+  minRows?: number;
 };
 
 export function AdminTableShell<T>({
@@ -40,9 +44,12 @@ export function AdminTableShell<T>({
   onPage,
   pageUnit,
   onRowClick,
+  isRowSelected,
+  minRows,
 }: Props<T>) {
   const count = totalCount ?? rows.length;
   const showPager = Boolean(onPage) && !loading && count > 0;
+  const padCount = minRows && rows.length > 0 ? Math.max(0, minRows - rows.length) : 0;
 
   return (
     <section className="admin-table-shell">
@@ -63,10 +70,17 @@ export function AdminTableShell<T>({
           <p className="admin-empty">{empty}</p>
         ) : (
           <table className={`admin-table${onRowClick ? " is-clickable" : ""}`}>
+            <colgroup>
+              {columns.map((col) => (
+                <col key={col.key} style={col.width ? { width: col.width } : undefined} />
+              ))}
+            </colgroup>
             <thead>
               <tr>
                 {columns.map((col) => (
-                  <th key={col.key}>{col.header}</th>
+                  <th key={col.key} className={col.className}>
+                    {col.header}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -74,10 +88,22 @@ export function AdminTableShell<T>({
               {rows.map((row) => (
                 <tr
                   key={rowKey(row)}
+                  className={isRowSelected?.(row) ? "is-picked" : undefined}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                 >
                   {columns.map((col) => (
-                    <td key={col.key}>{col.render(row)}</td>
+                    <td key={col.key} className={col.className}>
+                      {col.render(row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+              {Array.from({ length: padCount }, (_, index) => (
+                <tr key={`pad-${index}`} className="is-pad" aria-hidden>
+                  {columns.map((col) => (
+                    <td key={col.key} className={col.className}>
+                      {"\u00a0"}
+                    </td>
                   ))}
                 </tr>
               ))}
