@@ -37,6 +37,7 @@ const CAPACITY_GROUPS = [
     key: "event",
     title: "대회 총원",
     lead: "대회 전체 참가 상한",
+    nameHeader: "정원명",
     types: ["EVENT_TOTAL"] as CapacityType[],
     showSize: false,
   },
@@ -44,6 +45,7 @@ const CAPACITY_GROUPS = [
     key: "category",
     title: "종목 정원",
     lead: "코스·종목별 정원 및 합산 한도",
+    nameHeader: "정원명",
     types: ["CATEGORY", "CHILD_CATEGORY", "CATEGORY_GROUP"] as CapacityType[],
     showSize: false,
   },
@@ -51,6 +53,7 @@ const CAPACITY_GROUPS = [
     key: "souvenir",
     title: "기념품 재고",
     lead: "사이즈별 기념품 수량",
+    nameHeader: "기념품명",
     types: ["SOUVENIR"] as CapacityType[],
     showSize: true,
   },
@@ -179,22 +182,26 @@ function SummaryCard({
 }
 
 function CapacityGroupTable({
+  groupKey,
   title,
   lead,
+  nameHeader,
   rows,
   showSize,
   pick,
   onOpenList,
 }: {
+  groupKey: string;
   title: string;
   lead: string;
+  nameHeader: string;
   rows: CapacityRow[];
   showSize: boolean;
   pick: Pick | null;
   onOpenList: (row: CapacityRow, state: CapacityState) => void;
 }) {
   return (
-    <section className="admin-capacity__group">
+    <section className={`admin-capacity__group admin-capacity__group--${groupKey}`}>
       <div className="admin-capacity__group-head">
         <div>
           <h2 className="admin-capacity__group-title">{title}</h2>
@@ -215,13 +222,13 @@ function CapacityGroupTable({
           </colgroup>
           <thead>
             <tr>
-              <th>정원명</th>
-              {showSize ? <th>사이즈</th> : null}
-              <th>최대</th>
-              <th>홀딩</th>
-              <th>확정</th>
-              <th>사용</th>
-              <th>상태</th>
+              <th className="is-name">{nameHeader}</th>
+              {showSize ? <th className="is-muted">사이즈</th> : null}
+              <th className="is-num is-section-start">최대</th>
+              <th className="is-num">홀딩</th>
+              <th className="is-num">확정</th>
+              <th className="is-num">사용</th>
+              <th className="is-status is-section-start">상태</th>
             </tr>
           </thead>
           <tbody>
@@ -250,7 +257,7 @@ function CapacityGroupTable({
                     </span>
                   </td>
                   {showSize ? <td className="is-muted">{dash(row.size)}</td> : null}
-                  <td className="is-num">
+                  <td className="is-num is-section-start">
                     <LimitCell value={row.limitCount} unit={unit} />
                   </td>
                   <td className="is-num is-action">
@@ -272,7 +279,7 @@ function CapacityGroupTable({
                   <td className="is-num is-usage">
                     <UsageCount row={row} />
                   </td>
-                  <td className="is-status">
+                  <td className="is-status is-section-start">
                     <ActiveBadge active={row.active} />
                   </td>
                 </tr>
@@ -369,19 +376,19 @@ function ParticipantPanel({
           <table className="admin-table admin-capacity__panel-table">
             <thead>
               <tr>
-                <th>이름</th>
-                <th>생년월일</th>
-                <th>전화번호</th>
-                <th>단체명</th>
+                <th className="is-name">이름</th>
+                <th className="is-muted is-section-start">생년월일</th>
+                <th className="is-phone">전화번호</th>
+                <th className="is-name is-section-start">단체명</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
                 <tr key={row.registrationId}>
                   <td className="is-name">{row.name || "—"}</td>
-                  <td className="is-muted">{dash(row.birth)}</td>
+                  <td className="is-muted is-section-start">{dash(row.birth)}</td>
                   <td className="is-phone">{formatPhone(row.phNum) || row.phNum}</td>
-                  <td className="is-name">
+                  <td className="is-name is-section-start">
                     <span
                       className="admin-capacity__name"
                       title={row.organizationName ?? undefined}
@@ -580,28 +587,34 @@ export function CapacityStatusPage({ eventId }: Props) {
             </div>
           ) : null}
 
-          <div className="admin-capacity__board">
+          <div className="admin-capacity__groups">
             {capacities.isLoading ? (
-              <p className="admin-empty">불러오는 중…</p>
+              <div className="admin-capacity__group admin-capacity__group--empty">
+                <p className="admin-empty">불러오는 중…</p>
+              </div>
             ) : rows.length === 0 ? (
-              <div className="admin-empty">
-                <p>{emptyCapacities}</p>
-                {apiEventId && capacities.isError ? (
-                  <button
-                    type="button"
-                    className="admin-btn admin-btn--ghost"
-                    onClick={() => void capacities.refetch()}
-                  >
-                    다시 시도
-                  </button>
-                ) : null}
+              <div className="admin-capacity__group admin-capacity__group--empty">
+                <div className="admin-empty">
+                  <p>{emptyCapacities}</p>
+                  {apiEventId && capacities.isError ? (
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--ghost"
+                      onClick={() => void capacities.refetch()}
+                    >
+                      다시 시도
+                    </button>
+                  ) : null}
+                </div>
               </div>
             ) : (
               groups.map((group) => (
                 <CapacityGroupTable
                   key={group.key}
+                  groupKey={group.key}
                   title={group.title}
                   lead={group.lead}
+                  nameHeader={group.nameHeader}
                   rows={group.rows}
                   showSize={group.showSize}
                   pick={pick}
