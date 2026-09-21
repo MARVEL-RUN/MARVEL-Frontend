@@ -83,6 +83,11 @@ export function RegisterFlow() {
     requestAnimationFrame(scrollPageTop);
   }
 
+  function clearKind() {
+    setKind("");
+    requestAnimationFrame(scrollPageTop);
+  }
+
   if (!kind) {
     return (
       <ApplyTerms
@@ -93,9 +98,9 @@ export function RegisterFlow() {
     );
   }
   if (kind === "group") {
-    return <GroupFlow consents={consents} onBack={() => setKind("")} />;
+    return <GroupFlow consents={consents} onBack={clearKind} />;
   }
-  return <IndividualFlow consents={consents} onBack={() => setKind("")} />;
+  return <IndividualFlow consents={consents} onBack={clearKind} />;
 }
 
 function IndividualFlow({
@@ -382,7 +387,7 @@ function IndividualFlow({
             title={needsGuardian(draft.birth) ? "보호자 정보" : "보호자 정보 (선택)"}
             note={
               needsGuardian(draft.birth)
-                ? `${GUARDIAN_AGE_NOTE}. 보호자 이름·연락처·동의가 필요합니다.`
+                ? `${GUARDIAN_AGE_NOTE} 보호자 이름·연락처도 입력해 주세요.`
                 : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
             }
           >

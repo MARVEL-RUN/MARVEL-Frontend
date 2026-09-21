@@ -110,6 +110,14 @@
   word-break: keep-all;
 }
 
+.form-row__hint.is-err {
+  color: var(--marvel);
+}
+
+.form-row__hint.is-ok {
+  color: #3ecf8e;
+}
+
 .form-row__label {
   color: #fff;
   font-size: 0.95rem;
