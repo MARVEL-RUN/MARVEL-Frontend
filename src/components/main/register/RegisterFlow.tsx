@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useAppBasePath } from "@/lib/main/useAppBasePath";
+import { withAppBase } from "@/lib/preview";
 import {
   EMPTY_CONSENTS,
   EMPTY_DRAFT,
@@ -109,6 +111,7 @@ function IndividualFlow({
   const [registration, setRegistration] =
     useState<RegistrationCreateResponse | null>(null);
   const router = useRouter();
+  const base = useAppBasePath();
   const [payOpen, setPayOpen] = useState(false);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
@@ -171,7 +174,7 @@ function IndividualFlow({
 
   function openPay() {
     if (isMobileView()) {
-      router.push("/payment");
+      router.push(withAppBase(base, "/payment"));
       return;
     }
     setPayOpen(true);

@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { Fragment, FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
+import { useAppBasePath } from "@/lib/main/useAppBasePath";
+import { withAppBase } from "@/lib/preview";
 import { MainHttpError } from "@/lib/main/fetch";
 import {
   organizationPaymentOrder,
@@ -109,6 +111,7 @@ export function GroupFlow({
   const [openMember, setOpenMember] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
+  const base = useAppBasePath();
 
   function fail(message: string) {
     setError(message);
@@ -119,7 +122,7 @@ export function GroupFlow({
 
   function openPay() {
     if (isMobileView()) {
-      router.push("/payment");
+      router.push(withAppBase(base, "/payment"));
       return;
     }
     setPayOpen(true);

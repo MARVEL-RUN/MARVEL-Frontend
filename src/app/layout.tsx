@@ -3,6 +3,7 @@ import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import { OG_DESCRIPTION, OG_TITLE, SEO_TITLE, SITE_URL } from "@/lib/event";
 import { APP_MODE, isMain } from "@/lib/mode";
+import { PREVIEW_BASE_PATH } from "@/lib/preview";
 import { BgmPlayer } from "@/components/main/layout/BgmPlayer";
 import { BGM_SRC } from "@/lib/main/config";
 import { SiteZoom } from "@/components/main/layout/SiteZoom";
@@ -78,7 +79,7 @@ export default function RootLayout({
     <html lang="ko" className={notoSansKr.variable} suppressHydrationWarning>
       <body>
         <Script id="site-zoom-guard" strategy="beforeInteractive">
-          {`(function(){var p=location.pathname;if(p.indexOf("/admin")===0)return;if(${JSON.stringify(APP_MODE)}!=="main")return;document.documentElement.classList.add("is-main");if((p==="/"||p==="")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("is-intro");}})();`}
+          {`(function(){var p=location.pathname;if(p.indexOf("/admin")===0)return;var preview=${JSON.stringify(PREVIEW_BASE_PATH)};var onPreview=p===preview||p.indexOf(preview+"/")===0;if(${JSON.stringify(APP_MODE)}!=="main"&&!onPreview)return;document.documentElement.classList.add("is-main");if((p==="/"||p==="")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("is-intro");}})();`}
         </Script>
         <SiteZoom />
         {children}
