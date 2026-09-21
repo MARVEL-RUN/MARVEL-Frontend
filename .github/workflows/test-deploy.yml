@@ -29,7 +29,7 @@ env:
   GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
   NAVER_ANALYTICS_ID: ${{ secrets.NAVER_ANALYTICS_ID }}
   NEXT_PUBLIC_KAKAO_MAP_KEY: ${{ secrets.KAKAO_MAP_JS_KEY }}
-  NEXT_PUBLIC_TOSS_CLIENT_KEY: ${{ secrets.NEXT_PUBLIC_TOSS_CLIENT_KEY }}
+  NEXT_PUBLIC_TOSS_CLIENT_KEY: ${{ secrets.NEXT_PUBLIC_TOSS_CLIENT_KEY_TEST }}
 
 jobs:
   build-push-deploy:
@@ -118,7 +118,7 @@ jobs:
           esac
 
           if [ -z "${NEXT_PUBLIC_TOSS_CLIENT_KEY:-}" ]; then
-            echo "::error::NEXT_PUBLIC_TOSS_CLIENT_KEY GitHub Secret이 없습니다."
+            echo "::error::NEXT_PUBLIC_TOSS_CLIENT_KEY_TEST GitHub Secret이 없습니다."
             exit 1
           fi
 
