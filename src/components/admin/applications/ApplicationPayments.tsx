@@ -2,12 +2,7 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import {
-  paymentStatusBadge,
-  paymentStatusLabel,
-  registrationStatusBadge,
-  registrationStatusLabel,
-} from "@/lib/registration-status";
+import { paymentStatusBadge, paymentStatusLabel } from "@/lib/registration-status";
 import { formatAmount, type AdminApplicationRow } from "@/services/admin/applications";
 import {
   fetchPaymentLogs,
@@ -39,16 +34,6 @@ function PaymentStatus({ value }: { value?: string }) {
   return (
     <span className={`admin-badge admin-badge--${paymentStatusBadge(status)}`}>
       {paymentStatusLabel(status)}
-    </span>
-  );
-}
-
-function RegistrationStatus({ value }: { value?: string }) {
-  const status = value?.trim() ?? "";
-  if (!status) return <>-</>;
-  return (
-    <span className={`admin-badge admin-badge--${registrationStatusBadge(status)}`}>
-      {registrationStatusLabel(status)}
     </span>
   );
 }
@@ -199,12 +184,6 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
               <dt>계약금액</dt>
               <dd>
                 {data?.contractAmount != null ? formatAmount(data.contractAmount) : "-"}
-              </dd>
-            </div>
-            <div>
-              <dt>신청 상태</dt>
-              <dd>
-                <RegistrationStatus value={data?.registrationStatus} />
               </dd>
             </div>
             <div>
