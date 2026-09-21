@@ -545,21 +545,21 @@ html.admin-mode body {
 }
 
 .admin-apps-list {
-  --admin-apps-row-h: 30px;
-  --admin-apps-head-h: 32px;
+  --admin-apps-row-h: 32px;
+  --admin-apps-head-h: 34px;
   --admin-apps-list-rows: 15;
 }
 
 .admin-apps-list .admin-table-wrap {
   flex: 0 1 auto;
-  overflow: auto;
-  scrollbar-gutter: stable;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
+/* 행 높이는 셀에 고정. wrap 높이를 수식으로 맞추면 보더·서브픽셀 때문에 미세 스크롤이 남음 */
 .admin-apps-list.is-fixed-table .admin-table-wrap {
-  height: calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h));
-  max-height: min(calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
-      calc(100vh - var(--admin-head) - 220px));
+  height: auto;
+  max-height: calc(100vh - var(--admin-head) - 220px);
 }
 
 .admin-apps-list.is-fixed-table .admin-table thead tr {
@@ -568,6 +568,18 @@ html.admin-mode body {
 
 .admin-apps-list.is-fixed-table .admin-table tbody tr {
   height: var(--admin-apps-row-h);
+}
+
+.admin-apps-list.is-fixed-table .admin-table thead th,
+.admin-apps-list.is-fixed-table .admin-table tbody td {
+  box-sizing: border-box;
+  height: var(--admin-apps-row-h);
+  max-height: var(--admin-apps-row-h);
+}
+
+.admin-apps-list.is-fixed-table .admin-table thead th {
+  height: var(--admin-apps-head-h);
+  max-height: var(--admin-apps-head-h);
 }
 
 .admin-apps-list.is-fetching .admin-table tbody {
@@ -1633,6 +1645,11 @@ html.admin-mode body {
   width: 34%;
 }
 
+.admin-pay-log-table th.admin-pay-log-table__process,
+.admin-pay-log-table td.admin-pay-log-table__process {
+  text-align: center;
+}
+
 .admin-pay-log-table th:nth-child(3),
 .admin-pay-log-table td:nth-child(3) {
   width: 52px;
@@ -1882,6 +1899,7 @@ button.admin-pay-list__item:hover {
   color: #2563eb;
   font-size: 13px;
   font-weight: 500;
+  line-height: 1;
   text-decoration: none;
 }
 
@@ -3443,6 +3461,49 @@ button.admin-pay-list__item:hover {
   width: 100%;
 }
 
+.admin-input-modal__row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.admin-input-modal__row input {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #cfd5de;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.admin-input-modal__row input:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+}
+
+.admin-input-modal__row.is-error input {
+  border-color: #d93025;
+}
+
+.admin-input-modal__row.is-error input:focus {
+  box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
+}
+
+.admin-input-modal__check {
+  flex: 0 0 auto;
+  height: 42px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
 .admin-input-modal__control input {
   box-sizing: border-box;
   width: 100%;
@@ -3504,6 +3565,11 @@ button.admin-pay-list__item:hover {
 
 .admin-input-modal__hint.is-error {
   color: #d93025;
+  font-weight: 600;
+}
+
+.admin-input-modal__hint.is-ok {
+  color: #188038;
   font-weight: 600;
 }
 

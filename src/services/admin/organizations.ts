@@ -241,3 +241,58 @@ export function resetOrganizationPassword(
     { method: "PUT", body: JSON.stringify({ newPassword: password }) },
   );
 }
+
+export function updateOrganizationLoginId(
+  organizationId: string,
+  newLoginId: string,
+) {
+  const loginId = newLoginId.trim();
+  if (!organizationId.trim()) throw new Error("단체 정보를 찾을 수 없습니다.");
+  if (!loginId) throw new Error("로그인 아이디를 입력하세요.");
+  return adminFetch<void>(
+    `v1/admin/organizations/${encodeURIComponent(organizationId)}/loginId`,
+    { method: "PUT", body: JSON.stringify({ newLoginId: loginId }) },
+  );
+}
+
+export type AdminOrganizationDuplicateCheckResult = {
+  requestValue?: string;
+  requestUseable?: boolean;
+  requestedLoginId?: string;
+  useableLoginId?: boolean;
+};
+
+export function checkAdminOrganizationDuplicateId(params: {
+  eventId: string;
+  groupLoginId: string;
+}) {
+  const eventId = params.eventId.trim();
+  const groupLoginId = params.groupLoginId.trim();
+  if (!eventId) throw new Error("대회 정보가 없습니다.");
+  if (!groupLoginId) throw new Error("로그인 ID를 입력하세요.");
+
+  const query = new URLSearchParams({
+    eventId,
+    groupLoginId,
+  });
+  return adminFetch<AdminOrganizationDuplicateCheckResult>(
+    `v1/admin/organizations/organization/duplicate-id-check?${query}`,
+  ).then((data) => {
+    const row =
+      data && typeof data === "object"
+        ? (data as Record<string, unknown>)
+        : null;
+    const useable =
+      row && typeof row.requestUseable === "boolean"
+        ? row.requestUseable
+        : row && typeof row.useableLoginId === "boolean"
+          ? row.useableLoginId
+          : row && typeof row.exists === "boolean"
+            ? !row.exists
+            : true;
+    return {
+      requestedLoginId: groupLoginId,
+      useableLoginId: useable,
+    };
+  });
+}

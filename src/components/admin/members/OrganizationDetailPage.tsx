@@ -13,10 +13,13 @@ import { formatAmount } from "@/services/admin/applications";
 import {
   fetchAdminOrganization,
   resetOrganizationPassword,
+  updateOrganizationLoginId,
 } from "@/services/admin/organizations";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { OrganizationLoginIdModal } from "./OrganizationLoginIdModal";
 import { OrganizationMembersList } from "./OrganizationMembersList";
 
 function errorHint(error: unknown) {
@@ -36,12 +39,14 @@ function dash(value?: string | number | null) {
 
 export function OrganizationDetailPage() {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const organizationId = searchParams.get("organizationId")?.trim() ?? "";
   const apiEventId = searchParams.get("eventId")?.trim() ?? "";
   const slugParam = searchParams.get("slug")?.trim() ?? "";
   const slug = slugParam === "marvel" || slugParam === "virtual" ? slugParam : null;
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
+  const [loginIdOpen, setLoginIdOpen] = useState(false);
 
   const detailQuery = useQuery({
     queryKey: ["admin", "organization", organizationId],
@@ -58,6 +63,31 @@ export function OrganizationDetailPage() {
         err instanceof Error ? err.message : "비밀번호 초기화에 실패했습니다.",
       ),
   });
+
+  const changeLoginId = useMutation({
+    mutationFn: (newLoginId: string) =>
+      updateOrganizationLoginId(organizationId, newLoginId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["admin", "organization", organizationId],
+      });
+      adminToast.success("로그인 아이디가 변경되었습니다.");
+    },
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error ? err.message : "아이디 변경에 실패했습니다.",
+      ),
+  });
+
+  const handleChangeLoginId = async (next: string) => {
+    setLoginIdOpen(false);
+    const ok = await confirm({
+      title: "아이디 변경",
+      message: `로그인 아이디를 "${next}"(으)로 변경하시겠습니까?`,
+    });
+    if (!ok) return;
+    changeLoginId.mutate(next);
+  };
 
   const handleResetPassword = async () => {
     const label =
@@ -125,6 +155,19 @@ export function OrganizationDetailPage() {
             type="button"
             className="admin-btn admin-btn--ghost"
             disabled={
+              changeLoginId.isPending ||
+              detailQuery.isLoading ||
+              !detail ||
+              !apiEventId
+            }
+            onClick={() => setLoginIdOpen(true)}
+          >
+            {changeLoginId.isPending ? "변경 중…" : "아이디 변경"}
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost"
+            disabled={
               resetPassword.isPending || detailQuery.isLoading || !detail
             }
             onClick={handleResetPassword}
@@ -138,6 +181,13 @@ export function OrganizationDetailPage() {
       </header>
       {confirmModal}
       {inputModal}
+      <OrganizationLoginIdModal
+        open={loginIdOpen}
+        eventId={apiEventId}
+        currentLoginId={detail?.loginId}
+        onCancel={() => setLoginIdOpen(false)}
+        onConfirm={(loginId) => void handleChangeLoginId(loginId)}
+      />
 
       {detailQuery.isLoading ? (
         <p className="admin-empty">불러오는 중…</p>

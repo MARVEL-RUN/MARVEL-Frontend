@@ -56,7 +56,11 @@ import {
   type ParticipantDraft,
 } from "@/lib/register";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
-import { createOrganizationRegistration } from "@/services/main/registrations";
+import {
+  checkOrganizationDuplicateId,
+  checkOrganizationDuplicateName,
+  createOrganizationRegistration,
+} from "@/services/main/registrations";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
 import { SheetModal } from "../SheetModal";
@@ -88,6 +92,18 @@ const NOTICE = [
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
 
+type FieldCheck = {
+  status: "idle" | "checking" | "ready" | "error";
+  value: string;
+  useable?: boolean;
+  hint?: { text: string; tone: "" | "is-err" | "is-ok" };
+};
+
+const EMPTY_FIELD_CHECK: FieldCheck = {
+  status: "idle",
+  value: "",
+};
+
 function orgPasswordHint(value: string) {
   if (!value) {
     return { text: "조회용 비밀번호 (6자 이상)", tone: "" as const };
@@ -105,16 +121,30 @@ function orgPasswordConfirmHint(password: string, confirm: string) {
   return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
 }
 
-function orgAccountHint(value: string, langWarn: boolean) {
+function matchesField(check: FieldCheck, value: string) {
+  return check.value === value.trim();
+}
+
+function groupNameHint(value: string, check: FieldCheck) {
+  if (!matchesField(check, value)) return null;
+  return check.hint ?? null;
+}
+
+function orgAccountHint(value: string, langWarn: boolean, check: FieldCheck) {
   if (langWarn) {
     return { text: "영문으로 입력해주세요.", tone: "is-err" as const };
   }
   if (!value) {
+    if (matchesField(check, value) && check.hint) return check.hint;
     return { text: "영문·숫자·특수문자만 입력할 수 있습니다.", tone: "" as const };
   }
   const err = orgAccountError(value);
-  if (err) return { text: err, tone: "is-err" as const };
-  return { text: "사용 가능한 계정입니다.", tone: "is-ok" as const };
+  if (err) {
+    if (matchesField(check, value) && check.hint) return check.hint;
+    return { text: err, tone: "is-err" as const };
+  }
+  if (matchesField(check, value) && check.hint) return check.hint;
+  return { text: "영문·숫자·특수문자만 입력할 수 있습니다.", tone: "" as const };
 }
 
 function memberPeek(
@@ -144,6 +174,9 @@ export function GroupFlow({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [accountLangWarn, setAccountLangWarn] = useState(false);
+  const [nameCheck, setNameCheck] = useState<FieldCheck>(EMPTY_FIELD_CHECK);
+  const [accountCheck, setAccountCheck] =
+    useState<FieldCheck>(EMPTY_FIELD_CHECK);
   const [openMember, setOpenMember] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
@@ -228,6 +261,115 @@ export function GroupFlow({
   function patch(next: Partial<GroupDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
     setError("");
+    if ("groupName" in next) setNameCheck(EMPTY_FIELD_CHECK);
+    if ("organizationAccount" in next) setAccountCheck(EMPTY_FIELD_CHECK);
+  }
+
+  async function runNameDupCheck() {
+    const groupName = draft.groupName.trim();
+    if (!groupName) {
+      setNameCheck({
+        status: "error",
+        value: "",
+        hint: { text: "단체명을 입력하세요.", tone: "is-err" },
+      });
+      return;
+    }
+    if (!hasMainApi) {
+      setNameCheck({
+        status: "error",
+        value: groupName,
+        hint: { text: "API 주소가 설정되지 않았습니다.", tone: "is-err" },
+      });
+      return;
+    }
+
+    setError("");
+    setNameCheck({
+      status: "checking",
+      value: groupName,
+      hint: { text: "중복 확인 중…", tone: "" },
+    });
+    try {
+      const result = await checkOrganizationDuplicateName(
+        DEFAULT_EVENT_ID,
+        groupName,
+      );
+      setNameCheck({
+        status: "ready",
+        value: groupName,
+        useable: result.useableGroupName,
+        hint: result.useableGroupName
+          ? { text: "사용 가능한 단체명입니다.", tone: "is-ok" }
+          : { text: "이미 사용 중인 단체명입니다.", tone: "is-err" },
+      });
+    } catch (err) {
+      setNameCheck({
+        status: "error",
+        value: groupName,
+        hint: {
+          text:
+            err instanceof MainHttpError
+              ? err.message
+              : "중복 확인에 실패했습니다.",
+          tone: "is-err",
+        },
+      });
+    }
+  }
+
+  async function runAccountDupCheck() {
+    const loginId = draft.organizationAccount.trim();
+    const accountErr = orgAccountError(loginId);
+    if (accountErr) {
+      setAccountCheck({
+        status: "error",
+        value: loginId,
+        hint: { text: accountErr, tone: "is-err" },
+      });
+      return;
+    }
+    if (!hasMainApi) {
+      setAccountCheck({
+        status: "error",
+        value: loginId,
+        hint: { text: "API 주소가 설정되지 않았습니다.", tone: "is-err" },
+      });
+      return;
+    }
+
+    setError("");
+    setAccountCheck({
+      status: "checking",
+      value: loginId,
+      hint: { text: "중복 확인 중…", tone: "" },
+    });
+    try {
+      const result = await checkOrganizationDuplicateId(
+        DEFAULT_EVENT_ID,
+        loginId,
+      );
+      setAccountCheck({
+        status: "ready",
+        value: loginId,
+        useable: result.useableLoginId,
+        hint: result.useableLoginId
+          ? { text: "사용 가능한 계정입니다.", tone: "is-ok" }
+          : { text: "이미 사용 중인 계정입니다.", tone: "is-err" },
+      });
+    } catch (err) {
+      setAccountCheck({
+        status: "error",
+        value: loginId,
+        hint: {
+          text:
+            err instanceof MainHttpError
+              ? err.message
+              : "중복 확인에 실패했습니다.",
+          tone: "is-err",
+        },
+      });
+    }
   }
 
   function patchMember(i: number, next: Partial<ParticipantDraft>) {
@@ -270,6 +412,34 @@ export function GroupFlow({
     if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
     const accountErr = orgAccountError(draft.organizationAccount);
     if (accountErr) return fail(accountErr);
+    if (hasMainApi) {
+      if (
+        nameCheck.status !== "ready" ||
+        !matchesField(nameCheck, draft.groupName) ||
+        !nameCheck.useable
+      ) {
+        return fail(
+          nameCheck.status === "ready" &&
+            matchesField(nameCheck, draft.groupName) &&
+            nameCheck.useable === false
+            ? "이미 사용 중인 단체명입니다."
+            : "단체명 중복검사를 진행해 주세요.",
+        );
+      }
+      if (
+        accountCheck.status !== "ready" ||
+        !matchesField(accountCheck, draft.organizationAccount) ||
+        !accountCheck.useable
+      ) {
+        return fail(
+          accountCheck.status === "ready" &&
+            matchesField(accountCheck, draft.organizationAccount) &&
+            accountCheck.useable === false
+            ? "이미 사용 중인 계정입니다."
+            : "단체 계정 중복검사를 진행해 주세요.",
+        );
+      }
+    }
     const passwordErr = applicationPasswordError(draft.organizationPassword ?? "");
     if (passwordErr) return fail(passwordErr);
     if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
@@ -379,7 +549,12 @@ export function GroupFlow({
   const total = payment?.paymentAmount ?? groupOptionsFee(draft, categories);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(draft.participants);
-  const accountHint = orgAccountHint(draft.organizationAccount, accountLangWarn);
+  const nameHint = groupNameHint(draft.groupName, nameCheck);
+  const accountHint = orgAccountHint(
+    draft.organizationAccount,
+    accountLangWarn,
+    accountCheck,
+  );
   const passwordHint = orgPasswordHint(draft.organizationPassword);
   const passwordConfirmHint = orgPasswordConfirmHint(
     draft.organizationPassword,
@@ -406,31 +581,58 @@ export function GroupFlow({
 
           <FormSec kicker="01 / GROUP" title="단체 정보">
             <FormRow label="단체명" required>
-              <input
-                type="text"
-                placeholder="단체명을 띄어쓰기 없이 입력해주세요"
-                value={draft.groupName}
-                onChange={(e) => patch({ groupName: e.target.value })}
-                required
-              />
+              <div className="field-with-btn">
+                <input
+                  type="text"
+                  placeholder="단체명을 띄어쓰기 없이 입력해주세요"
+                  value={draft.groupName}
+                  onChange={(e) => patch({ groupName: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className="field-with-btn__btn"
+                  onClick={runNameDupCheck}
+                  disabled={nameCheck.status === "checking"}
+                >
+                  {nameCheck.status === "checking" ? "확인 중…" : "중복검사"}
+                </button>
+              </div>
+              {nameHint ? (
+                <p
+                  className={`form-row__hint${nameHint.tone ? ` ${nameHint.tone}` : ""}`}
+                >
+                  {nameHint.text}
+                </p>
+              ) : null}
             </FormRow>
             <FormRow label="단체 계정" required>
-              <input
-                type="text"
-                lang="en"
-                spellCheck={false}
-                placeholder="5~20자, 영문·숫자·특수문자"
-                value={draft.organizationAccount}
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const next = filterOrgAccountInput(raw);
-                  // 한글 등 비ASCII 입력 시도 시에만 안내
-                  setAccountLangWarn(/[^\x00-\x7F]/.test(raw));
-                  patch({ organizationAccount: next });
-                }}
-                autoComplete="username"
-                required
-              />
+              <div className="field-with-btn">
+                <input
+                  type="text"
+                  lang="en"
+                  spellCheck={false}
+                  placeholder="5~20자, 영문·숫자·특수문자"
+                  value={draft.organizationAccount}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const next = filterOrgAccountInput(raw);
+                    // 한글 등 비ASCII 입력 시도 시에만 안내
+                    setAccountLangWarn(/[^\x00-\x7F]/.test(raw));
+                    patch({ organizationAccount: next });
+                  }}
+                  autoComplete="username"
+                  required
+                />
+                <button
+                  type="button"
+                  className="field-with-btn__btn"
+                  onClick={runAccountDupCheck}
+                  disabled={accountCheck.status === "checking"}
+                >
+                  {accountCheck.status === "checking" ? "확인 중…" : "중복검사"}
+                </button>
+              </div>
               <p
                 className={`form-row__hint${accountHint.tone ? ` ${accountHint.tone}` : ""}`}
               >

@@ -42,6 +42,12 @@ function dash(value?: string | number | null) {
   return text || "-";
 }
 
+function agreeLabel(value?: boolean) {
+  if (value === true) return "동의함";
+  if (value === false) return "미동의";
+  return "-";
+}
+
 function isEmptyValue(value: ReactNode) {
   if (value == null) return true;
   if (typeof value === "string") {
@@ -156,12 +162,22 @@ function buildSections(row: AdminApplicationRow) {
     { label: "상세주소", value: dash(addressDetail) },
   ];
 
+  const termsFields: DetailField[] = [
+    { label: "필수 약관", value: agreeLabel(row.termsEssentialAgreed) },
+    { label: "마케팅", value: agreeLabel(row.termsMarketingAgreed) },
+    {
+      label: "전송매체 마케팅",
+      value: agreeLabel(row.termsMarketingChannelAgreed),
+    },
+  ];
+
   return {
     applyFields,
     personFields,
     guardianFields,
     groupFields: isGroup ? groupFields : [],
     addressFields,
+    termsFields,
   };
 }
 
@@ -332,6 +348,11 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 keepEmpty={!isGroup}
               />
               <DetailSection title="주소" fields={sections.addressFields} />
+              <DetailSection
+                title="약관 동의"
+                fields={sections.termsFields}
+                keepEmpty
+              />
             </>
           ) : null}
           <ApplicationPaySummary

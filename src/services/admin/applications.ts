@@ -81,6 +81,9 @@ export type AdminApplicationRow = {
   gender?: "male" | "female";
   memberCount?: number;
   marketingConsent: boolean;
+  termsEssentialAgreed?: boolean;
+  termsMarketingAgreed?: boolean;
+  termsMarketingChannelAgreed?: boolean;
   amount: number;
   cardPaymentInfo: string;
   address: string;
@@ -146,6 +149,9 @@ type RegistrationDetail = {
   leaderInfo?: unknown;
   leaderInfoResponse?: unknown;
   leader?: unknown;
+  termsEssentialAgreed?: unknown;
+  termsMarketingAgreed?: unknown;
+  termsMarketingChannelAgreed?: unknown;
 };
 
 export type RegistrationListParams = {
@@ -391,6 +397,15 @@ export function applyRegistrationDetail(
     organizationId,
     leaderName: leader?.name || row.leaderName,
     leader: leader ?? row.leader,
+    termsEssentialAgreed:
+      asOptionalBool(data.termsEssentialAgreed) ?? row.termsEssentialAgreed,
+    termsMarketingAgreed:
+      asOptionalBool(data.termsMarketingAgreed) ?? row.termsMarketingAgreed,
+    termsMarketingChannelAgreed:
+      asOptionalBool(data.termsMarketingChannelAgreed) ??
+      row.termsMarketingChannelAgreed,
+    marketingConsent:
+      asOptionalBool(data.termsMarketingAgreed) ?? row.marketingConsent,
   };
 }
 
