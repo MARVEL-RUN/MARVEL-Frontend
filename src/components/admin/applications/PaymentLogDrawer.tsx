@@ -2,11 +2,11 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { paymentLogProcessLabel, paymentLogSourceLabel } from "@/lib/payment-log";
 import {
-  paymentStatusBadge,
-  paymentStatusDisplay,
-  paymentStatusFromUnknown,
+  isRegistrationStatus,
+  registrationStatusBadge,
+  registrationStatusLabel,
+  statusKey,
 } from "@/lib/registration-status";
 import { formatAmount } from "@/services/admin/applications";
 import { fetchPaymentLogs, paymentMethodLabel, type AdminPayment } from "@/services/admin/payments";
@@ -20,6 +20,11 @@ type Props = {
   onClose: () => void;
 };
 
+function dash(value?: string | number | null) {
+  if (value == null || value === "") return "-";
+  return String(value);
+}
+
 function errorHint(error: unknown) {
   if (isAdminHttp(error, 400)) return "요청값을 확인하세요.";
   if (isAdminHttp(error, 401) || isAdminHttp(error, 403)) {
@@ -29,12 +34,12 @@ function errorHint(error: unknown) {
   return "처리 로그 조회에 실패했습니다.";
 }
 
-function PaymentStatus({ value }: { value?: string }) {
-  const key = paymentStatusFromUnknown(value);
-  const label = paymentStatusDisplay(value);
-  if (!key) return <>{label}</>;
+function RegistrationStatus({ value }: { value?: string }) {
+  const key = statusKey(value);
+  const label = registrationStatusLabel(value);
+  if (!isRegistrationStatus(key) && key !== "UNKNOWN") return <>{label}</>;
   return (
-    <span className={`admin-badge admin-badge--${paymentStatusBadge(value)}`}>
+    <span className={`admin-badge admin-badge--${registrationStatusBadge(value)}`}>
       {label}
     </span>
   );
@@ -67,7 +72,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
           <tr key={`${log.createdAt ?? "log"}-${index}`}>
             <td>{formatAdminBoardDate(log.createdAt)}</td>
             <td>
-              {paymentLogProcessLabel(log.processType)}
+              {dash(log.processType)}
               {log.errorCode || log.errorMessage ? (
                 <em className="admin-pay-log-table__error">
                   {log.errorCode ? `${log.errorCode} ` : ""}
@@ -75,7 +80,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
                 </em>
               ) : null}
             </td>
-            <td>{paymentLogSourceLabel(log.source)}</td>
+            <td>{dash(log.source)}</td>
           </tr>
         ))}
       </tbody>
@@ -120,7 +125,7 @@ export function PaymentLogDrawer({ eventId, payment, onClose }: Props) {
         <div className="admin-drawer__hero-meta admin-pay-log-drawer__meta">
           {payment.amount != null ? <span>{formatAmount(payment.amount)}</span> : null}
           <span>{paymentMethodLabel(payment)}</span>
-          <PaymentStatus value={payment.paymentStatus} />
+          <RegistrationStatus value={payment.paymentStatus} />
         </div>
       </header>
       <div className="admin-drawer__body admin-pay-log-drawer__body">

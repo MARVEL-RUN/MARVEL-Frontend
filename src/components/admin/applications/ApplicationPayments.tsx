@@ -4,12 +4,6 @@ import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import {
   isRegistrationStatus,
-  paymentActionDisplay,
-  paymentActionNote,
-  paymentStatusBadge,
-  paymentStatusDisplay,
-  paymentStatusFromUnknown,
-  refundStatusDisplay,
   registrationStatusBadge,
   registrationStatusLabel,
   statusKey,
@@ -42,20 +36,9 @@ function errorHint(error: unknown) {
 function RegistrationStatus({ value }: { value?: string }) {
   const key = statusKey(value);
   const label = registrationStatusLabel(value);
-  if (!isRegistrationStatus(key)) return <>{label}</>;
+  if (!isRegistrationStatus(key) && key !== "UNKNOWN") return <>{label}</>;
   return (
     <span className={`admin-badge admin-badge--${registrationStatusBadge(value)}`}>
-      {label}
-    </span>
-  );
-}
-
-function PaymentStatus({ value }: { value?: string }) {
-  const key = paymentStatusFromUnknown(value);
-  const label = paymentStatusDisplay(value);
-  if (!key) return <>{label}</>;
-  return (
-    <span className={`admin-badge admin-badge--${paymentStatusBadge(value)}`}>
       {label}
     </span>
   );
@@ -81,7 +64,7 @@ function PaymentCard({
           <p className="admin-pay__order">{dash(payment.orderId)}</p>
           <p className="admin-pay__meta">{dash(payment.orderName)}</p>
         </div>
-        <PaymentStatus value={payment.paymentStatus} />
+        <RegistrationStatus value={payment.paymentStatus} />
       </header>
       <dl className="admin-pay__facts">
         <div>
@@ -114,7 +97,7 @@ function PaymentCard({
             <li key={item.paymentCancelId ?? `${item.createdAt}-${index}`}>
               취소 {item.cancelAmount != null ? formatAmount(item.cancelAmount) : "-"}
               {item.cancelReason ? ` · ${item.cancelReason}` : ""}
-              {` · ${refundStatusDisplay(item.status)}`}
+              {item.status ? ` · ${registrationStatusLabel(item.status)}` : ""}
             </li>
           ))}
         </ul>
@@ -146,10 +129,6 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
   const payments = data?.payments?.content ?? [];
   const totalPages = Math.max(1, data?.payments?.totalPages ?? 1);
   const registrationStatus = data?.registrationStatus || row.status;
-  const paymentStatus = data?.paymentStatus || row.paymentStatus;
-  const refundStatus = data?.refundStatus || row.refundStatus;
-  const paymentAction = data?.paymentAction || row.paymentAction;
-  const actionNote = paymentActionNote(paymentAction);
   const logPaymentId = logPayment?.paymentId ?? "";
 
   return (
@@ -180,23 +159,6 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
                   <dt>신청상태</dt>
                   <dd>
                     <RegistrationStatus value={registrationStatus} />
-                  </dd>
-                </div>
-                <div>
-                  <dt>결제·환불</dt>
-                  <dd>
-                    <PaymentStatus value={paymentStatus} />
-                  </dd>
-                </div>
-                <div>
-                  <dt>환불 처리</dt>
-                  <dd>{refundStatusDisplay(refundStatus)}</dd>
-                </div>
-                <div>
-                  <dt>결제 안내</dt>
-                  <dd>
-                    {paymentActionDisplay(paymentAction)}
-                    {actionNote ? <p className="admin-pay__hint">{actionNote}</p> : null}
                   </dd>
                 </div>
               </dl>

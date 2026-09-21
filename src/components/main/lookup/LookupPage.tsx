@@ -3,12 +3,9 @@
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { genderLabel } from "@/lib/registration-gender";
 import {
+  canPrepareRegistrationPayment,
   closedRegistration,
-  paymentActionNote,
-  paymentStatusInfo,
-  refundStatusDisplay,
   registrationStatusLabel,
-  statusKey,
 } from "@/lib/registration-status";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
 import { formatPhone, orgAccountError, orgPasswordError, type ApplyKind } from "@/lib/register";
@@ -181,33 +178,6 @@ function lookupBirthView(raw?: string | null) {
   return (raw ?? "").trim();
 }
 
-function PaymentStatusValue({
-  status,
-  apiLabel,
-}: {
-  status?: string | null;
-  apiLabel?: string | null;
-}) {
-  const [open, setOpen] = useState(false);
-  const info = paymentStatusInfo(status, apiLabel);
-  if (!info.hint) return <>{info.label}</>;
-  return (
-    <>
-      <span>{info.label}</span>
-      <button
-        type="button"
-        className="status-help"
-        aria-expanded={open}
-        aria-label={`${info.label} 안내`}
-        onClick={() => setOpen((on) => !on)}
-      >
-        ?
-      </button>
-      {open ? <small className="status-help__tip">{info.hint}</small> : null}
-    </>
-  );
-}
-
 function receiptAddress(receipt: RegistrationReceipt) {
   return [receipt.address, receipt.addressDetail].filter(Boolean).join(" ").trim();
 }
@@ -240,25 +210,12 @@ function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
   return (
     <>
       <div>
-        <dt>결제·환불</dt>
-        <dd>
-          <PaymentStatusValue
-            status={receipt.paymentStatus}
-            apiLabel={receipt.paymentStatusLabel}
-          />
-        </dd>
-      </div>
-      <div>
         <dt>결제금액</dt>
         <dd>{formatWon(receipt.totalAmount)}</dd>
       </div>
       <div>
         <dt>납부금액</dt>
         <dd>{formatWon(receipt.paidAmount)}</dd>
-      </div>
-      <div>
-        <dt>환불 처리</dt>
-        <dd>{refundStatusDisplay(receipt.refundStatus)}</dd>
       </div>
     </>
   );
@@ -321,11 +278,12 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
 }
 
 function canPreparePayment(receipt: RegistrationReceipt) {
-  return statusKey(receipt.paymentAction) === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
+  return (
+    canPrepareRegistrationPayment(receipt.registrationStatus) && Boolean(receipt.paymentId)
+  );
 }
 
 function canModifyReceipt(receipt: RegistrationReceipt) {
-  if (statusKey(receipt.paymentAction) === "WAIT") return false;
   return Boolean(
     (receipt.registrationId || receipt.organizationId) &&
       !closedRegistration(receipt.registrationStatus),
@@ -392,17 +350,8 @@ function ReceiptActions({
 
 function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
   const warning = receipt.warningMessage?.trim() ?? "";
-  const actionNote = paymentActionNote(receipt.paymentAction);
-  const notes = [...new Set([warning, actionNote].filter(Boolean))];
-  return (
-    <>
-      {notes.map((note) => (
-        <p key={note} className="form__note">
-          {note}
-        </p>
-      ))}
-    </>
-  );
+  if (!warning) return null;
+  return <p className="form__note">{warning}</p>;
 }
 
 function IndividualReceiptCard({

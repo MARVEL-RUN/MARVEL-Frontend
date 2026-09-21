@@ -2,9 +2,6 @@ import { adminFetch } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
 import {
-  paymentStatusBadge,
-  paymentStatusFromUnknown,
-  paymentStatusLabel,
   registrationStatusBadge,
   registrationStatusLabel,
   statusKey,
@@ -86,9 +83,6 @@ export type AdminApplicationRow = {
   address: string;
   addressDetail: string;
   status: string;
-  paymentStatus: string;
-  refundStatus: string;
-  paymentAction: string;
   appliedAt: string;
   organizationId?: string;
 };
@@ -138,12 +132,8 @@ type RegistrationDetail = {
   amount?: unknown;
   orderId?: unknown;
   paymentMethod?: unknown;
-  paymentStatus?: unknown;
-  payStatus?: unknown;
   status?: unknown;
   registrationStatus?: unknown;
-  refundStatus?: unknown;
-  paymentAction?: unknown;
   address?: unknown;
   addressDetail?: unknown;
   organizationId?: unknown;
@@ -332,9 +322,6 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     address: "",
     addressDetail: "",
     status: statusKey(item.status),
-    paymentStatus: "",
-    refundStatus: "",
-    paymentAction: "",
     appliedAt: formatAdminBoardDate(asText(item.createdAt) || undefined),
     organizationId,
   };
@@ -375,11 +362,6 @@ export function applyRegistrationDetail(
     orderNo: firstText(data.orderId) || row.orderNo,
     cardPaymentInfo: firstText(data.paymentMethod) || row.cardPaymentInfo,
     status: statusKey(firstText(data.status, data.registrationStatus)) || row.status,
-    paymentStatus:
-      paymentStatusFromUnknown(firstText(data.paymentStatus, data.payStatus)) ||
-      row.paymentStatus,
-    refundStatus: statusKey(firstText(data.refundStatus)) || row.refundStatus,
-    paymentAction: statusKey(firstText(data.paymentAction)) || row.paymentAction,
     address: firstText(data.address, leader?.address) || row.address,
     addressDetail: firstText(data.addressDetail, leader?.addressDetail) || row.addressDetail,
     organizationId,
@@ -487,8 +469,6 @@ export function applicationGenderLabel(gender?: "male" | "female") {
 }
 
 export {
-  paymentStatusBadge as applicationPaymentBadge,
-  paymentStatusLabel as applicationPaymentLabel,
   registrationStatusBadge as applicationStatusBadge,
   registrationStatusLabel as applicationStatusLabel,
 };
