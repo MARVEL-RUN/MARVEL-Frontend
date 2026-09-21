@@ -75,7 +75,7 @@ export function OrganizationDetailPage() {
     <div className="admin-page admin-org-detail">
       <header className="admin-org-detail__head">
         <div>
-          <p className="admin-org-detail__crumb">회원관리 · 단체 회원관리</p>
+          <p className="admin-org-detail__crumb">단체회원 관리 · 단체 상세</p>
           <h1>단체 상세</h1>
           <p className="admin-org-detail__lead">{detail?.groupName || "불러오는 중…"}</p>
         </div>

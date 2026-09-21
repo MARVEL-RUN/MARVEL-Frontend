@@ -152,7 +152,7 @@ export function ApplicationsListPage({ slug }: Props) {
 
   const apiEventId = apiEvent?.eventId ?? "";
   const eventTitle =
-    apiEvent?.eventName || (slug ? getAdminRaceEvent(slug)?.name : "") || "신청자 목록";
+    apiEvent?.eventName || (slug ? getAdminRaceEvent(slug)?.name : "") || "전체 신청자 목록";
 
   const categoriesQuery = useQuery({
     queryKey: ["admin", "event-categories", apiEventId],

@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { eventId } = await params;
   const event = getAdminRaceEvent(eventId);
   return {
-    title: event ? `${event.name} 회원 | 관리자` : "회원 관리 | 관리자",
+    title: event ? `${event.name} 단체회원 | 관리자` : "단체회원 관리 | 관리자",
   };
 }
 

@@ -240,7 +240,7 @@ export function MembersListPage({ slug }: Props) {
       style={listPageStyle}
     >
       <AdminTableShell<AdminOrganizationListItem>
-        title="단체 회원관리"
+        title="단체회원 관리"
         rows={rows}
         loading={eventsQuery.isLoading || (listQuery.isLoading && !listQuery.data)}
         empty={empty}

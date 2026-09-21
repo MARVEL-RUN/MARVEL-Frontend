@@ -18,8 +18,8 @@ export const ADMIN_NAV: AdminNavItem[] = [
     name: "참가신청",
     href: "/admin/applications",
     children: [
-      { name: "신청자관리", href: "/admin/applications" },
-      { name: "회원 관리", href: "/admin/members" },
+      { name: "전체 신청자 관리", href: "/admin/applications" },
+      { name: "단체회원 관리", href: "/admin/members" },
       { name: "정원 현황", href: "/admin/capacities" },
     ],
   },
