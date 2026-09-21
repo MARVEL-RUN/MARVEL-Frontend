@@ -6,28 +6,31 @@
 
 ## #137 design: 관리자 참가신청 UI/UX 구성 변경
 
-### 완료
+> design: 관리자 참가신청 UI/UX 구성 변경
 
-- [x] 신청자관리·정원 현황·운영 홈 대회 선택 흐름 통일 (`GET /v1/admin/events`, `AdminEventsPicker`, `eventLinks`)
-- [x] 신청 목록 진입 경로 1차 정리 (`individual`/`group` 제거, `list` slug redirect)
+### 기능 설명
 
-### 남음
+- #128 #132 API 연동은 끝났고, 관리자 화면 구성·표시만 정리
+- 대회 선택 → 목록 → 상세 흐름을 한 IA로 맞추고, 마블런/버추얼에 맞게 필터·컬럼·상세 필드를 나눔
 
-- [ ] 신청 목록 URL을 `eventId` query만 사용 (`/admin/applications/list?eventId=...`)
-  - [ ] `/admin/applications/marvel`, `/virtual` slug 라우트 제거 또는 redirect
-  - [ ] `eventLinks`·운영 홈·대시보드 링크를 API `eventId` 기준으로 통일
-  - [ ] `ApplicationsListPage` slug 분기 정리 (`eventId` 중심)
+### 세부 작업 항목
+
+- [x] 신청자관리·정원 현황·운영 홈 대회 선택 흐름 통일
+- [x] 신청 목록 진입 경로 정리 (list·slug·개인·단체 리다이렉트)
+- [ ] 마블런/버추얼별 목록 필터·컬럼 구성 (유형·차수·코스)
 - [ ] 목록 주문번호 등 빠진 표시 값 맞춤
 - [ ] 운영 홈 접수 현황·환불 대기 진입과 신청 목록 맞춤
-- [ ] 신청 상세 개인·단체 필드 구분 표시
-- [ ] 상세 헤더(이름·주문번호·상태) 추가
+- [x] 신청 상세 개인·단체 필드 구분 표시
+- [x] 상세 헤더(이름·주문번호·상태) 추가
 - [ ] 상세 빈 항목·결제 정보 중복 표기 정리
 - [ ] 테스트·메인에서 신청 상세 열림 최종 확인
 
-### 보류
+### 참고
 
-- [ ] 마블런/버추얼별 목록 필터·컬럼 구성 (유형·차수·코스) — `eventCategoryId`·차수 매핑 확인 후
-- [ ] 정원 현황 대회 목록 API 통일 (관리자 편의, 급하지 않음)
+- #128 관리자 신청자 목록 조회 연동
+- #132 관리자 신청자 상세보기 미오픈
+- 대회 우선 IA: 참가신청 → 대회 선택 → 해당 대회 신청만 조회
+- IA 상세: `docs/superpowers/specs/2026-09-10-admin-applications-event-first-design.md`
 
 ---
 
@@ -52,9 +55,3 @@
 - ~~정원 현황 최대 수용량 열 단위(명/개)~~ — 유저·운영 표기 불필요
 - ~~운영 정원 API 확인~~ — 필요 시 수동
 
----
-
-## 참고
-
-- 대회 우선 IA: `docs/superpowers/specs/2026-09-10-admin-applications-event-first-design.md`
-- #128 신청자 목록 API, #132 상세 API 연동 완료 (UI 정리는 #137)
