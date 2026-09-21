@@ -568,6 +568,9 @@ html.admin-mode body {
 .admin-drawer__fields {
   margin: 0;
   padding: 4px 0;
+}
+
+.admin-drawer__body {
   overflow: auto;
   flex: 1;
 }
@@ -618,6 +621,130 @@ html.admin-mode body {
   min-width: 0;
   height: 28px;
   font-size: 13px;
+}
+
+.admin-apps-list .admin-drawer {
+  width: min(520px, 100%);
+}
+
+.admin-pay {
+  padding: 14px 14px 18px;
+  border-top: 8px solid #f0f2f5;
+}
+
+.admin-pay h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-pay__summary {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.admin-pay__summary > div {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-pay__summary dt,
+.admin-pay__facts dt {
+  margin: 0;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-pay__summary dd,
+.admin-pay__facts dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.admin-pay__hint {
+  margin: 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.admin-pay__card {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+}
+
+.admin-pay__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.admin-pay__order {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-pay__meta {
+  margin: 2px 0 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+.admin-pay__facts {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.admin-pay__facts > div {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+}
+
+.admin-pay__alloc,
+.admin-pay__cancels,
+.admin-pay__logs {
+  margin: 0;
+  padding-left: 16px;
+  color: #475467;
+  font-size: 12px;
+}
+
+.admin-pay__logs {
+  display: grid;
+  gap: 6px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.admin-pay__logs li {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-pay__logs em {
+  color: #b42318;
+  font-style: normal;
+}
+
+.admin-pay__pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
 }
 
 .admin-dash__head {

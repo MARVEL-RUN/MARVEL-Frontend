@@ -1,4 +1,4 @@
-import { AdminHttpError, adminFetch } from "@/lib/admin/fetch";
+import { adminFetch, isAdminHttp } from "@/lib/admin/fetch";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 
@@ -85,7 +85,4 @@ export function fetchCapacityRegistrations(
   );
 }
 
-export function isAdminHttp(error: unknown, status?: number): error is AdminHttpError {
-  if (!(error instanceof AdminHttpError)) return false;
-  return status === undefined || error.status === status;
-}
+export { isAdminHttp };
