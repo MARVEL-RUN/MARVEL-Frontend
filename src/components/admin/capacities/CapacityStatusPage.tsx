@@ -11,7 +11,6 @@ import {
 import { formatPhone } from "@/lib/register";
 import {
   capacityApiEventId,
-  capacityTypeLabel,
   capacityUnit,
   fetchCapacityRegistrations,
   fetchEventCapacities,
@@ -38,6 +37,7 @@ const CAPACITY_GROUPS = [
     title: "대회 총원",
     lead: "대회 전체 참가 상한",
     nameHeader: "정원명",
+    countUnit: "건",
     types: ["EVENT_TOTAL"] as CapacityType[],
     showSize: false,
   },
@@ -46,6 +46,7 @@ const CAPACITY_GROUPS = [
     title: "종목 정원",
     lead: "코스·종목별 정원 및 합산 한도",
     nameHeader: "정원명",
+    countUnit: "건",
     types: ["CATEGORY", "CHILD_CATEGORY", "CATEGORY_GROUP"] as CapacityType[],
     showSize: false,
   },
@@ -54,6 +55,7 @@ const CAPACITY_GROUPS = [
     title: "기념품 재고",
     lead: "사이즈별 기념품 수량",
     nameHeader: "기념품명",
+    countUnit: "품목",
     types: ["SOUVENIR"] as CapacityType[],
     showSize: true,
   },
@@ -186,6 +188,7 @@ function CapacityGroupTable({
   title,
   lead,
   nameHeader,
+  countUnit,
   rows,
   showSize,
   pick,
@@ -195,6 +198,7 @@ function CapacityGroupTable({
   title: string;
   lead: string;
   nameHeader: string;
+  countUnit: string;
   rows: CapacityRow[];
   showSize: boolean;
   pick: Pick | null;
@@ -204,10 +208,18 @@ function CapacityGroupTable({
     <section className={`admin-capacity__group admin-capacity__group--${groupKey}`}>
       <div className="admin-capacity__group-head">
         <div>
-          <h2 className="admin-capacity__group-title">{title}</h2>
-          <p className="admin-capacity__group-lead">{lead}</p>
+          <h2 className="admin-capacity__group-title">
+            <span className="admin-capacity__group-mark" aria-hidden />
+            {title}
+          </h2>
+          <p className="admin-capacity__group-lead">
+            {lead}
+            <span className="admin-capacity__group-meta">
+              총 <strong>{rows.length.toLocaleString()}</strong>
+              {countUnit}
+            </span>
+          </p>
         </div>
-        <span className="admin-capacity__group-count">{rows.length}항목</span>
       </div>
       <div className="admin-capacity__group-table-wrap">
         <table className="admin-table admin-capacity__group-table">
@@ -238,21 +250,12 @@ function CapacityGroupTable({
               return (
                 <tr
                   key={row.capacityId}
-                  className={[
-                    !row.active && "is-off",
-                    picked && "is-picked",
-                    row.type !== "EVENT_TOTAL" && row.type !== "SOUVENIR" && "is-subtype",
-                  ]
+                  className={[!row.active && "is-off", picked && "is-picked"]
                     .filter(Boolean)
                     .join(" ") || undefined}
                 >
                   <td className="is-name">
                     <span className="admin-capacity__name" title={row.name}>
-                      {row.type !== "EVENT_TOTAL" && row.type !== "SOUVENIR" ? (
-                        <span className="admin-capacity__subtype">
-                          {capacityTypeLabel(row.type)}
-                        </span>
-                      ) : null}
                       {row.name}
                     </span>
                   </td>
@@ -325,11 +328,6 @@ function ParticipantPanel({
         <div className="admin-capacity__panel-title-wrap">
           <p className="admin-capacity__panel-kicker">참가자 목록</p>
           <h2 className="admin-capacity__panel-title">{pick.name}</h2>
-          <span
-            className={`admin-capacity__panel-chip${pick.state === "HELD" ? " is-held" : " is-confirmed"}`}
-          >
-            {pick.state === "HELD" ? "홀딩" : "확정"}
-          </span>
         </div>
         <button
           type="button"
@@ -343,20 +341,34 @@ function ParticipantPanel({
       </div>
 
       <div className="admin-capacity__panel-toolbar">
+        <div
+          className="admin-capacity__state-toggle"
+          role="tablist"
+          aria-label="참가자 상태"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={pick.state === "HELD"}
+            className={`admin-capacity__state-btn${pick.state === "HELD" ? " is-on is-held" : ""}`}
+            onClick={() => onStateChange("HELD")}
+          >
+            홀딩
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={pick.state === "CONFIRMED"}
+            className={`admin-capacity__state-btn${pick.state === "CONFIRMED" ? " is-on is-confirmed" : ""}`}
+            onClick={() => onStateChange("CONFIRMED")}
+          >
+            확정
+          </button>
+        </div>
         <p className="admin-toolbar__count">
           총 <strong>{loading ? "…" : total.toLocaleString()}</strong>명
         </p>
         <div className="admin-toolbar__fields">
-          <AdminSelect
-            value={pick.state}
-            options={[
-              { value: "HELD" as const, label: "홀딩" },
-              { value: "CONFIRMED" as const, label: "확정" },
-            ]}
-            onChange={onStateChange}
-            ariaLabel="참가자 상태"
-            width={112}
-          />
           <AdminSelect
             value={pageSize}
             options={[...PAGE_SIZE_OPTIONS]}
@@ -615,6 +627,7 @@ export function CapacityStatusPage({ eventId }: Props) {
                   title={group.title}
                   lead={group.lead}
                   nameHeader={group.nameHeader}
+                  countUnit={group.countUnit}
                   rows={group.rows}
                   showSize={group.showSize}
                   pick={pick}
@@ -625,30 +638,32 @@ export function CapacityStatusPage({ eventId }: Props) {
           </div>
         </div>
 
-        {pick ? (
-          <ParticipantPanel
-            pick={pick}
-            rows={listRows}
-            total={listTotal}
-            page={page}
-            pageCount={listPages}
-            loading={list.isLoading && !listRows.length}
-            empty={listEmpty}
-            pageSize={pageSize}
-            onClose={() => setPick(null)}
-            onStateChange={changeState}
-            onPageSizeChange={changePageSize}
-            onPage={setPage}
-          />
-        ) : (
-          <aside className="admin-capacity__panel admin-capacity__panel--empty">
-            <p className="admin-capacity__panel-placeholder-title">참가자 조회</p>
-            <p className="admin-capacity__panel-placeholder">
-              왼쪽 표에서 <strong>홀딩</strong> 또는 <strong>확정</strong> 숫자를 클릭하면
-              해당 참가자 목록이 여기에 표시됩니다.
-            </p>
-          </aside>
-        )}
+        <div className="admin-capacity__aside">
+          {pick ? (
+            <ParticipantPanel
+              pick={pick}
+              rows={listRows}
+              total={listTotal}
+              page={page}
+              pageCount={listPages}
+              loading={list.isLoading && !listRows.length}
+              empty={listEmpty}
+              pageSize={pageSize}
+              onClose={() => setPick(null)}
+              onStateChange={changeState}
+              onPageSizeChange={changePageSize}
+              onPage={setPage}
+            />
+          ) : (
+            <aside className="admin-capacity__panel admin-capacity__panel--empty">
+              <p className="admin-capacity__panel-placeholder-title">참가자 조회</p>
+              <p className="admin-capacity__panel-placeholder">
+                왼쪽 표에서 <strong>홀딩</strong> 또는 <strong>확정</strong> 숫자를 클릭하면
+                해당 참가자 목록이 여기에 표시됩니다.
+              </p>
+            </aside>
+          )}
+        </div>
       </div>
     </div>
   );
