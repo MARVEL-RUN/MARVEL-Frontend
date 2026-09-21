@@ -1,7 +1,6 @@
 "use client";
 
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
-import { MainHttpError } from "@/lib/main/fetch";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
 import { formatPhone, type ApplyKind } from "@/lib/register";
 import {
@@ -505,13 +504,7 @@ function isTechnicalErrorMessage(message: string) {
 function lookupErrorMessage(err: unknown, fallback = "신청 내역을 조회하지 못했습니다.") {
   if (!(err instanceof Error)) return fallback;
   const message = err.message.trim();
-  if (
-    !message ||
-    isTechnicalErrorMessage(message) ||
-    (err instanceof MainHttpError && err.status >= 500)
-  ) {
-    return fallback;
-  }
+  if (!message || isTechnicalErrorMessage(message)) return fallback;
   return message;
 }
 
