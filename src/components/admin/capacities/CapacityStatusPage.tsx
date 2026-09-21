@@ -79,14 +79,8 @@ function errorHint(error: unknown) {
   return "조회에 실패했습니다.";
 }
 
-function capacityUsage(row: CapacityRow) {
-  const used = row.heldCount + row.confirmedCount;
-  if (row.limitCount <= 0) {
-    return { used, percent: 0, tone: "plain" as const };
-  }
-  const percent = Math.min(100, Math.round((used / row.limitCount) * 100));
-  const tone = percent >= 90 ? "danger" : percent >= 70 ? "warn" : "ok";
-  return { used, percent, tone };
+function capacityUsed(row: CapacityRow) {
+  return row.heldCount + row.confirmedCount;
 }
 
 function groupRows(rows: CapacityRow[]) {
@@ -103,11 +97,8 @@ function buildSummary(rows: CapacityRow[]) {
   );
   const souvenirs = rows.filter((row) => row.type === "SOUVENIR");
 
-  const eventUsage = event ? capacityUsage(event) : null;
-
   return {
     event,
-    eventUsage,
     categoryCount: categories.length,
     souvenirCount: souvenirs.length,
   };
@@ -147,28 +138,13 @@ function LimitCell({ value, unit }: { value: number; unit: string }) {
   );
 }
 
-function UsageBar({ row }: { row: CapacityRow }) {
-  const { used, percent, tone } = capacityUsage(row);
+function UsageCount({ row }: { row: CapacityRow }) {
+  const used = capacityUsed(row);
   if (row.limitCount <= 0) return <>—</>;
   return (
-    <div className="admin-capacity__usage">
-      <div
-        className={`admin-capacity__usage-track admin-capacity__usage-track--${tone}`}
-        role="progressbar"
-        aria-valuenow={percent}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`${row.name} 사용률 ${percent}%`}
-      >
-        <span className="admin-capacity__usage-fill" style={{ width: `${percent}%` }} />
-      </div>
-      <span className="admin-capacity__usage-label">
-        {percent}%
-        <span className="admin-capacity__usage-sub">
-          ({used.toLocaleString()}/{row.limitCount.toLocaleString()})
-        </span>
-      </span>
-    </div>
+    <span className="admin-capacity__usage-count">
+      {used.toLocaleString()}/{row.limitCount.toLocaleString()}
+    </span>
   );
 }
 
@@ -188,15 +164,13 @@ function SummaryCard({
   label,
   value,
   sub,
-  tone,
 }: {
   label: string;
   value: ReactNode;
   sub?: ReactNode;
-  tone?: "ok" | "warn" | "danger" | "plain";
 }) {
   return (
-    <article className={`admin-capacity__summary-card${tone ? ` is-${tone}` : ""}`}>
+    <article className="admin-capacity__summary-card">
       <p className="admin-capacity__summary-label">{label}</p>
       <p className="admin-capacity__summary-value">{value}</p>
       {sub ? <p className="admin-capacity__summary-sub">{sub}</p> : null}
@@ -236,7 +210,7 @@ function CapacityGroupTable({
             <col style={{ width: "88px" }} />
             <col style={{ width: "88px" }} />
             <col style={{ width: "88px" }} />
-            <col style={{ width: "168px" }} />
+            <col style={{ width: "96px" }} />
             <col style={{ width: "72px" }} />
           </colgroup>
           <thead>
@@ -246,7 +220,7 @@ function CapacityGroupTable({
               <th>최대</th>
               <th>홀딩</th>
               <th>확정</th>
-              <th>사용률</th>
+              <th>사용</th>
               <th>상태</th>
             </tr>
           </thead>
@@ -295,8 +269,8 @@ function CapacityGroupTable({
                       onClick={() => onOpenList(row, "CONFIRMED")}
                     />
                   </td>
-                  <td className="is-usage">
-                    <UsageBar row={row} />
+                  <td className="is-num is-usage">
+                    <UsageCount row={row} />
                   </td>
                   <td className="is-status">
                     <ActiveBadge active={row.active} />
@@ -588,21 +562,10 @@ export function CapacityStatusPage({ eventId }: Props) {
                 label="대회 총원"
                 value={
                   summary.event
-                    ? `${summary.eventUsage?.percent ?? 0}%`
+                    ? `${capacityUsed(summary.event).toLocaleString()}/${summary.event.limitCount.toLocaleString()}`
                     : "—"
                 }
-                sub={
-                  summary.event
-                    ? `${(summary.eventUsage?.used ?? 0).toLocaleString()} / ${summary.event.limitCount.toLocaleString()}명`
-                    : "등록된 총원 없음"
-                }
-                tone={
-                  summary.eventUsage?.tone === "ok" ||
-                  summary.eventUsage?.tone === "warn" ||
-                  summary.eventUsage?.tone === "danger"
-                    ? summary.eventUsage.tone
-                    : undefined
-                }
+                sub={summary.event ? "홀딩+확정 / 최대" : "등록된 총원 없음"}
               />
               <SummaryCard
                 label="종목 정원"
