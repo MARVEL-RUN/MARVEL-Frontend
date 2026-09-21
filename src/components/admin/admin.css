@@ -627,6 +627,10 @@ html.admin-mode body {
   width: min(520px, 100%);
 }
 
+.admin-apps-list .admin-drawer__row {
+  grid-template-columns: 120px 1fr;
+}
+
 .admin-pay {
   padding: 14px 14px 18px;
   border-top: 8px solid #f0f2f5;
