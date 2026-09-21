@@ -87,6 +87,73 @@ export type OrganizationRegistrationResponse = {
   paymentAmount: number;
 };
 
+export type IndividualRegistrationLookupRequest = {
+  name: string;
+  birth: string;
+  phNum: string;
+  password: string;
+};
+
+export type OrganizationLookupRequest = {
+  loginId: string;
+  password: string;
+};
+
+export type RegistrationReceiptMember = {
+  registrationId: string;
+  name?: string;
+  eventCategoryName?: string;
+  souvenirs?: RegistrationReceiptSouvenir[];
+  canceled?: boolean;
+  registrationStatus?: string;
+  status?: string;
+  contractAmount?: number;
+  paidAmount?: number;
+  balance?: number;
+};
+
+export type RegistrationReceiptSouvenir = {
+  souvenirId: string;
+  name: string;
+  size?: string;
+  selectedSize?: string;
+  quantity: number;
+};
+
+export type OrganizationLookupParticipant = {
+  registrationId: string;
+  name: string;
+  birth?: string;
+  phNum?: string;
+  gender?: string;
+  eventCategoryId?: string;
+  eventCategoryName?: string;
+  selectedSouvenirList?: RegistrationReceiptSouvenir[];
+  canceled?: boolean;
+  registrationStatus?: string;
+};
+
+export type RegistrationReceipt = {
+  registrationId?: string | null;
+  organizationId?: string | null;
+  organizationName?: string | null;
+  leaderName?: string | null;
+  email?: string | null;
+  address?: string | null;
+  addressDetail?: string | null;
+  members?: RegistrationReceiptMember[];
+  registrations?: OrganizationLookupParticipant[];
+  souvenirs?: RegistrationReceiptSouvenir[];
+  totalAmount: number;
+  paidAmount: number;
+  paymentStatus?: string;
+  paymentStatusLabel?: string;
+  warningMessage?: string | null;
+  paymentAction?: string;
+  paymentId?: string | null;
+  orderId?: string | null;
+};
+
 export type PaymentConfirmRequest = {
   paymentKey: string;
   orderId: string;
