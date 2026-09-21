@@ -2,17 +2,9 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import {
-  isRegistrationStatus,
-  registrationStatusBadge,
-  registrationStatusLabel,
-  statusKey,
-} from "@/lib/registration-status";
 import { formatAmount } from "@/services/admin/applications";
 import { fetchPaymentLogs, paymentMethodLabel, type AdminPayment } from "@/services/admin/payments";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 
 type Props = {
   eventId: string;
@@ -32,17 +24,6 @@ function errorHint(error: unknown) {
   }
   if (isAdminHttp(error, 404)) return "처리 로그가 없습니다.";
   return "처리 로그 조회에 실패했습니다.";
-}
-
-function RegistrationStatus({ value }: { value?: string }) {
-  const key = statusKey(value);
-  const label = registrationStatusLabel(value);
-  if (!isRegistrationStatus(key) && key !== "UNKNOWN") return <>{label}</>;
-  return (
-    <span className={`admin-badge admin-badge--${registrationStatusBadge(value)}`}>
-      {label}
-    </span>
-  );
 }
 
 function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: string }) {
@@ -89,36 +70,13 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
 }
 
 export function PaymentLogDrawer({ eventId, payment, onClose }: Props) {
-  const [mounted, setMounted] = useState(false);
   const paymentId = payment.paymentId ?? "";
   const orderId = payment.orderId?.trim() || "-";
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  if (!paymentId) return null;
 
-  useEffect(() => {
-    document.body.classList.add("admin-has-pay-log-drawer");
-    return () => document.body.classList.remove("admin-has-pay-log-drawer");
-  }, []);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  if (!mounted || !paymentId) return null;
-
-  return createPortal(
-    <aside
-      className="admin-drawer admin-drawer--log"
-      role="dialog"
-      aria-modal="true"
-      aria-label="처리 로그"
-    >
+  return (
+    <aside className="admin-drawer admin-drawer--log" role="dialog" aria-label="처리 로그">
       <header className="admin-drawer__hero">
         <div className="admin-drawer__hero-bar">
           <span className="admin-drawer__hero-kind">처리 로그</span>
@@ -130,13 +88,11 @@ export function PaymentLogDrawer({ eventId, payment, onClose }: Props) {
         <div className="admin-drawer__hero-meta admin-pay-log-drawer__meta">
           {payment.amount != null ? <span>{formatAmount(payment.amount)}</span> : null}
           <span>{paymentMethodLabel(payment)}</span>
-          <RegistrationStatus value={payment.paymentStatus} />
         </div>
       </header>
       <div className="admin-drawer__body admin-pay-log-drawer__body">
         <PaymentLogList eventId={eventId} paymentId={paymentId} />
       </div>
-    </aside>,
-    document.body,
+    </aside>
   );
 }
