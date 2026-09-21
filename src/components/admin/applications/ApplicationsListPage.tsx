@@ -8,6 +8,7 @@ import {
   getAdminRaceEvent,
   type AdminRaceEventId,
 } from "@/lib/admin/raceEvents";
+import { formatPhone } from "@/lib/register";
 import {
   REGISTRATION_STATUSES,
   registrationStatusFromParam,
@@ -35,7 +36,7 @@ import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
 import { useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
   { value: "", label: "전체 유형" },
@@ -72,6 +73,39 @@ function StatusBadge({ status }: { status: string }) {
       {registrationStatusLabel(status)}
     </span>
   );
+}
+
+function KindBadge({ kind }: { kind: AdminApplicationRow["kind"] }) {
+  const label = applicationKindLabel(kind);
+  const tone = kind === "group" ? "group" : "individual";
+  return (
+    <span className={`admin-apps-list__kind admin-apps-list__kind--${tone}`}>
+      {label}
+    </span>
+  );
+}
+
+function MarketingBadge({ consent }: { consent: boolean }) {
+  return (
+    <span
+      className={`admin-apps-list__yn${consent ? " is-yes" : " is-no"}`}
+      aria-label={consent ? "마케팅 동의" : "마케팅 미동의"}
+    >
+      {consent ? "Y" : "N"}
+    </span>
+  );
+}
+
+function CourseTag({ row }: { row: AdminApplicationRow }) {
+  const label = applicationCourseLabel(row);
+  if (!label || label === "-") return <>-</>;
+  return <span className="admin-apps-list__course">{label}</span>;
+}
+
+function displayPhone(value?: string | null) {
+  const raw = value?.trim();
+  if (!raw) return "-";
+  return formatPhone(raw);
 }
 
 type Props = {
@@ -203,51 +237,80 @@ export function ApplicationsListPage({ slug }: Props) {
           : "신청 내역이 없습니다.";
 
   const columns = [
-    { key: "no", header: "번호", render: (row: AdminApplicationRow) => row.no || "-" },
+    {
+      key: "no",
+      header: "번호",
+      className: "is-num is-center",
+      render: (row: AdminApplicationRow) => row.no || "-",
+    },
     {
       key: "kind",
       header: "유형",
-      render: (row: AdminApplicationRow) => applicationKindLabel(row.kind),
+      className: "is-kind is-center",
+      render: (row: AdminApplicationRow) => <KindBadge kind={row.kind} />,
     },
-    { key: "name", header: "이름/단체명", render: (row: AdminApplicationRow) => row.name || "-" },
+    {
+      key: "name",
+      header: "이름/단체명",
+      className: "is-name",
+      render: (row: AdminApplicationRow) => (
+        <span className="admin-apps-list__name" title={row.name || undefined}>
+          {row.name || "-"}
+        </span>
+      ),
+    },
     {
       key: "birth",
       header: "생년월일",
+      className: "is-muted is-center",
       render: (row: AdminApplicationRow) => row.birth || "-",
     },
     {
       key: "gender",
       header: "성별",
+      className: "is-muted is-center",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
-      render: (row: AdminApplicationRow) => applicationCourseLabel(row),
+      className: "is-course is-center",
+      render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
       key: "souvenir",
       header: "기념품",
-      render: (row: AdminApplicationRow) => row.souvenir || "-",
+      className: "is-clip",
+      render: (row: AdminApplicationRow) => (
+        <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
+          {row.souvenir || "-"}
+        </span>
+      ),
     },
     {
       key: "phone",
       header: "연락처",
-      render: (row: AdminApplicationRow) => row.phone || "-",
+      className: "is-phone is-center",
+      render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
       key: "marketing",
-      header: "마케팅동의",
-      render: (row: AdminApplicationRow) => (row.marketingConsent ? "Y" : "N"),
+      header: "마케팅",
+      className: "is-center",
+      render: (row: AdminApplicationRow) => (
+        <MarketingBadge consent={Boolean(row.marketingConsent)} />
+      ),
     },
     {
       key: "status",
       header: "상태",
+      className: "is-status is-center",
       render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
     },
     {
       key: "appliedAt",
       header: "신청일시",
+      className: "is-date is-center",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
@@ -269,8 +332,10 @@ export function ApplicationsListPage({ slug }: Props) {
           if (!row.id) return;
           setSelectedId(row.id);
         }}
+        isRowSelected={(row) => Boolean(selectedId && row.id === selectedId)}
         actions={
-          <div className="admin-table-shell__actions">
+          <div className="admin-table-shell__actions admin-apps-list__head-actions">
+            <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
             <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
               대회 목록
             </Link>
@@ -278,30 +343,32 @@ export function ApplicationsListPage({ slug }: Props) {
         }
         tools={
           <>
-            <AdminSelect
-              value={kind}
-              options={KIND_OPTIONS}
-              onChange={(value) => {
-                setKind(value);
-                setApplied((prev) => ({ ...prev, kind: value }));
-                setPage(1);
-              }}
-              ariaLabel="신청 유형"
-              width={112}
-            />
-            <AdminSelect
-              value={status}
-              options={STATUS_OPTIONS}
-              onChange={(value) => {
-                setStatus(value);
-                setApplied((prev) => ({ ...prev, status: value }));
-                setPage(1);
-              }}
-              ariaLabel="상태"
-              width={112}
-            />
+            <div className="admin-apps-list__filter-group">
+              <AdminSelect
+                value={kind}
+                options={KIND_OPTIONS}
+                onChange={(value) => {
+                  setKind(value);
+                  setApplied((prev) => ({ ...prev, kind: value }));
+                  setPage(1);
+                }}
+                ariaLabel="신청 유형"
+                width={112}
+              />
+              <AdminSelect
+                value={status}
+                options={STATUS_OPTIONS}
+                onChange={(value) => {
+                  setStatus(value);
+                  setApplied((prev) => ({ ...prev, status: value }));
+                  setPage(1);
+                }}
+                ariaLabel="상태"
+                width={112}
+              />
+            </div>
             <input
-              className="admin-toolbar__search"
+              className="admin-toolbar__search admin-apps-list__search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => {
@@ -309,22 +376,24 @@ export function ApplicationsListPage({ slug }: Props) {
               }}
               placeholder="이름 · 단체명 · 연락처"
             />
-            <button
-              type="button"
-              className="admin-btn admin-btn--primary admin-toolbar__btn"
-              onClick={runSearch}
-            >
-              검색
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn--ghost admin-toolbar__iconbtn"
-              aria-label="검색 초기화"
-              title="초기화"
-              onClick={resetSearch}
-            >
-              <RotateCcw size={24} strokeWidth={2.5} />
-            </button>
+            <div className="admin-apps-list__search-actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn--primary admin-toolbar__btn"
+                onClick={runSearch}
+              >
+                검색
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost admin-toolbar__iconbtn"
+                aria-label="검색 초기화"
+                title="초기화"
+                onClick={resetSearch}
+              >
+                <RotateCcw size={18} strokeWidth={2.25} />
+              </button>
+            </div>
           </>
         }
         columns={columns}

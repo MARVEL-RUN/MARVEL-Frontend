@@ -5,6 +5,7 @@ import { AdminPagination } from "@/components/admin/Pagination";
 type Column<T> = {
   key: string;
   header: string;
+  className?: string;
   render: (row: T) => React.ReactNode;
 };
 
@@ -23,6 +24,7 @@ type Props<T> = {
   onPage?: (page: number) => void;
   pageUnit?: string;
   onRowClick?: (row: T) => void;
+  isRowSelected?: (row: T) => boolean;
 };
 
 export function AdminTableShell<T>({
@@ -40,6 +42,7 @@ export function AdminTableShell<T>({
   onPage,
   pageUnit,
   onRowClick,
+  isRowSelected,
 }: Props<T>) {
   const count = totalCount ?? rows.length;
   const showPager = Boolean(onPage) && !loading && count > 0;
@@ -66,7 +69,9 @@ export function AdminTableShell<T>({
             <thead>
               <tr>
                 {columns.map((col) => (
-                  <th key={col.key}>{col.header}</th>
+                  <th key={col.key} className={col.className}>
+                    {col.header}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -74,10 +79,13 @@ export function AdminTableShell<T>({
               {rows.map((row) => (
                 <tr
                   key={rowKey(row)}
+                  className={isRowSelected?.(row) ? "is-picked" : undefined}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                 >
                   {columns.map((col) => (
-                    <td key={col.key}>{col.render(row)}</td>
+                    <td key={col.key} className={col.className}>
+                      {col.render(row)}
+                    </td>
                   ))}
                 </tr>
               ))}

@@ -509,10 +509,188 @@ html.admin-mode body {
   font-size: 13px;
 }
 
+.admin-main:has(.admin-apps-list) {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 12px;
+}
+
+.admin-page.admin-apps-list {
+  max-width: none;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-apps-list .admin-table-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-apps-list .admin-table-shell__head {
+  padding: 10px 14px;
+}
+
+.admin-apps-list .admin-table-shell__head h1 {
+  font-size: 16px;
+}
+
+.admin-apps-list .admin-toolbar {
+  padding: 8px 14px;
+}
+
+.admin-apps-list .admin-pagination {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.admin-apps-list .admin-table-wrap {
+  flex: 1;
+  min-height: 240px;
+  max-height: calc(100vh - var(--admin-head) - 196px);
+  overflow: auto;
+}
+
+.admin-apps-list .admin-table {
+  min-width: 1080px;
+}
+
 .admin-apps-list .admin-table th,
 .admin-apps-list .admin-table td {
-  padding: 8px 10px;
+  padding: 6px 8px;
   font-size: 13px;
+  line-height: 1.35;
+}
+
+.admin-apps-list .admin-table th.is-center,
+.admin-apps-list .admin-table td.is-center,
+.admin-apps-list .admin-table th.is-num,
+.admin-apps-list .admin-table td.is-num {
+  text-align: center;
+}
+
+.admin-apps-list .admin-table td.is-num {
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-muted);
+}
+
+.admin-apps-list .admin-table td.is-phone {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.admin-apps-list .admin-table td.is-muted {
+  color: var(--admin-muted);
+}
+
+.admin-apps-list .admin-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-apps-list .admin-table td.is-name,
+.admin-apps-list .admin-table td.is-clip {
+  max-width: 160px;
+}
+
+.admin-apps-list__head-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-apps-list__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--admin-muted);
+  white-space: nowrap;
+}
+
+.admin-apps-list__filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-apps-list__search {
+  width: min(240px, 28vw);
+  min-width: 160px;
+}
+
+.admin-apps-list__search-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-apps-list__name,
+.admin-apps-list__souvenir {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-apps-list__kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-apps-list__kind--individual {
+  background: #eef4ff;
+  color: #1558b8;
+}
+
+.admin-apps-list__kind--group {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.admin-apps-list__yn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-apps-list__yn.is-yes {
+  background: #e8f6ee;
+  color: #0d7a43;
+}
+
+.admin-apps-list__yn.is-no {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.admin-apps-list__course {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #f0f2f5;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5160;
 }
 
 .admin-root .admin-apps-list .admin-cell-input {
@@ -522,7 +700,14 @@ html.admin-mode body {
 }
 
 .admin-apps-list .admin-badge {
-  font-size: 12px;
+  font-size: 11px;
+  height: 20px;
+  padding: 0 7px;
+}
+
+.admin-root .admin-apps-list .admin-toolbar__iconbtn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .admin-drawer__dim {
@@ -2480,6 +2665,10 @@ html.admin-mode body {
 
   .admin-main {
     padding: 22px 28px 48px;
+  }
+
+  .admin-main:has(.admin-apps-list) {
+    padding: 10px 16px 12px;
   }
 }
 
