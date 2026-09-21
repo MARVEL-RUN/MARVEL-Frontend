@@ -2205,42 +2205,58 @@ button.admin-pay-list__item:hover {
 
 .admin-ops-guide__block {
   margin: 0;
-  padding: 14px 14px 12px;
+  padding: 12px 14px 10px;
   background: #fff;
   border: 1px solid var(--admin-line);
 }
 
 .admin-ops-guide__block h3 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eef1f5;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--admin-muted);
+}
+
+.admin-ops-guide__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-ops-guide__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+}
+
+.admin-ops-guide__item + .admin-ops-guide__item {
+  border-top: 1px solid #f3f5f8;
+}
+
+.admin-ops-guide__label {
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.35;
   color: #3d4450;
 }
 
-.admin-ops-guide__block ol,
-.admin-ops-guide__block ul {
-  margin: 0;
-  padding: 0 0 0 18px;
-  color: #3d4450;
-  font-size: 13px;
-  line-height: 1.55;
+.admin-ops-guide__hint {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #8a93a1;
 }
 
-.admin-ops-guide__block li + li {
-  margin-top: 6px;
-}
-
-.admin-ops-guide__block a {
-  font-weight: 600;
+.admin-ops-guide__label a {
+  font-weight: 700;
   color: var(--admin-blue);
 }
 
-.admin-ops-guide__block a:hover {
+.admin-ops-guide__label a:hover {
   text-decoration: underline;
-}
-
-.admin-ops-guide__block strong {
-  font-weight: 700;
 }
 
 @media (max-width: 960px) {
