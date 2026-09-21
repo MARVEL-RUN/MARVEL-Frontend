@@ -462,6 +462,49 @@
   cursor: not-allowed;
 }
 
+.field-with-btn {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  align-items: stretch;
+  width: min(24rem, 100%);
+}
+
+.form-row .field-with-btn input {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 2.75rem;
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.field-with-btn__btn {
+  flex: none;
+  height: 2.75rem;
+  box-sizing: border-box;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.field-with-btn__btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.field-with-btn__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .form-row .address-pick__base,
 .form-row .address-pick__detail {
   width: 100%;
@@ -2427,6 +2470,12 @@
   }
 
   .address-pick__btn {
+    height: var(--tap);
+    min-height: var(--tap);
+  }
+
+  .form-row .field-with-btn input,
+  .field-with-btn__btn {
     height: var(--tap);
     min-height: var(--tap);
   }
