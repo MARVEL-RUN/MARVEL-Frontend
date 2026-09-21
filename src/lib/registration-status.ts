@@ -14,14 +14,14 @@ export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number];
 export const STATUS_NOT_APPLICABLE = "해당 사항 없음";
 
 export const REGISTRATION_STATUS_LABEL: Record<RegistrationStatus, string> = {
-  PENDING: "결제 대기(관리자)",
+  PENDING: "편입·결제 대기",
   PAYMENT_PENDING: "결제 대기",
-  CONFIRMED: "확정",
+  CONFIRMED: "참가 확정",
   ADDITIONAL_PAYMENT_REQUIRED: "추가 결제 필요",
   PARTIAL_REFUND_REQUIRED: "부분 환불 필요",
-  CANCELLATION_PENDING: "취소 처리 중",
-  CANCELED: "취소",
-  EXPIRED: "만료",
+  CANCELLATION_PENDING: "취소·환불 처리 중",
+  CANCELED: "취소 완료",
+  EXPIRED: "결제 만료",
 };
 
 export function statusKey(value?: string | null) {
