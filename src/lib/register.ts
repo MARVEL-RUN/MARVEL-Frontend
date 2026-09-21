@@ -422,6 +422,12 @@ export function orgPasswordError(value: string) {
   return "";
 }
 
+/** 신청조회용: 4자 이상 */
+export function entryPasswordError(value: string) {
+  if (value.trim().length < 4) return "신청 비밀번호는 4자 이상 입력하세요.";
+  return "";
+}
+
 export function groupFee(
   draft: GroupDraft,
   categories: { categoryId: string; amount: number }[] = [],
@@ -513,9 +519,8 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
     throw new Error("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
-  if (draft.password.trim().length < 4) {
-    throw new Error("신청 비밀번호를 4자 이상 입력하세요.");
-  }
+  const passwordErr = entryPasswordError(draft.password);
+  if (passwordErr) throw new Error(passwordErr);
   if (draft.password !== draft.passwordConfirm) {
     throw new Error("신청 비밀번호가 일치하지 않습니다.");
   }

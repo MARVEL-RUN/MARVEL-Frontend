@@ -14,6 +14,7 @@ import {
   ageBand,
   courseById,
   emailOk,
+  entryPasswordError,
   genderLabel,
   guardianFieldsOk,
   needsGuardian,
@@ -73,6 +74,23 @@ type Step = 0 | 1;
 const NOTICE = [
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
+
+function entryPasswordHint(value: string) {
+  if (!value) {
+    return { text: "신청조회용 비밀번호 (4자 이상)", tone: "" as const };
+  }
+  const err = entryPasswordError(value);
+  if (err) return { text: err, tone: "is-err" as const };
+  return { text: "사용 가능한 비밀번호입니다.", tone: "is-ok" as const };
+}
+
+function entryPasswordConfirmHint(password: string, confirm: string) {
+  if (!confirm) return null;
+  if (confirm === password) {
+    return { text: "비밀번호가 일치합니다.", tone: "is-ok" as const };
+  }
+  return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
+}
 
 export function RegisterFlow() {
   const [kind, setKind] = useState<ApplyKind | "">("");
@@ -235,9 +253,8 @@ function IndividualFlow({
     }
     if (!draft.souvenirId) return fail("티셔츠 옵션을 불러오지 못했습니다.");
     if (!draft.selectedSize) return fail("티셔츠 사이즈를 선택하세요.");
-    if ((draft.password ?? "").trim().length < 4) {
-      return fail("신청 비밀번호를 4자 이상 입력하세요.");
-    }
+    const passwordErr = entryPasswordError(draft.password ?? "");
+    if (passwordErr) return fail(passwordErr);
     if ((draft.password ?? "") !== (draft.passwordConfirm ?? "")) {
       return fail("신청 비밀번호가 일치하지 않습니다.");
     }
@@ -295,6 +312,11 @@ function IndividualFlow({
   const souvenir = findSouvenir(selectedCategory, draft.souvenirId);
   const sizes = souvenirSizes(souvenir, draft.ticket);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
+  const passwordHint = entryPasswordHint(draft.password ?? "");
+  const passwordConfirmHint = entryPasswordConfirmHint(
+    draft.password ?? "",
+    draft.passwordConfirm ?? "",
+  );
 
   return (
     <div className="flow">
@@ -475,8 +497,14 @@ function IndividualFlow({
               <PasswordField
                 value={draft.password ?? ""}
                 onChange={(password) => patch({ password })}
+                placeholder="신청 비밀번호를 입력하세요."
                 required
               />
+              <p
+                className={`form-row__hint${passwordHint.tone ? ` ${passwordHint.tone}` : ""}`}
+              >
+                {passwordHint.text}
+              </p>
             </FormRow>
             <FormRow label="신청 비밀번호 확인" required>
               <PasswordField
@@ -487,6 +515,11 @@ function IndividualFlow({
                 onChange={(passwordConfirm) => patch({ passwordConfirm })}
                 required
               />
+              {passwordConfirmHint ? (
+                <p className={`form-row__hint ${passwordConfirmHint.tone}`}>
+                  {passwordConfirmHint.text}
+                </p>
+              ) : null}
             </FormRow>
             <FormRow label="참가비">
               {draft.courseId ? (
