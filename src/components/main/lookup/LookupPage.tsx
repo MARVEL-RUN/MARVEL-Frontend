@@ -181,88 +181,73 @@ function lookupBirthView(raw?: string | null) {
   return (raw ?? "").trim();
 }
 
-function refundStatusLabel(status?: string | null, registrationStatus?: string | null) {
-  const key = (status ?? "").trim().toUpperCase();
-  if (!key || key === "NONE" || key === "UNKNOWN") return "";
-  if (key === "REFUNDED") return "환불완료";
-  if (key === "DONE") return closedRegistration(registrationStatus) ? "환불완료" : "";
-  if (key === "REFUND_REQUESTED" || key === "REFUND_PENDING" || key === "PROCESSING") {
-    return "환불 대기";
-  }
+function statusKey(value?: string | null) {
+  return (value ?? "").trim().toUpperCase();
+}
+
+function refundStatusLabel(status?: string | null) {
+  const key = statusKey(status);
+  if (key === "PROCESSING") return "환불 처리 중";
+  if (key === "DONE") return "환불완료";
   if (key === "FAILED") return "환불 실패";
-  return status ?? "";
+  if (key === "UNKNOWN") return "확인 중";
+  return "";
 }
 
 function paymentActionNote(action?: string | null) {
-  if (action === "WAIT") {
+  const key = statusKey(action);
+  if (key === "WAIT") {
     return "결제를 확인하고 있습니다. 잠시 후 다시 조회해 주세요.";
   }
-  if (action === "PAYMENT_CLOSED") return "결제 기한이 종료되었습니다.";
-  if (action === "CONTACT_SUPPORT") return "운영 문의가 필요합니다.";
+  if (key === "PAYMENT_CLOSED") return "결제 기한이 종료되었습니다.";
+  if (key === "CONTACT_SUPPORT") return "운영 문의가 필요합니다.";
   return "";
 }
 
 const PAYMENT_STATUS: Record<string, { label: string; hint: string }> = {
+  UNPAID: {
+    label: "미결제",
+    hint: "결제가 아직 완료되지 않았습니다.",
+  },
   COMPLETED: {
     label: "결제완료",
     hint: "",
   },
-  FAILED: {
-    label: "결제 실패",
-    hint: "결제가 완료되지 않았습니다. 다시 결제하거나 문의해 주세요.",
+  MUST_CHECK: {
+    label: "확인 필요",
+    hint: "결제 상태를 확인하고 있습니다. 잠시 후 다시 조회해 주세요.",
   },
-  ADDITIONAL_PAYMENT_REQUIRED: {
-    label: "추가 결제 필요",
-    hint: "미납 금액이 있습니다. 결제 기한 내 결제를 완료해 주세요.",
+  NEED_PARTITIAL_REFUND: {
+    label: "차액 환불 요청",
+    hint: "차액 환불이 요청되었습니다.",
   },
-  PAYMENT_PENDING: {
-    label: "결제 대기",
-    hint: "결제가 아직 완료되지 않았습니다.",
+  NEED_PARTIAL_REFUND: {
+    label: "차액 환불 요청",
+    hint: "차액 환불이 요청되었습니다.",
   },
-  READY: {
-    label: "결제 대기",
-    hint: "결제가 아직 완료되지 않았습니다.",
-  },
-  PENDING: {
-    label: "결제 대기",
-    hint: "결제가 아직 완료되지 않았습니다.",
-  },
-  CANCELED: {
-    label: "결제 취소",
-    hint: "이 접수의 결제가 취소되었습니다.",
-  },
-  CANCELLED: {
-    label: "결제 취소",
-    hint: "이 접수의 결제가 취소되었습니다.",
+  NEED_REFUND: {
+    label: "전액 환불 요청",
+    hint: "전액 환불이 요청되었습니다.",
   },
   REFUNDED: {
-    label: "환불완료",
+    label: "전액 환불 완료",
     hint: "참가비가 환불되었습니다.",
-  },
-  REFUND_REQUESTED: {
-    label: "환불 대기",
-    hint: "환불이 접수되어 처리 중입니다.",
-  },
-  REFUND_PENDING: {
-    label: "환불 대기",
-    hint: "환불이 접수되어 처리 중입니다.",
   },
 };
 
 const REGISTRATION_STATUS_LABEL: Record<string, string> = {
-  CONFIRMED: "확정",
-  PENDING: "대기",
+  PENDING: "결제 대기",
   PAYMENT_PENDING: "결제 대기",
-  ADDITIONAL_PAYMENT_REQUIRED: "추가 결제",
-  PARTIAL_REFUND_REQUIRED: "부분 환불",
-  CANCELLATION_PENDING: "환불 대기",
+  CONFIRMED: "확정",
+  ADDITIONAL_PAYMENT_REQUIRED: "추가 결제 필요",
+  PARTIAL_REFUND_REQUIRED: "부분 환불 필요",
+  CANCELLATION_PENDING: "취소 처리 중",
   CANCELED: "취소",
-  CANCELLED: "취소",
   EXPIRED: "만료",
 };
 
 function paymentStatusInfo(status?: string | null, apiLabel?: string | null) {
-  const key = (status ?? "").trim().toUpperCase();
+  const key = statusKey(status);
   const meta = key ? PAYMENT_STATUS[key] : undefined;
   return {
     label: apiLabel?.trim() || meta?.label || (status?.trim() ? status : "—"),
@@ -271,7 +256,7 @@ function paymentStatusInfo(status?: string | null, apiLabel?: string | null) {
 }
 
 function registrationStatusLabel(status?: string) {
-  const key = (status ?? "").trim().toUpperCase();
+  const key = statusKey(status);
   if (!key) return "";
   return REGISTRATION_STATUS_LABEL[key] || status || "";
 }
@@ -332,7 +317,7 @@ function ReceiptContactSpec({ receipt }: { receipt: RegistrationReceipt }) {
 }
 
 function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
-  const refundLabel = refundStatusLabel(receipt.refundStatus, receipt.registrationStatus);
+  const refundLabel = refundStatusLabel(receipt.refundStatus);
   return (
     <>
       <div>
@@ -419,25 +404,33 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
 }
 
 function canPreparePayment(receipt: RegistrationReceipt) {
-  return receipt.paymentAction === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
+  return statusKey(receipt.paymentAction) === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
 }
 
 function closedRegistration(status?: string | null) {
-  const key = (status ?? "").trim().toUpperCase();
-  return ["CANCELED", "CANCELLED", "EXPIRED", "CANCELLATION_PENDING"].includes(key);
+  return ["CANCELED", "EXPIRED", "CANCELLATION_PENDING"].includes(statusKey(status));
+}
+
+function hasRefundHistory(receipt: RegistrationReceipt) {
+  const refund = statusKey(receipt.refundStatus);
+  const payment = statusKey(receipt.paymentStatus);
+  if (["PROCESSING", "DONE", "UNKNOWN"].includes(refund)) return true;
+  return ["REFUNDED", "NEED_REFUND", "NEED_PARTITIAL_REFUND", "NEED_PARTIAL_REFUND"].includes(
+    payment,
+  );
 }
 
 function canModifyReceipt(receipt: RegistrationReceipt) {
+  if (statusKey(receipt.paymentAction) === "WAIT") return false;
   return Boolean(
     (receipt.registrationId || receipt.organizationId) &&
-      !closedRegistration(receipt.registrationStatus),
+      !closedRegistration(receipt.registrationStatus) &&
+      !hasRefundHistory(receipt),
   );
 }
 
 function canRefundReceipt(receipt: RegistrationReceipt) {
-  if (!canModifyReceipt(receipt)) return false;
-  const refund = (receipt.refundStatus ?? "").trim().toUpperCase();
-  return refund !== "PROCESSING" && refund !== "REFUNDED";
+  return canModifyReceipt(receipt);
 }
 
 function payableOrder(result: RegistrationSettlementResult) {
@@ -495,13 +488,16 @@ function ReceiptActions({
 }
 
 function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
+  const warning = receipt.warningMessage?.trim() ?? "";
   const actionNote = paymentActionNote(receipt.paymentAction);
+  const notes = [...new Set([warning, actionNote].filter(Boolean))];
   return (
     <>
-      {receipt.warningMessage ? (
-        <p className="form__note">{receipt.warningMessage}</p>
-      ) : null}
-      {actionNote ? <p className="form__note">{actionNote}</p> : null}
+      {notes.map((note) => (
+        <p key={note} className="form__note">
+          {note}
+        </p>
+      ))}
     </>
   );
 }
@@ -632,6 +628,9 @@ function GroupReceiptCard({
 }) {
   const members = receiptMembers(receipt);
   const activeCount = members.filter((member) => !member.canceled).length;
+  const registrationLabel = registrationStatusLabel(
+    receipt.registrationStatus ?? undefined,
+  );
   return (
     <section className="ticket">
       <p className="kicker">FOUND</p>
@@ -658,6 +657,12 @@ function GroupReceiptCard({
           <dd>{activeCount}명</dd>
         </div>
         <ReceiptContactSpec receipt={receipt} />
+        {registrationLabel ? (
+          <div>
+            <dt>접수상태</dt>
+            <dd>{registrationLabel}</dd>
+          </div>
+        ) : null}
         <ReceiptPaymentSpec receipt={receipt} />
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
@@ -691,6 +696,22 @@ function lookupErrorMessage(err: unknown, fallback = "신청 내역을 조회하
   return message;
 }
 
+const REFUND_DONE_NOTE =
+  "환불 처리 후 카드사에 따라 영업일 기준 일주일 내외 소요됩니다.";
+
+function LookupRefundDone({ onOther }: { onOther: () => void }) {
+  return (
+    <section className="block wait">
+      <p className="kicker">DONE</p>
+      <h2>환불이 접수되었습니다.</h2>
+      <p className="sec__body">{REFUND_DONE_NOTE}</p>
+      <button type="button" className="btn btn--red" onClick={onOther}>
+        다른 접수건
+      </button>
+    </section>
+  );
+}
+
 function IndividualLookup({ onBack }: { onBack: () => void }) {
   const router = useRouter();
   const [view, setView] = useState<View>("form");
@@ -698,7 +719,6 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const [payingKey, setPayingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [doneMessage, setDoneMessage] = useState("");
   const [receipts, setReceipts] = useState<RegistrationReceipt[]>([]);
   const [active, setActive] = useState<RegistrationReceipt | null>(null);
   const [access, setAccess] = useState<IndividualRegistrationLookupRequest | null>(
@@ -857,7 +877,6 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         active.registrationId,
         access,
       );
-      setDoneMessage("환불이 접수되었습니다.");
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
@@ -880,15 +899,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   }
 
   if (view === "hit" && panel === "done") {
-    return (
-      <section className="block wait">
-        <p className="kicker">DONE</p>
-        <h2>{doneMessage || "처리되었습니다"}</h2>
-        <button type="button" className="btn btn--red" onClick={() => setView("form")}>
-          다른 접수건
-        </button>
-      </section>
-    );
+    return <LookupRefundDone onOther={() => setView("form")} />;
   }
 
   if (view === "hit" && panel === "edit" && active && access) {
@@ -1011,7 +1022,6 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const [payingKey, setPayingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [doneMessage, setDoneMessage] = useState("");
   const [receipts, setReceipts] = useState<RegistrationReceipt[]>([]);
   const [active, setActive] = useState<RegistrationReceipt | null>(null);
   const [access, setAccess] = useState<OrganizationLookupRequest | null>(null);
@@ -1152,7 +1162,6 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         active.organizationId,
         access,
       );
-      setDoneMessage("환불이 접수되었습니다.");
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
@@ -1175,15 +1184,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   }
 
   if (view === "hit" && panel === "done") {
-    return (
-      <section className="block wait">
-        <p className="kicker">DONE</p>
-        <h2>{doneMessage || "처리되었습니다"}</h2>
-        <button type="button" className="btn btn--red" onClick={() => setView("form")}>
-          다른 접수건
-        </button>
-      </section>
-    );
+    return <LookupRefundDone onOther={() => setView("form")} />;
   }
 
   if (view === "hit" && panel === "edit" && active && access) {
