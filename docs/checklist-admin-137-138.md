@@ -17,7 +17,6 @@
   - [ ] `/admin/applications/marvel`, `/virtual` slug 라우트 제거 또는 redirect
   - [ ] `eventLinks`·운영 홈·대시보드 링크를 API `eventId` 기준으로 통일
   - [ ] `ApplicationsListPage` slug 분기 정리 (`eventId` 중심)
-- [ ] 마블런/버추얼별 목록 필터·컬럼 구성 (유형·차수·코스)
 - [ ] 목록 주문번호 등 빠진 표시 값 맞춤
 - [ ] 운영 홈 접수 현황·환불 대기 진입과 신청 목록 맞춤
 - [ ] 신청 상세 개인·단체 필드 구분 표시
@@ -27,6 +26,7 @@
 
 ### 보류
 
+- [ ] 마블런/버추얼별 목록 필터·컬럼 구성 (유형·차수·코스) — `eventCategoryId`·차수 매핑 확인 후
 - [ ] 정원 현황 대회 목록 API 통일 (관리자 편의, 급하지 않음)
 
 ---
