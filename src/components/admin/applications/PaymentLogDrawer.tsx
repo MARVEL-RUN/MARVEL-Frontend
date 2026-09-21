@@ -2,6 +2,7 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { paymentLogProcessLabel, paymentLogSourceLabel } from "@/lib/payment-log";
 import { formatAmount } from "@/services/admin/applications";
 import { fetchPaymentLogs, paymentMethodLabel, type AdminPayment } from "@/services/admin/payments";
 import { useQuery } from "@tanstack/react-query";
@@ -11,11 +12,6 @@ type Props = {
   payment: AdminPayment;
   onClose: () => void;
 };
-
-function dash(value?: string | number | null) {
-  if (value == null || value === "") return "-";
-  return String(value);
-}
 
 function errorHint(error: unknown) {
   if (isAdminHttp(error, 400)) return "요청값을 확인하세요.";
@@ -53,7 +49,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
           <tr key={`${log.createdAt ?? "log"}-${index}`}>
             <td>{formatAdminBoardDate(log.createdAt)}</td>
             <td>
-              {dash(log.processType)}
+              {paymentLogProcessLabel(log.processType)}
               {log.errorCode || log.errorMessage ? (
                 <em className="admin-pay-log-table__error">
                   {log.errorCode ? `${log.errorCode} ` : ""}
@@ -61,7 +57,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
                 </em>
               ) : null}
             </td>
-            <td>{dash(log.source)}</td>
+            <td>{paymentLogSourceLabel(log.source)}</td>
           </tr>
         ))}
       </tbody>
