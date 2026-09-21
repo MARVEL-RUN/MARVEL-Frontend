@@ -243,7 +243,7 @@ export function TrendPanel({ kind, title, unit }: Props) {
         <div className="admin-trend__list">
           <div className="admin-trend__list-head">
             <span>날짜</span>
-            <span>{title.replace(" 현황", "")}</span>
+            <span>신청</span>
           </div>
           <div className="admin-trend__list-body">
             {[...trend].reverse().map((item) => (
