@@ -27,7 +27,7 @@ import {
 } from "@/services/admin/organizations";
 import { useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 20;
 
@@ -297,18 +297,8 @@ export function OrganizationMembersList({
     },
   ];
 
-  const tableRowCount = rows.length;
-  const fixedTableHeight =
-    hasAdminApi && !loading && members.length > 0 && tableRowCount > 0;
-  const listPageStyle = fixedTableHeight
-    ? ({ "--admin-apps-list-rows": tableRowCount } as CSSProperties)
-    : undefined;
-
   return (
-    <div
-      className={`admin-apps-list admin-org-detail__members${fixedTableHeight ? " is-fixed-table" : ""}`}
-      style={listPageStyle}
-    >
+    <div className="admin-apps-list admin-org-detail__members">
       <AdminTableShell<AdminApplicationRow>
         title="단체 구성원 목록"
         rows={rows}

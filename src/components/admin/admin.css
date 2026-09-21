@@ -1999,17 +1999,9 @@ button.admin-pay-list__item:hover {
 }
 
 .admin-org-detail__members.admin-apps-list .admin-table-wrap {
-  scrollbar-gutter: auto;
-}
-
-.admin-org-detail__members.admin-apps-list.is-fixed-table .admin-table-wrap {
-  flex: 0 1 auto;
-  height: min(
-    calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
-    calc(100vh - var(--admin-head) - 360px)
-  );
-  max-height: none;
-  overflow-y: auto;
+  flex: 0 0 auto;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 @media (max-width: 960px) {
