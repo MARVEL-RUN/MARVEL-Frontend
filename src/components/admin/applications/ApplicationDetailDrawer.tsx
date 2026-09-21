@@ -7,6 +7,7 @@ import {
   registrationStatusBadge,
   registrationStatusLabel,
 } from "@/lib/registration-status";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
@@ -225,11 +226,11 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
     if (!ok) return;
     const password = await prompt({
       title: "비밀번호 초기화",
-      description: "새 비밀번호를 입력해주세요.",
-      label: "비밀번호",
-      placeholder: "비밀번호를 입력해주세요",
+      description: `신청조회용 새 비밀번호를 입력해 주세요. (${APPLICATION_PASSWORD_MIN}자 이상)`,
+      label: "새 비밀번호",
+      placeholder: `${APPLICATION_PASSWORD_MIN}자 이상 입력`,
       type: "password",
-      minLength: 4,
+      minLength: APPLICATION_PASSWORD_MIN,
     });
     if (!password) return;
     resetPassword.mutate(password);

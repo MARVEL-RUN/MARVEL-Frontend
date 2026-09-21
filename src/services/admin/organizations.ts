@@ -1,5 +1,6 @@
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { adminFetch } from "@/lib/admin/fetch";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { statusKey } from "@/lib/registration-status";
 import { uiGenderFromApi } from "@/lib/registration-gender";
 import type { SpringPage } from "@/services/admin/boards/inquiries.types";
@@ -232,7 +233,9 @@ export function resetOrganizationPassword(
 ) {
   const password = newPassword.trim();
   if (!organizationId.trim()) throw new Error("단체 정보를 찾을 수 없습니다.");
-  if (password.length < 4) throw new Error("비밀번호는 4자 이상이어야 합니다.");
+  if (password.length < APPLICATION_PASSWORD_MIN) {
+    throw new Error(`비밀번호는 ${APPLICATION_PASSWORD_MIN}자 이상이어야 합니다.`);
+  }
   return adminFetch<void>(
     `v1/admin/organizations/${encodeURIComponent(organizationId)}/password`,
     { method: "PUT", body: JSON.stringify({ newPassword: password }) },

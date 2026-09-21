@@ -8,6 +8,7 @@ import { isAdminHttp } from "@/lib/admin/fetch";
 import { adminMembersListBackHref } from "@/lib/admin/eventLinks";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { formatAmount } from "@/services/admin/applications";
 import {
   fetchAdminOrganization,
@@ -70,11 +71,11 @@ export function OrganizationDetailPage() {
     if (!ok) return;
     const password = await prompt({
       title: "비밀번호 초기화",
-      description: "새 비밀번호를 입력해주세요.",
-      label: "비밀번호",
-      placeholder: "비밀번호를 입력해주세요",
+      description: `단체 조회용 새 비밀번호를 입력해 주세요. (${APPLICATION_PASSWORD_MIN}자 이상)`,
+      label: "새 비밀번호",
+      placeholder: `${APPLICATION_PASSWORD_MIN}자 이상 입력`,
       type: "password",
-      minLength: 4,
+      minLength: APPLICATION_PASSWORD_MIN,
     });
     if (!password) return;
     resetPassword.mutate(password);
