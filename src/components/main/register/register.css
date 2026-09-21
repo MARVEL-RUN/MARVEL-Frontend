@@ -324,9 +324,14 @@
 
 .birth-pick {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
+}
+
+.birth-pick__year-hint {
+  flex: 1 0 100%;
+  margin: 0.35rem 0 0;
 }
 
 .birth-pick select {

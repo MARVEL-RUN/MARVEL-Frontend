@@ -93,10 +93,12 @@ export function BirthPick({
   value,
   onChange,
   disabled,
+  yearHint,
 }: {
   value: string;
   onChange: (next: string) => void;
   disabled?: boolean;
+  yearHint?: string;
 }) {
   const y = value.slice(0, 4);
   const m = value.slice(4, 6);
@@ -152,6 +154,11 @@ export function BirthPick({
           </option>
         ))}
       </select>
+      {yearHint ? (
+        <p className="birth-pick__year-hint form-row__hint is-err" role="alert">
+          {yearHint}
+        </p>
+      ) : null}
     </div>
   );
 }

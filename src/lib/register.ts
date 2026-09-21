@@ -256,6 +256,8 @@ export const CHILD_ACCOMPANY_NOTE =
   "만 12세 이하는 보호자 동행이 필요합니다.";
 export const GUARDIAN_AGE_NOTE =
   "만 14세 미만의 경우 법정대리인 동의가 필요합니다.";
+export const LEADER_UNDER_AGE_NOTE =
+  "만 14세 미만은 단체장으로 신청할 수 없습니다.";
 export const TIMING_CHIP_NOTE =
   "배번호 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.";
 
@@ -267,6 +269,17 @@ export function ageBand(birth: string): AgeBand | null {
   if (birth >= CHILD_BIRTH_FROM) return "child";
   if (birth >= GUARDIAN_BIRTH_FROM) return "teen";
   return "adult";
+}
+
+/** 년도만 골라도 확정이면 true. 경계 연도는 ymd가 다 채워졌을 때만. */
+export function underGuardianAge(birth: string) {
+  const y = birth.slice(0, 4);
+  if (!/^\d{4}$/.test(y)) return false;
+  const gy = GUARDIAN_BIRTH_FROM.slice(0, 4);
+  if (y > gy) return true;
+  if (y < gy) return false;
+  if (!/^\d{8}$/.test(birth)) return false;
+  return birth >= GUARDIAN_BIRTH_FROM;
 }
 
 export function ticketForBirth(birth: string): TicketKind {
@@ -618,6 +631,9 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   if (!draft.leaderName.trim()) throw new Error("대표자 성명을 입력하세요.");
   if (!/^\d{8}$/.test(draft.leaderBirth)) {
     throw new Error("대표자 생년월일을 선택하세요.");
+  }
+  if (underGuardianAge(draft.leaderBirth)) {
+    throw new Error(LEADER_UNDER_AGE_NOTE);
   }
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (draft.email.trim() && !emailOk(draft.email)) {

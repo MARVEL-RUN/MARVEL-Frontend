@@ -36,6 +36,7 @@ import {
   EMPTY_GROUP,
   EMPTY_PARTICIPANT,
   GUARDIAN_AGE_NOTE,
+  LEADER_UNDER_AGE_NOTE,
   GENDERS,
   MAX_GROUP_SIZE,
   ageBand,
@@ -48,6 +49,7 @@ import {
   orgPasswordError,
   requiredConsentsOk,
   ticketForBirth,
+  underGuardianAge,
   type Consents,
   type Gender,
   type GroupDraft,
@@ -277,6 +279,9 @@ export function GroupFlow({
     if (!/^\d{8}$/.test(draft.leaderBirth)) {
       return fail("대표자 생년월일을 선택하세요.");
     }
+    if (underGuardianAge(draft.leaderBirth)) {
+      return fail(LEADER_UNDER_AGE_NOTE);
+    }
     if (!draft.phone.trim()) return fail("휴대폰번호를 입력하세요.");
     if (draft.email.trim() && !emailOk(draft.email)) {
       return fail("이메일 형식을 확인하세요.");
@@ -477,6 +482,11 @@ export function GroupFlow({
               <BirthPick
                 value={draft.leaderBirth}
                 onChange={(leaderBirth) => patch({ leaderBirth })}
+                yearHint={
+                  underGuardianAge(draft.leaderBirth)
+                    ? LEADER_UNDER_AGE_NOTE
+                    : undefined
+                }
               />
             </FormRow>
           </FormSec>
