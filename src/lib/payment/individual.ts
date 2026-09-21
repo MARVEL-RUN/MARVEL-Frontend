@@ -9,7 +9,8 @@ import type {
   RegistrationCategory,
   RegistrationCreateRequest,
 } from "@/services/main/types";
-import { genderToApi, phoneDigits } from "./map";
+import { needsGuardian } from "@/lib/register";
+import { birthToApi, genderToApi, phoneDigits } from "./map";
 
 export function toRegistrationCreateRequest(
   draft: EntryDraft,
@@ -31,6 +32,10 @@ export function toRegistrationCreateRequest(
     throw new Error("티셔츠 사이즈를 선택하세요.");
   }
 
+  const guardianName = draft.guardianName.trim();
+  const guardianPhone = phoneDigits(draft.guardianPhone);
+  const guardian = needsGuardian(draft.birth);
+
   return {
     eventCategoryId: category.categoryId,
     selectedSouvenirList: [
@@ -39,12 +44,15 @@ export function toRegistrationCreateRequest(
     password: (draft.password ?? "").trim(),
     name: draft.name.trim(),
     phNum: phoneDigits(draft.phone),
-    birth: draft.birth,
+    birth: birthToApi(draft.birth),
     gender: genderToApi(draft.gender),
     address: formatAddressForApi(
       (draft.zonecode ?? "").trim(),
       (draft.address ?? "").trim(),
     ),
     addressDetail: (draft.addressDetail ?? "").trim(),
+    ...(guardianName ? { guardianName } : {}),
+    ...(guardianPhone ? { guardianPhone } : {}),
+    guardianConsent: guardian ? draft.guardianConsent : false,
   };
 }

@@ -34,6 +34,9 @@ export type RegistrationCreateRequest = {
   gender: "M" | "F";
   address: string;
   addressDetail: string;
+  guardianName?: string;
+  guardianPhone?: string;
+  guardianConsent?: boolean;
 };
 
 export type RegistrationCreateResponse = {

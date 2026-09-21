@@ -48,7 +48,9 @@ export type EntryDraft = {
   gender: Gender | "";
   phone: string;
   email: string;
-  emergency: string;
+  guardianName: string;
+  guardianPhone: string;
+  guardianConsent: boolean;
   shirt: ShirtSize | "";
   souvenirId: string;
   selectedSize: string;
@@ -68,7 +70,8 @@ export type EntryRecord = {
   gender: Gender;
   phone: string;
   email: string;
-  emergency: string;
+  guardianName: string;
+  guardianPhone: string;
   shirt: ShirtSize;
 };
 
@@ -163,7 +166,9 @@ export const EMPTY_DRAFT: EntryDraft = {
   gender: "",
   phone: "",
   email: "",
-  emergency: "",
+  guardianName: "",
+  guardianPhone: "",
+  guardianConsent: false,
   shirt: "",
   souvenirId: "",
   selectedSize: "",
@@ -266,6 +271,16 @@ export function ticketForBirth(birth: string): TicketKind {
 export function needsGuardian(birth: string) {
   const band = ageBand(birth);
   return band === "child" || band === "teen";
+}
+
+export function guardianFieldsOk(draft: Pick<
+  EntryDraft,
+  "birth" | "guardianName" | "guardianPhone" | "guardianConsent"
+>) {
+  if (!needsGuardian(draft.birth)) return true;
+  if (!draft.guardianName.trim()) return false;
+  if (!draft.guardianPhone.trim()) return false;
+  return draft.guardianConsent;
 }
 
 export function courseHasTimingChip(courseId: CourseId) {
@@ -480,8 +495,11 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   if (draft.email.trim() && !emailOk(draft.email)) {
     throw new Error("이메일 형식을 확인하세요.");
   }
-  if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
-    throw new Error("만 14세 미만은 보호자 연락처를 입력하세요.");
+  if (!guardianFieldsOk(draft)) {
+    if (needsGuardian(draft.birth) && !draft.guardianConsent) {
+      throw new Error("보호자(법정대리인) 동의가 필요합니다.");
+    }
+    throw new Error("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   if (draft.password.trim().length < 4) {
@@ -578,7 +596,8 @@ export async function submitEntry(draft: EntryDraft): Promise<EntryRecord> {
     gender: draft.gender,
     phone: draft.phone.trim(),
     email: draft.email.trim(),
-    emergency: draft.emergency.trim(),
+    guardianName: draft.guardianName.trim(),
+    guardianPhone: draft.guardianPhone.trim(),
     shirt: draft.shirt,
   };
 }
@@ -608,7 +627,8 @@ export async function lookupEntry(query: LookupQuery): Promise<EntryRecord | nul
     gender: "none",
     phone,
     email: "runner@marvelrun.kr",
-    emergency: "010-0000-0000",
+    guardianName: "",
+    guardianPhone: "010-0000-0000",
     shirt: "M",
   };
 }
