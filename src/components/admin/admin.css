@@ -640,69 +640,73 @@ html.admin-mode body {
   white-space: nowrap;
 }
 
-.admin-apps-list__kind {
+.admin-apps-list__kind-text {
+  font-weight: 500;
+  color: var(--admin-ink);
+}
+
+.admin-apps-list__yn-text {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-apps-list__yn-text.is-yes {
+  color: var(--admin-ink);
+}
+
+.admin-apps-list__yn-text.is-no {
+  color: #b8bfc9;
+}
+
+.admin-apps-list__course-text {
+  font-weight: 500;
+  color: var(--admin-ink);
+}
+
+.admin-apps-list__status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 34px;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--admin-ink);
+  white-space: nowrap;
 }
 
-.admin-apps-list__kind--individual {
-  background: #eef4ff;
-  color: #1558b8;
+.admin-apps-list__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #c5cad3;
 }
 
-.admin-apps-list__kind--group {
-  background: #f3e8ff;
-  color: #7c3aed;
+.admin-apps-list__status-dot--paid {
+  background: #2d9f5a;
 }
 
-.admin-apps-list__yn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
+.admin-apps-list__status-dot--pending {
+  background: #d4920a;
 }
 
-.admin-apps-list__yn.is-yes {
-  background: #e8f6ee;
-  color: #0d7a43;
+.admin-apps-list__status-dot--refund_requested {
+  background: #d4622a;
 }
 
-.admin-apps-list__yn.is-no {
-  background: #f3f4f6;
-  color: #9ca3af;
+.admin-apps-list__status-dot--refunded {
+  background: #8a93a3;
 }
 
-.admin-apps-list__course {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: #f0f2f5;
-  font-size: 12px;
-  font-weight: 600;
-  color: #4a5160;
+.admin-apps-list__status-dot--plain {
+  background: #c5cad3;
 }
 
 .admin-root .admin-apps-list .admin-cell-input {
   height: 28px;
   font-size: 13px;
   min-width: 72px;
-}
-
-.admin-apps-list .admin-badge {
-  font-size: 11px;
-  height: 20px;
-  padding: 0 7px;
 }
 
 .admin-root .admin-apps-list .admin-toolbar__iconbtn svg {

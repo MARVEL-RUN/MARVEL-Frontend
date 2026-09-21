@@ -68,27 +68,23 @@ function errorHint(error: unknown) {
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const tone = registrationStatusBadge(status);
   return (
-    <span className={`admin-badge admin-badge--${registrationStatusBadge(status)}`}>
+    <span className="admin-apps-list__status">
+      <span className={`admin-apps-list__status-dot admin-apps-list__status-dot--${tone}`} aria-hidden />
       {registrationStatusLabel(status)}
     </span>
   );
 }
 
 function KindBadge({ kind }: { kind: AdminApplicationRow["kind"] }) {
-  const label = applicationKindLabel(kind);
-  const tone = kind === "group" ? "group" : "individual";
-  return (
-    <span className={`admin-apps-list__kind admin-apps-list__kind--${tone}`}>
-      {label}
-    </span>
-  );
+  return <span className="admin-apps-list__kind-text">{applicationKindLabel(kind)}</span>;
 }
 
 function MarketingBadge({ consent }: { consent: boolean }) {
   return (
     <span
-      className={`admin-apps-list__yn${consent ? " is-yes" : " is-no"}`}
+      className={`admin-apps-list__yn-text${consent ? " is-yes" : " is-no"}`}
       aria-label={consent ? "마케팅 동의" : "마케팅 미동의"}
     >
       {consent ? "Y" : "N"}
@@ -99,7 +95,7 @@ function MarketingBadge({ consent }: { consent: boolean }) {
 function CourseTag({ row }: { row: AdminApplicationRow }) {
   const label = applicationCourseLabel(row);
   if (!label || label === "-") return <>-</>;
-  return <span className="admin-apps-list__course">{label}</span>;
+  return <span className="admin-apps-list__course-text">{label}</span>;
 }
 
 function displayPhone(value?: string | null) {
