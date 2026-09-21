@@ -242,6 +242,19 @@ export function resetOrganizationPassword(
   );
 }
 
+export function updateOrganizationLoginId(
+  organizationId: string,
+  newLoginId: string,
+) {
+  const loginId = newLoginId.trim();
+  if (!organizationId.trim()) throw new Error("단체 정보를 찾을 수 없습니다.");
+  if (!loginId) throw new Error("로그인 아이디를 입력하세요.");
+  return adminFetch<void>(
+    `v1/admin/organizations/${encodeURIComponent(organizationId)}/loginId`,
+    { method: "PUT", body: JSON.stringify({ newLoginId: loginId }) },
+  );
+}
+
 export type AdminOrganizationDuplicateCheckResult = {
   requestValue?: string;
   requestUseable?: boolean;

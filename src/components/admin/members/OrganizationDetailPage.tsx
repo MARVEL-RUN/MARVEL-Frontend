@@ -8,16 +8,18 @@ import { isAdminHttp } from "@/lib/admin/fetch";
 import { adminMembersListBackHref } from "@/lib/admin/eventLinks";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { APPLICATION_PASSWORD_MIN, orgAccountError } from "@/lib/register";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { formatAmount } from "@/services/admin/applications";
 import {
-  checkAdminOrganizationDuplicateId,
   fetchAdminOrganization,
   resetOrganizationPassword,
+  updateOrganizationLoginId,
 } from "@/services/admin/organizations";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { OrganizationLoginIdModal } from "./OrganizationLoginIdModal";
 import { OrganizationMembersList } from "./OrganizationMembersList";
 
 function errorHint(error: unknown) {
@@ -37,12 +39,14 @@ function dash(value?: string | number | null) {
 
 export function OrganizationDetailPage() {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const organizationId = searchParams.get("organizationId")?.trim() ?? "";
   const apiEventId = searchParams.get("eventId")?.trim() ?? "";
   const slugParam = searchParams.get("slug")?.trim() ?? "";
   const slug = slugParam === "marvel" || slugParam === "virtual" ? slugParam : null;
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
+  const [loginIdOpen, setLoginIdOpen] = useState(false);
 
   const detailQuery = useQuery({
     queryKey: ["admin", "organization", organizationId],
@@ -60,48 +64,29 @@ export function OrganizationDetailPage() {
       ),
   });
 
-  const checkLoginId = useMutation({
-    mutationFn: (groupLoginId: string) =>
-      checkAdminOrganizationDuplicateId({
-        eventId: apiEventId,
-        groupLoginId,
-      }),
-    onSuccess: (result) => {
-      if (result.useableLoginId) {
-        adminToast.success("사용 가능한 아이디입니다.");
-        return;
-      }
-      adminToast.error("이미 사용 중인 아이디입니다.");
+  const changeLoginId = useMutation({
+    mutationFn: (newLoginId: string) =>
+      updateOrganizationLoginId(organizationId, newLoginId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["admin", "organization", organizationId],
+      });
+      adminToast.success("로그인 아이디가 변경되었습니다.");
     },
     onError: (err) =>
       adminToast.error(
-        err instanceof Error ? err.message : "아이디 중복 확인에 실패했습니다.",
+        err instanceof Error ? err.message : "아이디 변경에 실패했습니다.",
       ),
   });
 
-  const handleCheckLoginId = async () => {
-    const current = detailQuery.data?.loginId?.trim() ?? "";
-    const next = await prompt({
-      title: "아이디 중복검사",
-      description:
-        "교체할 단체 로그인 아이디를 입력해 주세요. (5~20자, 영문·숫자·특수문자)",
-      label: "로그인 아이디",
-      placeholder: current ? `현재: ${current}` : "새 로그인 아이디",
-      type: "text",
-      minLength: 5,
-      confirmLabel: "중복검사",
+  const handleChangeLoginId = async (next: string) => {
+    setLoginIdOpen(false);
+    const ok = await confirm({
+      title: "아이디 변경",
+      message: `로그인 아이디를 "${next}"(으)로 변경하시겠습니까?`,
     });
-    if (!next) return;
-    const accountErr = orgAccountError(next);
-    if (accountErr) {
-      adminToast.error(accountErr);
-      return;
-    }
-    if (current && next === current) {
-      adminToast.error("현재 아이디와 같습니다. 교체할 아이디를 입력해 주세요.");
-      return;
-    }
-    checkLoginId.mutate(next);
+    if (!ok) return;
+    changeLoginId.mutate(next);
   };
 
   const handleResetPassword = async () => {
@@ -170,14 +155,14 @@ export function OrganizationDetailPage() {
             type="button"
             className="admin-btn admin-btn--ghost"
             disabled={
-              checkLoginId.isPending ||
+              changeLoginId.isPending ||
               detailQuery.isLoading ||
               !detail ||
               !apiEventId
             }
-            onClick={handleCheckLoginId}
+            onClick={() => setLoginIdOpen(true)}
           >
-            {checkLoginId.isPending ? "확인 중…" : "아이디 중복검사"}
+            {changeLoginId.isPending ? "변경 중…" : "아이디 변경"}
           </button>
           <button
             type="button"
@@ -196,6 +181,13 @@ export function OrganizationDetailPage() {
       </header>
       {confirmModal}
       {inputModal}
+      <OrganizationLoginIdModal
+        open={loginIdOpen}
+        eventId={apiEventId}
+        currentLoginId={detail?.loginId}
+        onCancel={() => setLoginIdOpen(false)}
+        onConfirm={(loginId) => void handleChangeLoginId(loginId)}
+      />
 
       {detailQuery.isLoading ? (
         <p className="admin-empty">불러오는 중…</p>
