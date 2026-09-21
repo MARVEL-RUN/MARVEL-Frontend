@@ -11,8 +11,7 @@ import {
 import { formatAmount, type AdminApplicationRow } from "@/services/admin/applications";
 import {
   fetchPaymentLogs,
-  fetchOrganizationPayments,
-  fetchPersonalPayments,
+  fetchApplicationFinance,
   paymentMethodLabel,
   type AdminFinance,
   type AdminPayment,
@@ -32,17 +31,6 @@ function errorHint(error: unknown) {
   }
   if (isAdminHttp(error, 404)) return "결제 내역이 없습니다.";
   return "결제 조회에 실패했습니다.";
-}
-
-function fetchFinance(row: AdminApplicationRow, page: number) {
-  if (row.kind === "group") {
-    return fetchOrganizationPayments(
-      row.eventId,
-      row.organizationId || row.id,
-      page,
-    );
-  }
-  return fetchPersonalPayments(row.eventId, row.id, page);
 }
 
 function PaymentStatus({ value }: { value?: string }) {
@@ -183,7 +171,7 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
 
   const finance = useQuery({
     queryKey: ["admin", "finance", row.eventId, row.id, row.kind, row.organizationId, page],
-    queryFn: () => fetchFinance(row, page),
+    queryFn: () => fetchApplicationFinance(row, page),
     enabled: Boolean(row.eventId && row.id),
   });
 

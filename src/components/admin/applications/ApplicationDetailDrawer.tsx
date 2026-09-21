@@ -1,15 +1,18 @@
 "use client";
 
+import { paymentStatusFromUnknown } from "@/lib/registration-status";
 import {
+  applicationCourseLabel,
+  applicationGenderLabel,
   applicationPaymentBadge,
   applicationPaymentLabel,
   applicationStatusBadge,
   applicationStatusLabel,
-  applicationCourseLabel,
-  applicationGenderLabel,
   formatAmount,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
+import { fetchApplicationFinance } from "@/services/admin/payments";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { ApplicationPayments } from "./ApplicationPayments";
 
@@ -26,7 +29,17 @@ function dash(value?: string) {
 }
 
 export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props) {
+  const finance = useQuery({
+    queryKey: ["admin", "finance", row?.eventId, row?.id, row?.kind, row?.organizationId, 0],
+    queryFn: () => fetchApplicationFinance(row as AdminApplicationRow, 0),
+    enabled: Boolean(row?.eventId && row?.id),
+  });
+
   if (!row) return null;
+
+  const paymentStatus =
+    paymentStatusFromUnknown(finance.data?.paymentStatus) || row.paymentStatus;
+  const paymentLabel = applicationPaymentLabel(paymentStatus);
 
   const fields: { label: string; value: ReactNode }[] = [
     { label: "성명", value: dash(row.personName) },
@@ -69,13 +82,14 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
     },
     {
       label: "결제 상태",
-      value: (
-        <span
-          className={`admin-badge admin-badge--${applicationPaymentBadge(row.paymentStatus)}`}
-        >
-          {applicationPaymentLabel(row.paymentStatus)}
-        </span>
-      ),
+      value:
+        paymentLabel === "—" ? (
+          dash()
+        ) : (
+          <span className={`admin-badge admin-badge--${applicationPaymentBadge(paymentStatus)}`}>
+            {paymentLabel}
+          </span>
+        ),
     },
     {
       label: groupAddress ? "단체장 주소 확인" : "주소",
