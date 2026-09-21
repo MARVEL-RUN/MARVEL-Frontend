@@ -40,3 +40,21 @@
 - [ ] 운영에서 개인·단체 조회·수정·취소·재결제 최종 확인
 - [ ] 정식 오픈 전 `/entry-preview` 제거·비활성화 방법 정리 (README 등)
 - [ ] 관리자 접근 범위(숨은 경로 여부) 확정
+
+---
+
+## eventId·다대회 (후속)
+
+배포 DB에 테스트 대회 유지 + 실오픈용 `eventId` 별도 추가 예정 (백엔드 수기 개설).
+
+### 공개 사이트
+
+- [ ] `NEXT_PUBLIC_EVENT_ID` env → `DEFAULT_EVENT_ID` 연결 (현재 `test-marvelrun` 하드코딩)
+- [ ] 실오픈 직전 배포 env eventId를 운영 대회 id로 변경
+- [ ] `.env.example`·README에 `NEXT_PUBLIC_EVENT_ID` 문서화
+
+### 관리자
+
+- [ ] 테스트·실오픈 마블런 동시 존재 시 slug(`marvel`) 중복 — 대회 선택·목록·운영 홈 집계 섞임 확인
+- [ ] 정원 `/capacities/marvel` API eventId `DEFAULT_EVENT_ID` 고정 → 실제 대회 id 사용
+- [ ] 관리자 문의 목록 `DEFAULT_EVENT_ID` 고정 호출 구간 실오픈 id 맞춤
