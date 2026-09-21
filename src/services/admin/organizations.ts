@@ -241,3 +241,32 @@ export function resetOrganizationPassword(
     { method: "PUT", body: JSON.stringify({ newPassword: password }) },
   );
 }
+
+export type AdminOrganizationDuplicateCheckResult = {
+  requestedGroupName: string;
+  useableGroupName: boolean;
+  requestedLoginId: string;
+  useableLoginId: boolean;
+};
+
+export function checkAdminOrganizationDuplicateId(params: {
+  eventId: string;
+  groupName: string;
+  groupLoginId: string;
+}) {
+  const eventId = params.eventId.trim();
+  const groupName = params.groupName.trim();
+  const groupLoginId = params.groupLoginId.trim();
+  if (!eventId) throw new Error("대회 정보가 없습니다.");
+  if (!groupName) throw new Error("단체명을 입력하세요.");
+  if (!groupLoginId) throw new Error("로그인 ID를 입력하세요.");
+
+  const query = new URLSearchParams({
+    eventId,
+    groupName,
+    groupLoginId,
+  });
+  return adminFetch<AdminOrganizationDuplicateCheckResult>(
+    `v1/admin/organizations/organization/duplicate-id-check?${query}`,
+  );
+}

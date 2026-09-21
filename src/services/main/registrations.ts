@@ -39,6 +39,26 @@ export async function createOrganizationRegistration(
   );
 }
 
+export type OrganizationDuplicateCheckResult = {
+  requestedGroupName: string;
+  useableGroupName: boolean;
+  requestedLoginId: string;
+  useableLoginId: boolean;
+};
+
+export async function checkOrganizationDuplicateId(
+  eventId: string,
+  params: { groupName: string; groupLoginId: string },
+) {
+  const query = new URLSearchParams({
+    groupName: params.groupName.trim(),
+    groupLoginId: params.groupLoginId.trim(),
+  });
+  return mainFetch<OrganizationDuplicateCheckResult>(
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/organization/duplicate-id-check?${query}`,
+  );
+}
+
 export async function lookupIndividualRegistrations(
   eventId: string,
   body: IndividualRegistrationLookupRequest,

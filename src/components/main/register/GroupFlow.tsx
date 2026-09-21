@@ -56,7 +56,10 @@ import {
   type ParticipantDraft,
 } from "@/lib/register";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
-import { createOrganizationRegistration } from "@/services/main/registrations";
+import {
+  checkOrganizationDuplicateId,
+  createOrganizationRegistration,
+} from "@/services/main/registrations";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
 import { SheetModal } from "../SheetModal";
@@ -88,6 +91,21 @@ const NOTICE = [
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
 
+type DupCheck = {
+  status: "idle" | "checking" | "ready" | "error";
+  groupName: string;
+  loginId: string;
+  useableGroupName?: boolean;
+  useableLoginId?: boolean;
+  message?: string;
+};
+
+const EMPTY_DUP: DupCheck = {
+  status: "idle",
+  groupName: "",
+  loginId: "",
+};
+
 function orgPasswordHint(value: string) {
   if (!value) {
     return { text: "조회용 비밀번호 (6자 이상)", tone: "" as const };
@@ -105,7 +123,38 @@ function orgPasswordConfirmHint(password: string, confirm: string) {
   return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
 }
 
-function orgAccountHint(value: string, langWarn: boolean) {
+function matchesDup(dup: DupCheck, groupName: string, loginId: string) {
+  return dup.groupName === groupName.trim() && dup.loginId === loginId.trim();
+}
+
+function groupNameHint(value: string, loginId: string, dup: DupCheck) {
+  const name = value.trim();
+  if (!name) return null;
+  if (!matchesDup(dup, name, loginId)) return null;
+  if (dup.status === "checking") {
+    return { text: "중복 확인 중…", tone: "" as const };
+  }
+  if (dup.status === "ready") {
+    if (!dup.useableGroupName) {
+      return { text: "이미 사용 중인 단체명입니다.", tone: "is-err" as const };
+    }
+    return { text: "사용 가능한 단체명입니다.", tone: "is-ok" as const };
+  }
+  if (dup.status === "error") {
+    return {
+      text: dup.message || "중복 확인에 실패했습니다.",
+      tone: "is-err" as const,
+    };
+  }
+  return null;
+}
+
+function orgAccountHint(
+  value: string,
+  groupName: string,
+  langWarn: boolean,
+  dup: DupCheck,
+) {
   if (langWarn) {
     return { text: "영문으로 입력해주세요.", tone: "is-err" as const };
   }
@@ -114,7 +163,25 @@ function orgAccountHint(value: string, langWarn: boolean) {
   }
   const err = orgAccountError(value);
   if (err) return { text: err, tone: "is-err" as const };
-  return { text: "사용 가능한 계정입니다.", tone: "is-ok" as const };
+  if (!groupName.trim() || !matchesDup(dup, groupName, value)) {
+    return { text: "중복 여부를 확인합니다.", tone: "" as const };
+  }
+  if (dup.status === "checking") {
+    return { text: "중복 확인 중…", tone: "" as const };
+  }
+  if (dup.status === "ready") {
+    if (!dup.useableLoginId) {
+      return { text: "이미 사용 중인 계정입니다.", tone: "is-err" as const };
+    }
+    return { text: "사용 가능한 계정입니다.", tone: "is-ok" as const };
+  }
+  if (dup.status === "error") {
+    return {
+      text: dup.message || "중복 확인에 실패했습니다.",
+      tone: "is-err" as const,
+    };
+  }
+  return { text: "중복 여부를 확인합니다.", tone: "" as const };
 }
 
 function memberPeek(
@@ -144,6 +211,7 @@ export function GroupFlow({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [accountLangWarn, setAccountLangWarn] = useState(false);
+  const [dupCheck, setDupCheck] = useState<DupCheck>(EMPTY_DUP);
   const [openMember, setOpenMember] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
@@ -225,6 +293,55 @@ export function GroupFlow({
     });
   }, [categories, optionsLoading]);
 
+  useEffect(() => {
+    const groupName = draft.groupName.trim();
+    const loginId = draft.organizationAccount.trim();
+    if (!hasMainApi || !groupName || orgAccountError(loginId)) {
+      setDupCheck(EMPTY_DUP);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      setDupCheck({
+        status: "checking",
+        groupName,
+        loginId,
+      });
+      checkOrganizationDuplicateId(DEFAULT_EVENT_ID, {
+        groupName,
+        groupLoginId: loginId,
+      })
+        .then((result) => {
+          if (cancelled) return;
+          setDupCheck({
+            status: "ready",
+            groupName,
+            loginId,
+            useableGroupName: result.useableGroupName,
+            useableLoginId: result.useableLoginId,
+          });
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setDupCheck({
+            status: "error",
+            groupName,
+            loginId,
+            message:
+              err instanceof MainHttpError
+                ? err.message
+                : "중복 확인에 실패했습니다.",
+          });
+        });
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [draft.groupName, draft.organizationAccount]);
+
   function patch(next: Partial<GroupDraft>) {
     setDraft((prev) => ({ ...prev, ...next }));
     setError("");
@@ -270,6 +387,20 @@ export function GroupFlow({
     if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
     const accountErr = orgAccountError(draft.organizationAccount);
     if (accountErr) return fail(accountErr);
+    if (hasMainApi) {
+      if (
+        dupCheck.status !== "ready" ||
+        !matchesDup(dupCheck, draft.groupName, draft.organizationAccount)
+      ) {
+        return fail("단체명·계정 중복 확인이 끝날 때까지 기다려 주세요.");
+      }
+      if (!dupCheck.useableGroupName) {
+        return fail("이미 사용 중인 단체명입니다.");
+      }
+      if (!dupCheck.useableLoginId) {
+        return fail("이미 사용 중인 계정입니다.");
+      }
+    }
     const passwordErr = applicationPasswordError(draft.organizationPassword ?? "");
     if (passwordErr) return fail(passwordErr);
     if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
@@ -379,7 +510,17 @@ export function GroupFlow({
   const total = payment?.paymentAmount ?? groupOptionsFee(draft, categories);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(draft.participants);
-  const accountHint = orgAccountHint(draft.organizationAccount, accountLangWarn);
+  const nameHint = groupNameHint(
+    draft.groupName,
+    draft.organizationAccount,
+    dupCheck,
+  );
+  const accountHint = orgAccountHint(
+    draft.organizationAccount,
+    draft.groupName,
+    accountLangWarn,
+    dupCheck,
+  );
   const passwordHint = orgPasswordHint(draft.organizationPassword);
   const passwordConfirmHint = orgPasswordConfirmHint(
     draft.organizationPassword,
@@ -413,6 +554,13 @@ export function GroupFlow({
                 onChange={(e) => patch({ groupName: e.target.value })}
                 required
               />
+              {nameHint ? (
+                <p
+                  className={`form-row__hint${nameHint.tone ? ` ${nameHint.tone}` : ""}`}
+                >
+                  {nameHint.text}
+                </p>
+              ) : null}
             </FormRow>
             <FormRow label="단체 계정" required>
               <input
