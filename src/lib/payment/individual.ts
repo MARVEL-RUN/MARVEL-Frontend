@@ -4,7 +4,11 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
-import { guardianRequiredFor, type EntryDraft } from "@/lib/register";
+import {
+  guardianRequiredFor,
+  termsAgreementFields,
+  type EntryDraft,
+} from "@/lib/register";
 import type {
   RegistrationCategory,
   RegistrationCreateRequest,
@@ -55,5 +59,6 @@ export function toRegistrationCreateRequest(
     ...(guardianPhone ? { guardianPhone } : {}),
     ...(guardianRelation ? { guardianRelationship: guardianRelation } : {}),
     guardianConsent: requireGuardian ? draft.guardianConsent : false,
+    ...termsAgreementFields(draft),
   };
 }

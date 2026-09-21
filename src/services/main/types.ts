@@ -38,6 +38,9 @@ export type RegistrationCreateRequest = {
   guardianPhone?: string;
   guardianRelationship?: string;
   guardianConsent?: boolean;
+  termsEssentialAgreed: boolean;
+  termsMarketingAgreed: boolean;
+  termsMarketingChannelAgreed: boolean;
 };
 
 export type RegistrationCreateResponse = {
@@ -79,6 +82,9 @@ export type OrganizationRegistrationRequest = {
   account: OrganizationAccount;
   profile: OrganizationProfile;
   registrations: OrganizationParticipant[];
+  termsEssentialAgreed: boolean;
+  termsMarketingAgreed: boolean;
+  termsMarketingChannelAgreed: boolean;
 };
 
 export type OrganizationRegistrationResponse = {

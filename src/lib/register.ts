@@ -493,6 +493,15 @@ export function requiredConsentsOk(c: Consents) {
   return c.agreeRules && c.agreePrivacy && c.agreeThirdParty && c.agreeConsign;
 }
 
+/** 신청 생성 API 약관 동의 필드. 마케팅·전송매체는 동일 선택 동의로 매핑 */
+export function termsAgreementFields(c: Consents) {
+  return {
+    termsEssentialAgreed: requiredConsentsOk(c),
+    termsMarketingAgreed: c.agreeMarketing,
+    termsMarketingChannelAgreed: c.agreeMarketing,
+  };
+}
+
 export function consentsAll(on: boolean): Consents {
   return {
     agreeRules: on,
