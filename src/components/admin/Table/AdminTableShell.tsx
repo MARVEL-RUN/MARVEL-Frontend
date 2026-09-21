@@ -26,6 +26,7 @@ type Props<T> = {
   pageUnit?: string;
   onRowClick?: (row: T) => void;
   isRowSelected?: (row: T) => boolean;
+  rowClassName?: (row: T) => string | undefined;
   minRows?: number;
 };
 
@@ -45,6 +46,7 @@ export function AdminTableShell<T>({
   pageUnit,
   onRowClick,
   isRowSelected,
+  rowClassName,
   minRows,
 }: Props<T>) {
   const count = totalCount ?? rows.length;
@@ -88,7 +90,9 @@ export function AdminTableShell<T>({
               {rows.map((row) => (
                 <tr
                   key={rowKey(row)}
-                  className={isRowSelected?.(row) ? "is-picked" : undefined}
+                  className={[rowClassName?.(row), isRowSelected?.(row) ? "is-picked" : undefined]
+                    .filter(Boolean)
+                    .join(" ") || undefined}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                 >
                   {columns.map((col) => (
