@@ -99,6 +99,13 @@ export type OrganizationLookupRequest = {
   password: string;
 };
 
+export type PaymentRetryResponse = {
+  paymentId?: string;
+  orderId: string;
+  orderName?: string;
+  amount: number;
+};
+
 export type RegistrationReceiptMember = {
   registrationId: string;
   name?: string;

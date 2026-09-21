@@ -1,23 +1,30 @@
 "use client";
 
-import { DEFAULT_EVENT_ID, hasMainApi } from "@/lib/main/config";
+import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { MainHttpError } from "@/lib/main/fetch";
+import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
 import { formatPhone, type ApplyKind } from "@/lib/register";
 import {
   lookupIndividualRegistrations,
   lookupOrganizationRegistrations,
+  retryIndividualPayment,
+  retryOrganizationPayment,
 } from "@/services/main/registrations";
 import type {
+  IndividualRegistrationLookupRequest,
   OrganizationLookupParticipant,
+  OrganizationLookupRequest,
   RegistrationReceipt,
   RegistrationReceiptMember,
   RegistrationReceiptSouvenir,
 } from "@/services/main/types";
-import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useLayoutEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 import { PasswordField, PhoneField } from "../register/ApplyUi";
 import { useRegistrationOpen } from "../register/useRegistrationOpen";
+import { scrollPageTop } from "@/lib/scroll-page";
 
 type View = "form" | "hit" | "miss";
 
@@ -27,6 +34,10 @@ const LOOKUP_LEAD =
 export function LookupPage() {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const lookupOpen = useRegistrationOpen();
+
+  useLayoutEffect(() => {
+    scrollPageTop();
+  }, [kind]);
 
   return (
     <main className="page">
@@ -193,6 +204,7 @@ const PAYMENT_STATUS: Record<string, { label: string; hint: string }> = {
 const REGISTRATION_STATUS_LABEL: Record<string, string> = {
   CONFIRMED: "확정",
   PENDING: "대기",
+  PAYMENT_PENDING: "결제 대기",
   ADDITIONAL_PAYMENT_REQUIRED: "추가 결제",
   CANCELED: "취소",
   CANCELLED: "취소",
@@ -347,6 +359,44 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
   );
 }
 
+function canPreparePayment(receipt: RegistrationReceipt) {
+  return receipt.paymentAction === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
+}
+
+function receiptPayKey(receipt: RegistrationReceipt) {
+  return (
+    receipt.registrationId ||
+    receipt.organizationId ||
+    receipt.paymentId ||
+    receipt.orderId ||
+    ""
+  );
+}
+
+function ReceiptPayButton({
+  receipt,
+  busy,
+  onPay,
+}: {
+  receipt: RegistrationReceipt;
+  busy: boolean;
+  onPay: () => void;
+}) {
+  if (!canPreparePayment(receipt)) return null;
+  return (
+    <div className="flow__nav">
+      <button
+        type="button"
+        className="btn btn--red"
+        onClick={onPay}
+        disabled={busy}
+      >
+        {busy ? "결제 준비 중..." : "결제하기"}
+      </button>
+    </div>
+  );
+}
+
 function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
   const actionNote = paymentActionNote(receipt.paymentAction);
   return (
@@ -362,9 +412,13 @@ function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
 function IndividualReceiptCard({
   receipt,
   name,
+  paying,
+  onPay,
 }: {
   receipt: RegistrationReceipt;
   name: string;
+  paying?: boolean;
+  onPay?: () => void;
 }) {
   const members = receiptMembers(receipt);
   const course = members.find((member) => !member.canceled)?.course;
@@ -388,11 +442,22 @@ function IndividualReceiptCard({
       </dl>
       <ReceiptSouvenirList souvenirs={receiptSouvenirs(receipt)} />
       <ReceiptNotes receipt={receipt} />
+      {onPay ? (
+        <ReceiptPayButton receipt={receipt} busy={Boolean(paying)} onPay={onPay} />
+      ) : null}
     </section>
   );
 }
 
-function GroupReceiptCard({ receipt }: { receipt: RegistrationReceipt }) {
+function GroupReceiptCard({
+  receipt,
+  paying,
+  onPay,
+}: {
+  receipt: RegistrationReceipt;
+  paying?: boolean;
+  onPay?: () => void;
+}) {
   const members = receiptMembers(receipt);
   const activeCount = members.filter((member) => !member.canceled).length;
   return (
@@ -420,6 +485,9 @@ function GroupReceiptCard({ receipt }: { receipt: RegistrationReceipt }) {
       <ReceiptMemberList members={members} />
       <ReceiptSouvenirList souvenirs={receipt.souvenirs ?? []} />
       <ReceiptNotes receipt={receipt} />
+      {onPay ? (
+        <ReceiptPayButton receipt={receipt} busy={Boolean(paying)} onPay={onPay} />
+      ) : null}
     </section>
   );
 }
@@ -434,24 +502,29 @@ function isTechnicalErrorMessage(message: string) {
   );
 }
 
-function lookupErrorMessage(err: unknown) {
-  if (!(err instanceof Error)) return "신청 내역을 조회하지 못했습니다.";
+function lookupErrorMessage(err: unknown, fallback = "신청 내역을 조회하지 못했습니다.") {
+  if (!(err instanceof Error)) return fallback;
   const message = err.message.trim();
   if (
     !message ||
     isTechnicalErrorMessage(message) ||
     (err instanceof MainHttpError && err.status >= 500)
   ) {
-    return "신청 내역을 조회하지 못했습니다.";
+    return fallback;
   }
   return message;
 }
 
 function IndividualLookup({ onBack }: { onBack: () => void }) {
+  const router = useRouter();
   const [view, setView] = useState<View>("form");
   const [busy, setBusy] = useState(false);
+  const [payingKey, setPayingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [receipts, setReceipts] = useState<RegistrationReceipt[]>([]);
+  const [access, setAccess] = useState<IndividualRegistrationLookupRequest | null>(
+    null,
+  );
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
   const [phone, setPhone] = useState("");
@@ -463,22 +536,63 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("API 주소가 설정되지 않았습니다.");
       return;
     }
+    const body: IndividualRegistrationLookupRequest = {
+      name: name.trim(),
+      birth: toLookupBirth(birth),
+      phNum: formatPhone(phone),
+      password: password.trim(),
+    };
     setBusy(true);
     setError("");
     try {
-      const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, {
-        name: name.trim(),
-        birth: toLookupBirth(birth),
-        phNum: formatPhone(phone),
-        password: password.trim(),
-      });
+      const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, body);
       const rows = Array.isArray(found) ? found : [];
+      setAccess(body);
       setReceipts(rows);
       setView(rows.length ? "hit" : "miss");
     } catch (err) {
       setError(lookupErrorMessage(err));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function onRetryPay(receipt: RegistrationReceipt) {
+    if (!hasMainApi || !hasTossClientKey) {
+      setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+      return;
+    }
+    if (!access || !canPreparePayment(receipt) || !receipt.paymentId) {
+      setError("결제할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    const registrationId =
+      receipt.registrationId ||
+      receiptMembers(receipt).find((member) => !member.canceled)?.id;
+    if (!registrationId) {
+      setError("결제할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    const key = receiptPayKey(receipt);
+    setPayingKey(key);
+    setError("");
+    try {
+      const retried = await retryIndividualPayment(
+        DEFAULT_EVENT_ID,
+        registrationId,
+        receipt.paymentId,
+        access,
+      );
+      savePendingPayment({
+        registration: paymentOrderFromRetry(retried),
+        customerName: (receiptMembers(receipt)[0]?.name || name).trim(),
+        savedAt: Date.now(),
+      });
+      router.push("/payment");
+    } catch (err) {
+      setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+    } finally {
+      setPayingKey(null);
     }
   }
 
@@ -498,11 +612,14 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   if (view === "hit" && receipts.length > 0) {
     return (
       <>
+        {error ? <p className="form__err">{error}</p> : null}
         {receipts.map((receipt) => (
           <IndividualReceiptCard
             key={receipt.registrationId || receipt.orderId || receipt.paymentId}
             receipt={receipt}
             name={name.trim()}
+            paying={payingKey === receiptPayKey(receipt)}
+            onPay={() => void onRetryPay(receipt)}
           />
         ))}
         <div className="flow__nav">
@@ -572,10 +689,13 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
 }
 
 function GroupLookup({ onBack }: { onBack: () => void }) {
+  const router = useRouter();
   const [view, setView] = useState<View>("form");
   const [busy, setBusy] = useState(false);
+  const [payingKey, setPayingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [receipts, setReceipts] = useState<RegistrationReceipt[]>([]);
+  const [access, setAccess] = useState<OrganizationLookupRequest | null>(null);
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
 
@@ -585,20 +705,54 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("API 주소가 설정되지 않았습니다.");
       return;
     }
+    const body: OrganizationLookupRequest = {
+      loginId: account.trim(),
+      password: password.trim(),
+    };
     setBusy(true);
     setError("");
     try {
-      const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, {
-        loginId: account.trim(),
-        password: password.trim(),
-      });
+      const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, body);
       const rows = Array.isArray(found) ? found : [];
+      setAccess(body);
       setReceipts(rows);
       setView(rows.length ? "hit" : "miss");
     } catch (err) {
       setError(lookupErrorMessage(err));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function onRetryPay(receipt: RegistrationReceipt) {
+    if (!hasMainApi || !hasTossClientKey) {
+      setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+      return;
+    }
+    if (!access || !canPreparePayment(receipt) || !receipt.paymentId || !receipt.organizationId) {
+      setError("결제할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    const key = receiptPayKey(receipt);
+    setPayingKey(key);
+    setError("");
+    try {
+      const retried = await retryOrganizationPayment(
+        DEFAULT_EVENT_ID,
+        receipt.organizationId,
+        receipt.paymentId,
+        access,
+      );
+      savePendingPayment({
+        registration: paymentOrderFromRetry(retried),
+        customerName: (receipt.leaderName || receipt.organizationName || account).trim(),
+        savedAt: Date.now(),
+      });
+      router.push("/payment");
+    } catch (err) {
+      setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+    } finally {
+      setPayingKey(null);
     }
   }
 
@@ -618,10 +772,13 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   if (view === "hit" && receipts.length > 0) {
     return (
       <>
+        {error ? <p className="form__err">{error}</p> : null}
         {receipts.map((receipt, i) => (
           <GroupReceiptCard
             key={receipt.organizationId || receipt.orderId || receipt.paymentId || String(i)}
             receipt={receipt}
+            paying={payingKey === receiptPayKey(receipt)}
+            onPay={() => void onRetryPay(receipt)}
           />
         ))}
         <div className="flow__nav">

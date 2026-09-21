@@ -4,6 +4,7 @@ import type {
   OrganizationLookupRequest,
   OrganizationRegistrationRequest,
   OrganizationRegistrationResponse,
+  PaymentRetryResponse,
   RegistrationCreateRequest,
   RegistrationCreateResponse,
   RegistrationReceipt,
@@ -54,6 +55,36 @@ export async function lookupOrganizationRegistrations(
 ) {
   return mainFetch<RegistrationReceipt[]>(
     `v1/public/events/${encodeURIComponent(eventId)}/organizations/lookup`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function retryIndividualPayment(
+  eventId: string,
+  registrationId: string,
+  paymentId: string,
+  body: IndividualRegistrationLookupRequest,
+) {
+  return mainFetch<PaymentRetryResponse>(
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}/payments/${encodeURIComponent(paymentId)}/retry`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function retryOrganizationPayment(
+  eventId: string,
+  organizationId: string,
+  paymentId: string,
+  body: OrganizationLookupRequest,
+) {
+  return mainFetch<PaymentRetryResponse>(
+    `v1/public/events/${encodeURIComponent(eventId)}/organizations/${encodeURIComponent(organizationId)}/payments/${encodeURIComponent(paymentId)}/retry`,
     {
       method: "POST",
       body: JSON.stringify(body),
