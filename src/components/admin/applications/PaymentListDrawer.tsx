@@ -168,6 +168,11 @@ export function PaymentListDrawer({
         </div>
       </header>
       <div className="admin-drawer__body admin-pay-list-drawer__body">
+        {payments.length > 0 ? (
+          <p className="admin-pay-list-drawer__hint">
+            항목을 누르면 자세한 처리 로그를 확인할 수 있습니다.
+          </p>
+        ) : null}
         <div className="admin-pay-list">
           {payments.map((payment, index) => {
             const id = payment.paymentId ?? `pay-${index}`;
