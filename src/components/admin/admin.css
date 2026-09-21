@@ -1501,8 +1501,90 @@ html.admin-mode body {
   font-size: 13px;
 }
 
-.admin-apps-list .admin-drawer {
+.admin-apps-list .admin-drawer:not(.admin-drawer--log) {
   width: min(520px, 100%);
+}
+
+.admin-drawer--log {
+  --admin-detail-drawer-w: min(520px, 100vw);
+  right: var(--admin-detail-drawer-w);
+  width: min(400px, calc(100vw - var(--admin-detail-drawer-w)));
+  z-index: 191;
+  border-left: 1px solid var(--admin-line);
+  border-right: 1px solid var(--admin-line);
+  box-shadow: -8px 0 24px rgba(24, 28, 38, 0.12);
+}
+
+@media (max-width: 920px) {
+  .admin-drawer--log {
+    width: min(360px, calc(100vw - var(--admin-detail-drawer-w)));
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-drawer--log {
+    right: 0;
+    width: 100%;
+    z-index: 195;
+    box-shadow: -12px 0 32px rgba(24, 28, 38, 0.18);
+  }
+}
+
+.admin-pay-log-drawer__order {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.admin-pay-log-drawer__meta {
+  align-items: center;
+}
+
+.admin-pay-log-drawer__body {
+  padding: 12px 16px 18px;
+}
+
+.admin-pay-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.admin-pay-log-table th,
+.admin-pay-log-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eef1f5;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-pay-log-table th {
+  color: #667085;
+  font-weight: 700;
+  background: #fafbfc;
+}
+
+.admin-pay-log-table td {
+  color: var(--admin-ink);
+  font-weight: 500;
+}
+
+.admin-pay-log-table td:first-child {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-pay-log-table__error {
+  display: block;
+  margin-top: 4px;
+  color: #b42318;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.admin-pay__card.is-log-open {
+  border-color: #98a2b3;
+  background: #fafbfc;
 }
 
 .admin-apps-list .admin-drawer__row {
