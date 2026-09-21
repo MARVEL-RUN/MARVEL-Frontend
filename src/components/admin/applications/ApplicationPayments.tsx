@@ -2,6 +2,7 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { paymentLogProcessLabel, paymentLogSourceLabel } from "@/lib/payment-log";
 import {
   isRegistrationStatus,
   paymentActionDisplay,
@@ -85,8 +86,8 @@ function PaymentLogs({
       {rows.map((log, index) => (
         <li key={`${log.createdAt ?? "log"}-${index}`}>
           <strong>{formatAdminBoardDate(log.createdAt)}</strong>
-          <span>{dash(log.processType)}</span>
-          <span>{dash(log.source)}</span>
+          <span>{paymentLogProcessLabel(log.processType)}</span>
+          <span>{paymentLogSourceLabel(log.source)}</span>
           {log.errorCode || log.errorMessage ? (
             <em>
               {log.errorCode ? `${log.errorCode} ` : ""}

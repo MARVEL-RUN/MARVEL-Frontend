@@ -352,10 +352,15 @@ export function ApplicationsListPage({ slug }: Props) {
     },
   ];
 
-  const fixedTableHeight = hasAdminApi && Boolean(apiEventId) && listQuery.data !== undefined;
-  const listPageStyle = {
-    "--admin-apps-list-rows": PAGE_SIZE,
-  } as CSSProperties;
+  const tableRowCount = rows.length;
+  const fixedTableHeight =
+    hasAdminApi &&
+    Boolean(apiEventId) &&
+    listQuery.data !== undefined &&
+    tableRowCount > 0;
+  const listPageStyle = fixedTableHeight
+    ? ({ "--admin-apps-list-rows": tableRowCount } as CSSProperties)
+    : undefined;
 
   return (
     <div
@@ -378,7 +383,6 @@ export function ApplicationsListPage({ slug }: Props) {
           setSelectedId(row.id);
         }}
         isRowSelected={(row) => Boolean(selectedId && row.id === selectedId)}
-        minRows={fixedTableHeight ? PAGE_SIZE : undefined}
         actions={
           <div className="admin-table-shell__actions admin-apps-list__head-actions">
             <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
