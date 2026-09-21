@@ -3322,7 +3322,7 @@ button.admin-pay-list__item:hover {
   line-height: 1.3;
 }
 
-.admin-root .admin-input-modal__close {
+.admin-input-modal__close {
   width: 28px;
   height: 28px;
   margin: -2px -4px 0 0;
@@ -3337,7 +3337,7 @@ button.admin-pay-list__item:hover {
   cursor: pointer;
 }
 
-.admin-root .admin-input-modal__close:hover {
+.admin-input-modal__close:hover {
   color: var(--admin-ink);
 }
 
@@ -3364,6 +3364,7 @@ button.admin-pay-list__item:hover {
 .admin-input-modal__control {
   position: relative;
   display: block;
+  width: 100%;
 }
 
 .admin-input-modal__control input {
@@ -3394,13 +3395,16 @@ button.admin-pay-list__item:hover {
   box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
 }
 
-.admin-root .admin-input-modal__eye {
+.admin-input-modal__eye {
   position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 40px;
+  height: 42px;
+  margin: 0;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3410,7 +3414,7 @@ button.admin-pay-list__item:hover {
   cursor: pointer;
 }
 
-.admin-root .admin-input-modal__eye:hover {
+.admin-input-modal__eye:hover {
   color: var(--admin-ink);
 }
 
