@@ -2,11 +2,7 @@
 
 import { TrendPanel } from "@/components/admin/dashboard/TrendPanel";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
-import {
-  ADMIN_RACE_EVENTS,
-  getAdminRaceEvent,
-  type AdminRaceEventId,
-} from "@/lib/admin/raceEvents";
+import { adminApplicationsHref } from "@/lib/admin/eventLinks";
 import {
   getAdminDashboardStats,
   type EventIntakeStats,
@@ -16,15 +12,6 @@ import { Ban, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 const APPS = "/admin/applications";
-
-function applicationsHref(eventId: string, query?: string) {
-  const known = eventId === "marvel" || eventId === "virtual";
-  const path = known
-    ? `${APPS}/${eventId}`
-    : `${APPS}/list?eventId=${encodeURIComponent(eventId)}`;
-  if (!query) return path;
-  return known ? `${path}?${query}` : `${path}&${query}`;
-}
 
 function TaskLink({
   href,
@@ -58,37 +45,34 @@ function TaskLink({
 }
 
 function IntakeCard({
-  eventId,
   stats,
   loading,
 }: {
-  eventId: AdminRaceEventId;
-  stats?: EventIntakeStats;
+  stats: EventIntakeStats;
   loading: boolean;
 }) {
-  const event = getAdminRaceEvent(eventId);
   const n = (value?: number) => (loading ? "…" : (value ?? 0).toLocaleString());
   const hero =
-    eventId === "virtual"
-      ? { label: "참가 확정", value: stats?.confirmedCount }
-      : { label: "총 인원", value: stats?.participantCount };
+    stats.slug === "virtual"
+      ? { label: "참가 확정", value: stats.confirmedCount }
+      : { label: "총 인원", value: stats.participantCount };
   const side: [string, number | undefined][] =
-    eventId === "virtual"
+    stats.slug === "virtual"
       ? [
-          ["1차", stats?.roundCounts[0]],
-          ["2차", stats?.roundCounts[1]],
-          ["3차", stats?.roundCounts[2]],
+          ["1차", stats.roundCounts[0]],
+          ["2차", stats.roundCounts[1]],
+          ["3차", stats.roundCounts[2]],
         ]
       : [
-          ["개인", stats?.individualCount],
-          ["단체", stats?.groupCount],
-          ["참가 확정", stats?.confirmedCount],
+          ["개인", stats.individualCount],
+          ["단체", stats.groupCount],
+          ["참가 확정", stats.confirmedCount],
         ];
 
   return (
-    <Link href={applicationsHref(eventId)} className="admin-intake__card">
+    <Link href={adminApplicationsHref(stats.eventId)} className="admin-intake__card">
       <span className="admin-intake__head">
-        <strong>{event?.name}</strong>
+        <strong>{stats.eventName}</strong>
         <ChevronRight className="admin-intake__go" size={16} strokeWidth={2} />
       </span>
       <span className="admin-intake__body">
@@ -120,8 +104,13 @@ export function DashboardPage({
   });
 
   const cancelHref = data?.cancellationPendingEventId
-    ? applicationsHref(data.cancellationPendingEventId, "status=CANCELLATION_PENDING")
+    ? adminApplicationsHref(
+        data.cancellationPendingEventId,
+        "status=CANCELLATION_PENDING",
+      )
     : APPS;
+
+  const intakeEvents = data?.events ?? [];
 
   return (
     <div className="admin-page">
@@ -167,14 +156,15 @@ export function DashboardPage({
       <section className="admin-dash__section">
         <h2>접수 현황</h2>
         <div className="admin-intake">
-          {ADMIN_RACE_EVENTS.map((event) => (
-            <IntakeCard
-              key={event.id}
-              eventId={event.id}
-              stats={data?.events.find((row) => row.eventId === event.id)}
-              loading={isLoading}
-            />
-          ))}
+          {isLoading && intakeEvents.length === 0 ? (
+            <p className="admin-empty">불러오는 중…</p>
+          ) : intakeEvents.length > 0 ? (
+            intakeEvents.map((event) => (
+              <IntakeCard key={event.eventId} stats={event} loading={isLoading} />
+            ))
+          ) : (
+            <p className="admin-empty">등록된 대회가 없습니다.</p>
+          )}
         </div>
       </section>
 
