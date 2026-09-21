@@ -1,13 +1,19 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
+import { useAdminPrompt } from "@/components/admin/InputModal";
+import { adminToast } from "@/components/admin/Toast";
 import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { adminMembersListBackHref } from "@/lib/admin/eventLinks";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { formatAmount } from "@/services/admin/applications";
-import { fetchAdminOrganization } from "@/services/admin/organizations";
-import { useQuery } from "@tanstack/react-query";
+import {
+  fetchAdminOrganization,
+  resetOrganizationPassword,
+} from "@/services/admin/organizations";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { OrganizationMembersList } from "./OrganizationMembersList";
@@ -33,12 +39,46 @@ export function OrganizationDetailPage() {
   const apiEventId = searchParams.get("eventId")?.trim() ?? "";
   const slugParam = searchParams.get("slug")?.trim() ?? "";
   const slug = slugParam === "marvel" || slugParam === "virtual" ? slugParam : null;
+  const { confirm, modal: confirmModal } = useAdminConfirm();
+  const { prompt, modal: inputModal } = useAdminPrompt();
 
   const detailQuery = useQuery({
     queryKey: ["admin", "organization", organizationId],
     queryFn: () => fetchAdminOrganization(organizationId),
     enabled: hasAdminApi && Boolean(organizationId),
   });
+
+  const resetPassword = useMutation({
+    mutationFn: (password: string) =>
+      resetOrganizationPassword(organizationId, password),
+    onSuccess: () => adminToast.success("비밀번호가 초기화되었습니다."),
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error ? err.message : "비밀번호 초기화에 실패했습니다.",
+      ),
+  });
+
+  const handleResetPassword = async () => {
+    const label =
+      detailQuery.data?.loginId?.trim() ||
+      detailQuery.data?.groupName?.trim() ||
+      "해당 단체";
+    const ok = await confirm({
+      title: "비밀번호 초기화",
+      message: `${label} 계정의 비밀번호를 초기화하시겠습니까?`,
+    });
+    if (!ok) return;
+    const password = await prompt({
+      title: "비밀번호 초기화",
+      description: "새 비밀번호를 입력해주세요.",
+      label: "비밀번호",
+      placeholder: "비밀번호를 입력해주세요",
+      type: "password",
+      minLength: 4,
+    });
+    if (!password) return;
+    resetPassword.mutate(password);
+  };
 
   const detail = detailQuery.data;
   const members = detail?.members ?? [];
@@ -80,11 +120,23 @@ export function OrganizationDetailPage() {
           <p className="admin-org-detail__lead">{detail?.groupName || "불러오는 중…"}</p>
         </div>
         <div className="admin-org-detail__actions">
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost"
+            disabled={
+              resetPassword.isPending || detailQuery.isLoading || !detail
+            }
+            onClick={handleResetPassword}
+          >
+            비밀번호 초기화
+          </button>
           <Link href={listHref} className="admin-btn admin-btn--ghost">
             목록으로
           </Link>
         </div>
       </header>
+      {confirmModal}
+      {inputModal}
 
       {detailQuery.isLoading ? (
         <p className="admin-empty">불러오는 중…</p>

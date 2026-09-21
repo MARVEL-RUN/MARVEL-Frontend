@@ -225,3 +225,16 @@ export function fetchAdminOrganization(organizationId: string) {
     return detail;
   });
 }
+
+export function resetOrganizationPassword(
+  organizationId: string,
+  newPassword: string,
+) {
+  const password = newPassword.trim();
+  if (!organizationId.trim()) throw new Error("단체 정보를 찾을 수 없습니다.");
+  if (password.length < 4) throw new Error("비밀번호는 4자 이상이어야 합니다.");
+  return adminFetch<void>(
+    `v1/admin/organizations/${encodeURIComponent(organizationId)}/password`,
+    { method: "PUT", body: JSON.stringify({ newPassword: password }) },
+  );
+}

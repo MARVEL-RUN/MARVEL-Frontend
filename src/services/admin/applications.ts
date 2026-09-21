@@ -443,6 +443,19 @@ export function fetchAdminRegistration(registrationId: string) {
   );
 }
 
+export function resetRegistrationPassword(
+  registrationId: string,
+  newPassword: string,
+) {
+  const password = newPassword.trim();
+  if (!registrationId.trim()) throw new Error("신청 정보를 찾을 수 없습니다.");
+  if (password.length < 4) throw new Error("비밀번호는 4자 이상이어야 합니다.");
+  return adminFetch<void>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}/password`,
+    { method: "PUT", body: JSON.stringify({ newPassword: password }) },
+  );
+}
+
 export function mapRegistrationPage(
   page: Page<RegistrationListItem>,
   eventId: string,
