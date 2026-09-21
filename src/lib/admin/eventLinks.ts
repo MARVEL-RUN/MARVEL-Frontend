@@ -1,5 +1,5 @@
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
-import { raceEventSlug, type AdminEvent } from "@/services/admin/applications";
+import type { AdminEvent } from "@/services/admin/applications";
 
 const APPS = "/admin/applications";
 const CAPS = "/admin/capacities";
@@ -9,7 +9,7 @@ export function isAdminRaceSlug(id: string): id is AdminRaceEventId {
   return id === "marvel" || id === "virtual";
 }
 
-/** marvel·virtual → /applications/{slug}, 그 외 API id → /applications/list?eventId= */
+/** API eventId → list?eventId=, marvel·virtual slug → /{slug} (북마크용) */
 export function adminApplicationsHref(eventIdOrSlug: string, query?: string) {
   const path = isAdminRaceSlug(eventIdOrSlug)
     ? `${APPS}/${eventIdOrSlug}`
@@ -19,7 +19,7 @@ export function adminApplicationsHref(eventIdOrSlug: string, query?: string) {
 }
 
 export function adminApplicationsHrefFromEvent(event: AdminEvent, query?: string) {
-  return adminApplicationsHref(raceEventSlug(event) ?? event.eventId, query);
+  return adminApplicationsHref(event.eventId, query);
 }
 
 /** 대회 API eventId로 정원 상세 진입 */
@@ -32,7 +32,7 @@ export function adminCapacitiesHref(eventIdOrSlug: string) {
   return `${CAPS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
 }
 
-/** marvel·virtual → /members/{slug}, 그 외 API id → /members/list?eventId= */
+/** API eventId → list?eventId=, marvel·virtual slug → /{slug} (북마크용) */
 export function adminMembersHref(eventIdOrSlug: string, query?: string) {
   const path = isAdminRaceSlug(eventIdOrSlug)
     ? `${MEMBERS}/${eventIdOrSlug}`
@@ -42,22 +42,20 @@ export function adminMembersHref(eventIdOrSlug: string, query?: string) {
 }
 
 export function adminMembersHrefFromEvent(event: AdminEvent, query?: string) {
-  return adminMembersHref(raceEventSlug(event) ?? event.eventId, query);
+  return adminMembersHref(event.eventId, query);
 }
 
-export function adminMembersListBackHref(apiEventId: string, slug?: AdminRaceEventId | null) {
-  if (slug) return `${MEMBERS}/${slug}`;
+export function adminMembersListBackHref(apiEventId: string) {
   return `${MEMBERS}/list?eventId=${encodeURIComponent(apiEventId)}`;
 }
 
 export function adminOrganizationDetailHref(
   organizationId: string,
-  options: { apiEventId: string; slug?: AdminRaceEventId | null },
+  options: { apiEventId: string },
 ) {
   const params = new URLSearchParams({
     organizationId,
     eventId: options.apiEventId,
   });
-  if (options.slug) params.set("slug", options.slug);
   return `${MEMBERS}/detail?${params}`;
 }

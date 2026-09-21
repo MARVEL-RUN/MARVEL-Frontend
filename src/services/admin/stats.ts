@@ -72,12 +72,11 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     cancellationPendingEventId: cancellationPending[0]?.eventId ?? null,
     events: events.map((event) => {
       const slug = raceEventSlug(event);
-      const key = slug ?? event.eventId;
       return {
-        eventId: key,
+        eventId: event.eventId,
         eventName: event.eventName,
         slug,
-        ...intakeFor(applications.filter((row) => row.eventId === key)),
+        ...intakeFor(applications.filter((row) => row.eventId === event.eventId)),
       };
     }),
   };
