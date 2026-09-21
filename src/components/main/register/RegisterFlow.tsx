@@ -15,6 +15,7 @@ import {
   courseById,
   emailOk,
   genderLabel,
+  guardianFieldsOk,
   needsGuardian,
   requiredConsentsOk,
   ticketFee,
@@ -220,8 +221,11 @@ function IndividualFlow({
     } catch (err) {
       return fail(err instanceof Error ? err.message : "입력 내용을 확인하세요.");
     }
-    if (needsGuardian(draft.birth) && !draft.emergency.trim()) {
-      return fail("만 14세 미만은 보호자 연락처를 입력하세요.");
+    if (!guardianFieldsOk(draft)) {
+      if (needsGuardian(draft.birth) && !draft.guardianConsent) {
+        return fail("보호자(법정대리인) 동의가 필요합니다.");
+      }
+      return fail("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
     }
     if (!draft.souvenirId) return fail("티셔츠 옵션을 불러오지 못했습니다.");
     if (!draft.selectedSize) return fail("티셔츠 사이즈를 선택하세요.");
@@ -377,24 +381,49 @@ function IndividualFlow({
             title={needsGuardian(draft.birth) ? "보호자 정보" : "보호자 정보 (선택)"}
             note={
               needsGuardian(draft.birth)
-                ? `${GUARDIAN_AGE_NOTE}. 보호자 연락처를 입력해 주세요.`
+                ? `${GUARDIAN_AGE_NOTE}. 보호자 이름·연락처·동의가 필요합니다.`
                 : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
             }
           >
+            <FormRow label="보호자 이름" required={needsGuardian(draft.birth)}>
+              <input
+                className="field"
+                name="guardianName"
+                placeholder="보호자(학부모) 이름"
+                value={draft.guardianName}
+                onChange={(e) => patch({ guardianName: e.target.value })}
+                required={needsGuardian(draft.birth)}
+              />
+            </FormRow>
             <FormRow label="보호자 연락처" required={needsGuardian(draft.birth)}>
               <PhoneField
-                name="emergency"
-                placeholder="보호자 연락처를 입력해주세요."
-                value={draft.emergency}
-                onChange={(emergency) => patch({ emergency })}
+                name="guardianPhone"
+                placeholder="보호자(학부모) 연락처"
+                value={draft.guardianPhone}
+                onChange={(guardianPhone) => patch({ guardianPhone })}
                 required={needsGuardian(draft.birth)}
               />
               {needsGuardian(draft.birth) ? (
                 <p className="form-row__hint">
-                  만 14세 미만은 보호자 연락처를 입력해야 신청할 수 있습니다.
+                  만 14세 미만은 보호자 이름·연락처를 입력해야 신청할 수 있습니다.
                 </p>
               ) : null}
             </FormRow>
+            {needsGuardian(draft.birth) ? (
+              <FormRow label="보호자 동의" required>
+                <label className="apply-terms__row">
+                  <input
+                    type="checkbox"
+                    checked={draft.guardianConsent}
+                    onChange={(e) => patch({ guardianConsent: e.target.checked })}
+                    required
+                  />
+                  <span>
+                    법정대리인(보호자)으로서 참가 신청·개인정보 처리에 동의합니다.
+                  </span>
+                </label>
+              </FormRow>
+            ) : null}
           </FormSec>
 
           <FormSec kicker="05 / ENTRY" title="신청 정보">
@@ -522,9 +551,19 @@ function IndividualFlow({
               </dd>
             </div>
             <div>
-              <dt>보호자 연락처</dt>
-              <dd>{draft.emergency.trim() || "—"}</dd>
+              <dt>보호자 이름</dt>
+              <dd>{draft.guardianName.trim() || "—"}</dd>
             </div>
+            <div>
+              <dt>보호자 연락처</dt>
+              <dd>{draft.guardianPhone.trim() || "—"}</dd>
+            </div>
+            {needsGuardian(draft.birth) ? (
+              <div>
+                <dt>보호자 동의</dt>
+                <dd>{draft.guardianConsent ? "동의함" : "—"}</dd>
+              </div>
+            ) : null}
             <div>
               <dt>티셔츠 사이즈</dt>
               <dd>{draft.selectedSize || "—"}</dd>
