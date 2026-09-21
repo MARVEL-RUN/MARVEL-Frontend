@@ -1226,6 +1226,35 @@ html.admin-mode body {
   border: 1px solid var(--admin-line);
 }
 
+.admin-page .admin-table-shell + .admin-table-shell {
+  margin-top: 16px;
+}
+
+.admin-count-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--admin-blue);
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-count-btn:hover {
+  text-decoration: underline;
+}
+
+.admin-count-btn.is-on {
+  font-weight: 700;
+}
+
+.admin-table tbody tr.is-off td {
+  color: #8a93a3;
+}
+
+.admin-table tbody tr.is-picked td {
+  background: #eef4ff;
+}
+
 .admin-table-shell__head {
   display: flex;
   flex-wrap: wrap;
@@ -1531,6 +1560,14 @@ html.admin-mode body {
   padding: 56px 16px;
   text-align: center;
   color: #8a93a3;
+}
+
+.admin-empty p {
+  margin: 0;
+}
+
+.admin-empty .admin-btn {
+  margin-top: 12px;
 }
 
 .admin-badge {
