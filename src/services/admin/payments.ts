@@ -140,6 +140,25 @@ function asFinance(data: unknown): AdminFinance {
   };
 }
 
+export function fetchApplicationFinance(
+  row: {
+    eventId: string;
+    id: string;
+    kind: string;
+    organizationId?: string;
+  },
+  page = 0,
+) {
+  if (row.kind === "group") {
+    return fetchOrganizationPayments(
+      row.eventId,
+      row.organizationId || row.id,
+      page,
+    );
+  }
+  return fetchPersonalPayments(row.eventId, row.id, page);
+}
+
 export function fetchPersonalPayments(
   eventId: string,
   registrationId: string,

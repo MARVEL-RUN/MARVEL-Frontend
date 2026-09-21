@@ -76,6 +76,27 @@ export function isRegistrationStatus(value: string): value is RegistrationStatus
   return REGISTRATION_STATUSES.includes(value as RegistrationStatus);
 }
 
+export function isPaymentStatus(value: string): value is PaymentStatus {
+  return PAYMENT_STATUSES.includes(value as PaymentStatus);
+}
+
+export function paymentStatusKey(value?: string | null): PaymentStatus | "" {
+  const key = statusKey(value);
+  return isPaymentStatus(key) ? key : "";
+}
+
+/** 결제 필드에 신청 상태가 들어온 경우만 대응 */
+export function paymentStatusFromUnknown(value?: string | null): PaymentStatus | "" {
+  const payment = paymentStatusKey(value);
+  if (payment) return payment;
+  const key = statusKey(value);
+  if (key === "PENDING" || key === "PAYMENT_PENDING" || key === "EXPIRED") return "UNPAID";
+  if (key === "ADDITIONAL_PAYMENT_REQUIRED") return "UNPAID";
+  if (key === "PARTIAL_REFUND_REQUIRED") return "NEED_PARTIAL_REFUND";
+  if (key === "CANCELLATION_PENDING") return "NEED_REFUND";
+  return "";
+}
+
 export function registrationStatusFromParam(value: string | null): RegistrationStatus | "" {
   const key = statusKey(value);
   return isRegistrationStatus(key) ? key : "";
@@ -84,7 +105,7 @@ export function registrationStatusFromParam(value: string | null): RegistrationS
 export function registrationStatusLabel(status?: string | null) {
   const key = statusKey(status);
   if (isRegistrationStatus(key)) return REGISTRATION_STATUS_LABEL[key];
-  return status?.trim() || "—";
+  return "—";
 }
 
 export function registrationStatusBadge(status?: string | null) {
@@ -103,11 +124,11 @@ export function registrationStatusBadge(status?: string | null) {
 }
 
 export function paymentStatusInfo(status?: string | null, apiLabel?: string | null) {
-  const key = statusKey(status);
-  const meta = PAYMENT_STATUS[key as PaymentStatus];
+  const key = paymentStatusFromUnknown(status);
+  const meta = key ? PAYMENT_STATUS[key] : undefined;
   return {
-    label: apiLabel?.trim() || meta?.label || (status?.trim() ? status : "—"),
-    hint: meta ? meta.hint : status?.trim() ? "상태 안내는 운영 문의로 확인해 주세요." : "",
+    label: apiLabel?.trim() || meta?.label || "—",
+    hint: meta?.hint ?? "",
   };
 }
 
@@ -116,7 +137,7 @@ export function paymentStatusLabel(status?: string | null, apiLabel?: string | n
 }
 
 export function paymentStatusBadge(status?: string | null) {
-  const key = statusKey(status);
+  const key = paymentStatusFromUnknown(status);
   if (key === "COMPLETED") return "paid";
   if (key === "UNPAID") return "pending";
   if (key === "NEED_REFUND" || key === "NEED_PARTIAL_REFUND" || key === "NEED_PARTITIAL_REFUND") {
