@@ -8,7 +8,13 @@ import {
   registrationStatusLabel,
 } from "@/lib/registration-status";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
-import { formatPhone, orgAccountError, orgPasswordError, type ApplyKind } from "@/lib/register";
+import {
+  applicationPasswordError,
+  APPLICATION_PASSWORD_MIN,
+  formatPhone,
+  orgAccountError,
+  type ApplyKind,
+} from "@/lib/register";
 import {
   cancelIndividualRegistration,
   cancelOrganizationRegistration,
@@ -103,7 +109,8 @@ function individualLookupFormError(name: string, birth: string, phone: string, p
   if (!name.trim()) return "이름을 입력하세요.";
   if (birth.replace(/\D/g, "").length !== 8) return "생년월일을 입력하세요.";
   if (phone.replace(/\D/g, "").length < 10) return "전화번호를 입력하세요.";
-  if (password.trim().length < 4) return "신청조회용 비밀번호를 4자 이상 입력하세요.";
+  const passwordErr = applicationPasswordError(password);
+  if (passwordErr) return passwordErr;
   return "";
 }
 
@@ -861,7 +868,8 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         <PasswordField
           value={password}
           onChange={setPassword}
-          placeholder="신청조회용 비밀번호 (4자 이상)"
+          placeholder="신청조회용 비밀번호 (6자 이상)"
+          minLength={APPLICATION_PASSWORD_MIN}
           autoComplete="current-password"
           required
         />
@@ -899,7 +907,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError(accountErr);
       return;
     }
-    const passwordErr = orgPasswordError(password);
+    const passwordErr = applicationPasswordError(password);
     if (passwordErr) {
       setError(passwordErr);
       return;
@@ -1133,7 +1141,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           autoComplete="current-password"
           required
         />
-        <p className="field__hint">6~64자, 공백 없이 입력해주세요.</p>
+        <p className="field__hint">6자 이상 입력해주세요.</p>
       </div>
       {error ? <p className="form__err">{error}</p> : null}
       <LookupNav busy={busy} onBack={onBack} />

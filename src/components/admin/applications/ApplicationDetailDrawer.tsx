@@ -10,8 +10,14 @@ import {
   applicationKindLabel,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
+import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { ApplicationPayments } from "./ApplicationPayments";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { ApplicationPaySummary } from "./ApplicationPaySummary";
+import { PaymentListDrawer } from "./PaymentListDrawer";
+import { PaymentLogDrawer } from "./PaymentLogDrawer";
 
 type Props = {
   row: AdminApplicationRow | null;
@@ -155,21 +161,85 @@ function buildSections(row: AdminApplicationRow) {
 }
 
 export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props) {
-  if (!row) return null;
+  const [mounted, setMounted] = useState(false);
+  const [page, setPage] = useState(0);
+  const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setLogPayment(null);
+    setPage(0);
+  }, [row?.id]);
+
+  useEffect(() => {
+    setLogPayment(null);
+  }, [page]);
+
+  useEffect(() => {
+    if (!row) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (logPayment) {
+        setLogPayment(null);
+        return;
+      }
+      onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [logPayment, onClose, row]);
+
+  const finance = useQuery({
+    queryKey: ["admin", "finance", row?.eventId, row?.id, row?.kind, row?.organizationId, page],
+    queryFn: () => fetchApplicationFinance(row!, page),
+    enabled: Boolean(row?.eventId && row?.id),
+  });
+
+  if (!row || !mounted) return null;
 
   const isGroup = row.kind === "group";
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
+  const payments = finance.data?.payments?.content ?? [];
+  const totalPages = Math.max(1, finance.data?.payments?.totalPages ?? 1);
+  const totalCount = finance.data?.payments?.totalElements;
+  const showPayments = !finance.isLoading && !finance.isError && payments.length > 0;
+  const showLog = Boolean(logPayment);
 
-  return (
-    <>
+  return createPortal(
+    <div
+      className="admin-drawer-stack"
+      data-pay-open={showPayments ? "" : undefined}
+      data-log-open={showLog ? "" : undefined}
+    >
       <div
         className="admin-drawer__dim"
         role="presentation"
         aria-hidden="true"
         onClick={onClose}
       />
-      <aside className="admin-drawer" role="dialog" aria-modal="true" aria-label="신청 상세">
+      {showLog && logPayment ? (
+        <PaymentLogDrawer
+          eventId={row.eventId}
+          payment={logPayment}
+          onClose={() => setLogPayment(null)}
+        />
+      ) : null}
+      {showPayments ? (
+        <PaymentListDrawer
+          payments={payments}
+          page={page}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          activeLogPaymentId={logPayment?.paymentId ?? null}
+          onOpenLog={setLogPayment}
+          onPage={setPage}
+        />
+      ) : null}
+      <aside className="admin-drawer admin-drawer--detail" role="dialog" aria-modal="true" aria-label="신청 상세">
         <header className="admin-drawer__hero">
           <div className="admin-drawer__hero-bar">
             <span className="admin-drawer__hero-kind">{applicationKindLabel(row.kind)}</span>
@@ -212,11 +282,17 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 keepEmpty={!isGroup}
               />
               <DetailSection title="주소" fields={sections.addressFields} />
-              <ApplicationPayments row={row} />
             </>
           ) : null}
+          <ApplicationPaySummary
+            data={finance.data}
+            loading={finance.isLoading}
+            error={finance.isError ? finance.error : undefined}
+            paymentCount={totalCount ?? payments.length}
+          />
         </div>
       </aside>
-    </>
+    </div>,
+    document.body,
   );
 }

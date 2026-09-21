@@ -11,17 +11,17 @@ export const REGISTRATION_STATUSES = [
 
 export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number];
 
-export const STATUS_NOT_APPLICABLE = "해당 사항 없음";
+export const STATUS_CHECK_LOG = "로그 확인 필요";
 
 export const REGISTRATION_STATUS_LABEL: Record<RegistrationStatus, string> = {
-  PENDING: "결제 대기(관리자)",
+  PENDING: "편입·결제 대기",
   PAYMENT_PENDING: "결제 대기",
-  CONFIRMED: "확정",
+  CONFIRMED: "참가 확정",
   ADDITIONAL_PAYMENT_REQUIRED: "추가 결제 필요",
   PARTIAL_REFUND_REQUIRED: "부분 환불 필요",
-  CANCELLATION_PENDING: "취소 처리 중",
-  CANCELED: "취소",
-  EXPIRED: "만료",
+  CANCELLATION_PENDING: "취소·환불 처리 중",
+  CANCELED: "취소 완료",
+  EXPIRED: "결제 만료",
 };
 
 export function statusKey(value?: string | null) {
@@ -39,10 +39,10 @@ export function registrationStatusFromParam(value: string | null): RegistrationS
 
 export function registrationStatusLabel(status?: string | null) {
   const key = statusKey(status);
-  if (!key) return STATUS_NOT_APPLICABLE;
+  if (!key) return STATUS_CHECK_LOG;
   if (key === "UNKNOWN") return "확인 불가";
   if (isRegistrationStatus(key)) return REGISTRATION_STATUS_LABEL[key];
-  return STATUS_NOT_APPLICABLE;
+  return STATUS_CHECK_LOG;
 }
 
 export function registrationStatusBadge(status?: string | null) {
@@ -57,7 +57,7 @@ export function registrationStatusBadge(status?: string | null) {
     return "refund_requested";
   }
   if (key === "CANCELED" || key === "EXPIRED") return "refunded";
-  if (key === "UNKNOWN") return "must";
+  if (key === "UNKNOWN" || !key || !isRegistrationStatus(key)) return "must";
   return "plain";
 }
 

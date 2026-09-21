@@ -470,16 +470,12 @@ export function orgAccountError(value: string) {
   return "";
 }
 
-/** 백엔드: 6~64자 */
-export function orgPasswordError(value: string) {
-  const n = value.trim().length;
-  if (n < 6 || n > 64) return "단체 비밀번호는 6~64자로 입력하세요.";
-  return "";
-}
+export const APPLICATION_PASSWORD_MIN = 6;
 
-/** 신청조회용: 4자 이상 */
-export function entryPasswordError(value: string) {
-  if (value.trim().length < 4) return "신청 비밀번호는 4자 이상 입력하세요.";
+export function applicationPasswordError(value: string) {
+  if (value.trim().length < APPLICATION_PASSWORD_MIN) {
+    return "비밀번호는 6자 이상 입력하세요.";
+  }
   return "";
 }
 
@@ -571,7 +567,7 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
     throw new Error(guardianFieldsError(draft));
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
-  const passwordErr = entryPasswordError(draft.password);
+  const passwordErr = applicationPasswordError(draft.password);
   if (passwordErr) throw new Error(passwordErr);
   if (draft.password !== draft.passwordConfirm) {
     throw new Error("신청 비밀번호가 일치하지 않습니다.");
@@ -623,7 +619,7 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
   const accountErr = orgAccountError(draft.organizationAccount);
   if (accountErr) throw new Error(accountErr);
-  const passwordErr = orgPasswordError(draft.organizationPassword);
+  const passwordErr = applicationPasswordError(draft.organizationPassword);
   if (passwordErr) throw new Error(passwordErr);
   if (draft.organizationPassword !== draft.passwordConfirm) {
     throw new Error("단체 비밀번호가 일치하지 않습니다.");
@@ -687,7 +683,7 @@ export async function lookupEntry(query: LookupQuery): Promise<EntryRecord | nul
     !name ||
     !/^\d{8}$/.test(birth) ||
     phoneDigits.length < 10 ||
-    query.password.trim().length < 4
+    query.password.trim().length < APPLICATION_PASSWORD_MIN
   ) {
     return null;
   }
@@ -731,7 +727,7 @@ export async function lookupGroup(
 ): Promise<GroupRecord | null> {
   await wait(420);
   const account = query.account.trim();
-  if (orgAccountError(account) || orgPasswordError(query.password)) return null;
+  if (orgAccountError(account) || applicationPasswordError(query.password)) return null;
   const seq = String(20000 + (account.length * 419) % 80000);
   return {
     orderNo: `MR26-GRP-${seq}`,

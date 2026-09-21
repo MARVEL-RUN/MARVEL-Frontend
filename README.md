@@ -74,6 +74,8 @@ src/
   layouts/admin/
   lib/
     event.ts legal.ts privacy.ts mode.ts register.ts
+    registration-status.ts   # 신청상태(RegistrationStatus) 라벨
+    payment-log.ts           # 결제 처리 로그 processType·source 라벨
     main/                    # 공개 API base · fetch
     payment/                 # 토스 · 세션 · 종목 매핑
     admin/
@@ -91,6 +93,72 @@ public/images/
 - 공통 상수·타입만 `src/lib/` 루트. 공개 API는 `lib/main` + `services/main`, 결제는 `lib/payment`.
 - 관리자 전용은 `lib/admin`, `services/admin`. 게시판은 `boards/{notice,inquiry,faq}`, 약관은 `admin/legal`.
 - 메인 UI를 관리자에 복사하지 않는다. 반대도 같다.
+
+## 상태 표기
+
+백엔드 enum을 화면에 그대로 노출하지 않는다. 라벨은 아래 두 파일에서만 관리한다.
+
+| 파일 | API 값 | 쓰는 곳 |
+|------|--------|---------|
+| `src/lib/registration-status.ts` | `RegistrationStatus` | 신청 목록·상세, 신청조회 |
+| `src/lib/payment-log.ts` | 처리 로그 `processType`, `source` | 관리자 결제 처리 로그 |
+
+표기를 바꿀 때는 해당 파일의 `*_LABEL`만 수정한다.
+
+### RegistrationStatus (신청상태)
+
+백엔드 `RegistrationStatus` 기준. 관리자·신청조회 공통.
+
+| API | 화면 |
+|-----|------|
+| `PENDING` | 편입·결제 대기 |
+| `PAYMENT_PENDING` | 결제 대기 |
+| `CONFIRMED` | 참가 확정 |
+| `ADDITIONAL_PAYMENT_REQUIRED` | 추가 결제 필요 |
+| `PARTIAL_REFUND_REQUIRED` | 부분 환불 필요 |
+| `CANCELLATION_PENDING` | 취소·환불 처리 중 |
+| `CANCELED` | 취소 완료 |
+| `EXPIRED` | 결제 만료 |
+| `UNKNOWN` | 확인 불가 |
+| (없음·미매핑) | 로그 확인 필요 |
+
+헬퍼: `registrationStatusLabel()`, `registrationStatusBadge()`, `canPrepareRegistrationPayment()`.
+
+### 결제 처리 로그 (processType · source)
+
+토스 `payment.status`나 웹훅 `eventType`이 아니라, **백엔드가 토스 연동 단계마다 남기는 처리 로그**다. 토스 [결제 흐름](https://docs.tosspayments.com/guides/v2/get-started/llms-quick-reference)(준비 → 승인 API → 취소)과 대응한다.
+
+**processType**
+
+| API | 화면 |
+|-----|------|
+| `PAYMENT_PREPARED` | 결제 준비 |
+| `CONFIRM_REQUESTED` | 승인 요청 |
+| `CONFIRM_SUCCEEDED` | 승인 완료 |
+| `CONFIRM_FAILED` | 승인 실패 |
+| `CANCEL_PREPARED` | 취소 준비 |
+| `CANCEL_REQUESTED` | 취소 요청 |
+| `CANCEL_SUCCEEDED` | 취소 완료 |
+| `CANCEL_FAILED` | 취소 실패 |
+| `CANCEL_UNKNOWN` | 취소 확인 불가 |
+| `WEBHOOK_RECEIVED` | 웹훅 수신 |
+| `WEBHOOK_CONFIRM` | 웹훅 승인 처리 |
+| `WEBHOOK_CANCEL` | 웹훅 취소 처리 |
+| `RETRY_REQUESTED` | 재시도 요청 |
+| `STATUS_SYNC` | 상태 동기화 |
+| `EXPIRED` | 결제 만료 |
+
+**source**
+
+| API | 화면 |
+|-----|------|
+| `API` | API |
+| `WEBHOOK` | 웹훅 |
+| `SCHEDULER`, `CRON` | 배치 |
+| `ADMIN` | 관리자 |
+| `SYSTEM`, `INTERNAL` | 시스템 |
+
+헬퍼: `paymentLogProcessLabel()`, `paymentLogSourceLabel()`. 매핑에 없는 값은 API 원문 그대로 표시한다. 백엔드 enum이 늘면 `payment-log.ts`에 추가한다.
 
 ## 실행
 

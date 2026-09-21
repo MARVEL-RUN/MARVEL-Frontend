@@ -46,7 +46,7 @@ import {
   filterOrgAccountInput,
   groupNeedsGuardian,
   orgAccountError,
-  orgPasswordError,
+  applicationPasswordError,
   requiredConsentsOk,
   ticketForBirth,
   underGuardianAge,
@@ -90,9 +90,9 @@ const NOTICE = [
 
 function orgPasswordHint(value: string) {
   if (!value) {
-    return { text: "조회용 비밀번호 (6~64자)", tone: "" as const };
+    return { text: "조회용 비밀번호 (6자 이상)", tone: "" as const };
   }
-  const err = orgPasswordError(value);
+  const err = applicationPasswordError(value);
   if (err) return { text: err, tone: "is-err" as const };
   return { text: "사용 가능한 비밀번호입니다.", tone: "is-ok" as const };
 }
@@ -270,7 +270,7 @@ export function GroupFlow({
     if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
     const accountErr = orgAccountError(draft.organizationAccount);
     if (accountErr) return fail(accountErr);
-    const passwordErr = orgPasswordError(draft.organizationPassword ?? "");
+    const passwordErr = applicationPasswordError(draft.organizationPassword ?? "");
     if (passwordErr) return fail(passwordErr);
     if ((draft.organizationPassword ?? "") !== (draft.passwordConfirm ?? "")) {
       return fail("단체 비밀번호가 일치하지 않습니다.");

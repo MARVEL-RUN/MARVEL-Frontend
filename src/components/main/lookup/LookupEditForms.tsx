@@ -485,6 +485,7 @@ export function IndividualLookupEdit({
         </FormRow>
         <FormRow label="보호자 동의" required={guardianRequired}>
           <GuardianConsentField
+            variant="button"
             agreed={guardianConsent}
             onChange={setGuardianConsent}
           />

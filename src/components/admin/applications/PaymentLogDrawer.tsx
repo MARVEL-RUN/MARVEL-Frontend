@@ -2,28 +2,16 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import {
-  isRegistrationStatus,
-  registrationStatusBadge,
-  registrationStatusLabel,
-  statusKey,
-} from "@/lib/registration-status";
+import { paymentLogProcessLabel, paymentLogSourceLabel } from "@/lib/payment-log";
 import { formatAmount } from "@/services/admin/applications";
 import { fetchPaymentLogs, paymentMethodLabel, type AdminPayment } from "@/services/admin/payments";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 
 type Props = {
   eventId: string;
   payment: AdminPayment;
   onClose: () => void;
 };
-
-function dash(value?: string | number | null) {
-  if (value == null || value === "") return "-";
-  return String(value);
-}
 
 function errorHint(error: unknown) {
   if (isAdminHttp(error, 400)) return "요청값을 확인하세요.";
@@ -32,17 +20,6 @@ function errorHint(error: unknown) {
   }
   if (isAdminHttp(error, 404)) return "처리 로그가 없습니다.";
   return "처리 로그 조회에 실패했습니다.";
-}
-
-function RegistrationStatus({ value }: { value?: string }) {
-  const key = statusKey(value);
-  const label = registrationStatusLabel(value);
-  if (!isRegistrationStatus(key) && key !== "UNKNOWN") return <>{label}</>;
-  return (
-    <span className={`admin-badge admin-badge--${registrationStatusBadge(value)}`}>
-      {label}
-    </span>
-  );
 }
 
 function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: string }) {
@@ -72,7 +49,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
           <tr key={`${log.createdAt ?? "log"}-${index}`}>
             <td>{formatAdminBoardDate(log.createdAt)}</td>
             <td>
-              {dash(log.processType)}
+              {paymentLogProcessLabel(log.processType)}
               {log.errorCode || log.errorMessage ? (
                 <em className="admin-pay-log-table__error">
                   {log.errorCode ? `${log.errorCode} ` : ""}
@@ -80,7 +57,7 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
                 </em>
               ) : null}
             </td>
-            <td>{dash(log.source)}</td>
+            <td>{paymentLogSourceLabel(log.source)}</td>
           </tr>
         ))}
       </tbody>
@@ -89,31 +66,13 @@ function PaymentLogList({ eventId, paymentId }: { eventId: string; paymentId: st
 }
 
 export function PaymentLogDrawer({ eventId, payment, onClose }: Props) {
-  const [mounted, setMounted] = useState(false);
   const paymentId = payment.paymentId ?? "";
   const orderId = payment.orderId?.trim() || "-";
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  if (!paymentId) return null;
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  if (!mounted || !paymentId) return null;
-
-  return createPortal(
-    <aside
-      className="admin-drawer admin-drawer--log"
-      role="dialog"
-      aria-modal="true"
-      aria-label="처리 로그"
-    >
+  return (
+    <aside className="admin-drawer admin-drawer--log" role="dialog" aria-label="처리 로그">
       <header className="admin-drawer__hero">
         <div className="admin-drawer__hero-bar">
           <span className="admin-drawer__hero-kind">처리 로그</span>
@@ -125,13 +84,11 @@ export function PaymentLogDrawer({ eventId, payment, onClose }: Props) {
         <div className="admin-drawer__hero-meta admin-pay-log-drawer__meta">
           {payment.amount != null ? <span>{formatAmount(payment.amount)}</span> : null}
           <span>{paymentMethodLabel(payment)}</span>
-          <RegistrationStatus value={payment.paymentStatus} />
         </div>
       </header>
       <div className="admin-drawer__body admin-pay-log-drawer__body">
         <PaymentLogList eventId={eventId} paymentId={paymentId} />
       </div>
-    </aside>,
-    document.body,
+    </aside>
   );
 }

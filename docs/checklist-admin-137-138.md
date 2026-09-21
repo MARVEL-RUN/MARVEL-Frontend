@@ -6,39 +6,33 @@
 
 ## #137 design: 관리자 참가신청 UI/UX 구성 변경
 
-### 완료
+> design: 관리자 참가신청 UI/UX 구성 변경
 
-- [x] 신청자관리·정원 현황·운영 홈 대회 선택 흐름 통일 (`GET /v1/admin/events`, `AdminEventsPicker`, `eventLinks`)
-- [x] 신청 목록 진입 경로 1차 정리 (`individual`/`group` 제거, `list` slug redirect)
+### 기능 설명
 
-### 남음
+- #128 #132 API 연동은 끝났고, 관리자 화면 구성·표시만 정리
+- 대회 선택 → 목록 → 상세 흐름을 한 IA로 맞추고, 마블런/버추얼에 맞게 필터·컬럼·상세 필드를 나눔
 
-- [ ] 신청 목록 URL을 `eventId` query만 사용 (`/admin/applications/list?eventId=...`)
-  - [ ] `/admin/applications/marvel`, `/virtual` slug 라우트 제거 또는 redirect
-  - [ ] `eventLinks`·운영 홈·대시보드 링크를 API `eventId` 기준으로 통일
-  - [ ] `ApplicationsListPage` slug 분기 정리 (`eventId` 중심)
+### 세부 작업 항목 (남음)
+
 - [ ] 목록 주문번호 등 빠진 표시 값 맞춤
-- [ ] 운영 홈 접수 현황·환불 대기 진입과 신청 목록 맞춤
-- [ ] 신청 상세 개인·단체 필드 구분 표시
-- [ ] 상세 헤더(이름·주문번호·상태) 추가
-- [ ] 상세 빈 항목·결제 정보 중복 표기 정리
-- [ ] 테스트·메인에서 신청 상세 열림 최종 확인
 
-### 보류
+### 잔여 (후속)
 
-- [ ] 마블런/버추얼별 목록 필터·컬럼 구성 (유형·차수·코스) — `eventCategoryId`·차수 매핑 확인 후
-- [ ] 정원 현황 대회 목록 API 통일 (관리자 편의, 급하지 않음)
+- [ ] 결제·환불 요약「대표자」단체 섹션과 중복 표시 제거
+- [ ] 환불 대기 다대회일 때 목록 eventId·필터 진입 (현재 첫 건 eventId만)
+- [ ] 신청 목록 URL `eventId` query만 사용 (`marvel`/`virtual` slug 정리)
+
+### 참고
+
+- #128 관리자 신청자 목록 조회 연동
+- #132 관리자 신청자 상세보기 미오픈
+- 대회 우선 IA: 참가신청 → 대회 선택 → 해당 대회 신청만 조회
+- IA 상세: `docs/superpowers/specs/2026-09-10-admin-applications-event-first-design.md`
 
 ---
 
 ## #138 fix: 미리보기·신청조회·정원 현황 잔여 처리
-
-### 완료
-
-- [x] 신청조회 재결제·수정 후 결제 이동 미리보기 prefix 맞춤 (`LookupPage`, `useAppHref`)
-- [x] 공개 URL vs `/entry-preview` 역할 정리 (같은 컴포넌트, 게이트만 다름)
-- [x] 사이트맵·공개 내비 노출 범위 확인 (`main` + `REGISTRATION_OPEN=3` 기준)
-- [x] 신청조회 대회 id 범위 (마블런 고정, `DEFAULT_EVENT_ID` 유지)
 
 ### 남음 (운영)
 
@@ -47,14 +41,20 @@
 - [ ] 정식 오픈 전 `/entry-preview` 제거·비활성화 방법 정리 (README 등)
 - [ ] 관리자 접근 범위(숨은 경로 여부) 확정
 
-### 취소
-
-- ~~정원 현황 최대 수용량 열 단위(명/개)~~ — 유저·운영 표기 불필요
-- ~~운영 정원 API 확인~~ — 필요 시 수동
-
 ---
 
-## 참고
+## eventId·다대회 (후속)
 
-- 대회 우선 IA: `docs/superpowers/specs/2026-09-10-admin-applications-event-first-design.md`
-- #128 신청자 목록 API, #132 상세 API 연동 완료 (UI 정리는 #137)
+배포 DB에 테스트 대회 유지 + 실오픈용 `eventId` 별도 추가 예정 (백엔드 수기 개설).
+
+### 공개 사이트
+
+- [ ] `NEXT_PUBLIC_EVENT_ID` env → `DEFAULT_EVENT_ID` 연결 (현재 `test-marvelrun` 하드코딩)
+- [ ] 실오픈 직전 배포 env eventId를 운영 대회 id로 변경
+- [ ] `.env.example`·README에 `NEXT_PUBLIC_EVENT_ID` 문서화
+
+### 관리자
+
+- [ ] 테스트·실오픈 마블런 동시 존재 시 slug(`marvel`) 중복 — 대회 선택·목록·운영 홈 집계 섞임 확인
+- [ ] 정원 `/capacities/marvel` API eventId `DEFAULT_EVENT_ID` 고정 → 실제 대회 id 사용
+- [ ] 관리자 문의 목록 `DEFAULT_EVENT_ID` 고정 호출 구간 실오픈 id 맞춤
