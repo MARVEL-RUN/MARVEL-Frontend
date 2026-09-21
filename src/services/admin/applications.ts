@@ -2,9 +2,6 @@ import { adminFetch } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
 import {
-  paymentStatusBadge,
-  paymentStatusFromUnknown,
-  paymentStatusLabel,
   registrationStatusBadge,
   registrationStatusLabel,
   statusKey,
@@ -41,6 +38,11 @@ export type AdminEvent = {
   eventName: string;
   registrationType: string;
   registrationPeriod: string;
+};
+
+export type AdminEventCategory = {
+  id: string;
+  name: string;
 };
 
 export type AdminLeaderInfo = {
@@ -81,7 +83,6 @@ export type AdminApplicationRow = {
   address: string;
   addressDetail: string;
   status: string;
-  paymentStatus: string;
   appliedAt: string;
   organizationId?: string;
 };
@@ -131,8 +132,6 @@ type RegistrationDetail = {
   amount?: unknown;
   orderId?: unknown;
   paymentMethod?: unknown;
-  paymentStatus?: unknown;
-  payStatus?: unknown;
   status?: unknown;
   registrationStatus?: unknown;
   address?: unknown;
@@ -323,7 +322,6 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     address: "",
     addressDetail: "",
     status: statusKey(item.status),
-    paymentStatus: "",
     appliedAt: formatAdminBoardDate(asText(item.createdAt) || undefined),
     organizationId,
   };
@@ -364,9 +362,6 @@ export function applyRegistrationDetail(
     orderNo: firstText(data.orderId) || row.orderNo,
     cardPaymentInfo: firstText(data.paymentMethod) || row.cardPaymentInfo,
     status: statusKey(firstText(data.status, data.registrationStatus)) || row.status,
-    paymentStatus:
-      paymentStatusFromUnknown(firstText(data.paymentStatus, data.payStatus)) ||
-      row.paymentStatus,
     address: firstText(data.address, leader?.address) || row.address,
     addressDetail: firstText(data.addressDetail, leader?.addressDetail) || row.addressDetail,
     organizationId,
@@ -379,6 +374,24 @@ export function fetchAdminEvents() {
   return adminFetch<unknown>("v1/admin/events").then(asEventList);
 }
 
+function asEventCategoryList(data: unknown): AdminEventCategory[] {
+  if (!Array.isArray(data)) return [];
+  return data.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as { id?: unknown; name?: unknown };
+    const id = asText(row.id);
+    if (!id) return [];
+    const name = asText(row.name);
+    return [{ id, name: name || id }];
+  });
+}
+
+export function fetchAdminEventCategories(eventId: string) {
+  return adminFetch<unknown>(
+    `v1/admin/events/${encodeURIComponent(eventId)}/event-category`,
+  ).then(asEventCategoryList);
+}
+
 export function fetchAdminRegistrations(params: RegistrationListParams) {
   const query = new URLSearchParams({
     eventId: params.eventId,
@@ -389,7 +402,9 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   if (apiType) query.set("type", apiType);
   if (params.status) query.set("status", params.status);
   if (params.keyword?.trim()) query.set("keyword", params.keyword.trim());
-  if (params.eventCategoryId) query.set("eventCategoryId", params.eventCategoryId);
+  if (params.eventCategoryId?.trim()) {
+    query.set("eventCategoryId", params.eventCategoryId.trim());
+  }
 
   return adminFetch<unknown>(`v1/admin/registrations?${query}`).then((data) =>
     asRegistrationPage(data, params.size, params.page),
@@ -454,8 +469,6 @@ export function applicationGenderLabel(gender?: "male" | "female") {
 }
 
 export {
-  paymentStatusBadge as applicationPaymentBadge,
-  paymentStatusLabel as applicationPaymentLabel,
   registrationStatusBadge as applicationStatusBadge,
   registrationStatusLabel as applicationStatusLabel,
 };

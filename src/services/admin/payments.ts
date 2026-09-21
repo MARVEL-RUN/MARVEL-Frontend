@@ -77,7 +77,6 @@ export type AdminFinance = {
   leader?: AdminPaymentLeader;
   contractAmount?: number;
   registrationStatus?: string;
-  paymentStatus?: string;
   payments?: AdminPaymentPage;
 };
 
