@@ -78,6 +78,8 @@ export type AdminFinance = {
   contractAmount?: number;
   registrationStatus?: string;
   paymentStatus?: string;
+  refundStatus?: string;
+  paymentAction?: string;
   payments?: AdminPaymentPage;
 };
 

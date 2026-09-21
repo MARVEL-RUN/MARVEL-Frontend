@@ -87,6 +87,8 @@ export type AdminApplicationRow = {
   addressDetail: string;
   status: string;
   paymentStatus: string;
+  refundStatus: string;
+  paymentAction: string;
   appliedAt: string;
   organizationId?: string;
 };
@@ -140,6 +142,8 @@ type RegistrationDetail = {
   payStatus?: unknown;
   status?: unknown;
   registrationStatus?: unknown;
+  refundStatus?: unknown;
+  paymentAction?: unknown;
   address?: unknown;
   addressDetail?: unknown;
   organizationId?: unknown;
@@ -329,6 +333,8 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     addressDetail: "",
     status: statusKey(item.status),
     paymentStatus: "",
+    refundStatus: "",
+    paymentAction: "",
     appliedAt: formatAdminBoardDate(asText(item.createdAt) || undefined),
     organizationId,
   };
@@ -372,6 +378,8 @@ export function applyRegistrationDetail(
     paymentStatus:
       paymentStatusFromUnknown(firstText(data.paymentStatus, data.payStatus)) ||
       row.paymentStatus,
+    refundStatus: statusKey(firstText(data.refundStatus)) || row.refundStatus,
+    paymentAction: statusKey(firstText(data.paymentAction)) || row.paymentAction,
     address: firstText(data.address, leader?.address) || row.address,
     addressDetail: firstText(data.addressDetail, leader?.addressDetail) || row.addressDetail,
     organizationId,

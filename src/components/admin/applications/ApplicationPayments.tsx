@@ -2,7 +2,18 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { paymentStatusBadge, paymentStatusLabel } from "@/lib/registration-status";
+import {
+  isRegistrationStatus,
+  paymentActionDisplay,
+  paymentActionNote,
+  paymentStatusBadge,
+  paymentStatusDisplay,
+  paymentStatusFromUnknown,
+  refundStatusDisplay,
+  registrationStatusBadge,
+  registrationStatusLabel,
+  statusKey,
+} from "@/lib/registration-status";
 import { formatAmount, type AdminApplicationRow } from "@/services/admin/applications";
 import {
   fetchPaymentLogs,
@@ -28,12 +39,24 @@ function errorHint(error: unknown) {
   return "결제 조회에 실패했습니다.";
 }
 
-function PaymentStatus({ value }: { value?: string }) {
-  const status = value?.trim() ?? "";
-  if (!status) return <>-</>;
+function RegistrationStatus({ value }: { value?: string }) {
+  const key = statusKey(value);
+  const label = registrationStatusLabel(value);
+  if (!isRegistrationStatus(key)) return <>{label}</>;
   return (
-    <span className={`admin-badge admin-badge--${paymentStatusBadge(status)}`}>
-      {paymentStatusLabel(status)}
+    <span className={`admin-badge admin-badge--${registrationStatusBadge(value)}`}>
+      {label}
+    </span>
+  );
+}
+
+function PaymentStatus({ value }: { value?: string }) {
+  const key = paymentStatusFromUnknown(value);
+  const label = paymentStatusDisplay(value);
+  if (!key) return <>{label}</>;
+  return (
+    <span className={`admin-badge admin-badge--${paymentStatusBadge(value)}`}>
+      {label}
     </span>
   );
 }
@@ -131,7 +154,7 @@ function PaymentCard({
             <li key={item.paymentCancelId ?? `${item.createdAt}-${index}`}>
               취소 {item.cancelAmount != null ? formatAmount(item.cancelAmount) : "-"}
               {item.cancelReason ? ` · ${item.cancelReason}` : ""}
-              {item.status ? ` · ${item.status}` : ""}
+              {` · ${refundStatusDisplay(item.status)}`}
             </li>
           ))}
         </ul>
@@ -163,6 +186,11 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
   const data: AdminFinance | undefined = finance.data;
   const payments = data?.payments?.content ?? [];
   const totalPages = Math.max(1, data?.payments?.totalPages ?? 1);
+  const registrationStatus = data?.registrationStatus || row.status;
+  const paymentStatus = data?.paymentStatus || row.paymentStatus;
+  const refundStatus = data?.refundStatus || row.refundStatus;
+  const paymentAction = data?.paymentAction || row.paymentAction;
+  const actionNote = paymentActionNote(paymentAction);
 
   return (
     <section className="admin-pay" aria-label="결제·환불 내역">
@@ -188,9 +216,26 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
               </dd>
             </div>
             <div>
-              <dt>결제 상태</dt>
+              <dt>신청상태</dt>
               <dd>
-                <PaymentStatus value={data?.paymentStatus} />
+                <RegistrationStatus value={registrationStatus} />
+              </dd>
+            </div>
+            <div>
+              <dt>결제·환불</dt>
+              <dd>
+                <PaymentStatus value={paymentStatus} />
+              </dd>
+            </div>
+            <div>
+              <dt>환불 처리</dt>
+              <dd>{refundStatusDisplay(refundStatus)}</dd>
+            </div>
+            <div>
+              <dt>결제 안내</dt>
+              <dd>
+                {paymentActionDisplay(paymentAction)}
+                {actionNote ? <p className="admin-pay__hint">{actionNote}</p> : null}
               </dd>
             </div>
           </dl>

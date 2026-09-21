@@ -4,7 +4,9 @@ import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/confi
 import { genderLabel } from "@/lib/registration-gender";
 import {
   closedRegistration,
+  paymentActionNote,
   paymentStatusInfo,
+  refundStatusDisplay,
   registrationStatusLabel,
   statusKey,
 } from "@/lib/registration-status";
@@ -179,25 +181,6 @@ function lookupBirthView(raw?: string | null) {
   return (raw ?? "").trim();
 }
 
-function refundStatusLabel(status?: string | null) {
-  const key = statusKey(status);
-  if (key === "PROCESSING") return "환불 처리 중";
-  if (key === "DONE") return "환불완료";
-  if (key === "FAILED") return "환불 실패";
-  if (key === "UNKNOWN") return "확인 중";
-  return "";
-}
-
-function paymentActionNote(action?: string | null) {
-  const key = statusKey(action);
-  if (key === "WAIT") {
-    return "결제를 확인하고 있습니다. 잠시 후 다시 조회해 주세요.";
-  }
-  if (key === "PAYMENT_CLOSED") return "결제 기한이 종료되었습니다.";
-  if (key === "CONTACT_SUPPORT") return "운영 문의가 필요합니다.";
-  return "";
-}
-
 function PaymentStatusValue({
   status,
   apiLabel,
@@ -254,11 +237,10 @@ function ReceiptContactSpec({ receipt }: { receipt: RegistrationReceipt }) {
 }
 
 function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
-  const refundLabel = refundStatusLabel(receipt.refundStatus);
   return (
     <>
       <div>
-        <dt>결제상태</dt>
+        <dt>결제·환불</dt>
         <dd>
           <PaymentStatusValue
             status={receipt.paymentStatus}
@@ -274,12 +256,10 @@ function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
         <dt>납부금액</dt>
         <dd>{formatWon(receipt.paidAmount)}</dd>
       </div>
-      {refundLabel ? (
-        <div>
-          <dt>환불상태</dt>
-          <dd>{refundLabel}</dd>
-        </div>
-      ) : null}
+      <div>
+        <dt>환불 처리</dt>
+        <dd>{refundStatusDisplay(receipt.refundStatus)}</dd>
+      </div>
     </>
   );
 }
@@ -516,12 +496,10 @@ function IndividualReceiptCard({
           <dt>이메일</dt>
           <dd>{receipt.email?.trim() || "—"}</dd>
         </div>
-        {registrationLabel ? (
-          <div>
-            <dt>접수상태</dt>
-            <dd>{registrationLabel}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>신청상태</dt>
+          <dd>{registrationLabel}</dd>
+        </div>
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
       <ReceiptNotes receipt={receipt} />
@@ -580,12 +558,10 @@ function GroupReceiptCard({
           <dd>{activeCount}명</dd>
         </div>
         <ReceiptContactSpec receipt={receipt} />
-        {registrationLabel ? (
-          <div>
-            <dt>접수상태</dt>
-            <dd>{registrationLabel}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>신청상태</dt>
+          <dd>{registrationLabel}</dd>
+        </div>
         <ReceiptPaymentSpec receipt={receipt} />
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>

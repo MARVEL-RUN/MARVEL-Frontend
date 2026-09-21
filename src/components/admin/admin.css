@@ -1382,6 +1382,11 @@ html.admin-mode body {
   font-variant-numeric: tabular-nums;
 }
 
+.admin-drawer__hero-status {
+  display: grid;
+  gap: 4px;
+}
+
 .admin-drawer__status {
   display: inline-flex;
   align-items: center;

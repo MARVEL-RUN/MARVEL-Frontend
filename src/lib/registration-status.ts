@@ -11,8 +11,10 @@ export const REGISTRATION_STATUSES = [
 
 export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number];
 
+export const STATUS_NOT_APPLICABLE = "해당 사항 없음";
+
 export const REGISTRATION_STATUS_LABEL: Record<RegistrationStatus, string> = {
-  PENDING: "결제 대기",
+  PENDING: "결제 대기(관리자)",
   PAYMENT_PENDING: "결제 대기",
   CONFIRMED: "확정",
   ADDITIONAL_PAYMENT_REQUIRED: "추가 결제 필요",
@@ -20,6 +22,46 @@ export const REGISTRATION_STATUS_LABEL: Record<RegistrationStatus, string> = {
   CANCELLATION_PENDING: "취소 처리 중",
   CANCELED: "취소",
   EXPIRED: "만료",
+};
+
+export const PAYMENT_CANCEL_STATUSES = [
+  "PROCESSING",
+  "DONE",
+  "FAILED",
+  "UNKNOWN",
+] as const;
+
+export type PaymentCancelStatus = (typeof PAYMENT_CANCEL_STATUSES)[number];
+
+export const PAYMENT_CANCEL_STATUS_LABEL: Record<PaymentCancelStatus, string> = {
+  PROCESSING: "환불 처리 중",
+  DONE: "환불 완료",
+  FAILED: "환불 실패",
+  UNKNOWN: "확인 중",
+};
+
+export const PAYMENT_ACTIONS = [
+  "PREPARE_PAYMENT",
+  "WAIT",
+  "NONE",
+  "PAYMENT_CLOSED",
+  "CONTACT_SUPPORT",
+] as const;
+
+export type PaymentAction = (typeof PAYMENT_ACTIONS)[number];
+
+export const PAYMENT_ACTION_LABEL: Record<PaymentAction, string> = {
+  PREPARE_PAYMENT: "추가 결제 가능",
+  WAIT: "결제 확인 중",
+  NONE: STATUS_NOT_APPLICABLE,
+  PAYMENT_CLOSED: "결제 기한 종료",
+  CONTACT_SUPPORT: "운영 문의 필요",
+};
+
+export const PAYMENT_ACTION_NOTE: Partial<Record<PaymentAction, string>> = {
+  WAIT: "결제를 확인하고 있습니다. 잠시 후 다시 조회해 주세요.",
+  PAYMENT_CLOSED: "결제 기한이 종료되었습니다.",
+  CONTACT_SUPPORT: "운영 문의가 필요합니다.",
 };
 
 export const PAYMENT_STATUSES = [
@@ -80,6 +122,14 @@ export function isPaymentStatus(value: string): value is PaymentStatus {
   return PAYMENT_STATUSES.includes(value as PaymentStatus);
 }
 
+export function isPaymentCancelStatus(value: string): value is PaymentCancelStatus {
+  return PAYMENT_CANCEL_STATUSES.includes(value as PaymentCancelStatus);
+}
+
+export function isPaymentAction(value: string): value is PaymentAction {
+  return PAYMENT_ACTIONS.includes(value as PaymentAction);
+}
+
 export function paymentStatusKey(value?: string | null): PaymentStatus | "" {
   const key = statusKey(value);
   return isPaymentStatus(key) ? key : "";
@@ -105,7 +155,35 @@ export function registrationStatusFromParam(value: string | null): RegistrationS
 export function registrationStatusLabel(status?: string | null) {
   const key = statusKey(status);
   if (isRegistrationStatus(key)) return REGISTRATION_STATUS_LABEL[key];
-  return "—";
+  return STATUS_NOT_APPLICABLE;
+}
+
+export function refundStatusLabel(status?: string | null) {
+  const key = statusKey(status);
+  if (isPaymentCancelStatus(key)) return PAYMENT_CANCEL_STATUS_LABEL[key];
+  return "";
+}
+
+export function refundStatusDisplay(status?: string | null) {
+  const label = refundStatusLabel(status);
+  return label || STATUS_NOT_APPLICABLE;
+}
+
+export function paymentActionLabel(action?: string | null) {
+  const key = statusKey(action);
+  if (isPaymentAction(key)) return PAYMENT_ACTION_LABEL[key];
+  return "";
+}
+
+export function paymentActionNote(action?: string | null) {
+  const key = statusKey(action);
+  if (isPaymentAction(key)) return PAYMENT_ACTION_NOTE[key] ?? "";
+  return "";
+}
+
+export function paymentActionDisplay(action?: string | null) {
+  const label = paymentActionLabel(action);
+  return label || STATUS_NOT_APPLICABLE;
 }
 
 export function registrationStatusBadge(status?: string | null) {
@@ -126,10 +204,15 @@ export function registrationStatusBadge(status?: string | null) {
 export function paymentStatusInfo(status?: string | null, apiLabel?: string | null) {
   const key = paymentStatusFromUnknown(status);
   const meta = key ? PAYMENT_STATUS[key] : undefined;
+  const api = apiLabel?.trim();
   return {
-    label: apiLabel?.trim() || meta?.label || "—",
+    label: api || meta?.label || STATUS_NOT_APPLICABLE,
     hint: meta?.hint ?? "",
   };
+}
+
+export function paymentStatusDisplay(status?: string | null, apiLabel?: string | null) {
+  return paymentStatusInfo(status, apiLabel).label;
 }
 
 export function paymentStatusLabel(status?: string | null, apiLabel?: string | null) {

@@ -46,7 +46,7 @@ const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
 ];
 
 const STATUS_OPTIONS: { value: RegistrationStatus | ""; label: string }[] = [
-  { value: "", label: "결제상태" },
+  { value: "", label: "신청상태" },
   ...REGISTRATION_STATUSES.map((status) => ({
     value: status,
     label: registrationStatusLabel(status),
@@ -338,7 +338,7 @@ export function ApplicationsListPage({ slug }: Props) {
     },
     {
       key: "status",
-      header: "결제상태",
+      header: "신청상태",
       className: "is-status",
       width: "108px",
       render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
@@ -409,7 +409,7 @@ export function ApplicationsListPage({ slug }: Props) {
                   setApplied((prev) => ({ ...prev, status: value }));
                   setPage(1);
                 }}
-                ariaLabel="결제상태"
+                ariaLabel="신청상태"
                 width={112}
               />
               <AdminSelect

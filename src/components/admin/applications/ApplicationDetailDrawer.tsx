@@ -164,7 +164,10 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
               <span className="admin-drawer__hero-date">{row.appliedAt.trim()}</span>
             ) : null}
           </div>
-          <StatusLabel status={row.status} />
+          <div className="admin-drawer__hero-status">
+            <span className="admin-drawer__hero-kind">신청상태</span>
+            <StatusLabel status={row.status} />
+          </div>
         </header>
 
         <div className="admin-drawer__body">
