@@ -49,6 +49,7 @@ export type EntryDraft = {
   phone: string;
   email: string;
   guardianName: string;
+  guardianRelation: string;
   guardianPhone: string;
   guardianConsent: boolean;
   shirt: ShirtSize | "";
@@ -168,6 +169,7 @@ export const EMPTY_DRAFT: EntryDraft = {
   phone: "",
   email: "",
   guardianName: "",
+  guardianRelation: "",
   guardianPhone: "",
   guardianConsent: false,
   shirt: "",
@@ -254,6 +256,8 @@ export const CHILD_ACCOMPANY_NOTE =
   "만 12세 이하는 보호자 동행이 필요합니다.";
 export const GUARDIAN_AGE_NOTE =
   "만 14세 미만의 경우 법정대리인 동의가 필요합니다.";
+export const LEADER_UNDER_AGE_NOTE =
+  "만 14세 미만은 단체장으로 신청할 수 없습니다.";
 export const TIMING_CHIP_NOTE =
   "배번호 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.";
 
@@ -265,6 +269,17 @@ export function ageBand(birth: string): AgeBand | null {
   if (birth >= CHILD_BIRTH_FROM) return "child";
   if (birth >= GUARDIAN_BIRTH_FROM) return "teen";
   return "adult";
+}
+
+/** 년도만 골라도 확정이면 true. 경계 연도는 ymd가 다 채워졌을 때만. */
+export function underGuardianAge(birth: string) {
+  const y = birth.slice(0, 4);
+  if (!/^\d{4}$/.test(y)) return false;
+  const gy = GUARDIAN_BIRTH_FROM.slice(0, 4);
+  if (y > gy) return true;
+  if (y < gy) return false;
+  if (!/^\d{8}$/.test(birth)) return false;
+  return birth >= GUARDIAN_BIRTH_FROM;
 }
 
 export function ticketForBirth(birth: string): TicketKind {
@@ -280,14 +295,54 @@ export function groupNeedsGuardian(participants: { birth: string }[]) {
   return participants.some((p) => needsGuardian(p.birth));
 }
 
-export function guardianFieldsOk(draft: Pick<
-  EntryDraft,
-  "birth" | "guardianName" | "guardianPhone" | "guardianConsent"
->) {
-  if (!needsGuardian(draft.birth)) return true;
+export function guardianDraftStarted(
+  draft: Pick<
+    EntryDraft,
+    "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  return Boolean(
+    draft.guardianName.trim() ||
+      draft.guardianRelation.trim() ||
+      draft.guardianPhone.trim(),
+  );
+}
+
+export function guardianRequiredFor(
+  draft: Pick<
+    EntryDraft,
+    "birth" | "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  return needsGuardian(draft.birth) || guardianDraftStarted(draft);
+}
+
+export function guardianFieldsOk(
+  draft: Pick<
+    EntryDraft,
+    "birth" | "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  if (!guardianRequiredFor(draft)) return true;
   if (!draft.guardianName.trim()) return false;
+  if (!draft.guardianRelation.trim()) return false;
   if (!draft.guardianPhone.trim()) return false;
   return draft.guardianConsent;
+}
+
+export function guardianFieldsError(
+  draft: Pick<
+    EntryDraft,
+    "birth" | "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  if (guardianFieldsOk(draft)) return "";
+  if (!draft.guardianConsent) return "보호자(법정대리인) 동의가 필요합니다.";
+  if (!draft.guardianRelation.trim()) return "보호자 관계를 입력하세요.";
+  if (!draft.guardianName.trim() || !draft.guardianPhone.trim()) {
+    return "보호자 이름·관계·연락처를 모두 입력하세요.";
+  }
+  return "보호자 정보를 모두 입력하세요.";
 }
 
 export function courseHasTimingChip(courseId: CourseId) {
@@ -513,10 +568,7 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
     throw new Error("이메일 형식을 확인하세요.");
   }
   if (!guardianFieldsOk(draft)) {
-    if (needsGuardian(draft.birth) && !draft.guardianConsent) {
-      throw new Error("보호자(법정대리인) 동의가 필요합니다.");
-    }
-    throw new Error("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
+    throw new Error(guardianFieldsError(draft));
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   const passwordErr = entryPasswordError(draft.password);
@@ -579,6 +631,9 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   if (!draft.leaderName.trim()) throw new Error("대표자 성명을 입력하세요.");
   if (!/^\d{8}$/.test(draft.leaderBirth)) {
     throw new Error("대표자 생년월일을 선택하세요.");
+  }
+  if (underGuardianAge(draft.leaderBirth)) {
+    throw new Error(LEADER_UNDER_AGE_NOTE);
   }
   if (!draft.phone.trim()) throw new Error("휴대폰번호를 입력하세요.");
   if (draft.email.trim() && !emailOk(draft.email)) {

@@ -16,8 +16,9 @@ import {
   emailOk,
   entryPasswordError,
   genderLabel,
-  guardianFieldsOk,
   needsGuardian,
+  guardianRequiredFor,
+  guardianFieldsError,
   requiredConsentsOk,
   ticketFee,
   ticketLabel,
@@ -245,12 +246,8 @@ function IndividualFlow({
     } catch (err) {
       return fail(err instanceof Error ? err.message : "입력 내용을 확인하세요.");
     }
-    if (!guardianFieldsOk(draft)) {
-      if (needsGuardian(draft.birth) && !draft.guardianConsent) {
-        return fail("보호자(법정대리인) 동의가 필요합니다.");
-      }
-      return fail("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
-    }
+    const guardianErr = guardianFieldsError(draft);
+    if (guardianErr) return fail(guardianErr);
     if (!draft.souvenirId) return fail("티셔츠 옵션을 불러오지 못했습니다.");
     if (!draft.selectedSize) return fail("티셔츠 사이즈를 선택하세요.");
     const passwordErr = entryPasswordError(draft.password ?? "");
@@ -317,6 +314,8 @@ function IndividualFlow({
     draft.password ?? "",
     draft.passwordConfirm ?? "",
   );
+  const guardianRequired = guardianRequiredFor(draft);
+  const guardianMinor = needsGuardian(draft.birth);
 
   return (
     <div className="flow">
@@ -406,14 +405,14 @@ function IndividualFlow({
 
           <FormSec
             kicker="04 / GUARDIAN"
-            title={needsGuardian(draft.birth) ? "보호자 정보" : "보호자 정보 (선택)"}
+            title={guardianMinor ? "보호자 정보" : "보호자 정보 (선택)"}
             note={
-              needsGuardian(draft.birth)
-                ? `${GUARDIAN_AGE_NOTE} 보호자 이름·연락처도 입력해 주세요.`
-                : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+              guardianMinor
+                ? `${GUARDIAN_AGE_NOTE} 보호자 이름·관계·연락처·동의를 입력해 주세요.`
+                : "선택사항입니다. 입력하면 이름·관계·연락처·동의를 모두 작성해 주세요."
             }
           >
-            <FormRow label="보호자 이름" required={needsGuardian(draft.birth)}>
+            <FormRow label="보호자 이름" required={guardianRequired}>
               <input
                 type="text"
                 name="guardianName"
@@ -421,31 +420,44 @@ function IndividualFlow({
                 value={draft.guardianName}
                 onChange={(e) => patch({ guardianName: e.target.value })}
                 autoComplete="name"
-                required={needsGuardian(draft.birth)}
+                required={guardianRequired}
               />
             </FormRow>
-            <FormRow label="보호자 연락처" required={needsGuardian(draft.birth)}>
+            <FormRow label="보호자 관계" required={guardianRequired}>
+              <input
+                type="text"
+                name="guardianRelation"
+                placeholder="부, 모, 조부모 등"
+                value={draft.guardianRelation}
+                onChange={(e) => patch({ guardianRelation: e.target.value })}
+                required={guardianRequired}
+              />
+            </FormRow>
+            <FormRow label="보호자 연락처" required={guardianRequired}>
               <PhoneField
                 name="guardianPhone"
                 placeholder="보호자(학부모) 연락처"
                 value={draft.guardianPhone}
                 onChange={(guardianPhone) => patch({ guardianPhone })}
-                required={needsGuardian(draft.birth)}
+                required={guardianRequired}
               />
-              {needsGuardian(draft.birth) ? (
+            </FormRow>
+            <FormRow label="보호자 동의" required={guardianRequired}>
+              <GuardianConsentField
+                agreed={draft.guardianConsent}
+                onChange={(guardianConsent) => patch({ guardianConsent })}
+              />
+              {guardianRequired && !guardianMinor ? (
                 <p className="form-row__hint">
-                  만 14세 미만은 보호자 이름·연락처를 입력해야 신청할 수 있습니다.
+                  보호자 정보를 입력한 경우 동의까지 완료해 주세요.
+                </p>
+              ) : null}
+              {guardianMinor ? (
+                <p className="form-row__hint">
+                  만 14세 미만은 보호자 동의까지 완료해야 신청할 수 있습니다.
                 </p>
               ) : null}
             </FormRow>
-            {needsGuardian(draft.birth) ? (
-              <FormRow label="보호자 동의" required>
-                <GuardianConsentField
-                  agreed={draft.guardianConsent}
-                  onChange={(guardianConsent) => patch({ guardianConsent })}
-                />
-              </FormRow>
-            ) : null}
           </FormSec>
 
           <FormSec kicker="05 / ENTRY" title="신청 정보">
@@ -588,15 +600,17 @@ function IndividualFlow({
               <dd>{draft.guardianName.trim() || "—"}</dd>
             </div>
             <div>
+              <dt>보호자 관계</dt>
+              <dd>{draft.guardianRelation.trim() || "—"}</dd>
+            </div>
+            <div>
               <dt>보호자 연락처</dt>
               <dd>{draft.guardianPhone.trim() || "—"}</dd>
             </div>
-            {needsGuardian(draft.birth) ? (
-              <div>
-                <dt>보호자 동의</dt>
-                <dd>{draft.guardianConsent ? "동의함" : "—"}</dd>
-              </div>
-            ) : null}
+            <div>
+              <dt>보호자 동의</dt>
+              <dd>{draft.guardianConsent ? "동의함" : "—"}</dd>
+            </div>
             <div>
               <dt>티셔츠 사이즈</dt>
               <dd>{draft.selectedSize || "—"}</dd>

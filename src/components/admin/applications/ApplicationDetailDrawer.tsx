@@ -44,8 +44,16 @@ function visibleFields(fields: DetailField[]) {
   return fields.filter((field) => !isEmptyValue(field.value));
 }
 
-function DetailSection({ title, fields }: { title: string; fields: DetailField[] }) {
-  const items = visibleFields(fields);
+function DetailSection({
+  title,
+  fields,
+  keepEmpty,
+}: {
+  title: string;
+  fields: DetailField[];
+  keepEmpty?: boolean;
+}) {
+  const items = keepEmpty ? fields : visibleFields(fields);
   if (items.length === 0) return null;
 
   return (
@@ -99,10 +107,24 @@ function buildSections(row: AdminApplicationRow) {
     { label: "이메일", value: dash(row.email) },
   ];
 
-  const guardianFields: DetailField[] = [
-    { label: "연락처", value: dash(row.guardianPhone) },
-    { label: "관계", value: dash(row.guardianRelation) },
-  ];
+  const guardianFields: DetailField[] = isGroup
+    ? row.guardianConsent === true
+      ? [{ label: "동의", value: "동의함" }]
+      : []
+    : [
+        { label: "이름", value: dash(row.guardianName) },
+        { label: "관계", value: dash(row.guardianRelation) },
+        { label: "연락처", value: dash(row.guardianPhone) },
+        {
+          label: "동의",
+          value:
+            row.guardianConsent === true
+              ? "동의함"
+              : row.guardianConsent === false
+                ? "미동의"
+                : "-",
+        },
+      ];
 
   const groupFields: DetailField[] = [
     { label: "단체명", value: dash(row.groupName) },
@@ -184,7 +206,11 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 title={isGroup ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
-              <DetailSection title="보호자" fields={sections.guardianFields} />
+              <DetailSection
+                title="보호자"
+                fields={sections.guardianFields}
+                keepEmpty={!isGroup}
+              />
               <DetailSection title="주소" fields={sections.addressFields} />
               <ApplicationPayments row={row} />
             </>
