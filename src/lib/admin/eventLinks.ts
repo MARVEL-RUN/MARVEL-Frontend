@@ -8,7 +8,7 @@ export function isAdminRaceSlug(id: string): id is AdminRaceEventId {
   return id === "marvel" || id === "virtual";
 }
 
-/** slug 또는 API eventId → 신청 목록 */
+/** marvel·virtual → /applications/{slug}, 그 외 API id → /applications/list?eventId= */
 export function adminApplicationsHref(eventIdOrSlug: string, query?: string) {
   const path = isAdminRaceSlug(eventIdOrSlug)
     ? `${APPS}/${eventIdOrSlug}`
