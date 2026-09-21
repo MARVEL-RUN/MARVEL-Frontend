@@ -8,9 +8,10 @@ import { isAdminHttp } from "@/lib/admin/fetch";
 import { adminMembersListBackHref } from "@/lib/admin/eventLinks";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
+import { APPLICATION_PASSWORD_MIN, orgAccountError } from "@/lib/register";
 import { formatAmount } from "@/services/admin/applications";
 import {
+  checkAdminOrganizationDuplicateId,
   fetchAdminOrganization,
   resetOrganizationPassword,
 } from "@/services/admin/organizations";
@@ -58,6 +59,50 @@ export function OrganizationDetailPage() {
         err instanceof Error ? err.message : "비밀번호 초기화에 실패했습니다.",
       ),
   });
+
+  const checkLoginId = useMutation({
+    mutationFn: (groupLoginId: string) =>
+      checkAdminOrganizationDuplicateId({
+        eventId: apiEventId,
+        groupLoginId,
+      }),
+    onSuccess: (result) => {
+      if (result.useableLoginId) {
+        adminToast.success("사용 가능한 아이디입니다.");
+        return;
+      }
+      adminToast.error("이미 사용 중인 아이디입니다.");
+    },
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error ? err.message : "아이디 중복 확인에 실패했습니다.",
+      ),
+  });
+
+  const handleCheckLoginId = async () => {
+    const current = detailQuery.data?.loginId?.trim() ?? "";
+    const next = await prompt({
+      title: "아이디 중복검사",
+      description:
+        "교체할 단체 로그인 아이디를 입력해 주세요. (5~20자, 영문·숫자·특수문자)",
+      label: "로그인 아이디",
+      placeholder: current ? `현재: ${current}` : "새 로그인 아이디",
+      type: "text",
+      minLength: 5,
+      confirmLabel: "중복검사",
+    });
+    if (!next) return;
+    const accountErr = orgAccountError(next);
+    if (accountErr) {
+      adminToast.error(accountErr);
+      return;
+    }
+    if (current && next === current) {
+      adminToast.error("현재 아이디와 같습니다. 교체할 아이디를 입력해 주세요.");
+      return;
+    }
+    checkLoginId.mutate(next);
+  };
 
   const handleResetPassword = async () => {
     const label =
@@ -121,6 +166,19 @@ export function OrganizationDetailPage() {
           <p className="admin-org-detail__lead">{detail?.groupName || "불러오는 중…"}</p>
         </div>
         <div className="admin-org-detail__actions">
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost"
+            disabled={
+              checkLoginId.isPending ||
+              detailQuery.isLoading ||
+              !detail ||
+              !apiEventId
+            }
+            onClick={handleCheckLoginId}
+          >
+            {checkLoginId.isPending ? "확인 중…" : "아이디 중복검사"}
+          </button>
           <button
             type="button"
             className="admin-btn admin-btn--ghost"
