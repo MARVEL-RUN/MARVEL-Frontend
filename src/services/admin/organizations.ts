@@ -243,6 +243,8 @@ export function resetOrganizationPassword(
 }
 
 export type AdminOrganizationDuplicateCheckResult = {
+  requestValue?: string;
+  requestUseable?: boolean;
   requestedLoginId?: string;
   useableLoginId?: boolean;
 };
@@ -268,11 +270,13 @@ export function checkAdminOrganizationDuplicateId(params: {
         ? (data as Record<string, unknown>)
         : null;
     const useable =
-      row && typeof row.useableLoginId === "boolean"
-        ? row.useableLoginId
-        : row && typeof row.exists === "boolean"
-          ? !row.exists
-          : true;
+      row && typeof row.requestUseable === "boolean"
+        ? row.requestUseable
+        : row && typeof row.useableLoginId === "boolean"
+          ? row.useableLoginId
+          : row && typeof row.exists === "boolean"
+            ? !row.exists
+            : true;
     return {
       requestedLoginId: groupLoginId,
       useableLoginId: useable,

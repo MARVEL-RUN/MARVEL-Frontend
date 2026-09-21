@@ -40,11 +40,15 @@ export async function createOrganizationRegistration(
 }
 
 export type OrganizationNameDuplicateCheckResult = {
+  requestValue?: string;
+  requestUseable?: boolean;
   requestedGroupName?: string;
   useableGroupName?: boolean;
 };
 
 export type OrganizationIdDuplicateCheckResult = {
+  requestValue?: string;
+  requestUseable?: boolean;
   requestedLoginId?: string;
   useableLoginId?: boolean;
 };
@@ -55,6 +59,7 @@ function readUseable(data: unknown, keys: string[]) {
   for (const key of keys) {
     if (typeof row[key] === "boolean") return row[key] as boolean;
   }
+  if (typeof row.requestUseable === "boolean") return row.requestUseable;
   if (typeof row.exists === "boolean") return !row.exists;
   if (typeof row.available === "boolean") return row.available;
   if (typeof row.useable === "boolean") return row.useable;
@@ -71,7 +76,7 @@ export async function checkOrganizationDuplicateName(
   );
   return {
     requestedGroupName: groupName.trim(),
-    useableGroupName: readUseable(data, ["useableGroupName"]),
+    useableGroupName: readUseable(data, ["requestUseable", "useableGroupName"]),
   };
 }
 
@@ -85,7 +90,7 @@ export async function checkOrganizationDuplicateId(
   );
   return {
     requestedLoginId: groupLoginId.trim(),
-    useableLoginId: readUseable(data, ["useableLoginId"]),
+    useableLoginId: readUseable(data, ["requestUseable", "useableLoginId"]),
   };
 }
 
