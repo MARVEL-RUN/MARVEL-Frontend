@@ -39,24 +39,54 @@ export async function createOrganizationRegistration(
   );
 }
 
-export type OrganizationDuplicateCheckResult = {
-  requestedGroupName: string;
-  useableGroupName: boolean;
-  requestedLoginId: string;
-  useableLoginId: boolean;
+export type OrganizationNameDuplicateCheckResult = {
+  requestedGroupName?: string;
+  useableGroupName?: boolean;
 };
+
+export type OrganizationIdDuplicateCheckResult = {
+  requestedLoginId?: string;
+  useableLoginId?: boolean;
+};
+
+function readUseable(data: unknown, keys: string[]) {
+  if (!data || typeof data !== "object") return true;
+  const row = data as Record<string, unknown>;
+  for (const key of keys) {
+    if (typeof row[key] === "boolean") return row[key] as boolean;
+  }
+  if (typeof row.exists === "boolean") return !row.exists;
+  if (typeof row.available === "boolean") return row.available;
+  if (typeof row.useable === "boolean") return row.useable;
+  return true;
+}
+
+export async function checkOrganizationDuplicateName(
+  eventId: string,
+  groupName: string,
+) {
+  const query = new URLSearchParams({ groupName: groupName.trim() });
+  const data = await mainFetch<OrganizationNameDuplicateCheckResult>(
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/organization/duplicate-name-check?${query}`,
+  );
+  return {
+    requestedGroupName: groupName.trim(),
+    useableGroupName: readUseable(data, ["useableGroupName"]),
+  };
+}
 
 export async function checkOrganizationDuplicateId(
   eventId: string,
-  params: { groupName: string; groupLoginId: string },
+  groupLoginId: string,
 ) {
-  const query = new URLSearchParams({
-    groupName: params.groupName.trim(),
-    groupLoginId: params.groupLoginId.trim(),
-  });
-  return mainFetch<OrganizationDuplicateCheckResult>(
+  const query = new URLSearchParams({ groupLoginId: groupLoginId.trim() });
+  const data = await mainFetch<OrganizationIdDuplicateCheckResult>(
     `v1/public/events/${encodeURIComponent(eventId)}/registrations/organization/duplicate-id-check?${query}`,
   );
+  return {
+    requestedLoginId: groupLoginId.trim(),
+    useableLoginId: readUseable(data, ["useableLoginId"]),
+  };
 }
 
 export async function lookupIndividualRegistrations(
