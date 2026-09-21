@@ -17,6 +17,7 @@ npm run dev:main             # 본사이트
 
 ## 환경 변수
 
+
 `.env.example` 기준. 값을 바꾼 뒤에는 dev 서버를 다시 켠다.
 
 | 변수 | 용도 |
