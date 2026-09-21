@@ -54,7 +54,10 @@ export function adminOrganizationDetailHref(
   organizationId: string,
   options: { apiEventId: string; slug?: AdminRaceEventId | null },
 ) {
-  const params = new URLSearchParams({ eventId: options.apiEventId });
+  const params = new URLSearchParams({
+    organizationId,
+    eventId: options.apiEventId,
+  });
   if (options.slug) params.set("slug", options.slug);
-  return `${MEMBERS}/detail/${encodeURIComponent(organizationId)}?${params}`;
+  return `${MEMBERS}/detail?${params}`;
 }

@@ -71,12 +71,9 @@ function memberToRow(
   };
 }
 
-type Props = {
-  organizationId: string;
-};
-
-export function OrganizationDetailPage({ organizationId }: Props) {
+export function OrganizationDetailPage() {
   const searchParams = useSearchParams();
+  const organizationId = searchParams.get("organizationId")?.trim() ?? "";
   const apiEventId = searchParams.get("eventId")?.trim() ?? "";
   const slugParam = searchParams.get("slug")?.trim() ?? "";
   const slug = slugParam === "marvel" || slugParam === "virtual" ? slugParam : null;
@@ -120,10 +117,12 @@ export function OrganizationDetailPage({ organizationId }: Props) {
     }
   }, [apiEventId, members, organizationId, registrationQuery.data, selectedMember]);
 
-  if (!apiEventId) {
+  if (!organizationId || !apiEventId) {
     return (
       <div className="admin-page">
-        <p className="admin-empty">대회 정보가 없습니다.</p>
+        <p className="admin-empty">
+          {!organizationId ? "단체 정보가 없습니다." : "대회 정보가 없습니다."}
+        </p>
         <Link href="/admin/members" className="admin-btn admin-btn--ghost">
           대회 목록
         </Link>
