@@ -2,6 +2,7 @@ import {
   ADMIN_RACE_EVENTS,
   type AdminRaceEventId,
 } from "@/lib/admin/raceEvents";
+import { statusKey } from "@/lib/registration-status";
 import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { listAllApplications, type AdminApplicationRow } from "./applications";
 import { listAdminQuestions } from "./boards/inquiries";
@@ -18,7 +19,7 @@ export type EventIntakeStats = {
 export type AdminDashboardStats = {
   unansweredCount: number;
   cancellationPendingCount: number;
-  cancellationPendingEventId: AdminRaceEventId | null;
+  cancellationPendingEventId: string | null;
   events: EventIntakeStats[];
 };
 
@@ -34,7 +35,7 @@ function intakeFor(rows: AdminApplicationRow[]): Omit<EventIntakeStats, "eventId
   return {
     individualCount: individuals.length,
     groupCount: groups.length,
-    confirmedCount: rows.filter((row) => row.status === "paid").length,
+    confirmedCount: rows.filter((row) => statusKey(row.status) === "CONFIRMED").length,
     participantCount:
       individuals.length + groups.reduce((sum, row) => sum + (row.memberCount ?? 0), 0),
     roundCounts,
@@ -54,7 +55,7 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
   ]);
 
   const cancellationPending = applications.filter(
-    (row) => row.status === "refund_requested",
+    (row) => statusKey(row.status) === "CANCELLATION_PENDING",
   );
 
   return {

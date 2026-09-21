@@ -7,9 +7,3 @@ export type AdminUser = {
   role: string;
   roles?: string[];
 };
-
-export type AdminPayStatus =
-  | "paid"
-  | "pending"
-  | "refund_requested"
-  | "refunded";

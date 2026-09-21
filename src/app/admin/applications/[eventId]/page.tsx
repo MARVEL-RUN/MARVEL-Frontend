@@ -30,7 +30,7 @@ export default async function Page({ params }: Props) {
   if (!event) notFound();
   return (
     <Suspense>
-      <ApplicationsListPage eventId={event.id as AdminRaceEventId} />
+      <ApplicationsListPage slug={event.id as AdminRaceEventId} />
     </Suspense>
   );
 }
