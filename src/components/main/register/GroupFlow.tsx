@@ -42,6 +42,8 @@ import {
   formatFee,
   genderLabel,
   emailOk,
+  filterOrgAccountInput,
+  groupNeedsGuardian,
   orgAccountError,
   orgPasswordError,
   requiredConsentsOk,
@@ -67,6 +69,8 @@ import {
   EmailField,
   FormRow,
   FormSec,
+  GROUP_GUARDIAN_CONSENT_LABEL,
+  GuardianConsentField,
   KitFixed,
   PasswordField,
   PhoneField,
@@ -81,6 +85,35 @@ const NOTICE = [
   `한 번에 최대 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다. 초과 인원은 별도 단체로 신청하세요.`,
   "[개인 신청 후, 단체 전환 불가] 단체 참가시 반드시 단체로 신청하시기 바랍니다.",
 ];
+
+function orgPasswordHint(value: string) {
+  if (!value) {
+    return { text: "조회용 비밀번호 (6~64자)", tone: "" as const };
+  }
+  const err = orgPasswordError(value);
+  if (err) return { text: err, tone: "is-err" as const };
+  return { text: "사용 가능한 비밀번호입니다.", tone: "is-ok" as const };
+}
+
+function orgPasswordConfirmHint(password: string, confirm: string) {
+  if (!confirm) return null;
+  if (confirm === password) {
+    return { text: "비밀번호가 일치합니다.", tone: "is-ok" as const };
+  }
+  return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
+}
+
+function orgAccountHint(value: string, langWarn: boolean) {
+  if (langWarn) {
+    return { text: "영문으로 입력해주세요.", tone: "is-err" as const };
+  }
+  if (!value) {
+    return { text: "영문·숫자·특수문자만 입력할 수 있습니다.", tone: "" as const };
+  }
+  const err = orgAccountError(value);
+  if (err) return { text: err, tone: "is-err" as const };
+  return { text: "사용 가능한 계정입니다.", tone: "is-ok" as const };
+}
 
 function memberPeek(
   p: ParticipantDraft,
@@ -108,6 +141,7 @@ export function GroupFlow({
   const [optionsError, setOptionsError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [accountLangWarn, setAccountLangWarn] = useState(false);
   const [openMember, setOpenMember] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
@@ -286,6 +320,9 @@ export function GroupFlow({
     } catch (err) {
       return fail(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
     }
+    if (groupNeedsGuardian(draft.participants) && !draft.guardianConsent) {
+      return fail("만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.");
+    }
     if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
     setError("");
     setStep(1);
@@ -336,6 +373,13 @@ export function GroupFlow({
 
   const total = payment?.paymentAmount ?? groupOptionsFee(draft, categories);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
+  const needsGroupGuardian = groupNeedsGuardian(draft.participants);
+  const accountHint = orgAccountHint(draft.organizationAccount, accountLangWarn);
+  const passwordHint = orgPasswordHint(draft.organizationPassword);
+  const passwordConfirmHint = orgPasswordConfirmHint(
+    draft.organizationPassword,
+    draft.passwordConfirm,
+  );
 
   return (
     <div className="flow">
@@ -368,21 +412,39 @@ export function GroupFlow({
             <FormRow label="단체 계정" required>
               <input
                 type="text"
+                lang="en"
+                spellCheck={false}
                 placeholder="5~20자, 영문·숫자·특수문자"
                 value={draft.organizationAccount}
-                onChange={(e) => patch({ organizationAccount: e.target.value })}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  const next = filterOrgAccountInput(raw);
+                  // 한글 등 비ASCII 입력 시도 시에만 안내
+                  setAccountLangWarn(/[^\x00-\x7F]/.test(raw));
+                  patch({ organizationAccount: next });
+                }}
                 autoComplete="username"
                 required
               />
+              <p
+                className={`form-row__hint${accountHint.tone ? ` ${accountHint.tone}` : ""}`}
+              >
+                {accountHint.text}
+              </p>
             </FormRow>
             <FormRow label="단체 비밀번호" required>
               <PasswordField
                 value={draft.organizationPassword}
                 onChange={(organizationPassword) => patch({ organizationPassword })}
                 label="단체 비밀번호"
-                placeholder="조회용 비밀번호 (6~64자)"
+                placeholder="단체 비밀번호를 입력하세요."
                 required
               />
+              <p
+                className={`form-row__hint${passwordHint.tone ? ` ${passwordHint.tone}` : ""}`}
+              >
+                {passwordHint.text}
+              </p>
             </FormRow>
             <FormRow label="단체 비밀번호 확인" required>
               <PasswordField
@@ -393,6 +455,11 @@ export function GroupFlow({
                 onChange={(passwordConfirm) => patch({ passwordConfirm })}
                 required
               />
+              {passwordConfirmHint ? (
+                <p className={`form-row__hint ${passwordConfirmHint.tone}`}>
+                  {passwordConfirmHint.text}
+                </p>
+              ) : null}
             </FormRow>
           </FormSec>
 
@@ -678,6 +745,22 @@ export function GroupFlow({
             <p className="party-sum">합계 {formatFee(total)}</p>
           </FormSec>
 
+          {needsGroupGuardian ? (
+            <FormSec kicker="06 / CONSENT" title="단체장 동의">
+              <ApplyHint>
+                <p>{GUARDIAN_AGE_NOTE}</p>
+                <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>
+              </ApplyHint>
+              <FormRow label="법정대리인 동의" required>
+                <GuardianConsentField
+                  label={GROUP_GUARDIAN_CONSENT_LABEL}
+                  agreed={draft.guardianConsent}
+                  onChange={(guardianConsent) => patch({ guardianConsent })}
+                />
+              </FormRow>
+            </FormSec>
+          ) : null}
+
           <div className="flow__nav">
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
@@ -736,6 +819,12 @@ export function GroupFlow({
               <dt>합계</dt>
               <dd>{formatFee(total)}</dd>
             </div>
+            {needsGroupGuardian ? (
+              <div>
+                <dt>단체장 동의</dt>
+                <dd>{draft.guardianConsent ? "동의함" : "—"}</dd>
+              </div>
+            ) : null}
           </dl>
           <ul className="member-list">
             {draft.participants.map((p, i) => {

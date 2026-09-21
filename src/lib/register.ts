@@ -98,6 +98,7 @@ export type GroupDraft = {
   zonecode: string;
   address: string;
   addressDetail: string;
+  guardianConsent: boolean;
   participants: ParticipantDraft[];
 } & Consents;
 
@@ -203,6 +204,7 @@ export const EMPTY_GROUP: GroupDraft = {
   zonecode: "",
   address: "",
   addressDetail: "",
+  guardianConsent: false,
   participants: [{ ...EMPTY_PARTICIPANT }],
   ...EMPTY_CONSENTS,
 };
@@ -250,7 +252,8 @@ export const GUARDIAN_BIRTH_FROM = nextYmd(shiftYmd(EVENT.raceYmd, -14));
 export const CHILD_AGE_NOTE = `어린이 나이: 만 0세 ~ 만 12세 (${ymdKo(CHILD_BIRTH_FROM)} 이후 출생자)`;
 export const CHILD_ACCOMPANY_NOTE =
   "만 12세 이하는 보호자 동행이 필요합니다.";
-export const GUARDIAN_AGE_NOTE = `만 14세 미만 (${ymdKo(GUARDIAN_BIRTH_FROM)} 이후 출생자)`;
+export const GUARDIAN_AGE_NOTE =
+  "만 14세 미만의 경우 법정대리인 동의가 필요합니다.";
 export const TIMING_CHIP_NOTE =
   "배번호 뒷면에 기록칩이 부착되어 있습니다. 2.3 Km 부문에는 기록칩이 없습니다.";
 
@@ -271,6 +274,10 @@ export function ticketForBirth(birth: string): TicketKind {
 export function needsGuardian(birth: string) {
   const band = ageBand(birth);
   return band === "child" || band === "teen";
+}
+
+export function groupNeedsGuardian(participants: { birth: string }[]) {
+  return participants.some((p) => needsGuardian(p.birth));
 }
 
 export function guardianFieldsOk(draft: Pick<
@@ -395,6 +402,10 @@ export function emailOk(email: string) {
 }
 
 /** 백엔드: 5~20자, 영문/숫자/ASCII 특수문자 */
+export function filterOrgAccountInput(value: string) {
+  return value.replace(/[^\x21-\x7E]/g, "");
+}
+
 export function orgAccountError(value: string) {
   const v = value.trim();
   if (!v) return "단체 계정을 입력하세요.";
@@ -408,6 +419,12 @@ export function orgAccountError(value: string) {
 export function orgPasswordError(value: string) {
   const n = value.trim().length;
   if (n < 6 || n > 64) return "단체 비밀번호는 6~64자로 입력하세요.";
+  return "";
+}
+
+/** 신청조회용: 4자 이상 */
+export function entryPasswordError(value: string) {
+  if (value.trim().length < 4) return "신청 비밀번호는 4자 이상 입력하세요.";
   return "";
 }
 
@@ -502,9 +519,8 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
     throw new Error("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
-  if (draft.password.trim().length < 4) {
-    throw new Error("신청 비밀번호를 4자 이상 입력하세요.");
-  }
+  const passwordErr = entryPasswordError(draft.password);
+  if (passwordErr) throw new Error(passwordErr);
   if (draft.password !== draft.passwordConfirm) {
     throw new Error("신청 비밀번호가 일치하지 않습니다.");
   }
@@ -577,6 +593,9 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
     throw new Error(`한 번에 ${MAX_GROUP_SIZE}명까지 신청할 수 있습니다.`);
   }
   draft.participants.forEach(assertParticipant);
+  if (groupNeedsGuardian(draft.participants) && !draft.guardianConsent) {
+    throw new Error("만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.");
+  }
   if (!requiredConsentsOk(draft)) {
     throw new Error("필수 약관에 동의해 주세요.");
   }

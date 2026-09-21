@@ -344,21 +344,11 @@ function canPreparePayment(receipt: RegistrationReceipt) {
   return statusKey(receipt.paymentAction) === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
 }
 
-function hasRefundHistory(receipt: RegistrationReceipt) {
-  const refund = statusKey(receipt.refundStatus);
-  const payment = statusKey(receipt.paymentStatus);
-  if (["PROCESSING", "DONE", "UNKNOWN"].includes(refund)) return true;
-  return ["REFUNDED", "NEED_REFUND", "NEED_PARTITIAL_REFUND", "NEED_PARTIAL_REFUND"].includes(
-    payment,
-  );
-}
-
 function canModifyReceipt(receipt: RegistrationReceipt) {
   if (statusKey(receipt.paymentAction) === "WAIT") return false;
   return Boolean(
     (receipt.registrationId || receipt.organizationId) &&
-    !closedRegistration(receipt.registrationStatus) &&
-    !hasRefundHistory(receipt),
+      !closedRegistration(receipt.registrationStatus),
   );
 }
 
