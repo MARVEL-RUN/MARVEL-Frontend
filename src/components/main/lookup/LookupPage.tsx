@@ -36,7 +36,6 @@ import { FormEvent, useLayoutEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 import { BirthText, PasswordField, PhoneField } from "../register/ApplyUi";
-import { useRegistrationOpen } from "../register/useRegistrationOpen";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { mainToast } from "../feedback/MainFeedback";
 import {
@@ -52,7 +51,6 @@ const LOOKUP_LEAD =
 
 export function LookupPage() {
   const [kind, setKind] = useState<ApplyKind | "">("");
-  const lookupOpen = useRegistrationOpen();
 
   useLayoutEffect(() => {
     scrollPageTop();
@@ -62,11 +60,10 @@ export function LookupPage() {
     <main className="page">
       <SideBanner kicker="INTEL" title="신청조회" en="FIND YOUR ENTRY" />
       <div className="page__body wrap wrap--narrow">
-        {!lookupOpen || !kind ? (
+        {!kind ? (
           <ApplyKindPick
             heading="조회 유형을 선택하세요"
             lookup
-            disabled={!lookupOpen}
             onPick={setKind}
           />
         ) : kind === "group" ? (
