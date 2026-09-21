@@ -6,6 +6,7 @@ type Column<T> = {
   key: string;
   header: string;
   className?: string;
+  width?: string;
   render: (row: T) => React.ReactNode;
 };
 
@@ -25,6 +26,7 @@ type Props<T> = {
   pageUnit?: string;
   onRowClick?: (row: T) => void;
   isRowSelected?: (row: T) => boolean;
+  minRows?: number;
 };
 
 export function AdminTableShell<T>({
@@ -43,9 +45,11 @@ export function AdminTableShell<T>({
   pageUnit,
   onRowClick,
   isRowSelected,
+  minRows,
 }: Props<T>) {
   const count = totalCount ?? rows.length;
   const showPager = Boolean(onPage) && !loading && count > 0;
+  const padCount = minRows && rows.length > 0 ? Math.max(0, minRows - rows.length) : 0;
 
   return (
     <section className="admin-table-shell">
@@ -66,6 +70,11 @@ export function AdminTableShell<T>({
           <p className="admin-empty">{empty}</p>
         ) : (
           <table className={`admin-table${onRowClick ? " is-clickable" : ""}`}>
+            <colgroup>
+              {columns.map((col) => (
+                <col key={col.key} style={col.width ? { width: col.width } : undefined} />
+              ))}
+            </colgroup>
             <thead>
               <tr>
                 {columns.map((col) => (
@@ -85,6 +94,15 @@ export function AdminTableShell<T>({
                   {columns.map((col) => (
                     <td key={col.key} className={col.className}>
                       {col.render(row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+              {Array.from({ length: padCount }, (_, index) => (
+                <tr key={`pad-${index}`} className="is-pad" aria-hidden>
+                  {columns.map((col) => (
+                    <td key={col.key} className={col.className}>
+                      {"\u00a0"}
                     </td>
                   ))}
                 </tr>

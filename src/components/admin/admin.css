@@ -525,8 +525,6 @@ html.admin-mode body {
 }
 
 .admin-apps-list .admin-table-shell {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -543,20 +541,51 @@ html.admin-mode body {
   padding: 8px 14px;
 }
 
+.admin-apps-list {
+  --admin-apps-row-h: 30px;
+  --admin-apps-head-h: 32px;
+  --admin-apps-list-rows: 15;
+}
+
+.admin-apps-list .admin-table-wrap {
+  flex: 0 1 auto;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.admin-apps-list.is-fixed-table .admin-table-wrap {
+  height: calc(
+    var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)
+  );
+  max-height: min(
+    calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
+    calc(100vh - var(--admin-head) - 220px)
+  );
+}
+
+.admin-apps-list.is-fixed-table .admin-table thead tr {
+  height: var(--admin-apps-head-h);
+}
+
+.admin-apps-list.is-fixed-table .admin-table tbody tr {
+  height: var(--admin-apps-row-h);
+}
+
+.admin-apps-list.is-fetching .admin-table tbody {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 .admin-apps-list .admin-pagination {
+  flex-shrink: 0;
   padding: 8px 14px;
   font-size: 13px;
 }
 
-.admin-apps-list .admin-table-wrap {
-  flex: 1;
-  min-height: 240px;
-  max-height: calc(100vh - var(--admin-head) - 196px);
-  overflow: auto;
-}
-
 .admin-apps-list .admin-table {
-  min-width: 1080px;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 1120px;
 }
 
 .admin-apps-list .admin-table th,
@@ -564,13 +593,22 @@ html.admin-mode body {
   padding: 6px 8px;
   font-size: 13px;
   line-height: 1.35;
+  overflow: hidden;
+  vertical-align: middle;
 }
 
-.admin-apps-list .admin-table th.is-center,
-.admin-apps-list .admin-table td.is-center,
-.admin-apps-list .admin-table th.is-num,
-.admin-apps-list .admin-table td.is-num {
+.admin-apps-list .admin-table tbody tr.is-pad td {
+  pointer-events: none;
+  user-select: none;
+}
+
+.admin-apps-list .admin-table tbody td {
   text-align: center;
+}
+
+.admin-apps-list .admin-table td.is-date,
+.admin-apps-list .admin-table td.is-status {
+  text-align: left;
 }
 
 .admin-apps-list .admin-table td.is-num {
@@ -595,11 +633,7 @@ html.admin-mode body {
   padding-bottom: 8px;
   font-size: 12px;
   white-space: nowrap;
-}
-
-.admin-apps-list .admin-table td.is-name,
-.admin-apps-list .admin-table td.is-clip {
-  max-width: 160px;
+  text-align: center;
 }
 
 .admin-apps-list__head-actions {
@@ -667,8 +701,10 @@ html.admin-mode body {
 .admin-apps-list__status {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 13px;
   font-weight: 500;
   color: var(--admin-ink);

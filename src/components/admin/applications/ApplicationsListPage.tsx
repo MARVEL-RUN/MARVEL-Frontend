@@ -29,14 +29,14 @@ import {
   type AdminApplicationRow,
   type ApplicationKind,
 } from "@/services/admin/applications";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
   { value: "", label: "전체 유형" },
@@ -164,6 +164,7 @@ export function ApplicationsListPage({ slug }: Props) {
       return mapRegistrationPage(raw, apiEventId);
     },
     enabled: hasAdminApi && Boolean(apiEventId),
+    placeholderData: keepPreviousData,
   });
 
   const detailQuery = useQuery({
@@ -236,19 +237,22 @@ export function ApplicationsListPage({ slug }: Props) {
     {
       key: "no",
       header: "번호",
-      className: "is-num is-center",
+      className: "is-num",
+      width: "48px",
       render: (row: AdminApplicationRow) => row.no || "-",
     },
     {
       key: "kind",
       header: "유형",
-      className: "is-kind is-center",
+      className: "is-kind",
+      width: "48px",
       render: (row: AdminApplicationRow) => <KindBadge kind={row.kind} />,
     },
     {
       key: "name",
       header: "이름/단체명",
       className: "is-name",
+      width: "11%",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__name" title={row.name || undefined}>
           {row.name || "-"}
@@ -258,25 +262,29 @@ export function ApplicationsListPage({ slug }: Props) {
     {
       key: "birth",
       header: "생년월일",
-      className: "is-muted is-center",
+      className: "is-muted",
+      width: "96px",
       render: (row: AdminApplicationRow) => row.birth || "-",
     },
     {
       key: "gender",
       header: "성별",
-      className: "is-muted is-center",
+      className: "is-muted",
+      width: "56px",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
-      className: "is-course is-center",
+      className: "is-course",
+      width: "56px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
       key: "souvenir",
       header: "기념품",
       className: "is-clip",
+      width: "11%",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
           {row.souvenir || "-"}
@@ -286,13 +294,15 @@ export function ApplicationsListPage({ slug }: Props) {
     {
       key: "phone",
       header: "연락처",
-      className: "is-phone is-center",
+      className: "is-phone",
+      width: "118px",
       render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
       key: "marketing",
       header: "마케팅",
-      className: "is-center",
+      className: "is-marketing",
+      width: "52px",
       render: (row: AdminApplicationRow) => (
         <MarketingBadge consent={Boolean(row.marketingConsent)} />
       ),
@@ -300,23 +310,33 @@ export function ApplicationsListPage({ slug }: Props) {
     {
       key: "status",
       header: "상태",
-      className: "is-status is-center",
+      className: "is-status",
+      width: "108px",
       render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
     },
     {
       key: "appliedAt",
       header: "신청일시",
-      className: "is-date is-center",
+      className: "is-date",
+      width: "132px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
 
+  const fixedTableHeight = hasAdminApi && Boolean(apiEventId) && listQuery.data !== undefined;
+  const listPageStyle = {
+    "--admin-apps-list-rows": PAGE_SIZE,
+  } as CSSProperties;
+
   return (
-    <div className="admin-page admin-apps-list">
+    <div
+      className={`admin-page admin-apps-list${fixedTableHeight ? " is-fixed-table" : ""}${listQuery.isFetching ? " is-fetching" : ""}`}
+      style={listPageStyle}
+    >
       <AdminTableShell<AdminApplicationRow>
         title={eventTitle}
         rows={rows}
-        loading={eventsQuery.isLoading || listQuery.isLoading}
+        loading={eventsQuery.isLoading || (listQuery.isLoading && !listQuery.data)}
         empty={empty}
         rowKey={(row) => row.id || String(row.no)}
         page={page}
@@ -329,6 +349,7 @@ export function ApplicationsListPage({ slug }: Props) {
           setSelectedId(row.id);
         }}
         isRowSelected={(row) => Boolean(selectedId && row.id === selectedId)}
+        minRows={fixedTableHeight ? PAGE_SIZE : undefined}
         actions={
           <div className="admin-table-shell__actions admin-apps-list__head-actions">
             <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
