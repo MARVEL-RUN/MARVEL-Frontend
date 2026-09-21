@@ -70,14 +70,16 @@ export function ApplyHint({ children }: { children: ReactNode }) {
 export function FormRow({
   label,
   required,
+  locked,
   children,
 }: {
   label: string;
   required?: boolean;
+  locked?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div className="form-row">
+    <div className={locked ? "form-row is-locked" : "form-row"}>
       <p className="form-row__label">
         {label}
         {required ? <em> *</em> : null}
@@ -90,9 +92,13 @@ export function FormRow({
 export function BirthPick({
   value,
   onChange,
+  disabled,
+  yearHint,
 }: {
   value: string;
   onChange: (next: string) => void;
+  disabled?: boolean;
+  yearHint?: string;
 }) {
   const y = value.slice(0, 4);
   const m = value.slice(4, 6);
@@ -106,8 +112,13 @@ export function BirthPick({
   }
 
   return (
-    <div className="birth-pick">
-      <select value={y} onChange={(e) => setPart("y", e.target.value)} aria-label="년도">
+    <div className={`birth-pick${disabled ? " is-disabled" : ""}`}>
+      <select
+        value={y}
+        onChange={(e) => setPart("y", e.target.value)}
+        aria-label="년도"
+        disabled={disabled}
+      >
         <option value="">년도</option>
         {YEARS.map((n) => (
           <option key={n} value={n}>
@@ -116,7 +127,12 @@ export function BirthPick({
         ))}
       </select>
       <span>.</span>
-      <select value={m} onChange={(e) => setPart("m", e.target.value)} aria-label="월">
+      <select
+        value={m}
+        onChange={(e) => setPart("m", e.target.value)}
+        aria-label="월"
+        disabled={disabled}
+      >
         <option value="">월</option>
         {MONTHS.map((n) => (
           <option key={n} value={n}>
@@ -125,7 +141,12 @@ export function BirthPick({
         ))}
       </select>
       <span>.</span>
-      <select value={d} onChange={(e) => setPart("d", e.target.value)} aria-label="일">
+      <select
+        value={d}
+        onChange={(e) => setPart("d", e.target.value)}
+        aria-label="일"
+        disabled={disabled}
+      >
         <option value="">일</option>
         {DAYS.map((n) => (
           <option key={n} value={n}>
@@ -133,6 +154,11 @@ export function BirthPick({
           </option>
         ))}
       </select>
+      {yearHint ? (
+        <p className="birth-pick__year-hint form-row__hint is-err" role="alert">
+          {yearHint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -141,13 +167,15 @@ export function GenderPick({
   name,
   value,
   onChange,
+  disabled,
 }: {
   name: string;
   value: Gender | "";
   onChange: (next: Gender) => void;
+  disabled?: boolean;
 }) {
   return (
-    <div className="radio-row">
+    <div className={`radio-row${disabled ? " is-disabled" : ""}`}>
       {GENDERS.map((g) => (
         <label key={g.id}>
           <input
@@ -155,6 +183,7 @@ export function GenderPick({
             name={name}
             checked={value === g.id}
             onChange={() => onChange(g.id)}
+            disabled={disabled}
           />
           {g.label}
         </label>
@@ -390,12 +419,14 @@ export function BirthText({
   name,
   required,
   autoComplete,
+  disabled,
 }: {
   value: string;
   onChange: (next: string) => void;
   name?: string;
   required?: boolean;
   autoComplete?: string;
+  disabled?: boolean;
 }) {
   const digits = value.replace(/\D/g, "").slice(0, 8);
   let shown = digits;
@@ -414,6 +445,8 @@ export function BirthText({
       value={shown}
       onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 8))}
       required={required}
+      disabled={disabled}
+      readOnly={disabled}
       aria-label="생년월일"
     />
   );
@@ -426,6 +459,7 @@ export function PhoneField({
   placeholder,
   required,
   autoComplete,
+  disabled,
 }: {
   value: string;
   onChange: (next: string) => void;
@@ -433,6 +467,7 @@ export function PhoneField({
   placeholder?: string;
   required?: boolean;
   autoComplete?: string;
+  disabled?: boolean;
 }) {
   return (
     <input
@@ -444,36 +479,59 @@ export function PhoneField({
       onChange={(e) => onChange(formatPhone(e.target.value))}
       autoComplete={autoComplete}
       required={required}
+      disabled={disabled}
+      readOnly={disabled}
       maxLength={13}
     />
   );
 }
 
 const GUARDIAN_CONSENT_LABEL =
-  "법정대리인(보호자)으로서 참가 신청·개인정보 처리에 동의합니다.";
+  "법정대리인(보호자)으로서 참가 신청에 동의합니다.";
 
 export const GROUP_GUARDIAN_CONSENT_LABEL =
-  "단체장으로서 만 14세 미만 참가자의 참가 신청·개인정보 처리에 동의합니다.";
+  "단체장으로서 만 14세 미만 참가자의 참가 신청에 동의합니다.";
 
 export function GuardianConsentField({
   agreed,
   onChange,
   label = GUARDIAN_CONSENT_LABEL,
+  variant = "check",
 }: {
   agreed: boolean;
   onChange: (next: boolean) => void;
   label?: string;
+  variant?: "check" | "button";
 }) {
+  if (variant === "button") {
+    return (
+      <button
+        type="button"
+        className={agreed ? "guardian-consent is-agreed" : "guardian-consent"}
+        aria-pressed={agreed}
+        onClick={() => onChange(!agreed)}
+      >
+        <span className="guardian-consent__label">{label}</span>
+        <span className="guardian-consent__state">
+          {agreed ? "동의함" : "탭하여 동의"}
+        </span>
+      </button>
+    );
+  }
+
   return (
-    <button
-      type="button"
-      className={agreed ? "guardian-consent is-agreed" : "guardian-consent"}
-      aria-pressed={agreed}
-      onClick={() => onChange(!agreed)}
+    <label
+      className={
+        agreed ? "guardian-consent-check is-agreed" : "guardian-consent-check"
+      }
     >
-      <span className="guardian-consent__label">{label}</span>
-      <span className="guardian-consent__state">{agreed ? "동의함" : "탭하여 동의"}</span>
-    </button>
+      <input
+        type="checkbox"
+        checked={agreed}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <span className="guardian-consent-check__label">{label}</span>
+    </label>
   );
 }
 
