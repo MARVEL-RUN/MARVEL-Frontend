@@ -545,21 +545,25 @@ html.admin-mode body {
 }
 
 .admin-apps-list {
-  --admin-apps-row-h: 30px;
-  --admin-apps-head-h: 32px;
+  --admin-apps-row-h: 32px;
+  --admin-apps-head-h: 34px;
   --admin-apps-list-rows: 15;
 }
 
 .admin-apps-list .admin-table-wrap {
   flex: 0 1 auto;
-  overflow: auto;
-  scrollbar-gutter: stable;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 .admin-apps-list.is-fixed-table .admin-table-wrap {
-  height: calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h));
-  max-height: min(calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
-      calc(100vh - var(--admin-head) - 220px));
+  height: calc(
+    var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)
+  );
+  max-height: min(
+    calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
+    calc(100vh - var(--admin-head) - 220px)
+  );
 }
 
 .admin-apps-list.is-fixed-table .admin-table thead tr {
@@ -568,6 +572,18 @@ html.admin-mode body {
 
 .admin-apps-list.is-fixed-table .admin-table tbody tr {
   height: var(--admin-apps-row-h);
+}
+
+.admin-apps-list.is-fixed-table .admin-table thead th,
+.admin-apps-list.is-fixed-table .admin-table tbody td {
+  box-sizing: border-box;
+  height: var(--admin-apps-row-h);
+  max-height: var(--admin-apps-row-h);
+}
+
+.admin-apps-list.is-fixed-table .admin-table thead th {
+  height: var(--admin-apps-head-h);
+  max-height: var(--admin-apps-head-h);
 }
 
 .admin-apps-list.is-fetching .admin-table tbody {
@@ -1887,6 +1903,7 @@ button.admin-pay-list__item:hover {
   color: #2563eb;
   font-size: 13px;
   font-weight: 500;
+  line-height: 1;
   text-decoration: none;
 }
 
