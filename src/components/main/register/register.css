@@ -2,6 +2,7 @@
 
 .form {
   display: grid;
+  min-width: 0;
   gap: 2.4rem;
 }
 
@@ -966,7 +967,10 @@
 }
 
 .form__err {
+  min-width: 0;
+  max-width: 100%;
   padding: 0.75rem 0;
+  overflow-wrap: anywhere;
   color: var(--marvel);
   font-size: 0.9rem;
   font-weight: 700;
@@ -1248,6 +1252,14 @@
   margin-inline: auto;
 }
 
+/* 조회 컬럼(720)에서 수정 폼만 신청과 같은 920 */
+.lookup-edit {
+  width: auto;
+  max-width: none;
+  margin-left: calc(50% - min(460px, calc(50dvw / var(--site-zoom, 1) - 1.25rem)));
+  margin-right: calc(50% - min(460px, calc(50dvw / var(--site-zoom, 1) - 1.25rem)));
+}
+
 .flow__nav {
   display: flex;
   flex-wrap: wrap;
@@ -1483,8 +1495,50 @@
   margin: 1.6rem 0;
 }
 
+.ticket .spec .spec__code {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
 .ticket .member-list {
   text-align: left;
+}
+
+.member-list .is-canceled {
+  opacity: 0.55;
+}
+
+.status-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-left: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--note);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.status-help[aria-expanded="true"] {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.status-help__tip {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--note);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .member-list .kit-fixed {
