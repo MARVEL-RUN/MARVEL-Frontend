@@ -12,6 +12,7 @@ import {
   formatFee,
   needsGuardian,
   guardianRequiredFor,
+  groupNeedsGuardian,
   ticketForBirth,
   type CourseId,
   type Gender,
@@ -53,6 +54,7 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  GROUP_GUARDIAN_CONSENT_LABEL,
   GuardianConsentField,
   KitFixed,
   PhoneField,
@@ -276,7 +278,9 @@ export function IndividualLookupEdit({
     receipt.guardianRelationship?.trim() || "",
   );
   const [guardianPhone, setGuardianPhone] = useState(receipt.guardianPhNum || "");
-  const [guardianConsent, setGuardianConsent] = useState(false);
+  const [guardianConsent, setGuardianConsent] = useState(
+    () => receipt.guardianConsent === true,
+  );
   const [eventCategoryId, setEventCategoryId] = useState(receipt.eventCategoryId || "");
   const [souvenirs, setSouvenirs] = useState(
     souvenirSelections(receipt.selectedSouvenirList),
@@ -370,6 +374,7 @@ export function IndividualLookupEdit({
       guardianName: guardianName.trim() || undefined,
       guardianPhNum: toApiPhone(guardianPhone) || undefined,
       guardianRelationship: guardianRelation.trim() || undefined,
+      guardianConsent: guardianRequired ? guardianConsent : false,
     });
   }
 
@@ -532,7 +537,11 @@ export function IndividualLookupEdit({
         </FormRow>
       </FormSec>
 
-      {hint || error ? <p className="form__err">{hint || error}</p> : null}
+      {hint || error ? (
+        <p className="form__err flow__err" role="alert">
+          {hint || error}
+        </p>
+      ) : null}
       <div className="flow__nav">
         <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
           돌아가기
@@ -613,7 +622,11 @@ export function GroupLookupEdit({
   );
   const [openMember, setOpenMember] = useState(0);
   const [hint, setHint] = useState("");
+  const [guardianConsent, setGuardianConsent] = useState(
+    () => receipt.guardianConsent === true,
+  );
   const optionsReady = categories.length > 0;
+  const needsGroupGuardian = groupNeedsGuardian(members);
   const total = useMemo(
     () =>
       members.reduce((sum, member) => {
@@ -692,9 +705,14 @@ export function GroupLookupEdit({
         return;
       }
     }
+    if (needsGroupGuardian && !guardianConsent) {
+      setHint("만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.");
+      return;
+    }
     setHint("");
     onSubmit({
       access,
+      guardianConsent: needsGroupGuardian ? guardianConsent : false,
       registrations: members.map((row) => {
         const next: OrganizationParticipantModifyRequest = {
           eventCategoryId: row.eventCategoryId,
@@ -954,7 +972,27 @@ export function GroupLookupEdit({
         </div>
         <p className="party-sum">합계 {formatFee(total)}</p>
       </FormSec>
-      {hint || error ? <p className="form__err">{hint || error}</p> : null}
+      {needsGroupGuardian ? (
+        <FormSec kicker="02 / CONSENT" title="단체장 동의">
+          <ApplyHint>
+            <p>{GUARDIAN_AGE_NOTE}</p>
+            <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>
+          </ApplyHint>
+          <FormRow label="법정대리인 동의" required>
+            <GuardianConsentField
+              label={GROUP_GUARDIAN_CONSENT_LABEL}
+              variant="button"
+              agreed={guardianConsent}
+              onChange={setGuardianConsent}
+            />
+          </FormRow>
+        </FormSec>
+      ) : null}
+      {hint || error ? (
+        <p className="form__err flow__err" role="alert">
+          {hint || error}
+        </p>
+      ) : null}
       <div className="flow__nav">
         <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
           돌아가기

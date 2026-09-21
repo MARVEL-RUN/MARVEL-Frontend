@@ -426,6 +426,10 @@ function IndividualReceiptCard({
           <dt>보호자 연락처</dt>
           <dd>{guardianPhone || "—"}</dd>
         </div>
+        <div>
+          <dt>보호자 동의</dt>
+          <dd>{receipt.guardianConsent === true ? "동의함" : "—"}</dd>
+        </div>
         {address ? (
           <div>
             <dt>주소</dt>

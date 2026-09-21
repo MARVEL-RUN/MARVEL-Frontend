@@ -170,6 +170,7 @@ export type RegistrationReceipt = {
   guardianName?: string | null;
   guardianPhNum?: string | null;
   guardianRelationship?: string | null;
+  guardianConsent?: boolean | null;
   members?: RegistrationReceiptMember[];
   registrations?: OrganizationLookupParticipant[];
   souvenirs?: RegistrationReceiptSouvenir[];
@@ -203,6 +204,7 @@ export type IndividualRegistrationModifyRequest = {
   guardianName?: string;
   guardianPhNum?: string;
   guardianRelationship?: string;
+  guardianConsent?: boolean;
 };
 
 export type OrganizationParticipantModifyRequest = {
@@ -218,6 +220,7 @@ export type OrganizationParticipantModifyRequest = {
 export type OrganizationRegistrationModifyRequest = {
   access: OrganizationLookupRequest;
   registrations: OrganizationParticipantModifyRequest[];
+  guardianConsent?: boolean;
 };
 
 export type RegistrationSettlementResult = {
