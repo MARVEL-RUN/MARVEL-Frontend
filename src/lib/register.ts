@@ -479,6 +479,12 @@ export function applicationPasswordError(value: string) {
   return "";
 }
 
+/** 신청조회용: 4자 이상 */
+export function entryPasswordError(value: string) {
+  if (value.trim().length < 4) return "신청 비밀번호는 4자 이상 입력하세요.";
+  return "";
+}
+
 export function groupFee(
   draft: GroupDraft,
   categories: { categoryId: string; amount: number }[] = [],

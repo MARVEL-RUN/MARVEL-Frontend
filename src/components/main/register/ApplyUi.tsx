@@ -492,6 +492,9 @@ const GUARDIAN_CONSENT_LABEL =
 export const GROUP_GUARDIAN_CONSENT_LABEL =
   "단체장으로서 만 14세 미만 참가자의 참가 신청에 동의합니다.";
 
+export const GROUP_GUARDIAN_CONSENT_LABEL =
+  "단체장으로서 만 14세 미만 참가자의 참가 신청·개인정보 처리에 동의합니다.";
+
 export function GuardianConsentField({
   agreed,
   onChange,
