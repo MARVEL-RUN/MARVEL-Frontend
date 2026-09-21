@@ -4,6 +4,7 @@ import type { AdminEvent } from "@/services/admin/applications";
 const APPS = "/admin/applications";
 const CAPS = "/admin/capacities";
 const MEMBERS = "/admin/members";
+const INQUIRY = "/admin/boards/inquiry";
 
 export function isAdminRaceSlug(id: string): id is AdminRaceEventId {
   return id === "marvel" || id === "virtual";
@@ -58,4 +59,23 @@ export function adminOrganizationDetailHref(
     eventId: options.apiEventId,
   });
   return `${MEMBERS}/detail?${params}`;
+}
+
+export function adminInquiriesHref(eventId: string) {
+  return `${INQUIRY}/list?eventId=${encodeURIComponent(eventId)}`;
+}
+
+export function adminInquiriesHrefFromEvent(event: AdminEvent) {
+  return adminInquiriesHref(event.eventId);
+}
+
+export function adminInquiryDetailHref(
+  questionId: string,
+  options: { apiEventId: string },
+) {
+  const params = new URLSearchParams({
+    id: questionId,
+    eventId: options.apiEventId,
+  });
+  return `${INQUIRY}/detail?${params}`;
 }

@@ -1,6 +1,5 @@
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { statusKey } from "@/lib/registration-status";
-import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import {
   fetchAdminEvents,
   listAllApplications,
@@ -49,25 +48,32 @@ function intakeFor(
 }
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const [applications, unanswered] = await Promise.all([
+  const events = await fetchAdminEvents().catch(() => []);
+
+  const [applications, ...unansweredPages] = await Promise.all([
     listAllApplications(),
-    listAdminQuestions({
-      eventId: DEFAULT_EVENT_ID,
-      isAnswered: false,
-      page: 0,
-      size: 1,
-      sort: "LATEST",
-    }).catch(() => ({ totalElements: 0 })),
+    ...events.map((event) =>
+      listAdminQuestions({
+        eventId: event.eventId,
+        isAnswered: false,
+        page: 0,
+        size: 1,
+        sort: "LATEST",
+      }).catch(() => ({ totalElements: 0 })),
+    ),
   ]);
 
   const cancellationPending = applications.filter(
     (row) => statusKey(row.status) === "CANCELLATION_PENDING",
   );
 
-  const events = await fetchAdminEvents().catch(() => []);
+  const unansweredCount = unansweredPages.reduce(
+    (sum, page) => sum + (page.totalElements ?? 0),
+    0,
+  );
 
   return {
-    unansweredCount: unanswered.totalElements,
+    unansweredCount,
     cancellationPendingCount: cancellationPending.length,
     cancellationPendingEventId: cancellationPending[0]?.eventId ?? null,
     events: events.map((event) => {
