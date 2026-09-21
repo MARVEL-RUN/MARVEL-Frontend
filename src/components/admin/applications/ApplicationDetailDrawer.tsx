@@ -16,19 +16,34 @@ import { ApplicationPayments } from "./ApplicationPayments";
 type Props = {
   row: AdminApplicationRow | null;
   loading?: boolean;
+  error?: string;
   onClose: () => void;
 };
 
 function dash(value?: string) {
-  return value?.trim() ? value : "-";
+  if (typeof value !== "string") return "-";
+  return value.trim() ? value : "-";
 }
 
-export function ApplicationDetailDrawer({ row, loading, onClose }: Props) {
+export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props) {
   if (!row) return null;
 
   const fields: { label: string; value: ReactNode }[] = [
     { label: "성명", value: dash(row.personName) },
     { label: "단체명", value: dash(row.groupName) },
+  ];
+
+  if (row.leader) {
+    fields.push(
+      { label: "대표자", value: dash(row.leader.name) },
+      { label: "대표자 연락처", value: dash(row.leader.phNum) },
+      { label: "대표자 생년월일", value: dash(row.leader.birth) },
+      { label: "대표자 주소", value: dash(row.leader.address) },
+      { label: "대표자 상세주소", value: dash(row.leader.addressDetail) },
+    );
+  }
+
+  fields.push(
     { label: "코스", value: applicationCourseLabel(row) },
     { label: "기념품", value: dash(row.souvenir) },
     { label: "사이즈", value: dash(row.size) },
@@ -62,7 +77,7 @@ export function ApplicationDetailDrawer({ row, loading, onClose }: Props) {
     },
     { label: "주소", value: dash(row.address) },
     { label: "상세주소", value: dash(row.addressDetail) },
-  ];
+  );
 
   return (
     <>
@@ -82,6 +97,7 @@ export function ApplicationDetailDrawer({ row, loading, onClose }: Props) {
         </div>
 
         {loading ? <p className="admin-empty">불러오는 중…</p> : null}
+        {error ? <p className="admin-empty">{error}</p> : null}
 
         <div className="admin-drawer__body">
           <dl className="admin-drawer__fields">

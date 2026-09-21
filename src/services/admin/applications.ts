@@ -42,6 +42,15 @@ export type AdminEvent = {
   registrationPeriod: string;
 };
 
+export type AdminLeaderInfo = {
+  groupName: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  address: string;
+  addressDetail: string;
+};
+
 export type AdminApplicationRow = {
   id: string;
   no: number;
@@ -52,6 +61,7 @@ export type AdminApplicationRow = {
   personName: string;
   groupName: string;
   leaderName?: string;
+  leader?: AdminLeaderInfo;
   birth?: string;
   courseId?: CourseId;
   courseName?: string;
@@ -77,41 +87,57 @@ export type AdminApplicationRow = {
 
 type RegistrationListItem = {
   registrationId?: string;
+  id?: string;
   listNumber?: number;
   type?: string;
   registrationType?: string;
   name?: string;
   orgName?: string;
+  groupName?: string;
+  organizationName?: string;
   birth?: string;
   gender?: string;
   courseName?: string;
   souvenirName?: string;
   phoneNumber?: string;
-  marketingConsent?: string | boolean;
+  phNum?: string;
+  marketingConsent?: string | boolean | number;
   status?: string;
   createdAt?: string;
   organizationId?: string;
+  orgId?: string;
 };
 
 type RegistrationDetail = {
-  name?: string;
-  orgName?: string;
-  courseName?: string;
-  souvenirName?: string;
-  souvenirSize?: string;
-  gender?: string;
-  birth?: string;
-  phoneNumber?: string;
-  email?: string;
-  guardianPhoneNumber?: string;
-  guardianRelationship?: string;
-  createdAt?: string;
-  amount?: number;
-  orderId?: string;
-  paymentMethod?: string;
-  paymentStatus?: string;
-  address?: string;
-  addressDetail?: string;
+  name?: unknown;
+  orgName?: unknown;
+  groupName?: unknown;
+  organizationName?: unknown;
+  courseName?: unknown;
+  souvenirName?: unknown;
+  souvenirSize?: unknown;
+  gender?: unknown;
+  birth?: unknown;
+  phoneNumber?: unknown;
+  phNum?: unknown;
+  email?: unknown;
+  guardianPhoneNumber?: unknown;
+  guardianPhNum?: unknown;
+  guardianPhone?: unknown;
+  guardianRelationship?: unknown;
+  guardianRelation?: unknown;
+  createdAt?: unknown;
+  amount?: unknown;
+  orderId?: unknown;
+  paymentMethod?: unknown;
+  paymentStatus?: unknown;
+  address?: unknown;
+  addressDetail?: unknown;
+  organizationId?: unknown;
+  orgId?: unknown;
+  leaderInfo?: unknown;
+  leaderInfoResponse?: unknown;
+  leader?: unknown;
 };
 
 export type RegistrationListParams = {
@@ -126,6 +152,63 @@ export type RegistrationListParams = {
 
 function compactName(name: string) {
   return name.replace(/\s/g, "");
+}
+
+function asText(value: unknown): string {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return "";
+}
+
+function firstText(...values: unknown[]): string {
+  for (const value of values) {
+    const text = asText(value);
+    if (text) return text;
+  }
+  return "";
+}
+
+function asAmount(value: unknown, fallback: number): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const n = Number(value.replace(/,/g, "").trim());
+    if (Number.isFinite(n)) return n;
+  }
+  return fallback;
+}
+
+function asDetail(value: unknown): RegistrationDetail {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const obj = value as Record<string, unknown>;
+  if (obj.data && typeof obj.data === "object" && !Array.isArray(obj.data)) {
+    return obj.data as RegistrationDetail;
+  }
+  return obj as RegistrationDetail;
+}
+
+/** 단체 소속 인원만 내려옴. 아니면 orgId처럼 null */
+function asLeaderInfo(value: unknown): AdminLeaderInfo | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const info = value as Record<string, unknown>;
+  const leader: AdminLeaderInfo = {
+    groupName: firstText(info.groupName, info.orgName, info.organizationName),
+    name: asText(info.name),
+    phNum: firstText(info.phNum, info.phoneNumber, info.phone),
+    birth: asText(info.birth),
+    address: asText(info.address),
+    addressDetail: asText(info.addressDetail),
+  };
+  if (
+    !leader.groupName &&
+    !leader.name &&
+    !leader.phNum &&
+    !leader.birth &&
+    !leader.address &&
+    !leader.addressDetail
+  ) {
+    return undefined;
+  }
+  return leader;
 }
 
 /** 대시보드 슬러그. 이름에 버추얼이 있으면 virtual */
@@ -146,9 +229,10 @@ export function raceEventSlug(event: AdminEvent): AdminRaceEventId | null {
   return null;
 }
 
-function consentYes(value?: string | boolean) {
+function consentYes(value?: string | boolean | number) {
   if (typeof value === "boolean") return value;
-  const v = (value ?? "").trim().toLowerCase();
+  if (typeof value === "number") return value !== 0;
+  const v = asText(value).toLowerCase();
   return v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의";
 }
 
@@ -203,27 +287,28 @@ function asRegistrationPage(
 }
 
 function listItemRegistrationType(item: RegistrationListItem) {
-  return item.type?.trim() || item.registrationType?.trim() || "";
+  return firstText(item.type, item.registrationType);
 }
 
 function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow {
   const kind = kindFromRegistrationType(listItemRegistrationType(item));
-  const personName = item.name?.trim() ?? "";
-  const groupName = item.orgName?.trim() ?? "";
+  const personName = asText(item.name);
+  const groupName = firstText(item.orgName, item.groupName, item.organizationName);
+  const organizationId = firstText(item.organizationId, item.orgId) || undefined;
   return {
-    id: item.registrationId ?? "",
-    no: item.listNumber ?? 0,
+    id: firstText(item.registrationId, item.id),
+    no: asAmount(item.listNumber, 0),
     eventId,
     kind,
     orderNo: "",
     name: displayName(kind, personName, groupName),
     personName,
     groupName,
-    birth: item.birth ?? "",
-    courseName: item.courseName ?? "",
-    souvenir: item.souvenirName ?? "",
+    birth: asText(item.birth),
+    courseName: asText(item.courseName),
+    souvenir: asText(item.souvenirName),
     size: "",
-    phone: item.phoneNumber ?? "",
+    phone: firstText(item.phoneNumber, item.phNum),
     email: "",
     guardianPhone: "",
     guardianRelation: "",
@@ -235,38 +320,51 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     addressDetail: "",
     status: statusKey(item.status),
     paymentStatus: "",
-    appliedAt: formatAdminBoardDate(item.createdAt),
-    organizationId: item.organizationId?.trim() || undefined,
+    appliedAt: formatAdminBoardDate(asText(item.createdAt) || undefined),
+    organizationId,
   };
 }
 
 export function applyRegistrationDetail(
   row: AdminApplicationRow,
-  detail: RegistrationDetail,
+  detail: unknown,
 ): AdminApplicationRow {
-  const personName = detail.name?.trim() ?? row.personName;
-  const groupName = detail.orgName?.trim() ?? row.groupName;
+  const data = asDetail(detail);
+  const leader = asLeaderInfo(data.leaderInfo ?? data.leader ?? data.leaderInfoResponse);
+  const personName = firstText(data.name) || row.personName;
+  const groupName =
+    firstText(data.orgName, data.groupName, data.organizationName, leader?.groupName) ||
+    row.groupName;
+  const createdAt = asText(data.createdAt);
+  const organizationId =
+    firstText(data.organizationId, data.orgId) || row.organizationId;
   return {
     ...row,
     personName,
     groupName,
     name: displayName(row.kind, personName, groupName),
-    courseName: detail.courseName?.trim() || row.courseName,
-    souvenir: detail.souvenirName?.trim() || row.souvenir,
-    size: detail.souvenirSize?.trim() || row.size,
-    gender: uiGenderFromApi(detail.gender) ?? row.gender,
-    birth: detail.birth?.trim() || row.birth,
-    phone: detail.phoneNumber?.trim() || row.phone,
-    email: detail.email?.trim() ?? row.email,
-    guardianPhone: detail.guardianPhoneNumber?.trim() ?? row.guardianPhone,
-    guardianRelation: detail.guardianRelationship?.trim() ?? row.guardianRelation,
-    appliedAt: detail.createdAt ? formatAdminBoardDate(detail.createdAt) : row.appliedAt,
-    amount: detail.amount ?? row.amount,
-    orderNo: detail.orderId?.trim() || row.orderNo,
-    cardPaymentInfo: detail.paymentMethod?.trim() || row.cardPaymentInfo,
-    paymentStatus: statusKey(detail.paymentStatus) || row.paymentStatus,
-    address: detail.address?.trim() ?? row.address,
-    addressDetail: detail.addressDetail?.trim() ?? row.addressDetail,
+    courseName: firstText(data.courseName) || row.courseName,
+    souvenir: firstText(data.souvenirName) || row.souvenir,
+    size: firstText(data.souvenirSize) || row.size,
+    gender: uiGenderFromApi(asText(data.gender)) ?? row.gender,
+    birth: firstText(data.birth) || row.birth,
+    phone: firstText(data.phoneNumber, data.phNum) || row.phone,
+    email: firstText(data.email) || row.email,
+    guardianPhone:
+      firstText(data.guardianPhoneNumber, data.guardianPhNum, data.guardianPhone) ||
+      row.guardianPhone,
+    guardianRelation:
+      firstText(data.guardianRelationship, data.guardianRelation) || row.guardianRelation,
+    appliedAt: createdAt ? formatAdminBoardDate(createdAt) : row.appliedAt,
+    amount: asAmount(data.amount, row.amount),
+    orderNo: firstText(data.orderId) || row.orderNo,
+    cardPaymentInfo: firstText(data.paymentMethod) || row.cardPaymentInfo,
+    paymentStatus: statusKey(asText(data.paymentStatus)) || row.paymentStatus,
+    address: firstText(data.address) || row.address,
+    addressDetail: firstText(data.addressDetail) || row.addressDetail,
+    organizationId,
+    leaderName: leader?.name || row.leaderName,
+    leader: leader ?? row.leader,
   };
 }
 
@@ -292,7 +390,7 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
 }
 
 export function fetchAdminRegistration(registrationId: string) {
-  return adminFetch<RegistrationDetail>(
+  return adminFetch<unknown>(
     `v1/admin/registrations/${encodeURIComponent(registrationId)}`,
   );
 }
@@ -356,5 +454,7 @@ export {
 };
 
 export function formatAmount(amount: number) {
-  return `${amount.toLocaleString("ko-KR")}원`;
+  const n = asAmount(amount, Number.NaN);
+  if (!Number.isFinite(n)) return "-";
+  return `${n.toLocaleString("ko-KR")}원`;
 }

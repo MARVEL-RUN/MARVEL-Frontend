@@ -160,8 +160,12 @@ export function ApplicationsListPage({ slug }: Props) {
   const selected = useMemo(() => {
     const row = rows.find((item) => item.id === selectedId) ?? null;
     if (!row) return null;
-    if (detailQuery.data) return applyRegistrationDetail(row, detailQuery.data);
-    return row;
+    if (!detailQuery.data) return row;
+    try {
+      return applyRegistrationDetail(row, detailQuery.data);
+    } catch {
+      return row;
+    }
   }, [detailQuery.data, rows, selectedId]);
 
   const runSearch = () => {
@@ -328,6 +332,11 @@ export function ApplicationsListPage({ slug }: Props) {
       <ApplicationDetailDrawer
         row={selected}
         loading={Boolean(selectedId) && detailQuery.isLoading}
+        error={
+          Boolean(selectedId) && detailQuery.isError
+            ? errorHint(detailQuery.error)
+            : undefined
+        }
         onClose={() => setSelectedId(null)}
       />
     </div>
