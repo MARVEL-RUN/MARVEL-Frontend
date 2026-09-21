@@ -19,12 +19,11 @@ import {
   applyRegistrationDetail,
   fetchAdminEventCategories,
   fetchAdminRegistration,
-  fetchAdminRegistrations,
-  mapRegistrationPage,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
-import type {
-  AdminOrganizationMember,
+import {
+  mapOrganizationMemberToApplicationRow,
+  type AdminOrganizationMember,
 } from "@/services/admin/organizations";
 import { useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
@@ -88,40 +87,6 @@ function displayPhone(value?: string | null) {
   return formatPhone(raw);
 }
 
-function memberStub(
-  member: AdminOrganizationMember,
-  eventId: string,
-  organizationId: string,
-  no: number,
-): AdminApplicationRow {
-  return {
-    id: member.registrationId,
-    no,
-    eventId,
-    kind: "individual",
-    orderNo: "",
-    name: member.name,
-    personName: member.name,
-    groupName: "",
-    birth: member.birth,
-    courseName: member.courseName,
-    souvenir: member.souvenirName,
-    size: member.souvenirSize,
-    phone: "",
-    email: "",
-    guardianPhone: "",
-    guardianRelation: "",
-    marketingConsent: false,
-    amount: member.amount,
-    cardPaymentInfo: "",
-    address: "",
-    addressDetail: "",
-    status: "",
-    appliedAt: "",
-    organizationId,
-  };
-}
-
 function filterRows(
   rows: AdminApplicationRow[],
   applied: Applied,
@@ -144,9 +109,15 @@ type Props = {
   apiEventId: string;
   organizationId: string;
   members: AdminOrganizationMember[];
+  loading?: boolean;
 };
 
-export function OrganizationMembersList({ apiEventId, organizationId, members }: Props) {
+export function OrganizationMembersList({
+  apiEventId,
+  organizationId,
+  members,
+  loading = false,
+}: Props) {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<RegistrationStatus | "">("");
   const [course, setCourse] = useState("");
@@ -157,11 +128,6 @@ export function OrganizationMembersList({ apiEventId, organizationId, members }:
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const memberIds = useMemo(
-    () => members.map((member) => member.registrationId).filter(Boolean),
-    [members],
-  );
 
   const categoriesQuery = useQuery({
     queryKey: ["admin", "event-categories", apiEventId],
@@ -180,45 +146,13 @@ export function OrganizationMembersList({ apiEventId, organizationId, members }:
     [categoriesQuery.data],
   );
 
-  const listQuery = useQuery({
-    queryKey: ["admin", "org-member-registrations", organizationId, memberIds],
-    queryFn: async () => {
-      const memberIdSet = new Set(memberIds);
-      const [listRaw, ...details] = await Promise.all([
-        fetchAdminRegistrations({
-          eventId: apiEventId,
-          page: 0,
-          size: 200,
-        }),
-        ...members.map((member) => fetchAdminRegistration(member.registrationId)),
-      ]);
-
-      const listById = new Map(
-        mapRegistrationPage(listRaw, apiEventId).content
-          .filter((row) => memberIdSet.has(row.id))
-          .map((row) => [row.id, row]),
-      );
-
-      return members.map((member, index) => {
-        const base =
-          listById.get(member.registrationId) ??
-          memberStub(member, apiEventId, organizationId, index + 1);
-        const withOrg = { ...base, organizationId: base.organizationId || organizationId, no: index + 1 };
-        try {
-          const row = applyRegistrationDetail(withOrg, details[index]);
-          return {
-            ...row,
-            organizationId: row.organizationId || organizationId,
-            no: index + 1,
-            status: row.status || withOrg.status,
-          };
-        } catch {
-          return withOrg;
-        }
-      });
-    },
-    enabled: hasAdminApi && Boolean(apiEventId) && memberIds.length > 0,
-  });
+  const memberRows = useMemo(
+    () =>
+      members.map((member) =>
+        mapOrganizationMemberToApplicationRow(member, apiEventId, organizationId),
+      ),
+    [apiEventId, members, organizationId],
+  );
 
   const detailQuery = useQuery({
     queryKey: ["admin", "registration", selectedId],
@@ -229,7 +163,7 @@ export function OrganizationMembersList({ apiEventId, organizationId, members }:
   useEffect(() => {
     setPage(1);
     setSelectedId(null);
-  }, [apiEventId, organizationId, memberIds.join(",")]);
+  }, [apiEventId, organizationId, members]);
 
   useEffect(() => {
     setSelectedId(null);
@@ -240,8 +174,8 @@ export function OrganizationMembersList({ apiEventId, organizationId, members }:
     "";
 
   const filteredRows = useMemo(
-    () => filterRows(listQuery.data ?? [], applied, categoryName),
-    [applied, categoryName, listQuery.data],
+    () => filterRows(memberRows, applied, categoryName),
+    [applied, categoryName, memberRows],
   );
 
   const totalCount = filteredRows.length;
@@ -276,11 +210,9 @@ export function OrganizationMembersList({ apiEventId, organizationId, members }:
 
   const empty = !hasAdminApi
     ? "관리자 API 주소가 설정되지 않았습니다."
-    : listQuery.isError
-      ? errorHint(listQuery.error)
-      : memberIds.length === 0
-        ? "등록된 멤버가 없습니다."
-        : "조건에 맞는 멤버가 없습니다.";
+    : members.length === 0
+      ? "등록된 멤버가 없습니다."
+      : "조건에 맞는 멤버가 없습니다.";
 
   const columns = [
     {
@@ -367,23 +299,20 @@ export function OrganizationMembersList({ apiEventId, organizationId, members }:
 
   const tableRowCount = rows.length;
   const fixedTableHeight =
-    hasAdminApi &&
-    Boolean(apiEventId) &&
-    listQuery.data !== undefined &&
-    tableRowCount > 0;
+    hasAdminApi && !loading && members.length > 0 && tableRowCount > 0;
   const listPageStyle = fixedTableHeight
     ? ({ "--admin-apps-list-rows": tableRowCount } as CSSProperties)
     : undefined;
 
   return (
     <div
-      className={`admin-apps-list admin-org-detail__members${fixedTableHeight ? " is-fixed-table" : ""}${listQuery.isFetching ? " is-fetching" : ""}`}
+      className={`admin-apps-list admin-org-detail__members${fixedTableHeight ? " is-fixed-table" : ""}`}
       style={listPageStyle}
     >
       <AdminTableShell<AdminApplicationRow>
         title="단체 구성원 목록"
         rows={rows}
-        loading={listQuery.isLoading && !listQuery.data}
+        loading={loading}
         empty={empty}
         rowKey={(row) => row.id || String(row.no)}
         page={page}

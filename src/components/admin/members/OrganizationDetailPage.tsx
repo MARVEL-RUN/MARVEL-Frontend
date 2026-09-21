@@ -140,6 +140,7 @@ export function OrganizationDetailPage() {
             apiEventId={apiEventId}
             organizationId={organizationId}
             members={members}
+            loading={detailQuery.isLoading}
           />
         </>
       ) : (

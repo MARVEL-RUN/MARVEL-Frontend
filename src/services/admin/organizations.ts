@@ -1,5 +1,9 @@
+import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { adminFetch } from "@/lib/admin/fetch";
+import { statusKey } from "@/lib/registration-status";
+import { uiGenderFromApi } from "@/lib/registration-gender";
 import type { SpringPage } from "@/services/admin/boards/inquiries.types";
+import type { AdminApplicationRow } from "@/services/admin/applications";
 
 export type AdminOrganizationListItem = {
   listNumber: number;
@@ -13,12 +17,18 @@ export type AdminOrganizationListItem = {
 };
 
 export type AdminOrganizationMember = {
+  listNumber: number;
   registrationId: string;
   name: string;
+  birth: string;
+  gender: string;
   courseName: string;
   souvenirName: string;
   souvenirSize: string;
-  birth: string;
+  phoneNumber: string;
+  marketingConsent: string;
+  status: string;
+  createdAt: string;
   amount: number;
 };
 
@@ -48,6 +58,19 @@ function asNumber(value: unknown) {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
+}
+
+function firstText(...values: unknown[]) {
+  for (const value of values) {
+    const text = asText(value);
+    if (text) return text;
+  }
+  return "";
+}
+
+function marketingConsentYes(value?: string) {
+  const v = asText(value).toLowerCase();
+  return v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의";
 }
 
 function emptyPage(size: number, page: number): SpringPage<AdminOrganizationListItem> {
@@ -87,13 +110,54 @@ function toMember(row: unknown): AdminOrganizationMember | null {
   const registrationId = asText(item.registrationId);
   if (!registrationId) return null;
   return {
+    listNumber: asNumber(item.listNumber),
     registrationId,
     name: asText(item.name),
+    birth: asText(item.birth),
+    gender: asText(item.gender),
     courseName: asText(item.courseName),
     souvenirName: asText(item.souvenirName),
     souvenirSize: asText(item.souvenirSize),
-    birth: asText(item.birth),
+    phoneNumber: firstText(item.phoneNumber, item.phNum),
+    marketingConsent: asText(item.marketingConsent),
+    status: asText(item.status),
+    createdAt: asText(item.createdAt),
     amount: asNumber(item.amount),
+  };
+}
+
+export function mapOrganizationMemberToApplicationRow(
+  member: AdminOrganizationMember,
+  eventId: string,
+  organizationId: string,
+): AdminApplicationRow {
+  return {
+    id: member.registrationId,
+    no: member.listNumber,
+    eventId,
+    kind: "individual",
+    orderNo: "",
+    name: member.name,
+    personName: member.name,
+    groupName: "",
+    birth: member.birth,
+    courseName: member.courseName,
+    souvenir: member.souvenirName,
+    size: member.souvenirSize,
+    phone: member.phoneNumber,
+    email: "",
+    guardianName: "",
+    guardianPhone: "",
+    guardianRelation: "",
+    gender: uiGenderFromApi(member.gender),
+    marketingConsent: marketingConsentYes(member.marketingConsent),
+    amount: member.amount,
+    cardPaymentInfo: "",
+    address: "",
+    addressDetail: "",
+    status: statusKey(member.status),
+    appliedAt: formatAdminBoardDate(member.createdAt || undefined),
+    organizationId,
   };
 }
 
