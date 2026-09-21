@@ -1,6 +1,7 @@
 "use client";
 
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
+import { DailyApplicantsTable } from "@/components/admin/dashboard/DailyApplicantsTable";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
 import { adminApplicationsHref } from "@/lib/admin/eventLinks";
 import {
@@ -167,6 +168,11 @@ export function DashboardPage({
           )}
         </div>
       </section>
+
+      <DailyApplicantsTable
+        rows={data?.dailyApplicants ?? []}
+        loading={isLoading}
+      />
 
       <OpsGuide cancelHref={cancelHref} gaRealtimeUrl={gaRealtimeUrl} />
     </div>
