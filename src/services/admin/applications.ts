@@ -79,6 +79,7 @@ type RegistrationListItem = {
   registrationId?: string;
   listNumber?: number;
   type?: string;
+  registrationType?: string;
   name?: string;
   orgName?: string;
   birth?: string;
@@ -201,8 +202,12 @@ function asRegistrationPage(
   return emptyPage(size, page);
 }
 
+function listItemRegistrationType(item: RegistrationListItem) {
+  return item.type?.trim() || item.registrationType?.trim() || "";
+}
+
 function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow {
-  const kind = kindFromRegistrationType(item.type);
+  const kind = kindFromRegistrationType(listItemRegistrationType(item));
   const personName = item.name?.trim() ?? "";
   const groupName = item.orgName?.trim() ?? "";
   return {

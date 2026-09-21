@@ -15,8 +15,19 @@ export function isRegistrationType(value: string): value is RegistrationType {
   return REGISTRATION_TYPES.includes(value as RegistrationType);
 }
 
+/** API type·registrationType → PERSONAL | ORGANIZATION */
+export function registrationTypeKey(type?: string | null): RegistrationType | "" {
+  const key = statusKey(type);
+  if (isRegistrationType(key)) return key;
+  const raw = (type ?? "").trim();
+  if (raw === "단체") return "ORGANIZATION";
+  if (raw === "개인") return "PERSONAL";
+  if (key === "GROUP" || key === "TEAM") return "ORGANIZATION";
+  return "";
+}
+
 export function kindFromRegistrationType(type?: string | null): ApplicationKind {
-  return statusKey(type) === "ORGANIZATION" ? "group" : "individual";
+  return registrationTypeKey(type) === "ORGANIZATION" ? "group" : "individual";
 }
 
 export function registrationTypeFromKind(kind: ApplicationKind | ""): RegistrationType | "" {
@@ -26,7 +37,7 @@ export function registrationTypeFromKind(kind: ApplicationKind | ""): Registrati
 }
 
 export function registrationTypeLabel(type?: string | null) {
-  const key = statusKey(type);
-  if (isRegistrationType(key)) return REGISTRATION_TYPE_LABEL[key];
+  const key = registrationTypeKey(type);
+  if (key) return REGISTRATION_TYPE_LABEL[key];
   return type?.trim() || "-";
 }
