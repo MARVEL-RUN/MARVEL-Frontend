@@ -9,7 +9,6 @@ import {
   MAX_GROUP_SIZE,
   TIMING_CHIP_NOTE,
   ageBand,
-  applyCourseForBirth,
   formatFee,
   needsGuardian,
   guardianRequiredFor,
@@ -265,10 +264,10 @@ export function IndividualLookupEdit({
   const parsedAddress = splitApiAddress(receipt.address);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsError, setOptionsError] = useState("");
-  const [name, setName] = useState(receipt.name?.trim() || access.name);
-  const [birth, setBirth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
-  const [phone, setPhone] = useState(receipt.phNum || access.phNum);
-  const [gender, setGender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
+  const [name] = useState(receipt.name?.trim() || access.name);
+  const [birth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
+  const [phone] = useState(receipt.phNum || access.phNum);
+  const [gender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
@@ -333,15 +332,6 @@ export function IndividualLookupEdit({
     setSouvenirs(withShirtSize(next, souvenirs, size, nextBirth));
   }
 
-  function onBirthChange(nextBirth: string) {
-    const kept = applyCourseForBirth(courseId, nextBirth);
-    const next = kept.courseId
-      ? categoryForCourse(categories, kept.courseId, nextBirth)
-      : undefined;
-    setBirth(nextBirth);
-    applyCategory(next, memberShirtSize(souvenirs, next), nextBirth);
-  }
-
   function onCourseChange(nextCourseId: CourseId) {
     const next = categoryForCourse(categories, nextCourseId, birth);
     applyCategory(next);
@@ -388,41 +378,47 @@ export function IndividualLookupEdit({
       <div className="form__head">
         <h2>개인 접수 수정</h2>
         <p className="form__note">조회한 접수 정보를 수정합니다.</p>
+        <p className="lookup-edit__lock-note">
+          개인정보(이름·생년월일·성별)와 휴대폰 번호는 수정할 수 없습니다.
+        </p>
       </div>
 
       <FormSec kicker="01 / PROFILE" title="개인정보">
-        <FormRow label="이름" required>
+        <FormRow label="이름" required locked>
           <input
             type="text"
             name="name"
             placeholder="띄어쓰기 없이 입력해주세요."
             value={name}
-            onChange={(e) => setName(e.target.value)}
             autoComplete="name"
             required
+            disabled
+            readOnly
           />
         </FormRow>
-        <FormRow label="생년월일" required>
-          <BirthPick value={birth} onChange={onBirthChange} />
+        <FormRow label="생년월일" required locked>
+          <BirthPick value={birth} onChange={() => {}} disabled />
         </FormRow>
-        <FormRow label="성별" required>
+        <FormRow label="성별" required locked>
           <GenderPick
             name="gender"
             value={toUiGender(gender)}
-            onChange={(next) => setGender(next === "female" ? "F" : "M")}
+            onChange={() => {}}
+            disabled
           />
         </FormRow>
       </FormSec>
 
       <FormSec kicker="02 / CONTACT" title="연락처 정보">
-        <FormRow label="휴대폰번호" required>
+        <FormRow label="휴대폰번호" required locked>
           <PhoneField
             name="phone"
             placeholder="휴대폰번호를 입력해주세요."
             value={phone}
-            onChange={setPhone}
+            onChange={() => {}}
             autoComplete="tel"
             required
+            disabled
           />
         </FormRow>
       </FormSec>
@@ -721,6 +717,9 @@ export function GroupLookupEdit({
         <p className="form__note">
           참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
         </p>
+        <p className="lookup-edit__lock-note">
+          이미 등록된 참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
+        </p>
       </div>
       <FormSec kicker="01" title="참가자">
         <div className="party-bar">
@@ -770,6 +769,7 @@ export function GroupLookupEdit({
                 const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
                 const selectedSize = memberShirtSize(member.selectedSouvenirList, category);
                 const open = openMember === index;
+                const locked = Boolean(member.registrationId);
                 return (
                   <Fragment key={member.key}>
                     <tr className={open ? "party__info is-open" : "party__info"}>
@@ -781,19 +781,22 @@ export function GroupLookupEdit({
                           {groupMemberPeek(member, categories)}
                         </button>
                       </td>
-                      <td data-label="이름">
+                      <td data-label="이름" className={locked ? "is-locked" : undefined}>
                         <input
                           type="text"
                           placeholder="성명"
                           value={member.name}
                           onChange={(e) => patchMember(index, { name: e.target.value })}
                           required
+                          disabled={locked}
+                          readOnly={locked}
                         />
                       </td>
-                      <td data-label="생년월일">
+                      <td data-label="생년월일" className={locked ? "is-locked" : undefined}>
                         <BirthText
                           value={member.birth}
                           onChange={(birth) => {
+                            if (locked) return;
                             const current = findCategory(categories, member.eventCategoryId);
                             const keep = current && categoryOpenForBirth(current, birth);
                             patchMember(
@@ -821,23 +824,26 @@ export function GroupLookupEdit({
                             );
                           }}
                           required
+                          disabled={locked}
                         />
                       </td>
-                      <td data-label="연락처">
+                      <td data-label="연락처" className={locked ? "is-locked" : undefined}>
                         <PhoneField
                           placeholder="연락처"
                           value={member.phNum}
                           onChange={(phNum) => patchMember(index, { phNum })}
                           required
+                          disabled={locked}
                         />
                       </td>
-                      <td data-label="성별">
+                      <td data-label="성별" className={locked ? "is-locked" : undefined}>
                         <select
                           value={toUiGender(member.gender)}
                           onChange={(e) =>
                             patchMember(index, { gender: toApiGender(e.target.value) })
                           }
                           required
+                          disabled={locked}
                         >
                           <option value="">성별</option>
                           {GENDERS.map((g) => (
