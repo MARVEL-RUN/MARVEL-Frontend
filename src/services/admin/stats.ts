@@ -18,7 +18,7 @@ export type EventIntakeStats = {
 export type AdminDashboardStats = {
   unansweredCount: number;
   cancellationPendingCount: number;
-  cancellationPendingEventId: AdminRaceEventId | null;
+  cancellationPendingEventId: string | null;
   events: EventIntakeStats[];
 };
 

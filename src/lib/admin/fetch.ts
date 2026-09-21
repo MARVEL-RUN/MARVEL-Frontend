@@ -91,3 +91,8 @@ async function adminFetchOnce<T>(
   }
   return (await response.text()) as T;
 }
+
+export function isAdminHttp(error: unknown, status?: number): error is AdminHttpError {
+  if (!(error instanceof AdminHttpError)) return false;
+  return status === undefined || error.status === status;
+}

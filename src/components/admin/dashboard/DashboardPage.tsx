@@ -17,6 +17,15 @@ import Link from "next/link";
 
 const APPS = "/admin/applications";
 
+function applicationsHref(eventId: string, query?: string) {
+  const known = eventId === "marvel" || eventId === "virtual";
+  const path = known
+    ? `${APPS}/${eventId}`
+    : `${APPS}/list?eventId=${encodeURIComponent(eventId)}`;
+  if (!query) return path;
+  return known ? `${path}?${query}` : `${path}&${query}`;
+}
+
 function TaskLink({
   href,
   tone,
@@ -77,7 +86,7 @@ function IntakeCard({
         ];
 
   return (
-    <Link href={`${APPS}/${eventId}`} className="admin-intake__card">
+    <Link href={applicationsHref(eventId)} className="admin-intake__card">
       <span className="admin-intake__head">
         <strong>{event?.name}</strong>
         <ChevronRight className="admin-intake__go" size={16} strokeWidth={2} />
@@ -111,7 +120,7 @@ export function DashboardPage({
   });
 
   const cancelHref = data?.cancellationPendingEventId
-    ? `${APPS}/${data.cancellationPendingEventId}?status=refund_requested`
+    ? applicationsHref(data.cancellationPendingEventId, "status=refund_requested")
     : APPS;
 
   return (

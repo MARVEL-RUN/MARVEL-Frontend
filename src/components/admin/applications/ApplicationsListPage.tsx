@@ -1,22 +1,25 @@
 "use client";
 
-import { adminToast } from "@/components/admin/Toast";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
+import { hasAdminApi } from "@/lib/admin/config";
+import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   getAdminRaceEvent,
-  VIRTUAL_ROUND_LABEL,
   type AdminRaceEventId,
-  type VirtualRoundId,
 } from "@/lib/admin/raceEvents";
-import { EVENT } from "@/lib/event";
-import { type CourseId } from "@/lib/register";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
   applicationKindLabel,
-  applicationRoundLabel,
-  listApplicationsByEvent,
+  applicationPayBadge,
+  applicationPayLabel,
+  applyRegistrationDetail,
+  fetchAdminEvents,
+  fetchAdminRegistration,
+  fetchAdminRegistrations,
+  mapRegistrationPage,
+  matchRaceEvent,
   type AdminApplicationRow,
   type ApplicationKind,
 } from "@/services/admin/applications";
@@ -44,24 +47,10 @@ function payStatusFromParam(value: string | null): AdminPayStatus | "" {
     : "";
 }
 
-const STATUS_LABEL: Record<AdminPayStatus, string> = {
-  paid: "결제완료",
-  pending: "대기",
-  refund_requested: "환불 대기",
-  refunded: "환불완료",
-};
-
 const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
   { value: "", label: "전체 유형" },
   { value: "individual", label: "개인" },
   { value: "group", label: "단체" },
-];
-
-const ROUND_OPTIONS: { value: VirtualRoundId | ""; label: string }[] = [
-  { value: "", label: "전체 차수" },
-  { value: "1", label: VIRTUAL_ROUND_LABEL["1"] },
-  { value: "2", label: VIRTUAL_ROUND_LABEL["2"] },
-  { value: "3", label: VIRTUAL_ROUND_LABEL["3"] },
 ];
 
 const STATUS_OPTIONS: { value: AdminPayStatus | ""; label: string }[] = [
@@ -72,116 +61,96 @@ const STATUS_OPTIONS: { value: AdminPayStatus | ""; label: string }[] = [
   { value: "refunded", label: "환불완료" },
 ];
 
-const STATUS_EDIT_OPTIONS: { value: AdminPayStatus; label: string }[] = [
-  { value: "paid", label: "결제완료" },
-  { value: "pending", label: "대기" },
-  { value: "refund_requested", label: "환불 대기" },
-  { value: "refunded", label: "환불완료" },
-];
-
 type Applied = {
   q: string;
   kind: ApplicationKind | "";
-  round: VirtualRoundId | "";
-  courseId: CourseId | "";
   status: AdminPayStatus | "";
 };
 
-const INITIAL: Applied = {
-  q: "",
-  kind: "",
-  round: "",
-  courseId: "",
-  status: "",
-};
-
-const EMPTY_ROWS: AdminApplicationRow[] = [];
-
-function StatusBadge({ status }: { status: AdminPayStatus }) {
-  return <span className={`admin-badge admin-badge--${status}`}>{STATUS_LABEL[status]}</span>;
+function errorHint(error: unknown) {
+  if (isAdminHttp(error, 400)) return "요청값을 확인하세요.";
+  if (isAdminHttp(error, 401) || isAdminHttp(error, 403)) {
+    return "관리자 로그인이 필요하거나 권한이 없습니다.";
+  }
+  if (isAdminHttp(error, 404)) return "대회 또는 신청 정보가 없습니다.";
+  return "조회에 실패했습니다.";
 }
 
-function CellInput({
-  value,
-  onChange,
-  type = "text",
-  className,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  type?: string;
-  className?: string;
-}) {
+function StatusBadge({ status }: { status: string }) {
   return (
-    <input
-      className={["admin-cell-input", className].filter(Boolean).join(" ")}
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  );
-}
-
-function CellSelect({
-  value,
-  options,
-  onChange,
-}: {
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
-}) {
-  return (
-    <select
-      className="admin-cell-input admin-cell-input--select"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
+    <span className={`admin-badge admin-badge--${applicationPayBadge(status)}`}>
+      {applicationPayLabel(status)}
+    </span>
   );
 }
 
 type Props = {
-  eventId: AdminRaceEventId;
+  slug?: AdminRaceEventId;
 };
 
-export function ApplicationsListPage({ eventId }: Props) {
-  const event = getAdminRaceEvent(eventId);
+export function ApplicationsListPage({ slug }: Props) {
   const searchParams = useSearchParams();
+  const queryEventId = searchParams.get("eventId")?.trim() ?? "";
   const statusFromUrl = payStatusFromParam(searchParams.get("status"));
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin", "applications", eventId],
-    queryFn: () => listApplicationsByEvent(eventId),
-  });
-
-  const [rowsState, setRowsState] = useState<AdminApplicationRow[]>([]);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<AdminApplicationRow[]>([]);
 
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<ApplicationKind | "">("");
-  const [round, setRound] = useState<VirtualRoundId | "">("");
-  const [courseId, setCourseId] = useState<CourseId | "">("");
   const [status, setStatus] = useState<AdminPayStatus | "">(statusFromUrl);
   const [applied, setApplied] = useState<Applied>({
-    ...INITIAL,
+    q: "",
+    kind: "",
     status: statusFromUrl,
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!data) return;
-    setRowsState(data);
-    setEditing(false);
-    setDraft([]);
-    setSelectedId(null);
-  }, [data]);
+  const eventsQuery = useQuery({
+    queryKey: ["admin", "events"],
+    queryFn: fetchAdminEvents,
+    enabled: hasAdminApi,
+  });
+
+  const apiEvent = useMemo(() => {
+    const events = eventsQuery.data ?? [];
+    if (slug) return matchRaceEvent(events, slug);
+    if (queryEventId) {
+      return (
+        events.find((event) => event.eventId === queryEventId) ?? {
+          eventId: queryEventId,
+          eventName: "",
+          registrationType: "",
+          registrationPeriod: "",
+        }
+      );
+    }
+    return undefined;
+  }, [eventsQuery.data, queryEventId, slug]);
+
+  const apiEventId = apiEvent?.eventId ?? "";
+  const eventTitle =
+    apiEvent?.eventName || (slug ? getAdminRaceEvent(slug)?.name : "") || "신청자 목록";
+
+  const listQuery = useQuery({
+    queryKey: ["admin", "registrations", apiEventId, applied, page],
+    queryFn: async () => {
+      const raw = await fetchAdminRegistrations({
+        eventId: apiEventId,
+        type: applied.kind,
+        status: applied.status,
+        keyword: applied.q,
+        page: page - 1,
+        size: PAGE_SIZE,
+      });
+      return mapRegistrationPage(raw, apiEventId);
+    },
+    enabled: hasAdminApi && Boolean(apiEventId),
+  });
+
+  const detailQuery = useQuery({
+    queryKey: ["admin", "registration", selectedId],
+    queryFn: () => fetchAdminRegistration(selectedId as string),
+    enabled: Boolean(selectedId),
+  });
 
   useEffect(() => {
     const next = payStatusFromParam(searchParams.get("status"));
@@ -190,94 +159,35 @@ export function ApplicationsListPage({ eventId }: Props) {
     setPage(1);
   }, [searchParams]);
 
-  const courseOptions = useMemo(
-    () => [
-      { value: "" as const, label: "전체 코스" },
-      ...EVENT.courses.map((course) => ({
-        value: course.id as CourseId | "",
-        label: course.distance,
-      })),
-    ],
-    [],
-  );
+  useEffect(() => {
+    setSelectedId(null);
+  }, [apiEventId, applied, page]);
 
-  const courseEditOptions = useMemo(
-    () =>
-      EVENT.courses.map((course) => ({
-        value: course.id,
-        label: course.distance,
-      })),
-    [],
-  );
+  const rows = listQuery.data?.content ?? [];
+  const totalCount = listQuery.data?.totalElements ?? 0;
+  const pageCount = Math.max(1, listQuery.data?.totalPages ?? 1);
 
-  const source = editing ? draft : rowsState.length ? rowsState : (data ?? EMPTY_ROWS);
-
-  const filtered = useMemo(() => {
-    const keyword = applied.q.trim().toLowerCase();
-    return source.filter((row) => {
-      if (applied.kind && row.kind !== applied.kind) return false;
-      if (applied.round && row.round !== applied.round) return false;
-      if (applied.courseId && row.courseId !== applied.courseId) return false;
-      if (applied.status && row.status !== applied.status) return false;
-      if (!keyword) return true;
-      return [row.orderNo, row.name, row.leaderName, row.phone, row.souvenir]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(keyword);
-    });
-  }, [applied, source]);
-
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const selected = useMemo(() => {
+    const row = rows.find((item) => item.id === selectedId) ?? null;
+    if (!row) return null;
+    if (detailQuery.data) return applyRegistrationDetail(row, detailQuery.data);
+    return row;
+  }, [detailQuery.data, rows, selectedId]);
 
   const runSearch = () => {
-    setApplied({ q, kind, round, courseId, status });
+    setApplied({ q, kind, status });
     setPage(1);
   };
 
   const resetSearch = () => {
     setQ("");
     setKind("");
-    setRound("");
-    setCourseId("");
     setStatus("");
-    setApplied(INITIAL);
+    setApplied({ q: "", kind: "", status: "" });
     setPage(1);
   };
 
-  const startEdit = () => {
-    setDraft(rowsState.map((row) => ({ ...row })));
-    setEditing(true);
-  };
-
-  const cancelEdit = () => {
-    setDraft([]);
-    setEditing(false);
-  };
-
-  const saveEdit = () => {
-    setRowsState(draft.map((row) => ({ ...row })));
-    setDraft([]);
-    setEditing(false);
-    adminToast.success("신청 정보가 저장되었습니다.");
-  };
-
-  const patchRow = (id: string, patch: Partial<AdminApplicationRow>) => {
-    setDraft((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)));
-  };
-
-  const selected = useMemo(
-    () => (selectedId ? source.find((row) => row.id === selectedId) ?? null : null),
-    [selectedId, source],
-  );
-
-  const removeSelected = (id: string) => {
-    setRowsState((prev) => prev.filter((row) => row.id !== id));
-    setDraft((prev) => prev.filter((row) => row.id !== id));
-  };
-
-  if (!event) {
+  if (slug && !getAdminRaceEvent(slug)) {
     return (
       <div className="admin-page">
         <p className="admin-empty">존재하지 않는 대회입니다.</p>
@@ -288,247 +198,103 @@ export function ApplicationsListPage({ eventId }: Props) {
     );
   }
 
-  const locked = !editing;
+  const empty = !hasAdminApi
+    ? "관리자 API 주소가 설정되지 않았습니다."
+    : eventsQuery.isError && Boolean(slug)
+      ? errorHint(eventsQuery.error)
+      : listQuery.isError
+        ? errorHint(listQuery.error)
+        : eventsQuery.isFetched && slug && !apiEvent
+          ? "대회 정보가 없습니다."
+          : "신청 내역이 없습니다.";
 
-  const nameHeader = event.allowsGroup ? "이름/단체명" : "이름";
-
-  const sharedStart = [
-    { key: "no", header: "번호", render: (row: AdminApplicationRow) => row.no },
-    ...(event.allowsGroup
-      ? [
-          {
-            key: "kind",
-            header: "유형",
-            render: (row: AdminApplicationRow) => applicationKindLabel(row.kind),
-          },
-        ]
-      : []),
+  const columns = [
+    { key: "no", header: "번호", render: (row: AdminApplicationRow) => row.no || "-" },
     {
-      key: "name",
-      header: nameHeader,
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          row.name
-        ) : (
-          <CellInput value={row.name} onChange={(v) => patchRow(row.id, { name: v })} />
-        ),
+      key: "kind",
+      header: "유형",
+      render: (row: AdminApplicationRow) => applicationKindLabel(row.kind),
     },
+    { key: "name", header: "이름/단체명", render: (row: AdminApplicationRow) => row.name || "-" },
     {
       key: "birth",
       header: "생년월일",
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          row.birth || "-"
-        ) : (
-          <CellInput
-            value={row.birth ?? ""}
-            onChange={(v) => patchRow(row.id, { birth: v })}
-            className="admin-cell-input--wide"
-          />
-        ),
+      render: (row: AdminApplicationRow) => row.birth || "-",
     },
     {
       key: "gender",
       header: "성별",
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          applicationGenderLabel(row.gender)
-        ) : (
-          <CellSelect
-            value={row.gender ?? "male"}
-            options={[
-              { value: "male", label: "남성" },
-              { value: "female", label: "여성" },
-            ]}
-            onChange={(v) => patchRow(row.id, { gender: v as "male" | "female" })}
-          />
-        ),
+      render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
-  ];
-
-  const sharedEnd = [
+    {
+      key: "course",
+      header: "코스",
+      render: (row: AdminApplicationRow) => applicationCourseLabel(row),
+    },
     {
       key: "souvenir",
       header: "기념품",
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          row.souvenir
-        ) : (
-          <CellInput value={row.souvenir} onChange={(v) => patchRow(row.id, { souvenir: v })} />
-        ),
+      render: (row: AdminApplicationRow) => row.souvenir || "-",
     },
     {
       key: "phone",
       header: "연락처",
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          row.phone
-        ) : (
-          <CellInput value={row.phone} onChange={(v) => patchRow(row.id, { phone: v })} />
-        ),
+      render: (row: AdminApplicationRow) => row.phone || "-",
     },
     {
       key: "marketing",
       header: "마케팅동의",
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          row.marketingConsent ? "Y" : "N"
-        ) : (
-          <CellSelect
-            value={row.marketingConsent ? "Y" : "N"}
-            options={[
-              { value: "Y", label: "Y" },
-              { value: "N", label: "N" },
-            ]}
-            onChange={(v) => patchRow(row.id, { marketingConsent: v === "Y" })}
-          />
-        ),
+      render: (row: AdminApplicationRow) => (row.marketingConsent ? "Y" : "N"),
     },
     {
       key: "status",
       header: "상태",
-      render: (row: AdminApplicationRow) =>
-        locked ? (
-          <StatusBadge status={row.status} />
-        ) : (
-          <CellSelect
-            value={row.status}
-            options={STATUS_EDIT_OPTIONS}
-            onChange={(v) => patchRow(row.id, { status: v as AdminPayStatus })}
-          />
-        ),
+      render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
     },
     {
       key: "appliedAt",
       header: "신청일시",
-      render: (row: AdminApplicationRow) => row.appliedAt,
+      render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
-
-  const columns =
-    eventId === "virtual"
-      ? [
-          ...sharedStart,
-          {
-            key: "round",
-            header: "차수",
-            render: (row: AdminApplicationRow) =>
-              locked ? (
-                applicationRoundLabel(row)
-              ) : (
-                <CellSelect
-                  value={row.round ?? "1"}
-                  options={[
-                    { value: "1", label: "1차" },
-                    { value: "2", label: "2차" },
-                    { value: "3", label: "3차" },
-                  ]}
-                  onChange={(v) => patchRow(row.id, { round: v as VirtualRoundId })}
-                />
-              ),
-          },
-          ...sharedEnd,
-        ]
-      : [
-          ...sharedStart,
-          {
-            key: "course",
-            header: "코스",
-            render: (row: AdminApplicationRow) =>
-              locked ? (
-                applicationCourseLabel(row)
-              ) : (
-                <CellSelect
-                  value={row.courseId ?? ""}
-                  options={courseEditOptions}
-                  onChange={(v) => patchRow(row.id, { courseId: v as CourseId })}
-                />
-              ),
-          },
-          ...sharedEnd,
-        ];
 
   return (
     <div className="admin-page admin-apps-list">
       <AdminTableShell<AdminApplicationRow>
-        title={event.name}
+        title={eventTitle}
         rows={rows}
-        loading={isLoading}
-        empty="신청 내역이 없습니다."
-        rowKey={(row) => row.id}
+        loading={eventsQuery.isLoading || listQuery.isLoading}
+        empty={empty}
+        rowKey={(row) => row.id || String(row.no)}
         page={page}
         pageCount={pageCount}
-        totalCount={filtered.length}
+        totalCount={totalCount}
         onPage={(n) => setPage(n)}
         pageUnit="신청"
-        onRowClick={
-          editing
-            ? undefined
-            : (row) => {
-                setSelectedId(row.id);
-              }
-        }
+        onRowClick={(row) => {
+          if (!row.id) return;
+          setSelectedId(row.id);
+        }}
         actions={
           <div className="admin-table-shell__actions">
             <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
               대회 목록
             </Link>
-            {editing ? (
-              <>
-                <button type="button" className="admin-btn admin-btn--ghost" onClick={cancelEdit}>
-                  취소
-                </button>
-                <button type="button" className="admin-btn admin-btn--primary" onClick={saveEdit}>
-                  저장
-                </button>
-              </>
-            ) : (
-              <button type="button" className="admin-btn admin-btn--primary" onClick={startEdit}>
-                수정하기
-              </button>
-            )}
           </div>
         }
         tools={
           <>
-            {event.allowsGroup ? (
-              <AdminSelect
-                value={kind}
-                options={KIND_OPTIONS}
-                onChange={(value) => {
-                  setKind(value);
-                  setApplied((prev) => ({ ...prev, kind: value }));
-                  setPage(1);
-                }}
-                ariaLabel="신청 유형"
-                width={112}
-              />
-            ) : null}
-            {event.hasRounds ? (
-              <AdminSelect
-                value={round}
-                options={ROUND_OPTIONS}
-                onChange={(value) => {
-                  setRound(value);
-                  setApplied((prev) => ({ ...prev, round: value }));
-                  setPage(1);
-                }}
-                ariaLabel="차수"
-                width={112}
-              />
-            ) : (
-              <AdminSelect
-                value={courseId}
-                options={courseOptions}
-                onChange={(value) => {
-                  setCourseId(value);
-                  setApplied((prev) => ({ ...prev, courseId: value }));
-                  setPage(1);
-                }}
-                ariaLabel="코스"
-                width={112}
-              />
-            )}
+            <AdminSelect
+              value={kind}
+              options={KIND_OPTIONS}
+              onChange={(value) => {
+                setKind(value);
+                setApplied((prev) => ({ ...prev, kind: value }));
+                setPage(1);
+              }}
+              ariaLabel="신청 유형"
+              width={112}
+            />
             <AdminSelect
               value={status}
               options={STATUS_OPTIONS}
@@ -547,11 +313,7 @@ export function ApplicationsListPage({ eventId }: Props) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") runSearch();
               }}
-              placeholder={
-                event.allowsGroup
-                  ? "이름 · 단체명 · 주문번호 · 연락처"
-                  : "이름 · 주문번호 · 연락처"
-              }
+              placeholder="이름 · 단체명 · 연락처"
             />
             <button
               type="button"
@@ -575,12 +337,8 @@ export function ApplicationsListPage({ eventId }: Props) {
       />
       <ApplicationDetailDrawer
         row={selected}
+        loading={Boolean(selectedId) && detailQuery.isLoading}
         onClose={() => setSelectedId(null)}
-        onDelete={removeSelected}
-        onSave={(next) => {
-          setRowsState((prev) => prev.map((r) => (r.id === next.id ? next : r)));
-          setDraft((prev) => prev.map((r) => (r.id === next.id ? next : r)));
-        }}
       />
     </div>
   );
