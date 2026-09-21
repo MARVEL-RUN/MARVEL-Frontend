@@ -25,13 +25,12 @@ function dash(value?: string | number | null) {
   return String(value);
 }
 
-function RegistrationStatus({ value }: { value?: string }) {
+function PaymentStatusBadge({ value }: { value?: string }) {
   const key = statusKey(value);
-  const label = registrationStatusLabel(value);
-  if (!isRegistrationStatus(key) && key !== "UNKNOWN") return <>{label}</>;
+  if (!key || (!isRegistrationStatus(key) && key !== "UNKNOWN")) return null;
   return (
     <span className={`admin-badge admin-badge--${registrationStatusBadge(value)}`}>
-      {label}
+      {registrationStatusLabel(value)}
     </span>
   );
 }
@@ -51,73 +50,102 @@ function PaymentListItem({
   const cancels = payment.cancels ?? [];
   const allocations = payment.allocations ?? [];
   const orderId = payment.orderId?.trim() || `결제 ${index + 1}`;
-
-  return (
-    <article className={`admin-pay-list__item${logOpen ? " is-active" : ""}`}>
-      <div className="admin-pay-list__card">
-        <header className="admin-pay-list__head">
-          <div className="admin-pay-list__id">
-            <span className="admin-pay-list__no">{String(index + 1).padStart(2, "0")}</span>
-            <div className="admin-pay-list__id-text">
-              <p className="admin-pay-list__order" title={orderId}>
-                {orderId}
-              </p>
-              {payment.orderName?.trim() ? (
-                <p className="admin-pay-list__meta">{payment.orderName.trim()}</p>
-              ) : null}
-            </div>
+  const method = paymentMethodLabel(payment);
+  const itemClass = `admin-pay-list__item${logOpen ? " is-active" : ""}`;
+  const content = (
+    <>
+      <header className="admin-pay-list__head">
+        <span className="admin-pay-list__no">{String(index + 1).padStart(2, "0")}</span>
+        <div className="admin-pay-list__lead">
+          <div className="admin-pay-list__lead-top">
+            <span className="admin-pay-list__amount">
+              {payment.amount != null ? formatAmount(payment.amount) : "-"}
+            </span>
+            <PaymentStatusBadge value={payment.paymentStatus} />
           </div>
-          <RegistrationStatus value={payment.paymentStatus} />
-        </header>
-        <dl className="admin-pay-list__facts">
-          <div>
-            <dt>금액</dt>
-            <dd>{payment.amount != null ? formatAmount(payment.amount) : "-"}</dd>
-          </div>
-          <div>
+          <p className="admin-pay-list__order" title={orderId}>
+            {orderId}
+          </p>
+          {payment.orderName?.trim() ? (
+            <p className="admin-pay-list__meta">{payment.orderName.trim()}</p>
+          ) : null}
+        </div>
+        {paymentId ? (
+          <span className="admin-pay-list__log-hint" aria-hidden>
+            {logOpen ? "닫기" : "로그"}
+          </span>
+        ) : null}
+      </header>
+      <dl className="admin-pay-list__fields">
+        {method !== "-" ? (
+          <div className="admin-pay-list__row">
             <dt>결제방식</dt>
-            <dd>{paymentMethodLabel(payment)}</dd>
+            <dd>{method}</dd>
           </div>
-          <div>
-            <dt>승인일시</dt>
-            <dd>{formatAdminBoardDate(payment.approvedAt || payment.createdAt)}</dd>
+        ) : null}
+        <div className="admin-pay-list__row">
+          <dt>승인일시</dt>
+          <dd>{formatAdminBoardDate(payment.approvedAt || payment.createdAt)}</dd>
+        </div>
+        {allocations.map((item, i) => (
+          <div
+            className="admin-pay-list__row"
+            key={item.paymentAllocationId ?? `${item.registrationId}-${i}`}
+          >
+            <dt>{i === 0 ? "배분" : ""}</dt>
+            <dd>
+              {dash(item.name)}
+              {" · "}
+              {item.allocatedAmount != null ? formatAmount(item.allocatedAmount) : "-"}
+              {item.excludedFromCurrentRoster ? (
+                <span className="admin-pay-list__note">명단 제외</span>
+              ) : null}
+            </dd>
           </div>
-        </dl>
-        {allocations.length > 0 ? (
-          <ul className="admin-pay-list__sub">
-            {allocations.map((item, i) => (
-              <li key={item.paymentAllocationId ?? `${item.registrationId}-${i}`}>
-                {dash(item.name)} ·{" "}
-                {item.allocatedAmount != null ? formatAmount(item.allocatedAmount) : "-"}
-                {item.excludedFromCurrentRoster ? " · 명단 제외" : ""}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {cancels.length > 0 ? (
-          <ul className="admin-pay-list__sub admin-pay-list__sub--cancel">
-            {cancels.map((item, i) => (
-              <li key={item.paymentCancelId ?? `${item.createdAt}-${i}`}>
-                취소 {item.cancelAmount != null ? formatAmount(item.cancelAmount) : "-"}
-                {item.cancelReason ? ` · ${item.cancelReason}` : ""}
-                {item.status ? ` · ${registrationStatusLabel(item.status)}` : ""}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-      {paymentId ? (
-        <button
-          type="button"
-          className="admin-btn admin-btn--ghost admin-pay-list__log-btn"
-          onClick={onOpenLog}
-          aria-pressed={logOpen}
-        >
-          {logOpen ? "처리 로그 닫기" : "처리 로그 보기"}
-        </button>
-      ) : null}
-    </article>
+        ))}
+        {cancels.map((item, i) => (
+          <div
+            className="admin-pay-list__row admin-pay-list__row--cancel"
+            key={item.paymentCancelId ?? `${item.createdAt}-${i}`}
+          >
+            <dt>{i === 0 ? "취소·환불" : ""}</dt>
+            <dd>
+              {item.cancelAmount != null ? formatAmount(item.cancelAmount) : "-"}
+              {item.cancelReason ? (
+                <>
+                  {" · "}
+                  {item.cancelReason}
+                </>
+              ) : null}
+              {item.status ? (
+                <span
+                  className={`admin-badge admin-badge--${registrationStatusBadge(item.status)} admin-pay-list__inline-badge`}
+                >
+                  {registrationStatusLabel(item.status)}
+                </span>
+              ) : null}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </>
   );
+
+  if (paymentId) {
+    return (
+      <button
+        type="button"
+        className={itemClass}
+        onClick={onOpenLog}
+        aria-pressed={logOpen}
+        aria-label={`${orderId} 처리 로그 ${logOpen ? "닫기" : "보기"}`}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return <article className={itemClass}>{content}</article>;
 }
 
 export function PaymentListDrawer({
