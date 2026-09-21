@@ -58,6 +58,7 @@ export type AdminApplicationRow = {
   addressDetail: string;
   status: string;
   appliedAt: string;
+  organizationId?: string;
 };
 
 type RegistrationListItem = {
@@ -74,6 +75,7 @@ type RegistrationListItem = {
   marketingConsent?: string | boolean;
   status?: string;
   createdAt?: string;
+  organizationId?: string;
 };
 
 type RegistrationDetail = {
@@ -265,6 +267,7 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     addressDetail: "",
     status: normalizeStatus(item.status),
     appliedAt: formatAdminBoardDate(item.createdAt),
+    organizationId: item.organizationId?.trim() || undefined,
   };
 }
 

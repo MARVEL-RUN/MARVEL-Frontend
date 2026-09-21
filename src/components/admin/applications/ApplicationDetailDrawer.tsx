@@ -9,6 +9,7 @@ import {
   type AdminApplicationRow,
 } from "@/services/admin/applications";
 import type { ReactNode } from "react";
+import { ApplicationPayments } from "./ApplicationPayments";
 
 type Props = {
   row: AdminApplicationRow | null;
@@ -70,14 +71,17 @@ export function ApplicationDetailDrawer({ row, loading, onClose }: Props) {
 
         {loading ? <p className="admin-empty">불러오는 중…</p> : null}
 
-        <dl className="admin-drawer__fields">
-          {fields.map((field) => (
-            <div key={field.label} className="admin-drawer__row">
-              <dt>{field.label}</dt>
-              <dd>{field.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <div className="admin-drawer__body">
+          <dl className="admin-drawer__fields">
+            {fields.map((field) => (
+              <div key={field.label} className="admin-drawer__row">
+                <dt>{field.label}</dt>
+                <dd>{field.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <ApplicationPayments row={row} />
+        </div>
 
         <div className="admin-drawer__foot">
           <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
