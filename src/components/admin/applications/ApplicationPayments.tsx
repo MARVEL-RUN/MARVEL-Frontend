@@ -166,7 +166,8 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
 
   return (
     <section className="admin-pay" aria-label="결제·환불 내역">
-      <h2>결제·환불</h2>
+      <h2 className="admin-drawer__section-title">결제·환불</h2>
+      <div className="admin-pay__body">
       {finance.isLoading ? (
         <p className="admin-pay__hint">불러오는 중…</p>
       ) : finance.isError ? (
@@ -236,6 +237,7 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
           ) : null}
         </>
       )}
+      </div>
     </section>
   );
 }
