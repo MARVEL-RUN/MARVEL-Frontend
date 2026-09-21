@@ -452,12 +452,17 @@ export function PhoneField({
 const GUARDIAN_CONSENT_LABEL =
   "법정대리인(보호자)으로서 참가 신청·개인정보 처리에 동의합니다.";
 
+export const GROUP_GUARDIAN_CONSENT_LABEL =
+  "단체장으로서 만 14세 미만 참가자의 참가 신청·개인정보 처리에 동의합니다.";
+
 export function GuardianConsentField({
   agreed,
   onChange,
+  label = GUARDIAN_CONSENT_LABEL,
 }: {
   agreed: boolean;
   onChange: (next: boolean) => void;
+  label?: string;
 }) {
   return (
     <button
@@ -466,7 +471,7 @@ export function GuardianConsentField({
       aria-pressed={agreed}
       onClick={() => onChange(!agreed)}
     >
-      <span className="guardian-consent__label">{GUARDIAN_CONSENT_LABEL}</span>
+      <span className="guardian-consent__label">{label}</span>
       <span className="guardian-consent__state">{agreed ? "동의함" : "탭하여 동의"}</span>
     </button>
   );

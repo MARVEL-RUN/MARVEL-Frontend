@@ -432,7 +432,7 @@ export function IndividualLookupEdit({
         title={guardianRequired ? "보호자 정보" : "보호자 정보 (선택)"}
         note={
           guardianRequired
-            ? `${GUARDIAN_AGE_NOTE}. 보호자 이름·연락처가 필요합니다.`
+            ? `${GUARDIAN_AGE_NOTE} 보호자 이름·연락처도 입력해 주세요.`
             : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
         }
       >
