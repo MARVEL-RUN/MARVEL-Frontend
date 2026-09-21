@@ -98,6 +98,11 @@ export function PaymentLogDrawer({ eventId, payment, onClose }: Props) {
   }, []);
 
   useEffect(() => {
+    document.body.classList.add("admin-has-pay-log-drawer");
+    return () => document.body.classList.remove("admin-has-pay-log-drawer");
+  }, []);
+
+  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
