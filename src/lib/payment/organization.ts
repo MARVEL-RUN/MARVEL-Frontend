@@ -20,7 +20,7 @@ export function toOrganizationRegistrationRequest(
       phNum: formatPhone(draft.phone),
       email: draft.email.trim(),
       leaderName: draft.leaderName.trim(),
-      guardianConsent: false,
+      guardianConsent: draft.guardianConsent,
     },
     registrations: draft.participants.map((p) => ({
       eventCategoryId: p.categoryId,
