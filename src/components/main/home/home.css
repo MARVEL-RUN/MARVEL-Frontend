@@ -2,12 +2,12 @@
 
 .home-pop {
   position: fixed;
-  top: calc(var(--header-h) + 0.55rem);
+  top: calc(var(--header-h) + 1rem);
   left: 1.15rem;
-  z-index: 36;
+  z-index: 42;
   display: flex;
   flex-direction: column;
-  width: min(26.5rem, calc(100vw - 2.3rem));
+  width: min(36rem, calc(100vw - 2.3rem));
   height: max-content;
   max-height: calc(100dvh - var(--header-h) - 1.4rem);
   overflow: hidden;
@@ -23,7 +23,7 @@
 
 .home-pop.is-drag {
   cursor: grabbing;
-  z-index: 45;
+  z-index: 43;
 }
 
 .home-pop__shot {
@@ -51,7 +51,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .home-pop__bar {

@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { ApplicationsListRoute } from "@/components/admin/applications/ApplicationsListRoute";
+import { MembersListRoute } from "@/components/admin/members/MembersListRoute";
 
 export const metadata: Metadata = {
-  title: "전체 신청자 목록 | 관리자",
+  title: "단체회원 목록 | 관리자",
 };
 
 export default function Page() {
   return (
     <Suspense>
-      <ApplicationsListRoute />
+      <MembersListRoute />
     </Suspense>
   );
 }

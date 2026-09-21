@@ -1,17 +1,28 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
+import { useAdminPrompt } from "@/components/admin/InputModal";
+import { adminToast } from "@/components/admin/Toast";
 import {
   registrationStatusBadge,
   registrationStatusLabel,
 } from "@/lib/registration-status";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
   applicationKindLabel,
+  resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
+import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { ApplicationPayments } from "./ApplicationPayments";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { ApplicationPaySummary } from "./ApplicationPaySummary";
+import { PaymentListDrawer } from "./PaymentListDrawer";
+import { PaymentLogDrawer } from "./PaymentLogDrawer";
 
 type Props = {
   row: AdminApplicationRow | null;
@@ -31,6 +42,12 @@ function dash(value?: string | number | null) {
   return text || "-";
 }
 
+function agreeLabel(value?: boolean) {
+  if (value === true) return "동의함";
+  if (value === false) return "미동의";
+  return "-";
+}
+
 function isEmptyValue(value: ReactNode) {
   if (value == null) return true;
   if (typeof value === "string") {
@@ -44,8 +61,16 @@ function visibleFields(fields: DetailField[]) {
   return fields.filter((field) => !isEmptyValue(field.value));
 }
 
-function DetailSection({ title, fields }: { title: string; fields: DetailField[] }) {
-  const items = visibleFields(fields);
+function DetailSection({
+  title,
+  fields,
+  keepEmpty,
+}: {
+  title: string;
+  fields: DetailField[];
+  keepEmpty?: boolean;
+}) {
+  const items = keepEmpty ? fields : visibleFields(fields);
   if (items.length === 0) return null;
 
   return (
@@ -99,10 +124,24 @@ function buildSections(row: AdminApplicationRow) {
     { label: "이메일", value: dash(row.email) },
   ];
 
-  const guardianFields: DetailField[] = [
-    { label: "연락처", value: dash(row.guardianPhone) },
-    { label: "관계", value: dash(row.guardianRelation) },
-  ];
+  const guardianFields: DetailField[] = isGroup
+    ? row.guardianConsent === true
+      ? [{ label: "동의", value: "동의함" }]
+      : []
+    : [
+        { label: "이름", value: dash(row.guardianName) },
+        { label: "관계", value: dash(row.guardianRelation) },
+        { label: "연락처", value: dash(row.guardianPhone) },
+        {
+          label: "동의",
+          value:
+            row.guardianConsent === true
+              ? "동의함"
+              : row.guardianConsent === false
+                ? "미동의"
+                : "-",
+        },
+      ];
 
   const groupFields: DetailField[] = [
     { label: "단체명", value: dash(row.groupName) },
@@ -123,37 +162,156 @@ function buildSections(row: AdminApplicationRow) {
     { label: "상세주소", value: dash(addressDetail) },
   ];
 
+  const termsFields: DetailField[] = [
+    { label: "필수 약관", value: agreeLabel(row.termsEssentialAgreed) },
+    { label: "마케팅", value: agreeLabel(row.termsMarketingAgreed) },
+    {
+      label: "전송매체 마케팅",
+      value: agreeLabel(row.termsMarketingChannelAgreed),
+    },
+  ];
+
   return {
     applyFields,
     personFields,
     guardianFields,
     groupFields: isGroup ? groupFields : [],
     addressFields,
+    termsFields,
   };
 }
 
 export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props) {
-  if (!row) return null;
+  const [mounted, setMounted] = useState(false);
+  const [page, setPage] = useState(0);
+  const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
+  const { confirm, modal: confirmModal } = useAdminConfirm();
+  const { prompt, modal: inputModal } = useAdminPrompt();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setLogPayment(null);
+    setPage(0);
+  }, [row?.id]);
+
+  useEffect(() => {
+    setLogPayment(null);
+  }, [page]);
+
+  useEffect(() => {
+    if (!row) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (logPayment) {
+        setLogPayment(null);
+        return;
+      }
+      onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [logPayment, onClose, row]);
+
+  const finance = useQuery({
+    queryKey: ["admin", "finance", row?.eventId, row?.id, row?.kind, row?.organizationId, page],
+    queryFn: () => fetchApplicationFinance(row!, page),
+    enabled: Boolean(row?.eventId && row?.id),
+  });
+
+  const resetPassword = useMutation({
+    mutationFn: (password: string) =>
+      resetRegistrationPassword(row!.id, password),
+    onSuccess: () => adminToast.success("비밀번호가 초기화되었습니다."),
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error ? err.message : "비밀번호 초기화에 실패했습니다.",
+      ),
+  });
+
+  const handleResetPassword = async () => {
+    if (!row || row.kind === "group") return;
+    const label =
+      row.personName?.trim() || row.name?.trim() || "해당 신청자";
+    const ok = await confirm({
+      title: "비밀번호 초기화",
+      message: `${label} 계정의 비밀번호를 초기화하시겠습니까?`,
+    });
+    if (!ok) return;
+    const password = await prompt({
+      title: "비밀번호 초기화",
+      description: `신청조회용 새 비밀번호를 입력해 주세요. (${APPLICATION_PASSWORD_MIN}자 이상)`,
+      label: "새 비밀번호",
+      placeholder: `${APPLICATION_PASSWORD_MIN}자 이상 입력`,
+      type: "password",
+      minLength: APPLICATION_PASSWORD_MIN,
+    });
+    if (!password) return;
+    resetPassword.mutate(password);
+  };
+
+  if (!row || !mounted) return null;
 
   const isGroup = row.kind === "group";
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
+  const payments = finance.data?.payments?.content ?? [];
+  const totalPages = Math.max(1, finance.data?.payments?.totalPages ?? 1);
+  const totalCount = finance.data?.payments?.totalElements;
+  const showPayments = !finance.isLoading && !finance.isError && payments.length > 0;
+  const showLog = Boolean(logPayment);
 
-  return (
-    <>
+  return createPortal(
+    <div
+      className="admin-drawer-stack"
+      data-pay-open={showPayments ? "" : undefined}
+      data-log-open={showLog ? "" : undefined}
+    >
       <div
         className="admin-drawer__dim"
         role="presentation"
         aria-hidden="true"
         onClick={onClose}
       />
-      <aside className="admin-drawer" role="dialog" aria-modal="true" aria-label="신청 상세">
+      {showLog && logPayment ? (
+        <PaymentLogDrawer
+          eventId={row.eventId}
+          payment={logPayment}
+          onClose={() => setLogPayment(null)}
+        />
+      ) : null}
+      {showPayments ? (
+        <PaymentListDrawer
+          payments={payments}
+          page={page}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          activeLogPaymentId={logPayment?.paymentId ?? null}
+          onOpenLog={setLogPayment}
+          onPage={setPage}
+        />
+      ) : null}
+      <aside className="admin-drawer admin-drawer--detail" role="dialog" aria-modal="true" aria-label="신청 상세">
         <header className="admin-drawer__hero">
           <div className="admin-drawer__hero-bar">
             <span className="admin-drawer__hero-kind">{applicationKindLabel(row.kind)}</span>
-            <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
-              닫기
-            </button>
+            <div className="admin-drawer__actions">
+              {!isGroup ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  disabled={resetPassword.isPending || loading || Boolean(error)}
+                  onClick={handleResetPassword}
+                >
+                  비밀번호 초기화
+                </button>
+              ) : null}
+              <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
+                닫기
+              </button>
+            </div>
           </div>
           <h1 className="admin-drawer__hero-title">{title}</h1>
           <div className="admin-drawer__hero-meta">
@@ -164,7 +322,10 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
               <span className="admin-drawer__hero-date">{row.appliedAt.trim()}</span>
             ) : null}
           </div>
-          <StatusLabel status={row.status} />
+          <div className="admin-drawer__hero-status">
+            <span className="admin-drawer__hero-kind">신청상태</span>
+            <StatusLabel status={row.status} />
+          </div>
         </header>
 
         <div className="admin-drawer__body">
@@ -181,13 +342,30 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 title={isGroup ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
-              <DetailSection title="보호자" fields={sections.guardianFields} />
+              <DetailSection
+                title="보호자"
+                fields={sections.guardianFields}
+                keepEmpty={!isGroup}
+              />
               <DetailSection title="주소" fields={sections.addressFields} />
-              <ApplicationPayments row={row} />
+              <DetailSection
+                title="약관 동의"
+                fields={sections.termsFields}
+                keepEmpty
+              />
             </>
           ) : null}
+          <ApplicationPaySummary
+            data={finance.data}
+            loading={finance.isLoading}
+            error={finance.isError ? finance.error : undefined}
+            paymentCount={totalCount ?? payments.length}
+          />
         </div>
       </aside>
-    </>
+      {confirmModal}
+      {inputModal}
+    </div>,
+    document.body,
   );
 }

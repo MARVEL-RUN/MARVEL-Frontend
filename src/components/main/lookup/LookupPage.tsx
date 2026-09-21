@@ -3,13 +3,18 @@
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { genderLabel } from "@/lib/registration-gender";
 import {
+  canPrepareRegistrationPayment,
   closedRegistration,
-  paymentStatusInfo,
   registrationStatusLabel,
-  statusKey,
 } from "@/lib/registration-status";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
-import { formatPhone, orgAccountError, orgPasswordError, type ApplyKind } from "@/lib/register";
+import {
+  applicationPasswordError,
+  APPLICATION_PASSWORD_MIN,
+  formatPhone,
+  orgAccountError,
+  type ApplyKind,
+} from "@/lib/register";
 import {
   cancelIndividualRegistration,
   cancelOrganizationRegistration,
@@ -104,7 +109,8 @@ function individualLookupFormError(name: string, birth: string, phone: string, p
   if (!name.trim()) return "이름을 입력하세요.";
   if (birth.replace(/\D/g, "").length !== 8) return "생년월일을 입력하세요.";
   if (phone.replace(/\D/g, "").length < 10) return "전화번호를 입력하세요.";
-  if (password.trim().length < 4) return "신청조회용 비밀번호를 4자 이상 입력하세요.";
+  const passwordErr = applicationPasswordError(password);
+  if (passwordErr) return passwordErr;
   return "";
 }
 
@@ -179,52 +185,6 @@ function lookupBirthView(raw?: string | null) {
   return (raw ?? "").trim();
 }
 
-function refundStatusLabel(status?: string | null) {
-  const key = statusKey(status);
-  if (key === "PROCESSING") return "환불 처리 중";
-  if (key === "DONE") return "환불완료";
-  if (key === "FAILED") return "환불 실패";
-  if (key === "UNKNOWN") return "확인 중";
-  return "";
-}
-
-function paymentActionNote(action?: string | null) {
-  const key = statusKey(action);
-  if (key === "WAIT") {
-    return "결제를 확인하고 있습니다. 잠시 후 다시 조회해 주세요.";
-  }
-  if (key === "PAYMENT_CLOSED") return "결제 기한이 종료되었습니다.";
-  if (key === "CONTACT_SUPPORT") return "운영 문의가 필요합니다.";
-  return "";
-}
-
-function PaymentStatusValue({
-  status,
-  apiLabel,
-}: {
-  status?: string | null;
-  apiLabel?: string | null;
-}) {
-  const [open, setOpen] = useState(false);
-  const info = paymentStatusInfo(status, apiLabel);
-  if (!info.hint) return <>{info.label}</>;
-  return (
-    <>
-      <span>{info.label}</span>
-      <button
-        type="button"
-        className="status-help"
-        aria-expanded={open}
-        aria-label={`${info.label} 안내`}
-        onClick={() => setOpen((on) => !on)}
-      >
-        ?
-      </button>
-      {open ? <small className="status-help__tip">{info.hint}</small> : null}
-    </>
-  );
-}
-
 function receiptAddress(receipt: RegistrationReceipt) {
   return [receipt.address, receipt.addressDetail].filter(Boolean).join(" ").trim();
 }
@@ -254,18 +214,8 @@ function ReceiptContactSpec({ receipt }: { receipt: RegistrationReceipt }) {
 }
 
 function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
-  const refundLabel = refundStatusLabel(receipt.refundStatus);
   return (
     <>
-      <div>
-        <dt>결제상태</dt>
-        <dd>
-          <PaymentStatusValue
-            status={receipt.paymentStatus}
-            apiLabel={receipt.paymentStatusLabel}
-          />
-        </dd>
-      </div>
       <div>
         <dt>결제금액</dt>
         <dd>{formatWon(receipt.totalAmount)}</dd>
@@ -274,12 +224,6 @@ function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
         <dt>납부금액</dt>
         <dd>{formatWon(receipt.paidAmount)}</dd>
       </div>
-      {refundLabel ? (
-        <div>
-          <dt>환불상태</dt>
-          <dd>{refundLabel}</dd>
-        </div>
-      ) : null}
     </>
   );
 }
@@ -341,11 +285,12 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
 }
 
 function canPreparePayment(receipt: RegistrationReceipt) {
-  return statusKey(receipt.paymentAction) === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
+  return (
+    canPrepareRegistrationPayment(receipt.registrationStatus) && Boolean(receipt.paymentId)
+  );
 }
 
 function canModifyReceipt(receipt: RegistrationReceipt) {
-  if (statusKey(receipt.paymentAction) === "WAIT") return false;
   return Boolean(
     (receipt.registrationId || receipt.organizationId) &&
       !closedRegistration(receipt.registrationStatus),
@@ -412,17 +357,8 @@ function ReceiptActions({
 
 function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
   const warning = receipt.warningMessage?.trim() ?? "";
-  const actionNote = paymentActionNote(receipt.paymentAction);
-  const notes = [...new Set([warning, actionNote].filter(Boolean))];
-  return (
-    <>
-      {notes.map((note) => (
-        <p key={note} className="form__note">
-          {note}
-        </p>
-      ))}
-    </>
-  );
+  if (!warning) return null;
+  return <p className="form__note">{warning}</p>;
 }
 
 function IndividualReceiptCard({
@@ -490,8 +426,16 @@ function IndividualReceiptCard({
           <dd>{guardianName || "—"}</dd>
         </div>
         <div>
+          <dt>보호자 관계</dt>
+          <dd>{receipt.guardianRelationship?.trim() || "—"}</dd>
+        </div>
+        <div>
           <dt>보호자 연락처</dt>
           <dd>{guardianPhone || "—"}</dd>
+        </div>
+        <div>
+          <dt>보호자 동의</dt>
+          <dd>{receipt.guardianConsent === true ? "동의함" : "—"}</dd>
         </div>
         {address ? (
           <div>
@@ -516,12 +460,10 @@ function IndividualReceiptCard({
           <dt>이메일</dt>
           <dd>{receipt.email?.trim() || "—"}</dd>
         </div>
-        {registrationLabel ? (
-          <div>
-            <dt>접수상태</dt>
-            <dd>{registrationLabel}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>신청상태</dt>
+          <dd>{registrationLabel}</dd>
+        </div>
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
       <ReceiptNotes receipt={receipt} />
@@ -580,12 +522,10 @@ function GroupReceiptCard({
           <dd>{activeCount}명</dd>
         </div>
         <ReceiptContactSpec receipt={receipt} />
-        {registrationLabel ? (
-          <div>
-            <dt>접수상태</dt>
-            <dd>{registrationLabel}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>신청상태</dt>
+          <dd>{registrationLabel}</dd>
+        </div>
         <ReceiptPaymentSpec receipt={receipt} />
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
@@ -928,7 +868,8 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         <PasswordField
           value={password}
           onChange={setPassword}
-          placeholder="신청조회용 비밀번호 (4자 이상)"
+          placeholder="신청조회용 비밀번호 (6자 이상)"
+          minLength={APPLICATION_PASSWORD_MIN}
           autoComplete="current-password"
           required
         />
@@ -966,7 +907,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError(accountErr);
       return;
     }
-    const passwordErr = orgPasswordError(password);
+    const passwordErr = applicationPasswordError(password);
     if (passwordErr) {
       setError(passwordErr);
       return;
@@ -1200,7 +1141,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           autoComplete="current-password"
           required
         />
-        <p className="field__hint">6~64자, 공백 없이 입력해주세요.</p>
+        <p className="field__hint">6자 이상 입력해주세요.</p>
       </div>
       {error ? <p className="form__err">{error}</p> : null}
       <LookupNav busy={busy} onBack={onBack} />

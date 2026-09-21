@@ -1,10 +1,8 @@
 import { adminFetch } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
 import {
-  paymentStatusBadge,
-  paymentStatusFromUnknown,
-  paymentStatusLabel,
   registrationStatusBadge,
   registrationStatusLabel,
   statusKey,
@@ -43,6 +41,11 @@ export type AdminEvent = {
   registrationPeriod: string;
 };
 
+export type AdminEventCategory = {
+  id: string;
+  name: string;
+};
+
 export type AdminLeaderInfo = {
   groupName: string;
   name: string;
@@ -71,17 +74,21 @@ export type AdminApplicationRow = {
   size: string;
   phone: string;
   email: string;
+  guardianName: string;
   guardianPhone: string;
   guardianRelation: string;
+  guardianConsent?: boolean;
   gender?: "male" | "female";
   memberCount?: number;
   marketingConsent: boolean;
+  termsEssentialAgreed?: boolean;
+  termsMarketingAgreed?: boolean;
+  termsMarketingChannelAgreed?: boolean;
   amount: number;
   cardPaymentInfo: string;
   address: string;
   addressDetail: string;
   status: string;
-  paymentStatus: string;
   appliedAt: string;
   organizationId?: string;
 };
@@ -122,17 +129,17 @@ type RegistrationDetail = {
   phoneNumber?: unknown;
   phNum?: unknown;
   email?: unknown;
+  guardianName?: unknown;
   guardianPhoneNumber?: unknown;
   guardianPhNum?: unknown;
   guardianPhone?: unknown;
   guardianRelationship?: unknown;
   guardianRelation?: unknown;
+  guardianConsent?: unknown;
   createdAt?: unknown;
   amount?: unknown;
   orderId?: unknown;
   paymentMethod?: unknown;
-  paymentStatus?: unknown;
-  payStatus?: unknown;
   status?: unknown;
   registrationStatus?: unknown;
   address?: unknown;
@@ -142,10 +149,14 @@ type RegistrationDetail = {
   leaderInfo?: unknown;
   leaderInfoResponse?: unknown;
   leader?: unknown;
+  termsEssentialAgreed?: unknown;
+  termsMarketingAgreed?: unknown;
+  termsMarketingChannelAgreed?: unknown;
 };
 
 export type RegistrationListParams = {
   eventId: string;
+  organizationId?: string;
   type?: ApplicationKind | "";
   status?: RegistrationStatus | "";
   keyword?: string;
@@ -240,6 +251,20 @@ function consentYes(value?: string | boolean | number) {
   return v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의";
 }
 
+function asOptionalBool(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return undefined;
+  }
+  const v = asText(value).toLowerCase();
+  if (!v) return undefined;
+  if (v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의") return true;
+  if (v === "false" || v === "n" || v === "no" || v === "0" || v === "미동의") return false;
+  return undefined;
+}
+
 function displayName(kind: ApplicationKind, name: string, orgName: string) {
   if (kind === "group") return orgName || name;
   return name || orgName;
@@ -314,8 +339,10 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     size: "",
     phone: firstText(item.phoneNumber, item.phNum),
     email: "",
+    guardianName: "",
     guardianPhone: "",
     guardianRelation: "",
+    guardianConsent: undefined,
     gender: uiGenderFromApi(item.gender),
     marketingConsent: consentYes(item.marketingConsent),
     amount: 0,
@@ -323,7 +350,6 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     address: "",
     addressDetail: "",
     status: statusKey(item.status),
-    paymentStatus: "",
     appliedAt: formatAdminBoardDate(asText(item.createdAt) || undefined),
     organizationId,
   };
@@ -354,29 +380,55 @@ export function applyRegistrationDetail(
     birth: firstText(data.birth) || row.birth,
     phone: firstText(data.phoneNumber, data.phNum) || row.phone,
     email: firstText(data.email) || row.email,
+    guardianName: firstText(data.guardianName) || row.guardianName,
     guardianPhone:
       firstText(data.guardianPhoneNumber, data.guardianPhNum, data.guardianPhone) ||
       row.guardianPhone,
     guardianRelation:
       firstText(data.guardianRelationship, data.guardianRelation) || row.guardianRelation,
+    guardianConsent: asOptionalBool(data.guardianConsent) ?? row.guardianConsent,
     appliedAt: createdAt ? formatAdminBoardDate(createdAt) : row.appliedAt,
     amount: asAmount(data.amount, row.amount),
     orderNo: firstText(data.orderId) || row.orderNo,
     cardPaymentInfo: firstText(data.paymentMethod) || row.cardPaymentInfo,
     status: statusKey(firstText(data.status, data.registrationStatus)) || row.status,
-    paymentStatus:
-      paymentStatusFromUnknown(firstText(data.paymentStatus, data.payStatus)) ||
-      row.paymentStatus,
     address: firstText(data.address, leader?.address) || row.address,
     addressDetail: firstText(data.addressDetail, leader?.addressDetail) || row.addressDetail,
     organizationId,
     leaderName: leader?.name || row.leaderName,
     leader: leader ?? row.leader,
+    termsEssentialAgreed:
+      asOptionalBool(data.termsEssentialAgreed) ?? row.termsEssentialAgreed,
+    termsMarketingAgreed:
+      asOptionalBool(data.termsMarketingAgreed) ?? row.termsMarketingAgreed,
+    termsMarketingChannelAgreed:
+      asOptionalBool(data.termsMarketingChannelAgreed) ??
+      row.termsMarketingChannelAgreed,
+    marketingConsent:
+      asOptionalBool(data.termsMarketingAgreed) ?? row.marketingConsent,
   };
 }
 
 export function fetchAdminEvents() {
   return adminFetch<unknown>("v1/admin/events").then(asEventList);
+}
+
+function asEventCategoryList(data: unknown): AdminEventCategory[] {
+  if (!Array.isArray(data)) return [];
+  return data.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as { id?: unknown; name?: unknown };
+    const id = asText(row.id);
+    if (!id) return [];
+    const name = asText(row.name);
+    return [{ id, name: name || id }];
+  });
+}
+
+export function fetchAdminEventCategories(eventId: string) {
+  return adminFetch<unknown>(
+    `v1/admin/events/${encodeURIComponent(eventId)}/event-category`,
+  ).then(asEventCategoryList);
 }
 
 export function fetchAdminRegistrations(params: RegistrationListParams) {
@@ -389,7 +441,12 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   if (apiType) query.set("type", apiType);
   if (params.status) query.set("status", params.status);
   if (params.keyword?.trim()) query.set("keyword", params.keyword.trim());
-  if (params.eventCategoryId) query.set("eventCategoryId", params.eventCategoryId);
+  if (params.eventCategoryId?.trim()) {
+    query.set("eventCategoryId", params.eventCategoryId.trim());
+  }
+  if (params.organizationId?.trim()) {
+    query.set("organizationId", params.organizationId.trim());
+  }
 
   return adminFetch<unknown>(`v1/admin/registrations?${query}`).then((data) =>
     asRegistrationPage(data, params.size, params.page),
@@ -399,6 +456,21 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
 export function fetchAdminRegistration(registrationId: string) {
   return adminFetch<unknown>(
     `v1/admin/registrations/${encodeURIComponent(registrationId)}`,
+  );
+}
+
+export function resetRegistrationPassword(
+  registrationId: string,
+  newPassword: string,
+) {
+  const password = newPassword.trim();
+  if (!registrationId.trim()) throw new Error("신청 정보를 찾을 수 없습니다.");
+  if (password.length < APPLICATION_PASSWORD_MIN) {
+    throw new Error(`비밀번호는 ${APPLICATION_PASSWORD_MIN}자 이상이어야 합니다.`);
+  }
+  return adminFetch<void>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}/password`,
+    { method: "PUT", body: JSON.stringify({ newPassword: password }) },
   );
 }
 
@@ -454,8 +526,6 @@ export function applicationGenderLabel(gender?: "male" | "female") {
 }
 
 export {
-  paymentStatusBadge as applicationPaymentBadge,
-  paymentStatusLabel as applicationPaymentLabel,
   registrationStatusBadge as applicationStatusBadge,
   registrationStatusLabel as applicationStatusLabel,
 };

@@ -1,49 +1,35 @@
 "use client";
 
+import { ApplicationDetailDrawer } from "@/components/admin/applications/ApplicationDetailDrawer";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
-import {
-  getAdminRaceEvent,
-  type AdminRaceEventId,
-} from "@/lib/admin/raceEvents";
 import { formatPhone } from "@/lib/register";
 import {
   REGISTRATION_STATUSES,
-  registrationStatusFromParam,
   registrationStatusBadge,
   registrationStatusLabel,
+  statusKey,
   type RegistrationStatus,
 } from "@/lib/registration-status";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
-  applicationKindLabel,
   applyRegistrationDetail,
   fetchAdminEventCategories,
-  fetchAdminEvents,
   fetchAdminRegistration,
-  fetchAdminRegistrations,
-  mapRegistrationPage,
-  matchRaceEvent,
   type AdminApplicationRow,
-  type ApplicationKind,
 } from "@/services/admin/applications";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  mapOrganizationMemberToApplicationRow,
+  type AdminOrganizationMember,
+} from "@/services/admin/organizations";
+import { useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 15;
-
-const KIND_OPTIONS: { value: ApplicationKind | ""; label: string }[] = [
-  { value: "", label: "전체 유형" },
-  { value: "individual", label: "개인" },
-  { value: "group", label: "단체" },
-];
+const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS: { value: RegistrationStatus | ""; label: string }[] = [
   { value: "", label: "신청상태" },
@@ -55,7 +41,6 @@ const STATUS_OPTIONS: { value: RegistrationStatus | ""; label: string }[] = [
 
 type Applied = {
   q: string;
-  kind: ApplicationKind | "";
   status: RegistrationStatus | "";
   eventCategoryId: string;
 };
@@ -65,7 +50,7 @@ function errorHint(error: unknown) {
   if (isAdminHttp(error, 401) || isAdminHttp(error, 403)) {
     return "관리자 로그인이 필요하거나 권한이 없습니다.";
   }
-  if (isAdminHttp(error, 404)) return "대회 또는 신청 정보가 없습니다.";
+  if (isAdminHttp(error, 404)) return "신청 정보가 없습니다.";
   return "조회에 실패했습니다.";
 }
 
@@ -79,8 +64,10 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function KindBadge({ kind }: { kind: AdminApplicationRow["kind"] }) {
-  return <span className="admin-apps-list__kind-text">{applicationKindLabel(kind)}</span>;
+function CourseTag({ row }: { row: AdminApplicationRow }) {
+  const label = applicationCourseLabel(row);
+  if (!label || label === "-") return <>-</>;
+  return <span className="admin-apps-list__course-text">{label}</span>;
 }
 
 function MarketingBadge({ consent }: { consent: boolean }) {
@@ -94,65 +81,53 @@ function MarketingBadge({ consent }: { consent: boolean }) {
   );
 }
 
-function CourseTag({ row }: { row: AdminApplicationRow }) {
-  const label = applicationCourseLabel(row);
-  if (!label || label === "-") return <>-</>;
-  return <span className="admin-apps-list__course-text">{label}</span>;
-}
-
 function displayPhone(value?: string | null) {
   const raw = value?.trim();
   if (!raw) return "-";
   return formatPhone(raw);
 }
 
+function filterRows(
+  rows: AdminApplicationRow[],
+  applied: Applied,
+  categoryName: string,
+) {
+  const keyword = applied.q.trim().toLowerCase();
+  return rows.filter((row) => {
+    if (applied.status && statusKey(row.status) !== applied.status) return false;
+    if (applied.eventCategoryId && categoryName) {
+      const course = applicationCourseLabel(row);
+      if (course !== categoryName && row.courseName !== categoryName) return false;
+    }
+    if (!keyword) return true;
+    const hay = [row.name, row.personName, row.phone].join(" ").toLowerCase();
+    return hay.includes(keyword);
+  });
+}
+
 type Props = {
-  slug?: AdminRaceEventId;
+  apiEventId: string;
+  organizationId: string;
+  members: AdminOrganizationMember[];
+  loading?: boolean;
 };
 
-export function ApplicationsListPage({ slug }: Props) {
-  const searchParams = useSearchParams();
-  const queryEventId = searchParams.get("eventId")?.trim() ?? "";
-  const statusFromUrl = registrationStatusFromParam(searchParams.get("status"));
-
+export function OrganizationMembersList({
+  apiEventId,
+  organizationId,
+  members,
+  loading = false,
+}: Props) {
   const [q, setQ] = useState("");
-  const [kind, setKind] = useState<ApplicationKind | "">("");
-  const [status, setStatus] = useState<RegistrationStatus | "">(statusFromUrl);
+  const [status, setStatus] = useState<RegistrationStatus | "">("");
   const [course, setCourse] = useState("");
   const [applied, setApplied] = useState<Applied>({
     q: "",
-    kind: "",
-    status: statusFromUrl,
+    status: "",
     eventCategoryId: "",
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const eventsQuery = useQuery({
-    queryKey: ["admin", "events"],
-    queryFn: fetchAdminEvents,
-    enabled: hasAdminApi,
-  });
-
-  const apiEvent = useMemo(() => {
-    const events = eventsQuery.data ?? [];
-    if (slug) return matchRaceEvent(events, slug);
-    if (queryEventId) {
-      return (
-        events.find((event) => event.eventId === queryEventId) ?? {
-          eventId: queryEventId,
-          eventName: "",
-          registrationType: "",
-          registrationPeriod: "",
-        }
-      );
-    }
-    return undefined;
-  }, [eventsQuery.data, queryEventId, slug]);
-
-  const apiEventId = apiEvent?.eventId ?? "";
-  const eventTitle =
-    apiEvent?.eventName || (slug ? getAdminRaceEvent(slug)?.name : "") || "전체 신청자 목록";
 
   const categoriesQuery = useQuery({
     queryKey: ["admin", "event-categories", apiEventId],
@@ -171,23 +146,13 @@ export function ApplicationsListPage({ slug }: Props) {
     [categoriesQuery.data],
   );
 
-  const listQuery = useQuery({
-    queryKey: ["admin", "registrations", apiEventId, applied, page],
-    queryFn: async () => {
-      const raw = await fetchAdminRegistrations({
-        eventId: apiEventId,
-        type: applied.kind,
-        status: applied.status,
-        keyword: applied.q,
-        eventCategoryId: applied.eventCategoryId,
-        page: page - 1,
-        size: PAGE_SIZE,
-      });
-      return mapRegistrationPage(raw, apiEventId);
-    },
-    enabled: hasAdminApi && Boolean(apiEventId),
-    placeholderData: keepPreviousData,
-  });
+  const memberRows = useMemo(
+    () =>
+      members.map((member) =>
+        mapOrganizationMemberToApplicationRow(member, apiEventId, organizationId),
+      ),
+    [apiEventId, members, organizationId],
+  );
 
   const detailQuery = useQuery({
     queryKey: ["admin", "registration", selectedId],
@@ -196,71 +161,58 @@ export function ApplicationsListPage({ slug }: Props) {
   });
 
   useEffect(() => {
-    const next = registrationStatusFromParam(searchParams.get("status"));
-    setStatus(next);
-    setApplied((prev) => (prev.status === next ? prev : { ...prev, status: next }));
     setPage(1);
-  }, [searchParams]);
-
-  useEffect(() => {
-    setCourse("");
-    setApplied((prev) => ({ ...prev, eventCategoryId: "" }));
-    setPage(1);
-  }, [apiEventId]);
+    setSelectedId(null);
+  }, [apiEventId, organizationId, members]);
 
   useEffect(() => {
     setSelectedId(null);
-  }, [apiEventId, applied, page]);
+  }, [applied, page]);
 
-  const rows = listQuery.data?.content ?? [];
-  const totalCount = listQuery.data?.totalElements ?? 0;
-  const pageCount = Math.max(1, listQuery.data?.totalPages ?? 1);
+  const categoryName =
+    categoriesQuery.data?.find((category) => category.id === applied.eventCategoryId)?.name ??
+    "";
+
+  const filteredRows = useMemo(
+    () => filterRows(memberRows, applied, categoryName),
+    [applied, categoryName, memberRows],
+  );
+
+  const totalCount = filteredRows.length;
+  const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const rows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const selected = useMemo(() => {
-    const row = rows.find((item) => item.id === selectedId) ?? null;
+    const row = filteredRows.find((item) => item.id === selectedId) ?? null;
     if (!row) return null;
-    if (!detailQuery.data) return row;
+    const base = { ...row, organizationId: row.organizationId || organizationId };
+    if (!detailQuery.data) return base;
     try {
-      return applyRegistrationDetail(row, detailQuery.data);
+      const detail = applyRegistrationDetail(base, detailQuery.data);
+      return { ...detail, organizationId: detail.organizationId || organizationId };
     } catch {
-      return row;
+      return base;
     }
-  }, [detailQuery.data, rows, selectedId]);
+  }, [detailQuery.data, filteredRows, organizationId, selectedId]);
 
   const runSearch = () => {
-    setApplied({ q, kind, status, eventCategoryId: course });
+    setApplied({ q, status, eventCategoryId: course });
     setPage(1);
   };
 
   const resetSearch = () => {
     setQ("");
-    setKind("");
     setStatus("");
     setCourse("");
-    setApplied({ q: "", kind: "", status: "", eventCategoryId: "" });
+    setApplied({ q: "", status: "", eventCategoryId: "" });
     setPage(1);
   };
 
-  if (slug && !getAdminRaceEvent(slug)) {
-    return (
-      <div className="admin-page">
-        <p className="admin-empty">존재하지 않는 대회입니다.</p>
-        <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
-          대회 목록
-        </Link>
-      </div>
-    );
-  }
-
   const empty = !hasAdminApi
     ? "관리자 API 주소가 설정되지 않았습니다."
-    : eventsQuery.isError && Boolean(slug)
-      ? errorHint(eventsQuery.error)
-      : listQuery.isError
-        ? errorHint(listQuery.error)
-        : eventsQuery.isFetched && slug && !apiEvent
-          ? "대회 정보가 없습니다."
-          : "신청 내역이 없습니다.";
+    : members.length === 0
+      ? "등록된 멤버가 없습니다."
+      : "조건에 맞는 멤버가 없습니다.";
 
   const columns = [
     {
@@ -271,15 +223,8 @@ export function ApplicationsListPage({ slug }: Props) {
       render: (row: AdminApplicationRow) => row.no || "-",
     },
     {
-      key: "kind",
-      header: "유형",
-      className: "is-kind",
-      width: "48px",
-      render: (row: AdminApplicationRow) => <KindBadge kind={row.kind} />,
-    },
-    {
       key: "name",
-      header: "이름/단체명",
+      header: "성명",
       className: "is-name",
       width: "11%",
       render: (row: AdminApplicationRow) => (
@@ -352,25 +297,12 @@ export function ApplicationsListPage({ slug }: Props) {
     },
   ];
 
-  const tableRowCount = rows.length;
-  const fixedTableHeight =
-    hasAdminApi &&
-    Boolean(apiEventId) &&
-    listQuery.data !== undefined &&
-    tableRowCount > 0;
-  const listPageStyle = fixedTableHeight
-    ? ({ "--admin-apps-list-rows": tableRowCount } as CSSProperties)
-    : undefined;
-
   return (
-    <div
-      className={`admin-page admin-apps-list${fixedTableHeight ? " is-fixed-table" : ""}${listQuery.isFetching ? " is-fetching" : ""}`}
-      style={listPageStyle}
-    >
+    <div className="admin-apps-list admin-org-detail__members">
       <AdminTableShell<AdminApplicationRow>
-        title={eventTitle}
+        title="단체 구성원 목록"
         rows={rows}
-        loading={eventsQuery.isLoading || (listQuery.isLoading && !listQuery.data)}
+        loading={loading}
         empty={empty}
         rowKey={(row) => row.id || String(row.no)}
         page={page}
@@ -384,27 +316,11 @@ export function ApplicationsListPage({ slug }: Props) {
         }}
         isRowSelected={(row) => Boolean(selectedId && row.id === selectedId)}
         actions={
-          <div className="admin-table-shell__actions admin-apps-list__head-actions">
-            <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
-            <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
-              대회 목록
-            </Link>
-          </div>
+          <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
         }
         tools={
           <>
             <div className="admin-apps-list__filter-group">
-              <AdminSelect
-                value={kind}
-                options={KIND_OPTIONS}
-                onChange={(value) => {
-                  setKind(value);
-                  setApplied((prev) => ({ ...prev, kind: value }));
-                  setPage(1);
-                }}
-                ariaLabel="신청 유형"
-                width={112}
-              />
               <AdminSelect
                 value={status}
                 options={STATUS_OPTIONS}
@@ -435,7 +351,7 @@ export function ApplicationsListPage({ slug }: Props) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") runSearch();
               }}
-              placeholder="이름 · 단체명 · 연락처"
+              placeholder="이름 · 연락처"
             />
             <div className="admin-apps-list__search-actions">
               <button

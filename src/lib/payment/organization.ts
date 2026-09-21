@@ -1,5 +1,9 @@
 import { formatAddressForApi } from "@/lib/daumPostcode";
-import { formatPhone, type GroupDraft } from "@/lib/register";
+import {
+  formatPhone,
+  termsAgreementFields,
+  type GroupDraft,
+} from "@/lib/register";
 import type { OrganizationRegistrationRequest } from "@/services/main/types";
 import type { PaymentOrder } from "./session";
 import { birthToApi, genderToApi, phoneDigits } from "./map";
@@ -32,6 +36,7 @@ export function toOrganizationRegistrationRequest(
       birth: birthToApi(p.birth),
       gender: genderToApi(p.gender),
     })),
+    ...termsAgreementFields(draft),
   };
 }
 
