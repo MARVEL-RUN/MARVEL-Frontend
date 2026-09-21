@@ -145,6 +145,7 @@ type RegistrationDetail = {
 
 export type RegistrationListParams = {
   eventId: string;
+  organizationId?: string;
   type?: ApplicationKind | "";
   status?: RegistrationStatus | "";
   keyword?: string;
@@ -404,6 +405,9 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   if (params.keyword?.trim()) query.set("keyword", params.keyword.trim());
   if (params.eventCategoryId?.trim()) {
     query.set("eventCategoryId", params.eventCategoryId.trim());
+  }
+  if (params.organizationId?.trim()) {
+    query.set("organizationId", params.organizationId.trim());
   }
 
   return adminFetch<unknown>(`v1/admin/registrations?${query}`).then((data) =>

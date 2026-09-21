@@ -514,6 +514,7 @@ html.admin-mode body {
 .admin-main:has(.admin-org-detail) {
   display: flex;
   flex-direction: column;
+  min-height: 0;
   padding: 10px 12px 12px;
 }
 
@@ -1892,9 +1893,13 @@ button.admin-pay-list__item:hover {
   text-align: center;
 }
 
-.admin-org-detail {
+.admin-page.admin-org-detail {
   max-width: none;
   margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .admin-org-detail__head {
@@ -1903,6 +1908,7 @@ button.admin-pay-list__item:hover {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .admin-org-detail__crumb {
@@ -1933,7 +1939,8 @@ button.admin-pay-list__item:hover {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .admin-org-detail__card {
@@ -1976,8 +1983,33 @@ button.admin-pay-list__item:hover {
   word-break: break-word;
 }
 
+.admin-org-detail__members {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .admin-org-detail__members .admin-table-shell {
+  flex: 0 1 auto;
+  min-height: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-org-detail__members.admin-apps-list .admin-table-wrap {
+  scrollbar-gutter: auto;
+}
+
+.admin-org-detail__members.admin-apps-list.is-fixed-table .admin-table-wrap {
+  flex: 0 1 auto;
+  height: min(
+    calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
+    calc(100vh - var(--admin-head) - 360px)
+  );
+  max-height: none;
+  overflow-y: auto;
 }
 
 @media (max-width: 960px) {
@@ -3854,7 +3886,8 @@ button.admin-pay-list__item:hover {
   }
 
   .admin-main:has(.admin-apps-list),
-  .admin-main:has(.admin-capacity) {
+  .admin-main:has(.admin-capacity),
+  .admin-main:has(.admin-org-detail) {
     padding: 10px 16px 12px;
   }
 }

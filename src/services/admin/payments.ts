@@ -155,6 +155,10 @@ export function fetchApplicationFinance(
       page,
     );
   }
+  // 단체 소속 개인 신청은 단체 결제 API
+  if (row.organizationId) {
+    return fetchOrganizationPayments(row.eventId, row.organizationId, page);
+  }
   return fetchPersonalPayments(row.eventId, row.id, page);
 }
 

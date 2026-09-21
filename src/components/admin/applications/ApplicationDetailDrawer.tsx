@@ -256,14 +256,14 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
               />
               <DetailSection title="보호자" fields={sections.guardianFields} />
               <DetailSection title="주소" fields={sections.addressFields} />
-              <ApplicationPaySummary
-                data={finance.data}
-                loading={finance.isLoading}
-                error={finance.isError ? finance.error : undefined}
-                paymentCount={totalCount ?? payments.length}
-              />
             </>
           ) : null}
+          <ApplicationPaySummary
+            data={finance.data}
+            loading={finance.isLoading}
+            error={finance.isError ? finance.error : undefined}
+            paymentCount={totalCount ?? payments.length}
+          />
         </div>
       </aside>
     </div>,
