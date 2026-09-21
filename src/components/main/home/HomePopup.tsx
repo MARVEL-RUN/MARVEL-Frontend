@@ -27,13 +27,20 @@ function siteZoom() {
   return z > 0 ? z : 1;
 }
 
-function clamp(left: number, top: number, el: HTMLElement) {
+function minTopDesktop() {
+  const header = document.querySelector(".site-header");
+  const z = siteZoom();
+  if (!header) return EDGE;
+  return header.getBoundingClientRect().bottom / z + 14 / z;
+}
+
+function clamp(left: number, top: number, el: HTMLElement, floorTop = EDGE) {
   const z = siteZoom();
   const maxL = window.innerWidth / z - el.offsetWidth - EDGE;
   const maxT = window.innerHeight / z - el.offsetHeight - EDGE;
   return {
     left: Math.min(Math.max(EDGE, left), Math.max(EDGE, maxL)),
-    top: Math.min(Math.max(EDGE, top), Math.max(EDGE, maxT)),
+    top: Math.min(Math.max(floorTop, top), Math.max(floorTop, maxT)),
   };
 }
 
@@ -96,6 +103,20 @@ export function HomePopup() {
     };
   }, [open, mobile]);
 
+  useLayoutEffect(() => {
+    if (!open || mobile) return;
+    const el = box.current;
+    if (!el) return;
+    const z = siteZoom();
+    const rootFont = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const minTop = minTopDesktop();
+    const left = 1.15 * rootFont;
+    setPos((prev) => ({
+      left: prev?.left ?? left,
+      top: Math.max(minTop, prev?.top ?? minTop),
+    }));
+  }, [open, mobile]);
+
   useEffect(() => {
     if (!open || mobile) return;
     const el = box.current;
@@ -117,7 +138,12 @@ export function HomePopup() {
       if (!start) return;
       const z = siteZoom();
       setPos(
-        clamp(start.left + (e.clientX - start.x) / z, start.top + (e.clientY - start.y) / z, el),
+        clamp(
+          start.left + (e.clientX - start.x) / z,
+          start.top + (e.clientY - start.y) / z,
+          el,
+          minTopDesktop(),
+        ),
       );
     };
 
