@@ -43,6 +43,11 @@ export type AdminEvent = {
   registrationPeriod: string;
 };
 
+export type AdminEventCategory = {
+  id: string;
+  name: string;
+};
+
 export type AdminLeaderInfo = {
   groupName: string;
   name: string;
@@ -379,6 +384,24 @@ export function fetchAdminEvents() {
   return adminFetch<unknown>("v1/admin/events").then(asEventList);
 }
 
+function asEventCategoryList(data: unknown): AdminEventCategory[] {
+  if (!Array.isArray(data)) return [];
+  return data.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as { id?: unknown; name?: unknown };
+    const id = asText(row.id);
+    if (!id) return [];
+    const name = asText(row.name);
+    return [{ id, name: name || id }];
+  });
+}
+
+export function fetchAdminEventCategories(eventId: string) {
+  return adminFetch<unknown>(
+    `v1/admin/events/${encodeURIComponent(eventId)}/event-category`,
+  ).then(asEventCategoryList);
+}
+
 export function fetchAdminRegistrations(params: RegistrationListParams) {
   const query = new URLSearchParams({
     eventId: params.eventId,
@@ -389,7 +412,9 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   if (apiType) query.set("type", apiType);
   if (params.status) query.set("status", params.status);
   if (params.keyword?.trim()) query.set("keyword", params.keyword.trim());
-  if (params.eventCategoryId) query.set("eventCategoryId", params.eventCategoryId);
+  if (params.eventCategoryId?.trim()) {
+    query.set("eventCategoryId", params.eventCategoryId.trim());
+  }
 
   return adminFetch<unknown>(`v1/admin/registrations?${query}`).then((data) =>
     asRegistrationPage(data, params.size, params.page),

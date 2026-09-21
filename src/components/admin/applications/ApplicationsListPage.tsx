@@ -21,6 +21,7 @@ import {
   applicationGenderLabel,
   applicationKindLabel,
   applyRegistrationDetail,
+  fetchAdminEventCategories,
   fetchAdminEvents,
   fetchAdminRegistration,
   fetchAdminRegistrations,
@@ -56,6 +57,7 @@ type Applied = {
   q: string;
   kind: ApplicationKind | "";
   status: RegistrationStatus | "";
+  eventCategoryId: string;
 };
 
 function errorHint(error: unknown) {
@@ -116,10 +118,12 @@ export function ApplicationsListPage({ slug }: Props) {
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<ApplicationKind | "">("");
   const [status, setStatus] = useState<RegistrationStatus | "">(statusFromUrl);
+  const [course, setCourse] = useState("");
   const [applied, setApplied] = useState<Applied>({
     q: "",
     kind: "",
     status: statusFromUrl,
+    eventCategoryId: "",
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -150,6 +154,23 @@ export function ApplicationsListPage({ slug }: Props) {
   const eventTitle =
     apiEvent?.eventName || (slug ? getAdminRaceEvent(slug)?.name : "") || "신청자 목록";
 
+  const categoriesQuery = useQuery({
+    queryKey: ["admin", "event-categories", apiEventId],
+    queryFn: () => fetchAdminEventCategories(apiEventId),
+    enabled: hasAdminApi && Boolean(apiEventId),
+  });
+
+  const courseOptions = useMemo(
+    () => [
+      { value: "", label: "전체 코스" },
+      ...(categoriesQuery.data ?? []).map((category) => ({
+        value: category.id,
+        label: category.name,
+      })),
+    ],
+    [categoriesQuery.data],
+  );
+
   const listQuery = useQuery({
     queryKey: ["admin", "registrations", apiEventId, applied, page],
     queryFn: async () => {
@@ -158,6 +179,7 @@ export function ApplicationsListPage({ slug }: Props) {
         type: applied.kind,
         status: applied.status,
         keyword: applied.q,
+        eventCategoryId: applied.eventCategoryId,
         page: page - 1,
         size: PAGE_SIZE,
       });
@@ -181,6 +203,12 @@ export function ApplicationsListPage({ slug }: Props) {
   }, [searchParams]);
 
   useEffect(() => {
+    setCourse("");
+    setApplied((prev) => ({ ...prev, eventCategoryId: "" }));
+    setPage(1);
+  }, [apiEventId]);
+
+  useEffect(() => {
     setSelectedId(null);
   }, [apiEventId, applied, page]);
 
@@ -200,7 +228,7 @@ export function ApplicationsListPage({ slug }: Props) {
   }, [detailQuery.data, rows, selectedId]);
 
   const runSearch = () => {
-    setApplied({ q, kind, status });
+    setApplied({ q, kind, status, eventCategoryId: course });
     setPage(1);
   };
 
@@ -208,7 +236,8 @@ export function ApplicationsListPage({ slug }: Props) {
     setQ("");
     setKind("");
     setStatus("");
-    setApplied({ q: "", kind: "", status: "" });
+    setCourse("");
+    setApplied({ q: "", kind: "", status: "", eventCategoryId: "" });
     setPage(1);
   };
 
@@ -382,6 +411,17 @@ export function ApplicationsListPage({ slug }: Props) {
                 }}
                 ariaLabel="상태"
                 width={112}
+              />
+              <AdminSelect
+                value={course}
+                options={courseOptions}
+                onChange={(value) => {
+                  setCourse(value);
+                  setApplied((prev) => ({ ...prev, eventCategoryId: value }));
+                  setPage(1);
+                }}
+                ariaLabel="코스"
+                width={128}
               />
             </div>
             <input
