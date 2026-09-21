@@ -44,8 +44,16 @@ function visibleFields(fields: DetailField[]) {
   return fields.filter((field) => !isEmptyValue(field.value));
 }
 
-function DetailSection({ title, fields }: { title: string; fields: DetailField[] }) {
-  const items = visibleFields(fields);
+function DetailSection({
+  title,
+  fields,
+  keepEmpty,
+}: {
+  title: string;
+  fields: DetailField[];
+  keepEmpty?: boolean;
+}) {
+  const items = keepEmpty ? fields : visibleFields(fields);
   if (items.length === 0) return null;
 
   return (
@@ -191,7 +199,7 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 title={isGroup ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
-              <DetailSection title="보호자" fields={sections.guardianFields} />
+              <DetailSection title="보호자" fields={sections.guardianFields} keepEmpty />
               <DetailSection title="주소" fields={sections.addressFields} />
               <ApplicationPayments row={row} />
             </>
