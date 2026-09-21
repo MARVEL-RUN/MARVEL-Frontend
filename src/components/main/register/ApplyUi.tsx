@@ -387,9 +387,15 @@ export function birthView(value: string) {
 export function BirthText({
   value,
   onChange,
+  name,
+  required,
+  autoComplete,
 }: {
   value: string;
   onChange: (next: string) => void;
+  name?: string;
+  required?: boolean;
+  autoComplete?: string;
 }) {
   const digits = value.replace(/\D/g, "").slice(0, 8);
   let shown = digits;
@@ -401,10 +407,13 @@ export function BirthText({
   return (
     <input
       type="text"
+      name={name}
       inputMode="numeric"
       placeholder="YYYY-MM-DD"
+      autoComplete={autoComplete}
       value={shown}
       onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 8))}
+      required={required}
       aria-label="생년월일"
     />
   );
