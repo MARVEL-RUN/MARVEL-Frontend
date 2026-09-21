@@ -1252,6 +1252,14 @@
   margin-inline: auto;
 }
 
+/* 조회 컬럼(720)에서 수정 폼만 신청과 같은 920 */
+.lookup-edit {
+  width: auto;
+  max-width: none;
+  margin-left: calc(50% - min(460px, calc(50dvw / var(--site-zoom, 1) - 1.25rem)));
+  margin-right: calc(50% - min(460px, calc(50dvw / var(--site-zoom, 1) - 1.25rem)));
+}
+
 .flow__nav {
   display: flex;
   flex-wrap: wrap;

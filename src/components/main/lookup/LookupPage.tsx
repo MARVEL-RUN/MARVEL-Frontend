@@ -2,20 +2,27 @@
 
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
-import { formatPhone, type ApplyKind } from "@/lib/register";
+import { formatPhone, orgAccountError, orgPasswordError, type ApplyKind } from "@/lib/register";
 import {
+  cancelIndividualRegistration,
+  cancelOrganizationRegistration,
   lookupIndividualRegistrations,
   lookupOrganizationRegistrations,
+  modifyIndividualRegistration,
+  modifyOrganizationRegistration,
   retryIndividualPayment,
   retryOrganizationPayment,
 } from "@/services/main/registrations";
 import type {
   IndividualRegistrationLookupRequest,
+  IndividualRegistrationModifyRequest,
   OrganizationLookupParticipant,
   OrganizationLookupRequest,
+  OrganizationRegistrationModifyRequest,
   RegistrationReceipt,
   RegistrationReceiptMember,
   RegistrationReceiptSouvenir,
+  RegistrationSettlementResult,
 } from "@/services/main/types";
 import { useRouter } from "next/navigation";
 import { FormEvent, useLayoutEffect, useState } from "react";
@@ -24,6 +31,12 @@ import { ApplyKindPick } from "../register/ApplyKindPick";
 import { BirthText, PasswordField, PhoneField } from "../register/ApplyUi";
 import { useRegistrationOpen } from "../register/useRegistrationOpen";
 import { scrollPageTop } from "@/lib/scroll-page";
+import { mainToast } from "../feedback/MainFeedback";
+import {
+  GroupLookupEdit,
+  IndividualLookupEdit,
+  LookupRefundModal,
+} from "./LookupEditForms";
 
 type View = "form" | "hit" | "miss";
 
@@ -82,6 +95,14 @@ function toLookupBirth(raw: string) {
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
 }
 
+function individualLookupFormError(name: string, birth: string, phone: string, password: string) {
+  if (!name.trim()) return "이름을 입력하세요.";
+  if (birth.replace(/\D/g, "").length !== 8) return "생년월일을 입력하세요.";
+  if (phone.replace(/\D/g, "").length < 10) return "전화번호를 입력하세요.";
+  if (password.trim().length < 4) return "신청조회용 비밀번호를 4자 이상 입력하세요.";
+  return "";
+}
+
 function souvenirSize(item: RegistrationReceiptSouvenir) {
   return item.size || item.selectedSize || "";
 }
@@ -131,6 +152,7 @@ function receiptMembers(receipt: RegistrationReceipt): ReceiptMemberView[] {
 }
 
 function receiptSouvenirs(receipt: RegistrationReceipt) {
+  if (receipt.selectedSouvenirList?.length) return receipt.selectedSouvenirList;
   if (receipt.souvenirs?.length) return receipt.souvenirs;
   return receiptMembers(receipt)
     .filter((member) => !member.canceled)
@@ -142,6 +164,33 @@ function receiptSouvenirs(receipt: RegistrationReceipt) {
         quantity: item.quantity,
       })),
     );
+}
+
+function lookupGenderLabel(gender?: string | null) {
+  const key = (gender ?? "").trim().toUpperCase();
+  if (key === "M" || key === "MALE") return "남성";
+  if (key === "F" || key === "FEMALE") return "여성";
+  return (gender ?? "").trim();
+}
+
+function lookupBirthView(raw?: string | null) {
+  const digits = (raw ?? "").replace(/\D/g, "");
+  if (digits.length === 8) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+  return (raw ?? "").trim();
+}
+
+function refundStatusLabel(status?: string | null, registrationStatus?: string | null) {
+  const key = (status ?? "").trim().toUpperCase();
+  if (!key || key === "NONE" || key === "UNKNOWN") return "";
+  if (key === "REFUNDED") return "환불완료";
+  if (key === "DONE") return closedRegistration(registrationStatus) ? "환불완료" : "";
+  if (key === "REFUND_REQUESTED" || key === "REFUND_PENDING" || key === "PROCESSING") {
+    return "환불 대기";
+  }
+  if (key === "FAILED") return "환불 실패";
+  return status ?? "";
 }
 
 function paymentActionNote(action?: string | null) {
@@ -205,8 +254,11 @@ const REGISTRATION_STATUS_LABEL: Record<string, string> = {
   PENDING: "대기",
   PAYMENT_PENDING: "결제 대기",
   ADDITIONAL_PAYMENT_REQUIRED: "추가 결제",
+  PARTIAL_REFUND_REQUIRED: "부분 환불",
+  CANCELLATION_PENDING: "환불 대기",
   CANCELED: "취소",
   CANCELLED: "취소",
+  EXPIRED: "만료",
 };
 
 function paymentStatusInfo(status?: string | null, apiLabel?: string | null) {
@@ -265,12 +317,10 @@ function ReceiptContactSpec({ receipt }: { receipt: RegistrationReceipt }) {
           <dd className="spec__code">{receipt.orderId}</dd>
         </div>
       ) : null}
-      {receipt.email ? (
-        <div>
-          <dt>이메일</dt>
-          <dd>{receipt.email}</dd>
-        </div>
-      ) : null}
+      <div>
+        <dt>이메일</dt>
+        <dd>{receipt.email?.trim() || "—"}</dd>
+      </div>
       {address ? (
         <div>
           <dt>주소</dt>
@@ -282,6 +332,7 @@ function ReceiptContactSpec({ receipt }: { receipt: RegistrationReceipt }) {
 }
 
 function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
+  const refundLabel = refundStatusLabel(receipt.refundStatus, receipt.registrationStatus);
   return (
     <>
       <div>
@@ -301,24 +352,33 @@ function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
         <dt>납부금액</dt>
         <dd>{formatWon(receipt.paidAmount)}</dd>
       </div>
+      {refundLabel ? (
+        <div>
+          <dt>환불상태</dt>
+          <dd>{refundLabel}</dd>
+        </div>
+      ) : null}
     </>
   );
 }
 
-function ReceiptSouvenirList({ souvenirs }: { souvenirs: RegistrationReceiptSouvenir[] }) {
+function ReceiptSouvenirSpec({ souvenirs }: { souvenirs: RegistrationReceiptSouvenir[] }) {
   if (!souvenirs.length) return null;
   return (
-    <ul className="member-list">
-      {souvenirs.map((item, i) => (
-        <li key={`${item.souvenirId}-${souvenirSize(item)}-${i}`}>
-          <strong>{item.name}</strong>
-          <span>
-            {souvenirSize(item) || "—"}
-            {item.quantity > 1 ? ` · ${item.quantity}개` : ""}
-          </span>
-        </li>
-      ))}
-    </ul>
+    <>
+      {souvenirs.map((item, i) => {
+        const size = souvenirSize(item);
+        const detail = [size, item.quantity > 1 ? `${item.quantity}개` : ""]
+          .filter(Boolean)
+          .join(" · ");
+        return (
+          <div key={`${item.souvenirId}-${size}-${i}`}>
+            <dt>{item.name}</dt>
+            <dd>{detail || "—"}</dd>
+          </div>
+        );
+      })}
+    </>
   );
 }
 
@@ -362,6 +422,30 @@ function canPreparePayment(receipt: RegistrationReceipt) {
   return receipt.paymentAction === "PREPARE_PAYMENT" && Boolean(receipt.paymentId);
 }
 
+function closedRegistration(status?: string | null) {
+  const key = (status ?? "").trim().toUpperCase();
+  return ["CANCELED", "CANCELLED", "EXPIRED", "CANCELLATION_PENDING"].includes(key);
+}
+
+function canModifyReceipt(receipt: RegistrationReceipt) {
+  return Boolean(
+    (receipt.registrationId || receipt.organizationId) &&
+      !closedRegistration(receipt.registrationStatus),
+  );
+}
+
+function canRefundReceipt(receipt: RegistrationReceipt) {
+  if (!canModifyReceipt(receipt)) return false;
+  const refund = (receipt.refundStatus ?? "").trim().toUpperCase();
+  return refund !== "PROCESSING" && refund !== "REFUNDED";
+}
+
+function payableOrder(result: RegistrationSettlementResult) {
+  return (
+    result.orders?.find((order) => order.orderId && Number(order.amount) > 0) ?? null
+  );
+}
+
 function receiptPayKey(receipt: RegistrationReceipt) {
   return (
     receipt.registrationId ||
@@ -372,26 +456,40 @@ function receiptPayKey(receipt: RegistrationReceipt) {
   );
 }
 
-function ReceiptPayButton({
+function ReceiptActions({
   receipt,
   busy,
   onPay,
+  onEdit,
+  onRefund,
 }: {
   receipt: RegistrationReceipt;
   busy: boolean;
-  onPay: () => void;
+  onPay?: () => void;
+  onEdit?: () => void;
+  onRefund?: () => void;
 }) {
-  if (!canPreparePayment(receipt)) return null;
+  const pay = Boolean(onPay && canPreparePayment(receipt));
+  const edit = Boolean(onEdit && canModifyReceipt(receipt));
+  const refund = Boolean(onRefund && canRefundReceipt(receipt));
+  if (!pay && !edit && !refund) return null;
   return (
     <div className="flow__nav">
-      <button
-        type="button"
-        className="btn btn--red"
-        onClick={onPay}
-        disabled={busy}
-      >
-        {busy ? "결제 준비 중..." : "결제하기"}
-      </button>
+      {edit ? (
+        <button type="button" className="btn btn--ghost" onClick={onEdit} disabled={busy}>
+          수정
+        </button>
+      ) : null}
+      {refund ? (
+        <button type="button" className="btn btn--ghost-red" onClick={onRefund} disabled={busy}>
+          환불 신청
+        </button>
+      ) : null}
+      {pay ? (
+        <button type="button" className="btn btn--red" onClick={onPay} disabled={busy}>
+          {busy ? "결제 준비 중..." : "결제하기"}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -411,16 +509,36 @@ function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
 function IndividualReceiptCard({
   receipt,
   name,
-  paying,
+  busy,
   onPay,
+  onEdit,
+  onRefund,
 }: {
   receipt: RegistrationReceipt;
   name: string;
-  paying?: boolean;
+  busy?: boolean;
   onPay?: () => void;
+  onEdit?: () => void;
+  onRefund?: () => void;
 }) {
   const members = receiptMembers(receipt);
-  const course = members.find((member) => !member.canceled)?.course;
+  const displayName = receipt.name?.trim() || members[0]?.name || name;
+  const course =
+    receipt.eventCategoryName?.trim() ||
+    members.find((member) => !member.canceled)?.course ||
+    "";
+  const birth = lookupBirthView(receipt.birth);
+  const phone = receipt.phNum ? formatPhone(receipt.phNum) : "";
+  const gender = lookupGenderLabel(receipt.gender);
+  const address = receiptAddress(receipt);
+  const registrationLabel = registrationStatusLabel(
+    receipt.registrationStatus ?? undefined,
+  );
+  const guardianName = receipt.guardianName?.trim() ?? "";
+  const guardianPhone = receipt.guardianPhNum
+    ? formatPhone(receipt.guardianPhNum)
+    : "";
+
   return (
     <section className="ticket">
       <p className="kicker">FOUND</p>
@@ -428,34 +546,89 @@ function IndividualReceiptCard({
       <dl className="spec">
         <div>
           <dt>이름</dt>
-          <dd>{members[0]?.name || name}</dd>
+          <dd>{displayName || "—"}</dd>
         </div>
+        {birth ? (
+          <div>
+            <dt>생년월일</dt>
+            <dd>{birth}</dd>
+          </div>
+        ) : null}
+        {gender ? (
+          <div>
+            <dt>성별</dt>
+            <dd>{gender}</dd>
+          </div>
+        ) : null}
+        {phone ? (
+          <div>
+            <dt>전화번호</dt>
+            <dd>{phone}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>보호자</dt>
+          <dd>{guardianName || "—"}</dd>
+        </div>
+        <div>
+          <dt>보호자 연락처</dt>
+          <dd>{guardianPhone || "—"}</dd>
+        </div>
+        {address ? (
+          <div>
+            <dt>주소</dt>
+            <dd>{address}</dd>
+          </div>
+        ) : null}
         {course ? (
           <div>
             <dt>코스</dt>
             <dd>{course}</dd>
           </div>
         ) : null}
-        <ReceiptContactSpec receipt={receipt} />
+        <ReceiptSouvenirSpec souvenirs={receiptSouvenirs(receipt)} />
+        {receipt.orderId ? (
+          <div>
+            <dt>주문번호</dt>
+            <dd className="spec__code">{receipt.orderId}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>이메일</dt>
+          <dd>{receipt.email?.trim() || "—"}</dd>
+        </div>
+        {registrationLabel ? (
+          <div>
+            <dt>접수상태</dt>
+            <dd>{registrationLabel}</dd>
+          </div>
+        ) : null}
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
-      <ReceiptSouvenirList souvenirs={receiptSouvenirs(receipt)} />
       <ReceiptNotes receipt={receipt} />
-      {onPay ? (
-        <ReceiptPayButton receipt={receipt} busy={Boolean(paying)} onPay={onPay} />
-      ) : null}
+      <ReceiptActions
+        receipt={receipt}
+        busy={Boolean(busy)}
+        onPay={onPay}
+        onEdit={onEdit}
+        onRefund={onRefund}
+      />
     </section>
   );
 }
 
 function GroupReceiptCard({
   receipt,
-  paying,
+  busy,
   onPay,
+  onEdit,
+  onRefund,
 }: {
   receipt: RegistrationReceipt;
-  paying?: boolean;
+  busy?: boolean;
   onPay?: () => void;
+  onEdit?: () => void;
+  onRefund?: () => void;
 }) {
   const members = receiptMembers(receipt);
   const activeCount = members.filter((member) => !member.canceled).length;
@@ -468,25 +641,35 @@ function GroupReceiptCard({
           <dt>단체명</dt>
           <dd>{receipt.organizationName || "—"}</dd>
         </div>
-        {receipt.leaderName ? (
-          <div>
-            <dt>대표자</dt>
-            <dd>{receipt.leaderName}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>대표자</dt>
+          <dd>{receipt.leaderName?.trim() || "—"}</dd>
+        </div>
+        <div>
+          <dt>대표자 생년월일</dt>
+          <dd>{lookupBirthView(receipt.leaderBirth) || "—"}</dd>
+        </div>
+        <div>
+          <dt>대표자 연락처</dt>
+          <dd>{receipt.leaderPhNum ? formatPhone(receipt.leaderPhNum) : "—"}</dd>
+        </div>
         <div>
           <dt>인원</dt>
           <dd>{activeCount}명</dd>
         </div>
         <ReceiptContactSpec receipt={receipt} />
         <ReceiptPaymentSpec receipt={receipt} />
+        <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
-      <ReceiptSouvenirList souvenirs={receipt.souvenirs ?? []} />
       <ReceiptNotes receipt={receipt} />
-      {onPay ? (
-        <ReceiptPayButton receipt={receipt} busy={Boolean(paying)} onPay={onPay} />
-      ) : null}
+      <ReceiptActions
+        receipt={receipt}
+        busy={Boolean(busy)}
+        onPay={onPay}
+        onEdit={onEdit}
+        onRefund={onRefund}
+      />
     </section>
   );
 }
@@ -511,10 +694,13 @@ function lookupErrorMessage(err: unknown, fallback = "신청 내역을 조회하
 function IndividualLookup({ onBack }: { onBack: () => void }) {
   const router = useRouter();
   const [view, setView] = useState<View>("form");
+  const [panel, setPanel] = useState<"list" | "edit" | "cancel" | "done">("list");
   const [busy, setBusy] = useState(false);
   const [payingKey, setPayingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [doneMessage, setDoneMessage] = useState("");
   const [receipts, setReceipts] = useState<RegistrationReceipt[]>([]);
+  const [active, setActive] = useState<RegistrationReceipt | null>(null);
   const [access, setAccess] = useState<IndividualRegistrationLookupRequest | null>(
     null,
   );
@@ -523,8 +709,19 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
+  useLayoutEffect(() => {
+    if (view !== "hit" || panel !== "list") return;
+    scrollPageTop();
+    requestAnimationFrame(scrollPageTop);
+  }, [view, panel]);
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const invalid = individualLookupFormError(name, birth, phone, password);
+    if (invalid) {
+      setError(invalid);
+      return;
+    }
     if (!hasMainApi) {
       setError("API 주소가 설정되지 않았습니다.");
       return;
@@ -532,7 +729,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     const body: IndividualRegistrationLookupRequest = {
       name: name.trim(),
       birth: toLookupBirth(birth),
-      phNum: formatPhone(phone),
+      phNum: phone.replace(/\D/g, ""),
       password: password.trim(),
     };
     setBusy(true);
@@ -542,6 +739,8 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       const rows = Array.isArray(found) ? found : [];
       setAccess(body);
       setReceipts(rows);
+      setActive(null);
+      setPanel("list");
       setView(rows.length ? "hit" : "miss");
     } catch (err) {
       setError(lookupErrorMessage(err));
@@ -578,7 +777,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       );
       savePendingPayment({
         registration: paymentOrderFromRetry(retried),
-        customerName: (receiptMembers(receipt)[0]?.name || name).trim(),
+        customerName: (receipt.name || receiptMembers(receipt)[0]?.name || name).trim(),
         savedAt: Date.now(),
       });
       router.push("/payment");
@@ -586,6 +785,84 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
     } finally {
       setPayingKey(null);
+    }
+  }
+
+  async function refreshIndividual(nextAccess: IndividualRegistrationLookupRequest) {
+    const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, nextAccess);
+    const rows = Array.isArray(found) ? found : [];
+    setAccess(nextAccess);
+    setReceipts(rows);
+    setName(nextAccess.name);
+    setBirth(nextAccess.birth.replace(/\D/g, ""));
+    setPhone(nextAccess.phNum);
+    setActive(null);
+    setPanel("list");
+    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function onModify(body: IndividualRegistrationModifyRequest) {
+    if (!active?.registrationId) {
+      setError("수정할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const settled = await modifyIndividualRegistration(
+        DEFAULT_EVENT_ID,
+        active.registrationId,
+        body,
+      );
+      const order = payableOrder(settled);
+      const nextAccess: IndividualRegistrationLookupRequest = {
+        ...body.access,
+        name: body.name,
+        birth: body.birth,
+        phNum: body.phNum,
+      };
+      if (order) {
+        if (!hasTossClientKey) {
+          setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+          return;
+        }
+        savePendingPayment({
+          registration: paymentOrderFromRetry(order),
+          customerName: body.name.trim(),
+          savedAt: Date.now(),
+        });
+        setAccess(nextAccess);
+        router.push("/payment");
+        return;
+      }
+      await refreshIndividual(nextAccess);
+      mainToast.success("수정이 완료되었습니다.");
+    } catch (err) {
+      setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onCancel() {
+    if (!access || !active?.registrationId) {
+      setError("환불할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      await cancelIndividualRegistration(
+        DEFAULT_EVENT_ID,
+        active.registrationId,
+        access,
+      );
+      setDoneMessage("환불이 접수되었습니다.");
+      setPanel("done");
+    } catch (err) {
+      setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -602,17 +879,55 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     );
   }
 
+  if (view === "hit" && panel === "done") {
+    return (
+      <section className="block wait">
+        <p className="kicker">DONE</p>
+        <h2>{doneMessage || "처리되었습니다"}</h2>
+        <button type="button" className="btn btn--red" onClick={() => setView("form")}>
+          다른 접수건
+        </button>
+      </section>
+    );
+  }
+
+  if (view === "hit" && panel === "edit" && active && access) {
+    return (
+      <IndividualLookupEdit
+        receipt={active}
+        access={access}
+        busy={busy}
+        error={error}
+        onBack={() => {
+          setError("");
+          setPanel("list");
+        }}
+        onSubmit={(body) => void onModify(body)}
+      />
+    );
+  }
+
   if (view === "hit" && receipts.length > 0) {
     return (
       <>
-        {error ? <p className="form__err">{error}</p> : null}
+        {error && panel !== "cancel" ? <p className="form__err">{error}</p> : null}
         {receipts.map((receipt) => (
           <IndividualReceiptCard
             key={receipt.registrationId || receipt.orderId || receipt.paymentId}
             receipt={receipt}
             name={name.trim()}
-            paying={payingKey === receiptPayKey(receipt)}
+            busy={payingKey === receiptPayKey(receipt)}
             onPay={() => void onRetryPay(receipt)}
+            onEdit={() => {
+              setError("");
+              setActive(receipt);
+              setPanel("edit");
+            }}
+            onRefund={() => {
+              setError("");
+              setActive(receipt);
+              setPanel("cancel");
+            }}
           />
         ))}
         <div className="flow__nav">
@@ -620,12 +935,23 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             다른 접수건
           </button>
         </div>
+        <LookupRefundModal
+          open={panel === "cancel"}
+          busy={busy}
+          error={error}
+          onClose={() => {
+            if (busy) return;
+            setError("");
+            setPanel("list");
+          }}
+          onConfirm={() => void onCancel()}
+        />
       </>
     );
   }
 
   return (
-    <form className="form" onSubmit={onSubmit}>
+    <form className="form" onSubmit={onSubmit} noValidate>
       <div className="form__head">
         <h2>개인 신청 조회</h2>
         <p className="form__note">{LOOKUP_LEAD}</p>
@@ -681,16 +1007,35 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
 function GroupLookup({ onBack }: { onBack: () => void }) {
   const router = useRouter();
   const [view, setView] = useState<View>("form");
+  const [panel, setPanel] = useState<"list" | "edit" | "cancel" | "done">("list");
   const [busy, setBusy] = useState(false);
   const [payingKey, setPayingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [doneMessage, setDoneMessage] = useState("");
   const [receipts, setReceipts] = useState<RegistrationReceipt[]>([]);
+  const [active, setActive] = useState<RegistrationReceipt | null>(null);
   const [access, setAccess] = useState<OrganizationLookupRequest | null>(null);
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
 
+  useLayoutEffect(() => {
+    if (view !== "hit" || panel !== "list") return;
+    scrollPageTop();
+    requestAnimationFrame(scrollPageTop);
+  }, [view, panel]);
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const accountErr = orgAccountError(account);
+    if (accountErr) {
+      setError(accountErr);
+      return;
+    }
+    const passwordErr = orgPasswordError(password);
+    if (passwordErr) {
+      setError(passwordErr);
+      return;
+    }
     if (!hasMainApi) {
       setError("API 주소가 설정되지 않았습니다.");
       return;
@@ -706,6 +1051,8 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       const rows = Array.isArray(found) ? found : [];
       setAccess(body);
       setReceipts(rows);
+      setActive(null);
+      setPanel("list");
       setView(rows.length ? "hit" : "miss");
     } catch (err) {
       setError(lookupErrorMessage(err));
@@ -746,6 +1093,74 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     }
   }
 
+  async function refreshOrganization(nextAccess: OrganizationLookupRequest) {
+    const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, nextAccess);
+    const rows = Array.isArray(found) ? found : [];
+    setAccess(nextAccess);
+    setReceipts(rows);
+    setActive(null);
+    setPanel("list");
+    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function onModify(body: OrganizationRegistrationModifyRequest) {
+    if (!active?.organizationId) {
+      setError("수정할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const settled = await modifyOrganizationRegistration(
+        DEFAULT_EVENT_ID,
+        active.organizationId,
+        body,
+      );
+      const order = payableOrder(settled);
+      if (order) {
+        if (!hasTossClientKey) {
+          setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+          return;
+        }
+        savePendingPayment({
+          registration: paymentOrderFromRetry(order),
+          customerName: (active.leaderName || active.organizationName || account).trim(),
+          savedAt: Date.now(),
+        });
+        router.push("/payment");
+        return;
+      }
+      await refreshOrganization(body.access);
+      mainToast.success("수정이 완료되었습니다.");
+    } catch (err) {
+      setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onCancel() {
+    if (!access || !active?.organizationId) {
+      setError("환불할 접수 정보를 확인하지 못했습니다.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      await cancelOrganizationRegistration(
+        DEFAULT_EVENT_ID,
+        active.organizationId,
+        access,
+      );
+      setDoneMessage("환불이 접수되었습니다.");
+      setPanel("done");
+    } catch (err) {
+      setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (view === "miss") {
     return (
       <section className="block wait">
@@ -759,16 +1174,54 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     );
   }
 
+  if (view === "hit" && panel === "done") {
+    return (
+      <section className="block wait">
+        <p className="kicker">DONE</p>
+        <h2>{doneMessage || "처리되었습니다"}</h2>
+        <button type="button" className="btn btn--red" onClick={() => setView("form")}>
+          다른 접수건
+        </button>
+      </section>
+    );
+  }
+
+  if (view === "hit" && panel === "edit" && active && access) {
+    return (
+      <GroupLookupEdit
+        receipt={active}
+        access={access}
+        busy={busy}
+        error={error}
+        onBack={() => {
+          setError("");
+          setPanel("list");
+        }}
+        onSubmit={(body) => void onModify(body)}
+      />
+    );
+  }
+
   if (view === "hit" && receipts.length > 0) {
     return (
       <>
-        {error ? <p className="form__err">{error}</p> : null}
+        {error && panel !== "cancel" ? <p className="form__err">{error}</p> : null}
         {receipts.map((receipt, i) => (
           <GroupReceiptCard
             key={receipt.organizationId || receipt.orderId || receipt.paymentId || String(i)}
             receipt={receipt}
-            paying={payingKey === receiptPayKey(receipt)}
+            busy={payingKey === receiptPayKey(receipt)}
             onPay={() => void onRetryPay(receipt)}
+            onEdit={() => {
+              setError("");
+              setActive(receipt);
+              setPanel("edit");
+            }}
+            onRefund={() => {
+              setError("");
+              setActive(receipt);
+              setPanel("cancel");
+            }}
           />
         ))}
         <div className="flow__nav">
@@ -776,12 +1229,23 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             다른 접수건
           </button>
         </div>
+        <LookupRefundModal
+          open={panel === "cancel"}
+          busy={busy}
+          error={error}
+          onClose={() => {
+            if (busy) return;
+            setError("");
+            setPanel("list");
+          }}
+          onConfirm={() => void onCancel()}
+        />
       </>
     );
   }
 
   return (
-    <form className="form" onSubmit={onSubmit}>
+    <form className="form" onSubmit={onSubmit} noValidate>
       <div className="form__head">
         <h2>단체 신청 조회</h2>
         <p className="form__note">{LOOKUP_LEAD}</p>

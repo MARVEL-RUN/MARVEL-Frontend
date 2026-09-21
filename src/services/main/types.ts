@@ -62,6 +62,7 @@ export type OrganizationProfile = {
   phNum: string;
   email: string;
   leaderName: string;
+  guardianConsent: boolean;
 };
 
 export type OrganizationParticipant = {
@@ -112,8 +113,13 @@ export type PaymentRetryResponse = {
 export type RegistrationReceiptMember = {
   registrationId: string;
   name?: string;
+  birth?: string;
+  phNum?: string;
+  gender?: string;
+  eventCategoryId?: string;
   eventCategoryName?: string;
   souvenirs?: RegistrationReceiptSouvenir[];
+  selectedSouvenirList?: RegistrationReceiptSouvenir[];
   canceled?: boolean;
   registrationStatus?: string;
   status?: string;
@@ -148,9 +154,20 @@ export type RegistrationReceipt = {
   organizationId?: string | null;
   organizationName?: string | null;
   leaderName?: string | null;
+  leaderBirth?: string | null;
+  leaderPhNum?: string | null;
+  name?: string | null;
+  birth?: string | null;
+  phNum?: string | null;
+  gender?: string | null;
+  eventCategoryId?: string | null;
+  eventCategoryName?: string | null;
+  selectedSouvenirList?: RegistrationReceiptSouvenir[];
   email?: string | null;
   address?: string | null;
   addressDetail?: string | null;
+  guardianName?: string | null;
+  guardianPhNum?: string | null;
   members?: RegistrationReceiptMember[];
   registrations?: OrganizationLookupParticipant[];
   souvenirs?: RegistrationReceiptSouvenir[];
@@ -158,10 +175,57 @@ export type RegistrationReceipt = {
   paidAmount: number;
   paymentStatus?: string;
   paymentStatusLabel?: string;
+  registrationStatus?: string | null;
+  refundStatus?: string | null;
   warningMessage?: string | null;
   paymentAction?: string;
   paymentId?: string | null;
   orderId?: string | null;
+};
+
+export type RegistrationSouvenirSelection = {
+  souvenirId: string;
+  selectedSize?: string;
+};
+
+export type IndividualRegistrationModifyRequest = {
+  access: IndividualRegistrationLookupRequest;
+  eventCategoryId: string;
+  selectedSouvenirList: RegistrationSouvenirSelection[];
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+  address?: string;
+  addressDetail?: string;
+  guardianName?: string;
+  guardianPhNum?: string;
+};
+
+export type OrganizationParticipantModifyRequest = {
+  registrationId?: string;
+  eventCategoryId: string;
+  selectedSouvenirList: RegistrationSouvenirSelection[];
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+};
+
+export type OrganizationRegistrationModifyRequest = {
+  access: OrganizationLookupRequest;
+  registrations: OrganizationParticipantModifyRequest[];
+};
+
+export type RegistrationSettlementResult = {
+  members?: RegistrationReceiptMember[];
+  orders?: PaymentRetryResponse[];
+  refunds?: {
+    paymentCancelId?: string;
+    paymentId?: string;
+    amount?: number;
+    status?: string;
+  }[];
 };
 
 export type PaymentConfirmRequest = {

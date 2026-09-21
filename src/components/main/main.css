@@ -134,6 +134,15 @@ html.is-intro {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.btn--ghost-red {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--marvel);
+}
+
+.btn--ghost-red:hover {
+  background: rgba(237, 29, 36, 0.16);
+}
+
 .btn--on-red {
   background: #fff;
   color: var(--navy);
@@ -809,6 +818,10 @@ button.course:disabled:hover {
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.4;
+}
+
+.inquiry-secret__desc + .inquiry-secret__error {
+  margin: -0.55rem 0 0.85rem;
 }
 
 .inquiry-secret__control input {
