@@ -14,7 +14,7 @@ export const EVENT = {
     enabled: true,
     id: "shuttle-survey-2026",
     title: "마블런 셔틀버스 추가 운행지역 수요조사",
-    image: "/images/main/popup/shuttle-survey.jpeg",
+    image: MAIN_ASSETS.popupShuttleSurvey,
   },
   dateShort: "2026.10.31 SAT",
   dateLong: "2026년 10월 31일 토요일",
