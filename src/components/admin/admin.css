@@ -504,6 +504,11 @@ html.admin-mode body {
   border-bottom: 1px solid var(--admin-line);
 }
 
+.admin-muted {
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
 .admin-apps-list .admin-table th,
 .admin-apps-list .admin-table td {
   padding: 8px 10px;
