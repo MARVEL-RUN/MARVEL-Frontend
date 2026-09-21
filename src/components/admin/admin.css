@@ -556,14 +556,10 @@ html.admin-mode body {
   overflow-y: auto;
 }
 
+/* 행 높이는 셀에 고정. wrap 높이를 수식으로 맞추면 보더·서브픽셀 때문에 미세 스크롤이 남음 */
 .admin-apps-list.is-fixed-table .admin-table-wrap {
-  height: calc(
-    var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)
-  );
-  max-height: min(
-    calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
-    calc(100vh - var(--admin-head) - 220px)
-  );
+  height: auto;
+  max-height: calc(100vh - var(--admin-head) - 220px);
 }
 
 .admin-apps-list.is-fixed-table .admin-table thead tr {
