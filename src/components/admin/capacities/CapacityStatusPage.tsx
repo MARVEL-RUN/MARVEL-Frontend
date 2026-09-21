@@ -10,7 +10,10 @@ import {
 } from "@/lib/admin/raceEvents";
 import { formatPhone } from "@/lib/register";
 import {
-  capacityApiEventId,
+  fetchAdminEvents,
+  matchRaceEvent,
+} from "@/services/admin/applications";
+import {
   capacityUnit,
   fetchCapacityRegistrations,
   fetchEventCapacities,
@@ -23,6 +26,7 @@ import {
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { RotateCcw, X } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 const PAGE_SIZE_OPTIONS = [
@@ -68,7 +72,8 @@ type Pick = {
 };
 
 type Props = {
-  eventId: AdminRaceEventId;
+  /** slug 라우트용. 없으면 searchParams eventId */
+  slug?: AdminRaceEventId;
 };
 
 function dash(value: string | null | undefined) {
@@ -428,16 +433,44 @@ function ParticipantPanel({
   );
 }
 
-export function CapacityStatusPage({ eventId }: Props) {
-  const event = getAdminRaceEvent(eventId);
-  const apiEventId = capacityApiEventId(eventId);
+export function CapacityStatusPage({ slug }: Props) {
+  const searchParams = useSearchParams();
+  const queryEventId = searchParams.get("eventId")?.trim() ?? "";
   const [pick, setPick] = useState<Pick | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState("50");
 
+  const eventsQuery = useQuery({
+    queryKey: ["admin", "events"],
+    queryFn: fetchAdminEvents,
+    enabled: hasAdminApi,
+  });
+
+  const apiEvent = useMemo(() => {
+    const events = eventsQuery.data ?? [];
+    if (slug) return matchRaceEvent(events, slug);
+    if (queryEventId) {
+      return (
+        events.find((event) => event.eventId === queryEventId) ?? {
+          eventId: queryEventId,
+          eventName: "",
+          registrationType: "",
+          registrationPeriod: "",
+        }
+      );
+    }
+    return undefined;
+  }, [eventsQuery.data, queryEventId, slug]);
+
+  const apiEventId = apiEvent?.eventId ?? "";
+  const eventTitle =
+    apiEvent?.eventName ||
+    (slug ? getAdminRaceEvent(slug)?.name : "") ||
+    "대회";
+
   const capacities = useQuery({
     queryKey: ["admin", "capacities", apiEventId],
-    queryFn: () => fetchEventCapacities(apiEventId as string),
+    queryFn: () => fetchEventCapacities(apiEventId),
     enabled: hasAdminApi && Boolean(apiEventId),
   });
 
@@ -452,7 +485,7 @@ export function CapacityStatusPage({ eventId }: Props) {
       pageSize,
     ],
     queryFn: () =>
-      fetchCapacityRegistrations(apiEventId as string, pick!.capacityId, {
+      fetchCapacityRegistrations(apiEventId, pick!.capacityId, {
         state: pick!.state,
         page: page - 1,
         size: Number(pageSize),
@@ -515,7 +548,7 @@ export function CapacityStatusPage({ eventId }: Props) {
   const listTotal = listMatches ? (listData?.totalElements ?? 0) : 0;
   const listPages = listMatches ? Math.max(1, listData?.totalPages ?? 1) : 1;
 
-  if (!event) {
+  if (slug && !getAdminRaceEvent(slug)) {
     return (
       <div className="admin-page">
         <p className="admin-empty">존재하지 않는 대회입니다.</p>
@@ -529,11 +562,15 @@ export function CapacityStatusPage({ eventId }: Props) {
   const emptyCapacities =
     !hasAdminApi
       ? "관리자 API 주소가 설정되지 않았습니다."
-      : !apiEventId
-        ? "등록된 정원 정보가 없습니다."
-        : capacities.isError
-          ? errorHint(capacities.error)
-          : "등록된 정원 정보가 없습니다.";
+      : eventsQuery.isError && Boolean(slug)
+        ? errorHint(eventsQuery.error)
+        : eventsQuery.isFetched && slug && !apiEvent
+          ? "대회 정보가 없습니다."
+          : !apiEventId
+            ? "등록된 정원 정보가 없습니다."
+            : capacities.isError
+              ? errorHint(capacities.error)
+              : "등록된 정원 정보가 없습니다.";
 
   const listEmpty =
     list.isError && !listMatches
@@ -546,7 +583,7 @@ export function CapacityStatusPage({ eventId }: Props) {
     >
       <header className="admin-capacity__hero">
         <div>
-          <h1>{event.name} 정원 현황</h1>
+          <h1>{eventTitle} 정원 현황</h1>
           <p className="admin-capacity__hero-lead">
             대회·종목·기념품 정원을 구분해 확인하고, 홀딩·확정 숫자로 참가자를 조회할 수 있습니다.
           </p>

@@ -22,14 +22,14 @@ export function adminApplicationsHrefFromEvent(event: AdminEvent, query?: string
   return adminApplicationsHref(raceEventSlug(event) ?? event.eventId, query);
 }
 
-/** marvel·virtual slug만 정원 상세 라우트 있음 */
+/** 대회 API eventId로 정원 상세 진입 */
 export function adminCapacitiesHrefFromEvent(event: AdminEvent) {
-  const slug = raceEventSlug(event);
-  return slug ? `${CAPS}/${slug}` : null;
+  return adminCapacitiesHref(event.eventId);
 }
 
 export function adminCapacitiesHref(eventIdOrSlug: string) {
-  return isAdminRaceSlug(eventIdOrSlug) ? `${CAPS}/${eventIdOrSlug}` : null;
+  if (isAdminRaceSlug(eventIdOrSlug)) return `${CAPS}/${eventIdOrSlug}`;
+  return `${CAPS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
 }
 
 /** marvel·virtual → /members/{slug}, 그 외 API id → /members/list?eventId= */
