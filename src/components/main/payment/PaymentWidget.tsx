@@ -5,6 +5,8 @@ import type { TossPaymentsWidgets } from "@tosspayments/tosspayments-sdk";
 import { formatFee } from "@/lib/register";
 import { createPaymentWidgets } from "@/lib/payment/toss";
 import type { PaymentOrder } from "@/lib/payment/session";
+import { useAppBasePath } from "@/lib/main/useAppBasePath";
+import { withAppBase } from "@/lib/preview";
 
 type Props = {
   registration: PaymentOrder;
@@ -13,6 +15,7 @@ type Props = {
 };
 
 export function PaymentWidget({ registration, customerName, onError }: Props) {
+  const base = useAppBasePath();
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [bootError, setBootError] = useState("");
@@ -85,8 +88,8 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
       await widgets.requestPayment({
         orderId: registration.orderId,
         orderName: registration.orderName,
-        successUrl: `${origin}/payment/success`,
-        failUrl: `${origin}/payment/fail`,
+        successUrl: `${origin}${withAppBase(base, "/payment/success")}`,
+        failUrl: `${origin}${withAppBase(base, "/payment/fail")}`,
         customerName,
       });
     } catch (err) {

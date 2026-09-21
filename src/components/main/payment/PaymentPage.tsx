@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { readPendingPayment, type PendingPayment } from "@/lib/payment/session";
+import { useAppHref } from "@/lib/main/useAppBasePath";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { SideBanner } from "../layout/SideBanner";
 import { PaymentWidget } from "./PaymentWidget";
 
 export function PaymentPage() {
+  const registerHref = useAppHref("/register");
   const [pending, setPending] = useState<PendingPayment | null | undefined>(
     undefined,
   );
@@ -34,7 +36,7 @@ export function PaymentPage() {
               <p className="kicker">NO ORDER</p>
               <h2>결제할 신청이 없습니다</h2>
               <p className="sec__body">참가신청을 먼저 진행해 주세요.</p>
-              <Link href="/register" className="btn btn--red">
+              <Link href={registerHref} className="btn btn--red">
                 참가신청
               </Link>
             </section>

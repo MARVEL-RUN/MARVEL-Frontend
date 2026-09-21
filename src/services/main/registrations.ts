@@ -11,7 +11,7 @@ export async function createRegistration(
   body: RegistrationCreateRequest,
 ) {
   return mainFetch<RegistrationCreateResponse>(
-    `public/events/${encodeURIComponent(eventId)}/registrations`,
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations`,
     {
       method: "POST",
       body: JSON.stringify(body),
@@ -24,7 +24,7 @@ export async function createOrganizationRegistration(
   body: OrganizationRegistrationRequest,
 ) {
   return mainFetch<OrganizationRegistrationResponse>(
-    `public/events/${encodeURIComponent(eventId)}/registrations/organization`,
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/organization`,
     {
       method: "POST",
       body: JSON.stringify(body),

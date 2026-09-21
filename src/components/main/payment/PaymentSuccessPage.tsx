@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
+import { useAppHref } from "@/lib/main/useAppBasePath";
 import { formatFee } from "@/lib/register";
 import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
@@ -49,6 +50,9 @@ function authFromParams(params: { get: (key: string) => string | null }) {
 
 export function PaymentSuccessPage() {
   const params = useSearchParams();
+  const paymentHref = useAppHref("/payment");
+  const registerHref = useAppHref("/register");
+  const lookupHref = useAppHref("/lookup");
   const [phase, setPhase] = useState<Phase>(() =>
     authFromParams(params) ? "loading" : "error",
   );
@@ -192,7 +196,7 @@ export function PaymentSuccessPage() {
                   영수증
                 </button>
               ) : null}
-              <Link href="/lookup" className="btn btn--ghost">
+              <Link href={lookupHref} className="btn btn--ghost">
                 신청조회
               </Link>
               <Link href="/" className="btn btn--red">
@@ -233,12 +237,12 @@ export function PaymentSuccessPage() {
             </p>
             <div className="flow__nav">
               <Link
-                href={canRetry ? "/payment" : "/register"}
+                href={canRetry ? paymentHref : registerHref}
                 className="btn btn--red"
               >
                 {canRetry ? "다시 결제" : "다시 신청"}
               </Link>
-              <Link href="/lookup" className="btn btn--ghost">
+              <Link href={lookupHref} className="btn btn--ghost">
                 신청조회
               </Link>
               <Link href="/" className="btn btn--ghost">

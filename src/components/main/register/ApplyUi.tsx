@@ -440,6 +440,29 @@ export function PhoneField({
   );
 }
 
+const GUARDIAN_CONSENT_LABEL =
+  "법정대리인(보호자)으로서 참가 신청·개인정보 처리에 동의합니다.";
+
+export function GuardianConsentField({
+  agreed,
+  onChange,
+}: {
+  agreed: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={agreed ? "guardian-consent is-agreed" : "guardian-consent"}
+      aria-pressed={agreed}
+      onClick={() => onChange(!agreed)}
+    >
+      <span className="guardian-consent__label">{GUARDIAN_CONSENT_LABEL}</span>
+      <span className="guardian-consent__state">{agreed ? "동의함" : "탭하여 동의"}</span>
+    </button>
+  );
+}
+
 const EMAIL_SET = new Set<string>(EMAIL_DOMAINS);
 
 export function EmailField({
