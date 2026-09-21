@@ -100,8 +100,18 @@ function buildSections(row: AdminApplicationRow) {
   ];
 
   const guardianFields: DetailField[] = [
-    { label: "연락처", value: dash(row.guardianPhone) },
+    { label: "이름", value: dash(row.guardianName) },
     { label: "관계", value: dash(row.guardianRelation) },
+    { label: "연락처", value: dash(row.guardianPhone) },
+    {
+      label: "동의",
+      value:
+        row.guardianConsent === true
+          ? "동의함"
+          : row.guardianConsent === false
+            ? "미동의"
+            : "-",
+    },
   ];
 
   const groupFields: DetailField[] = [

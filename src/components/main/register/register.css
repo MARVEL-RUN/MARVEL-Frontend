@@ -190,7 +190,60 @@
   color: rgba(255, 255, 255, 0.38);
 }
 
-/* 보호자 동의 — 입력 필드 형태, 탭하면 동의 상태 */
+/* 개인 보호자 동의 — 체크박스 */
+.guardian-consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  width: min(24rem, 100%);
+  margin: 0;
+  padding: 0.15rem 0;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.guardian-consent-check input {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0.18rem 0 0;
+  padding: 0;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background-color: transparent;
+  background-image: none;
+  cursor: pointer;
+}
+
+.guardian-consent-check input:checked {
+  border-color: var(--marvel);
+  background-color: var(--marvel);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.4 6.3 4.9 8.8 9.6 3.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0.7rem;
+}
+
+.guardian-consent-check input:focus,
+.guardian-consent-check input:focus-visible {
+  outline: 2px solid var(--marvel);
+  outline-offset: 2px;
+}
+
+.guardian-consent-check__label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+/* 단체장 동의 — develop과 동일 한 줄 버튼 */
 .guardian-consent {
   display: flex;
   align-items: center;
@@ -214,6 +267,7 @@
   flex: 1;
   min-width: 0;
   font-weight: 600;
+  word-break: keep-all;
 }
 
 .guardian-consent__state {
@@ -240,7 +294,10 @@
 }
 
 .form-row__ctrl>select:focus,
-.form-row input:focus {
+.form-row input[type="text"]:focus,
+.form-row input[type="email"]:focus,
+.form-row input[type="tel"]:focus,
+.form-row input[type="password"]:focus {
   outline: none;
   border-color: var(--marvel);
   background: #08091d;

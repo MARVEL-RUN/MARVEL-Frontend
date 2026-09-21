@@ -450,30 +450,51 @@ export function PhoneField({
 }
 
 const GUARDIAN_CONSENT_LABEL =
-  "법정대리인(보호자)으로서 참가 신청·개인정보 처리에 동의합니다.";
+  "법정대리인(보호자)으로서 참가 신청에 동의합니다.";
 
 export const GROUP_GUARDIAN_CONSENT_LABEL =
-  "단체장으로서 만 14세 미만 참가자의 참가 신청·개인정보 처리에 동의합니다.";
+  "단체장으로서 만 14세 미만 참가자의 참가 신청에 동의합니다.";
 
 export function GuardianConsentField({
   agreed,
   onChange,
   label = GUARDIAN_CONSENT_LABEL,
+  variant = "check",
 }: {
   agreed: boolean;
   onChange: (next: boolean) => void;
   label?: string;
+  variant?: "check" | "button";
 }) {
+  if (variant === "button") {
+    return (
+      <button
+        type="button"
+        className={agreed ? "guardian-consent is-agreed" : "guardian-consent"}
+        aria-pressed={agreed}
+        onClick={() => onChange(!agreed)}
+      >
+        <span className="guardian-consent__label">{label}</span>
+        <span className="guardian-consent__state">
+          {agreed ? "동의함" : "탭하여 동의"}
+        </span>
+      </button>
+    );
+  }
+
   return (
-    <button
-      type="button"
-      className={agreed ? "guardian-consent is-agreed" : "guardian-consent"}
-      aria-pressed={agreed}
-      onClick={() => onChange(!agreed)}
+    <label
+      className={
+        agreed ? "guardian-consent-check is-agreed" : "guardian-consent-check"
+      }
     >
-      <span className="guardian-consent__label">{label}</span>
-      <span className="guardian-consent__state">{agreed ? "동의함" : "탭하여 동의"}</span>
-    </button>
+      <input
+        type="checkbox"
+        checked={agreed}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <span className="guardian-consent-check__label">{label}</span>
+    </label>
   );
 }
 

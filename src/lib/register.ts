@@ -49,6 +49,7 @@ export type EntryDraft = {
   phone: string;
   email: string;
   guardianName: string;
+  guardianRelation: string;
   guardianPhone: string;
   guardianConsent: boolean;
   shirt: ShirtSize | "";
@@ -168,6 +169,7 @@ export const EMPTY_DRAFT: EntryDraft = {
   phone: "",
   email: "",
   guardianName: "",
+  guardianRelation: "",
   guardianPhone: "",
   guardianConsent: false,
   shirt: "",
@@ -280,14 +282,54 @@ export function groupNeedsGuardian(participants: { birth: string }[]) {
   return participants.some((p) => needsGuardian(p.birth));
 }
 
-export function guardianFieldsOk(draft: Pick<
-  EntryDraft,
-  "birth" | "guardianName" | "guardianPhone" | "guardianConsent"
->) {
-  if (!needsGuardian(draft.birth)) return true;
+export function guardianDraftStarted(
+  draft: Pick<
+    EntryDraft,
+    "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  return Boolean(
+    draft.guardianName.trim() ||
+      draft.guardianRelation.trim() ||
+      draft.guardianPhone.trim(),
+  );
+}
+
+export function guardianRequiredFor(
+  draft: Pick<
+    EntryDraft,
+    "birth" | "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  return needsGuardian(draft.birth) || guardianDraftStarted(draft);
+}
+
+export function guardianFieldsOk(
+  draft: Pick<
+    EntryDraft,
+    "birth" | "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  if (!guardianRequiredFor(draft)) return true;
   if (!draft.guardianName.trim()) return false;
+  if (!draft.guardianRelation.trim()) return false;
   if (!draft.guardianPhone.trim()) return false;
   return draft.guardianConsent;
+}
+
+export function guardianFieldsError(
+  draft: Pick<
+    EntryDraft,
+    "birth" | "guardianName" | "guardianRelation" | "guardianPhone" | "guardianConsent"
+  >,
+) {
+  if (guardianFieldsOk(draft)) return "";
+  if (!draft.guardianConsent) return "보호자(법정대리인) 동의가 필요합니다.";
+  if (!draft.guardianRelation.trim()) return "보호자 관계를 입력하세요.";
+  if (!draft.guardianName.trim() || !draft.guardianPhone.trim()) {
+    return "보호자 이름·관계·연락처를 모두 입력하세요.";
+  }
+  return "보호자 정보를 모두 입력하세요.";
 }
 
 export function courseHasTimingChip(courseId: CourseId) {
@@ -513,10 +555,7 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
     throw new Error("이메일 형식을 확인하세요.");
   }
   if (!guardianFieldsOk(draft)) {
-    if (needsGuardian(draft.birth) && !draft.guardianConsent) {
-      throw new Error("보호자(법정대리인) 동의가 필요합니다.");
-    }
-    throw new Error("만 14세 미만은 보호자 이름과 연락처를 입력하세요.");
+    throw new Error(guardianFieldsError(draft));
   }
   if (!draft.shirt) throw new Error("기념품을 선택하세요.");
   const passwordErr = entryPasswordError(draft.password);

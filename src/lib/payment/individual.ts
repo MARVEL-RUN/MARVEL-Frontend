@@ -4,12 +4,11 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
-import type { EntryDraft } from "@/lib/register";
+import { guardianRequiredFor, type EntryDraft } from "@/lib/register";
 import type {
   RegistrationCategory,
   RegistrationCreateRequest,
 } from "@/services/main/types";
-import { needsGuardian } from "@/lib/register";
 import { birthToApi, genderToApi, phoneDigits } from "./map";
 
 export function toRegistrationCreateRequest(
@@ -34,7 +33,8 @@ export function toRegistrationCreateRequest(
 
   const guardianName = draft.guardianName.trim();
   const guardianPhone = phoneDigits(draft.guardianPhone);
-  const guardian = needsGuardian(draft.birth);
+  const guardianRelation = draft.guardianRelation.trim();
+  const requireGuardian = guardianRequiredFor(draft);
 
   return {
     eventCategoryId: category.categoryId,
@@ -53,6 +53,7 @@ export function toRegistrationCreateRequest(
     addressDetail: (draft.addressDetail ?? "").trim(),
     ...(guardianName ? { guardianName } : {}),
     ...(guardianPhone ? { guardianPhone } : {}),
-    guardianConsent: guardian ? draft.guardianConsent : false,
+    ...(guardianRelation ? { guardianRelationship: guardianRelation } : {}),
+    guardianConsent: requireGuardian ? draft.guardianConsent : false,
   };
 }

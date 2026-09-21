@@ -12,6 +12,7 @@ import {
   applyCourseForBirth,
   formatFee,
   needsGuardian,
+  guardianRequiredFor,
   ticketForBirth,
   type CourseId,
   type Gender,
@@ -53,6 +54,7 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  GuardianConsentField,
   KitFixed,
   PhoneField,
   ShirtPick,
@@ -271,7 +273,11 @@ export function IndividualLookupEdit({
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
   const [guardianName, setGuardianName] = useState(receipt.guardianName?.trim() || "");
+  const [guardianRelation, setGuardianRelation] = useState(
+    receipt.guardianRelationship?.trim() || "",
+  );
   const [guardianPhone, setGuardianPhone] = useState(receipt.guardianPhNum || "");
+  const [guardianConsent, setGuardianConsent] = useState(false);
   const [eventCategoryId, setEventCategoryId] = useState(receipt.eventCategoryId || "");
   const [souvenirs, setSouvenirs] = useState(
     souvenirSelections(receipt.selectedSouvenirList),
@@ -309,7 +315,14 @@ export function IndividualLookupEdit({
   const selectedSize = memberShirtSize(souvenirs, category);
   const ticket = ticketForBirth(birth);
   const optionsReady = categories.length > 0;
-  const guardianRequired = needsGuardian(birth);
+  const guardianMinor = needsGuardian(birth);
+  const guardianRequired = guardianRequiredFor({
+    birth,
+    guardianName,
+    guardianRelation,
+    guardianPhone,
+    guardianConsent,
+  });
 
   function applyCategory(
     next: RegistrationCategory | undefined,
@@ -341,9 +354,11 @@ export function IndividualLookupEdit({
       (!zonecode.trim() || !address.trim() ? "우편번호 찾기로 주소를 선택하세요." : "") ||
       (!addressDetail.trim() ? "상세주소를 입력하세요." : "") ||
       (guardianRequired && !guardianName.trim() ? "보호자 이름을 입력하세요." : "") ||
+      (guardianRequired && !guardianRelation.trim() ? "보호자 관계를 입력하세요." : "") ||
       (guardianRequired && guardianPhone.replace(/\D/g, "").length < 10
         ? "보호자 연락처를 입력하세요."
         : "") ||
+      (guardianRequired && !guardianConsent ? "보호자 동의가 필요합니다." : "") ||
       (!eventCategoryId ? "참가종목을 선택하세요." : "") ||
       (souvenir && !selectedSize ? "티셔츠 사이즈를 선택하세요." : "");
     if (invalid) {
@@ -364,6 +379,7 @@ export function IndividualLookupEdit({
       addressDetail: addressDetail.trim(),
       guardianName: guardianName.trim() || undefined,
       guardianPhNum: toApiPhone(guardianPhone) || undefined,
+      guardianRelationship: guardianRelation.trim() || undefined,
     });
   }
 
@@ -429,11 +445,11 @@ export function IndividualLookupEdit({
 
       <FormSec
         kicker="04 / GUARDIAN"
-        title={guardianRequired ? "보호자 정보" : "보호자 정보 (선택)"}
+        title={guardianMinor ? "보호자 정보" : "보호자 정보 (선택)"}
         note={
-          guardianRequired
-            ? `${GUARDIAN_AGE_NOTE} 보호자 이름·연락처도 입력해 주세요.`
-            : "선택사항이지만, 응급 상황에 대비해 가능하면 입력해 주세요."
+          guardianMinor
+            ? `${GUARDIAN_AGE_NOTE} 보호자 이름·관계·연락처·동의를 입력해 주세요.`
+            : "선택사항입니다. 입력하면 이름·관계·연락처·동의를 모두 작성해 주세요."
         }
       >
         <FormRow label="보호자 이름" required={guardianRequired}>
@@ -447,6 +463,16 @@ export function IndividualLookupEdit({
             required={guardianRequired}
           />
         </FormRow>
+        <FormRow label="보호자 관계" required={guardianRequired}>
+          <input
+            type="text"
+            name="guardianRelation"
+            placeholder="부, 모, 조부모 등"
+            value={guardianRelation}
+            onChange={(e) => setGuardianRelation(e.target.value)}
+            required={guardianRequired}
+          />
+        </FormRow>
         <FormRow label="보호자 연락처" required={guardianRequired}>
           <PhoneField
             name="guardianPhone"
@@ -455,9 +481,20 @@ export function IndividualLookupEdit({
             onChange={setGuardianPhone}
             required={guardianRequired}
           />
-          {guardianRequired ? (
+        </FormRow>
+        <FormRow label="보호자 동의" required={guardianRequired}>
+          <GuardianConsentField
+            agreed={guardianConsent}
+            onChange={setGuardianConsent}
+          />
+          {guardianRequired && !guardianMinor ? (
             <p className="form-row__hint">
-              만 14세 미만은 보호자 이름·연락처를 입력해야 신청할 수 있습니다.
+              보호자 정보를 입력한 경우 동의까지 완료해 주세요.
+            </p>
+          ) : null}
+          {guardianMinor ? (
+            <p className="form-row__hint">
+              만 14세 미만은 보호자 동의까지 완료해야 신청할 수 있습니다.
             </p>
           ) : null}
         </FormRow>

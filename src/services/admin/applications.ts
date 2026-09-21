@@ -71,8 +71,10 @@ export type AdminApplicationRow = {
   size: string;
   phone: string;
   email: string;
+  guardianName: string;
   guardianPhone: string;
   guardianRelation: string;
+  guardianConsent?: boolean;
   gender?: "male" | "female";
   memberCount?: number;
   marketingConsent: boolean;
@@ -122,11 +124,13 @@ type RegistrationDetail = {
   phoneNumber?: unknown;
   phNum?: unknown;
   email?: unknown;
+  guardianName?: unknown;
   guardianPhoneNumber?: unknown;
   guardianPhNum?: unknown;
   guardianPhone?: unknown;
   guardianRelationship?: unknown;
   guardianRelation?: unknown;
+  guardianConsent?: unknown;
   createdAt?: unknown;
   amount?: unknown;
   orderId?: unknown;
@@ -240,6 +244,20 @@ function consentYes(value?: string | boolean | number) {
   return v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의";
 }
 
+function asOptionalBool(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return undefined;
+  }
+  const v = asText(value).toLowerCase();
+  if (!v) return undefined;
+  if (v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의") return true;
+  if (v === "false" || v === "n" || v === "no" || v === "0" || v === "미동의") return false;
+  return undefined;
+}
+
 function displayName(kind: ApplicationKind, name: string, orgName: string) {
   if (kind === "group") return orgName || name;
   return name || orgName;
@@ -314,8 +332,10 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     size: "",
     phone: firstText(item.phoneNumber, item.phNum),
     email: "",
+    guardianName: "",
     guardianPhone: "",
     guardianRelation: "",
+    guardianConsent: undefined,
     gender: uiGenderFromApi(item.gender),
     marketingConsent: consentYes(item.marketingConsent),
     amount: 0,
@@ -354,11 +374,13 @@ export function applyRegistrationDetail(
     birth: firstText(data.birth) || row.birth,
     phone: firstText(data.phoneNumber, data.phNum) || row.phone,
     email: firstText(data.email) || row.email,
+    guardianName: firstText(data.guardianName) || row.guardianName,
     guardianPhone:
       firstText(data.guardianPhoneNumber, data.guardianPhNum, data.guardianPhone) ||
       row.guardianPhone,
     guardianRelation:
       firstText(data.guardianRelationship, data.guardianRelation) || row.guardianRelation,
+    guardianConsent: asOptionalBool(data.guardianConsent) ?? row.guardianConsent,
     appliedAt: createdAt ? formatAdminBoardDate(createdAt) : row.appliedAt,
     amount: asAmount(data.amount, row.amount),
     orderNo: firstText(data.orderId) || row.orderNo,

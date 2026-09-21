@@ -754,6 +754,7 @@ export function GroupFlow({
               <FormRow label="법정대리인 동의" required>
                 <GuardianConsentField
                   label={GROUP_GUARDIAN_CONSENT_LABEL}
+                  variant="button"
                   agreed={draft.guardianConsent}
                   onChange={(guardianConsent) => patch({ guardianConsent })}
                 />
