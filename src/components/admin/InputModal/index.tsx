@@ -32,14 +32,19 @@ export function AdminInputModal({
 }: Props) {
   const titleId = useId();
   const inputId = useId();
+  const hintId = useId();
   const [value, setValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const valid = value.trim().length >= minLength;
+  const [touched, setTouched] = useState(false);
+  const trimmed = value.trim();
+  const valid = trimmed.length >= minLength;
+  const showError = touched && trimmed.length > 0 && !valid;
 
   useEffect(() => {
     if (!open) return;
     setValue("");
     setShowPassword(false);
+    setTouched(false);
   }, [open]);
 
   useEffect(() => {
@@ -54,8 +59,9 @@ export function AdminInputModal({
   if (!open) return null;
 
   const submit = () => {
+    setTouched(true);
     if (!valid) return;
-    onConfirm(value.trim());
+    onConfirm(trimmed);
   };
 
   return (
@@ -65,50 +71,74 @@ export function AdminInputModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-describedby={description ? undefined : hintId}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="admin-input-modal__head">
           <h2 id={titleId}>{title}</h2>
-          <button type="button" className="admin-input-modal__close" aria-label="닫기" onClick={onCancel}>
+          <button
+            type="button"
+            className="admin-input-modal__close"
+            aria-label="닫기"
+            onClick={onCancel}
+          >
             ×
           </button>
         </div>
-        {description ? <p className="admin-input-modal__desc">{description}</p> : null}
-        <label className="admin-input-modal__field" htmlFor={inputId}>
-          {label}
-          <span className="admin-input-modal__control">
-            <input
-              id={inputId}
-              type={type === "password" && !showPassword ? "password" : "text"}
-              value={value}
-              placeholder={placeholder}
-              autoFocus
-              autoComplete="new-password"
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  submit();
-                }
-              }}
-            />
-            {type === "password" ? (
-              <button
-                type="button"
-                className="admin-input-modal__eye"
-                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-                onClick={() => setShowPassword((v) => !v)}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            ) : null}
-          </span>
-        </label>
-        {minLength > 1 ? (
-          <p className="admin-input-modal__hint">*{minLength}자리 이상으로 입력해주세요</p>
+        {description ? (
+          <p className="admin-input-modal__desc">{description}</p>
         ) : null}
+        <div className="admin-input-modal__body">
+          <label className="admin-input-modal__field" htmlFor={inputId}>
+            {label}
+            <span
+              className={`admin-input-modal__control${showError ? " is-error" : ""}`}
+            >
+              <input
+                id={inputId}
+                type={type === "password" && !showPassword ? "password" : "text"}
+                value={value}
+                placeholder={placeholder}
+                autoFocus
+                autoComplete="new-password"
+                aria-invalid={showError}
+                aria-describedby={hintId}
+                onChange={(e) => setValue(e.target.value)}
+                onBlur={() => setTouched(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    submit();
+                  }
+                }}
+              />
+              {type === "password" ? (
+                <button
+                  type="button"
+                  className="admin-input-modal__eye"
+                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                  onClick={() => setShowPassword((v) => !v)}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              ) : null}
+            </span>
+          </label>
+          {minLength > 1 ? (
+            <p
+              id={hintId}
+              className={`admin-input-modal__hint${showError ? " is-error" : ""}`}
+            >
+              {minLength}자 이상 입력해 주세요.
+            </p>
+          ) : null}
+        </div>
         <div className="admin-confirm__actions">
-          <button type="button" className="admin-btn admin-btn--ghost" onClick={onCancel}>
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost"
+            onClick={onCancel}
+          >
             {cancelLabel}
           </button>
           <button

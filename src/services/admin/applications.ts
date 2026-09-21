@@ -1,5 +1,6 @@
 import { adminFetch } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
 import {
   registrationStatusBadge,
@@ -440,6 +441,21 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
 export function fetchAdminRegistration(registrationId: string) {
   return adminFetch<unknown>(
     `v1/admin/registrations/${encodeURIComponent(registrationId)}`,
+  );
+}
+
+export function resetRegistrationPassword(
+  registrationId: string,
+  newPassword: string,
+) {
+  const password = newPassword.trim();
+  if (!registrationId.trim()) throw new Error("신청 정보를 찾을 수 없습니다.");
+  if (password.length < APPLICATION_PASSWORD_MIN) {
+    throw new Error(`비밀번호는 ${APPLICATION_PASSWORD_MIN}자 이상이어야 합니다.`);
+  }
+  return adminFetch<void>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}/password`,
+    { method: "PUT", body: JSON.stringify({ newPassword: password }) },
   );
 }
 
