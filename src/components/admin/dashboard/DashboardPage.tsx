@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendPanel } from "@/components/admin/dashboard/TrendPanel";
+import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
 import { adminApplicationsHref } from "@/lib/admin/eventLinks";
 import {
@@ -168,10 +168,7 @@ export function DashboardPage({
         </div>
       </section>
 
-      <div className="admin-trend-grid">
-        <TrendPanel kind="visitor" title="방문자 현황" unit="명" />
-        <TrendPanel kind="applicant" title="신청자 현황" unit="건" />
-      </div>
+      <OpsGuide cancelHref={cancelHref} gaRealtimeUrl={gaRealtimeUrl} />
     </div>
   );
 }
