@@ -225,7 +225,7 @@ export function CapacityStatusPage({ eventId }: Props) {
                       <td>{capacityTypeLabel(row.type)}</td>
                       <td>{row.name}</td>
                       <td>{dash(row.size)}</td>
-                      <td>{row.limitCount.toLocaleString()}</td>
+                      <td>{formatCount(row.limitCount, unit)}</td>
                       <td>
                         <button
                           type="button"
