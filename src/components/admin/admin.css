@@ -1498,9 +1498,9 @@ html.admin-mode body {
 }
 
 .admin-drawer-stack {
-  --admin-detail-w: 520px;
-  --admin-payments-w: 400px;
-  --admin-log-w: 380px;
+  --admin-detail-w: 440px;
+  --admin-payments-w: 360px;
+  --admin-log-w: 340px;
 }
 
 .admin-drawer-stack .admin-drawer {
@@ -1605,6 +1605,7 @@ html.admin-mode body {
 
 .admin-pay-log-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -1621,6 +1622,20 @@ html.admin-mode body {
   color: #667085;
   font-weight: 700;
   background: #fafbfc;
+  white-space: nowrap;
+}
+
+.admin-pay-log-table th:nth-child(1),
+.admin-pay-log-table td:nth-child(1) {
+  width: 34%;
+}
+
+.admin-pay-log-table th:nth-child(3),
+.admin-pay-log-table td:nth-child(3) {
+  width: 52px;
+  padding-left: 6px;
+  padding-right: 8px;
+  white-space: nowrap;
 }
 
 .admin-pay-log-table td {
@@ -1658,54 +1673,68 @@ html.admin-mode body {
 
 .admin-pay-list {
   display: grid;
-  gap: 8px;
-  padding: 12px 14px 14px;
+  gap: 6px;
+  padding: 10px 12px 12px;
   overflow: auto;
   flex: 1;
   align-content: start;
 }
 
 .admin-pay-list__item {
-  display: grid;
-  gap: 8px;
-  padding: 10px 12px;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   background: #fff;
   border: 1px solid #eef1f5;
   border-radius: 4px;
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+}
+
+button.admin-pay-list__item {
+  appearance: none;
+  cursor: pointer;
+}
+
+button.admin-pay-list__item:hover {
+  border-color: #d0d5dd;
 }
 
 .admin-pay-list__item.is-active {
-  border-color: #d0d5dd;
-  background: #f0f2f5;
-}
-
-.admin-pay-list__item.is-active .admin-pay-list__facts {
-  background: #e8ebf0;
-}
-
-.admin-pay-list__card {
-  display: grid;
-  gap: 8px;
+  border-color: #98a2b3;
+  background: #f8f9fb;
 }
 
 .admin-pay-list__head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.admin-pay-list__id {
-  display: flex;
-  align-items: flex-start;
   gap: 8px;
+  padding: 9px 10px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.admin-pay-list__lead {
   min-width: 0;
   flex: 1;
 }
 
-.admin-pay-list__id-text {
-  min-width: 0;
-  flex: 1;
+.admin-pay-list__lead-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-pay-list__amount {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-ink);
+  line-height: 1.3;
 }
 
 .admin-pay-list__no {
@@ -1724,11 +1753,12 @@ html.admin-mode body {
 }
 
 .admin-pay-list__order {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 500;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-variant-numeric: tabular-nums;
+  color: #667085;
   line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1737,7 +1767,7 @@ html.admin-mode body {
 
 .admin-pay-list__meta {
   margin: 2px 0 0;
-  color: #667085;
+  color: #98a2b3;
   font-size: 11px;
   line-height: 1.35;
   overflow: hidden;
@@ -1745,61 +1775,69 @@ html.admin-mode body {
   white-space: nowrap;
 }
 
-.admin-pay-list__facts {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  padding: 8px 10px;
-  background: #fafbfc;
-  border-radius: 4px;
-}
-
-.admin-pay-list__facts > div {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 8px;
-  align-items: baseline;
-}
-
-.admin-pay-list__facts dt {
-  margin: 0;
-  color: #667085;
+.admin-pay-list__log-hint {
+  flex-shrink: 0;
+  align-self: center;
+  color: #98a2b3;
   font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.admin-pay-list__item.is-active .admin-pay-list__log-hint {
+  color: #475467;
   font-weight: 700;
 }
 
-.admin-pay-list__facts dd {
+.admin-pay-list__fields {
   margin: 0;
-  font-size: 12px;
+  padding: 2px 0 4px;
+}
+
+.admin-pay-list__row {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 6px;
+  align-items: baseline;
+  padding: 5px 10px;
+}
+
+.admin-pay-list__row + .admin-pay-list__row {
+  border-top: 1px solid #f4f6f8;
+}
+
+.admin-pay-list__row dt {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.admin-pay-list__row dd {
+  margin: 0;
+  font-size: 11px;
   font-weight: 500;
+  color: #344054;
+  line-height: 1.45;
   word-break: break-word;
 }
 
-.admin-pay-list__sub {
-  margin: 0;
-  padding: 8px 10px;
-  list-style: none;
-  background: #f8f9fb;
-  border-radius: 4px;
+.admin-pay-list__row--cancel dd {
   color: #475467;
-  font-size: 11px;
-  line-height: 1.45;
 }
 
-.admin-pay-list__sub--cancel {
-  background: #fff8f8;
-  color: #7a271a;
+.admin-pay-list__note {
+  margin-left: 4px;
+  color: #98a2b3;
+  font-size: 10px;
+  font-weight: 600;
 }
 
-.admin-pay-list__sub li + li {
-  margin-top: 4px;
-}
-
-.admin-pay-list__log-btn {
-  width: 100%;
-  min-height: 30px;
-  justify-content: center;
-  font-size: 12px;
+.admin-pay-list__inline-badge {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 10px;
+  vertical-align: baseline;
 }
 
 .admin-pay-list-drawer__pager {
