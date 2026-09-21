@@ -22,3 +22,9 @@ export function genderToApi(gender: Gender | ""): "M" | "F" {
 export function phoneDigits(phone: string) {
   return phone.replace(/\D/g, "");
 }
+
+/** API는 yyyy-MM-dd. UI·검증은 yyyyMMdd */
+export function birthToApi(ymd: string) {
+  if (!/^\d{8}$/.test(ymd)) throw new Error("생년월일이 올바르지 않습니다.");
+  return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+}

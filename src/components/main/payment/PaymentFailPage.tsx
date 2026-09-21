@@ -4,10 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SideBanner } from "@/components/main/layout/SideBanner";
+import { useAppHref } from "@/lib/main/useAppBasePath";
 import { readPendingPayment } from "@/lib/payment/session";
 
 export function PaymentFailPage() {
   const params = useSearchParams();
+  const paymentHref = useAppHref("/payment");
+  const registerHref = useAppHref("/register");
+  const lookupHref = useAppHref("/lookup");
   const code = params.get("code") ?? "";
   const message = params.get("message") ?? "결제가 취소되었거나 실패했습니다.";
   const orderId = params.get("orderId") ?? "";
@@ -34,12 +38,12 @@ export function PaymentFailPage() {
           ) : null}
           <div className="flow__nav">
             <Link
-              href={hasPending ? "/payment" : "/register"}
+              href={hasPending ? paymentHref : registerHref}
               className="btn btn--red"
             >
               {hasPending ? "다시 결제" : "다시 신청"}
             </Link>
-            <Link href="/lookup" className="btn btn--ghost">
+            <Link href={lookupHref} className="btn btn--ghost">
               신청조회
             </Link>
             <Link href="/" className="btn btn--ghost">

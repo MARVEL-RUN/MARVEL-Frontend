@@ -2,12 +2,7 @@ import { formatAddressForApi } from "@/lib/daumPostcode";
 import { formatPhone, type GroupDraft } from "@/lib/register";
 import type { OrganizationRegistrationRequest } from "@/services/main/types";
 import type { PaymentOrder } from "./session";
-import { genderToApi, phoneDigits } from "./map";
-
-export function birthToIso(ymd: string) {
-  if (!/^\d{8}$/.test(ymd)) throw new Error("생년월일이 올바르지 않습니다.");
-  return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
-}
+import { birthToApi, genderToApi, phoneDigits } from "./map";
 
 export function toOrganizationRegistrationRequest(
   draft: GroupDraft,
@@ -21,7 +16,7 @@ export function toOrganizationRegistrationRequest(
     profile: {
       address: formatAddressForApi(draft.zonecode.trim(), draft.address.trim()),
       addressDetail: draft.addressDetail.trim(),
-      birth: birthToIso(draft.leaderBirth),
+      birth: birthToApi(draft.leaderBirth),
       phNum: formatPhone(draft.phone),
       email: draft.email.trim(),
       leaderName: draft.leaderName.trim(),
@@ -33,7 +28,7 @@ export function toOrganizationRegistrationRequest(
       ],
       name: p.name.trim(),
       phNum: phoneDigits(p.phone),
-      birth: p.birth,
+      birth: birthToApi(p.birth),
       gender: genderToApi(p.gender),
     })),
   };
