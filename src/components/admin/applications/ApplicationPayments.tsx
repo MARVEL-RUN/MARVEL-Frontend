@@ -2,12 +2,7 @@
 
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import {
-  paymentStatusBadge,
-  paymentStatusLabel,
-  registrationStatusBadge,
-  registrationStatusLabel,
-} from "@/lib/registration-status";
+import { paymentStatusBadge, paymentStatusLabel } from "@/lib/registration-status";
 import { formatAmount, type AdminApplicationRow } from "@/services/admin/applications";
 import {
   fetchPaymentLogs,
@@ -39,16 +34,6 @@ function PaymentStatus({ value }: { value?: string }) {
   return (
     <span className={`admin-badge admin-badge--${paymentStatusBadge(status)}`}>
       {paymentStatusLabel(status)}
-    </span>
-  );
-}
-
-function RegistrationStatus({ value }: { value?: string }) {
-  const status = value?.trim() ?? "";
-  if (!status) return <>-</>;
-  return (
-    <span className={`admin-badge admin-badge--${registrationStatusBadge(status)}`}>
-      {registrationStatusLabel(status)}
     </span>
   );
 }
@@ -181,7 +166,8 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
 
   return (
     <section className="admin-pay" aria-label="결제·환불 내역">
-      <h2>결제·환불</h2>
+      <h2 className="admin-drawer__section-title">결제·환불</h2>
+      <div className="admin-pay__body">
       {finance.isLoading ? (
         <p className="admin-pay__hint">불러오는 중…</p>
       ) : finance.isError ? (
@@ -199,12 +185,6 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
               <dt>계약금액</dt>
               <dd>
                 {data?.contractAmount != null ? formatAmount(data.contractAmount) : "-"}
-              </dd>
-            </div>
-            <div>
-              <dt>신청 상태</dt>
-              <dd>
-                <RegistrationStatus value={data?.registrationStatus} />
               </dd>
             </div>
             <div>
@@ -257,6 +237,7 @@ export function ApplicationPayments({ row }: { row: AdminApplicationRow }) {
           ) : null}
         </>
       )}
+      </div>
     </section>
   );
 }

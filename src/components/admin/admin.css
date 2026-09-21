@@ -504,10 +504,239 @@ html.admin-mode body {
   border-bottom: 1px solid var(--admin-line);
 }
 
+.admin-muted {
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-main:has(.admin-apps-list) {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 12px;
+}
+
+.admin-page.admin-apps-list {
+  max-width: none;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-apps-list .admin-table-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-apps-list .admin-table-shell__head {
+  padding: 10px 14px;
+}
+
+.admin-apps-list .admin-table-shell__head h1 {
+  font-size: 16px;
+}
+
+.admin-apps-list .admin-toolbar {
+  padding: 8px 14px;
+}
+
+.admin-apps-list {
+  --admin-apps-row-h: 30px;
+  --admin-apps-head-h: 32px;
+  --admin-apps-list-rows: 15;
+}
+
+.admin-apps-list .admin-table-wrap {
+  flex: 0 1 auto;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.admin-apps-list.is-fixed-table .admin-table-wrap {
+  height: calc(
+    var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)
+  );
+  max-height: min(
+    calc(var(--admin-apps-head-h) + var(--admin-apps-list-rows) * var(--admin-apps-row-h)),
+    calc(100vh - var(--admin-head) - 220px)
+  );
+}
+
+.admin-apps-list.is-fixed-table .admin-table thead tr {
+  height: var(--admin-apps-head-h);
+}
+
+.admin-apps-list.is-fixed-table .admin-table tbody tr {
+  height: var(--admin-apps-row-h);
+}
+
+.admin-apps-list.is-fetching .admin-table tbody {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.admin-apps-list .admin-pagination {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.admin-apps-list .admin-table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 1120px;
+}
+
 .admin-apps-list .admin-table th,
 .admin-apps-list .admin-table td {
-  padding: 8px 10px;
+  padding: 6px 8px;
   font-size: 13px;
+  line-height: 1.35;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.admin-apps-list .admin-table tbody tr.is-pad td {
+  pointer-events: none;
+  user-select: none;
+}
+
+.admin-apps-list .admin-table tbody td {
+  text-align: center;
+}
+
+.admin-apps-list .admin-table td.is-date,
+.admin-apps-list .admin-table td.is-status {
+  text-align: left;
+}
+
+.admin-apps-list .admin-table td.is-num {
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-muted);
+}
+
+.admin-apps-list .admin-table td.is-phone {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.admin-apps-list .admin-table td.is-muted {
+  color: var(--admin-muted);
+}
+
+.admin-apps-list .admin-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.admin-apps-list__head-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-apps-list__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--admin-muted);
+  white-space: nowrap;
+}
+
+.admin-apps-list__filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-apps-list__search {
+  width: min(240px, 28vw);
+  min-width: 160px;
+}
+
+.admin-apps-list__search-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-apps-list__name,
+.admin-apps-list__souvenir {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-apps-list__kind-text {
+  font-weight: 500;
+  color: var(--admin-ink);
+}
+
+.admin-apps-list__yn-text {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-apps-list__yn-text.is-yes {
+  color: var(--admin-ink);
+}
+
+.admin-apps-list__yn-text.is-no {
+  color: #b8bfc9;
+}
+
+.admin-apps-list__course-text {
+  font-weight: 500;
+  color: var(--admin-ink);
+}
+
+.admin-apps-list__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--admin-ink);
+  white-space: nowrap;
+}
+
+.admin-apps-list__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #c5cad3;
+}
+
+.admin-apps-list__status-dot--paid {
+  background: #2d9f5a;
+}
+
+.admin-apps-list__status-dot--pending {
+  background: #d4920a;
+}
+
+.admin-apps-list__status-dot--refund_requested {
+  background: #d4622a;
+}
+
+.admin-apps-list__status-dot--refunded {
+  background: #8a93a3;
+}
+
+.admin-apps-list__status-dot--plain {
+  background: #c5cad3;
 }
 
 .admin-root .admin-apps-list .admin-cell-input {
@@ -516,8 +745,9 @@ html.admin-mode body {
   min-width: 72px;
 }
 
-.admin-apps-list .admin-badge {
-  font-size: 12px;
+.admin-root .admin-apps-list .admin-toolbar__iconbtn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .admin-drawer__dim {
@@ -553,6 +783,98 @@ html.admin-mode body {
   border-bottom: 1px solid var(--admin-line);
 }
 
+.admin-drawer__hero {
+  flex-shrink: 0;
+  padding: 12px 16px 14px;
+  border-bottom: 1px solid var(--admin-line);
+  background: #fafbfc;
+}
+
+.admin-drawer__hero-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.admin-drawer__hero-bar .admin-btn {
+  min-height: 26px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.admin-drawer__hero-kind {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--admin-muted);
+}
+
+.admin-drawer__hero-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.admin-drawer__hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+
+.admin-drawer__hero-order {
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-drawer__hero-date {
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-drawer__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--admin-ink);
+}
+
+.admin-drawer__section {
+  padding: 0 0 12px;
+}
+
+.admin-drawer__section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 16px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a5160;
+  white-space: nowrap;
+}
+
+.admin-drawer__section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--admin-line);
+}
+
+.admin-drawer__section .admin-drawer__fields {
+  margin: 0 12px;
+  background: #fafbfc;
+  border: 1px solid #eef1f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
 .admin-drawer__actions {
   display: flex;
   flex-wrap: wrap;
@@ -567,7 +889,7 @@ html.admin-mode body {
 
 .admin-drawer__fields {
   margin: 0;
-  padding: 4px 0;
+  padding: 0 0 4px;
 }
 
 .admin-drawer__body {
@@ -577,11 +899,15 @@ html.admin-mode body {
 
 .admin-drawer__row {
   display: grid;
-  grid-template-columns: 100px 1fr;
+  grid-template-columns: 88px 1fr;
   gap: 10px;
   align-items: start;
-  padding: 8px 14px;
-  border-bottom: 1px solid #f0f2f5;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.admin-drawer__section .admin-drawer__row:last-child {
+  border-bottom: 0;
 }
 
 .admin-drawer__row dt {
@@ -628,24 +954,29 @@ html.admin-mode body {
 }
 
 .admin-apps-list .admin-drawer__row {
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 96px 1fr;
 }
 
 .admin-pay {
-  padding: 14px 14px 18px;
-  border-top: 8px solid #f0f2f5;
+  padding: 0 0 18px;
 }
 
-.admin-pay h2 {
-  margin: 0 0 10px;
-  font-size: 13px;
-  font-weight: 800;
+.admin-pay .admin-drawer__section-title {
+  padding-bottom: 10px;
+}
+
+.admin-pay__body {
+  padding: 0 12px;
 }
 
 .admin-pay__summary {
   display: grid;
-  gap: 8px;
+  gap: 0;
   margin: 0 0 12px;
+  background: #fafbfc;
+  border: 1px solid #eef1f5;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .admin-pay__summary > div {
@@ -653,6 +984,12 @@ html.admin-mode body {
   grid-template-columns: 72px 1fr;
   gap: 8px;
   align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.admin-pay__summary > div:last-child {
+  border-bottom: 0;
 }
 
 .admin-pay__summary dt,
@@ -2475,6 +2812,10 @@ html.admin-mode body {
 
   .admin-main {
     padding: 22px 28px 48px;
+  }
+
+  .admin-main:has(.admin-apps-list) {
+    padding: 10px 16px 12px;
   }
 }
 
