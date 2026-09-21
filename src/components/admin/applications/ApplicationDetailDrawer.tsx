@@ -1,17 +1,22 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
+import { useAdminPrompt } from "@/components/admin/InputModal";
+import { adminToast } from "@/components/admin/Toast";
 import {
   registrationStatusBadge,
   registrationStatusLabel,
 } from "@/lib/registration-status";
+import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
   applicationKindLabel,
+  resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
 import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -164,6 +169,8 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(0);
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
+  const { confirm, modal: confirmModal } = useAdminConfirm();
+  const { prompt, modal: inputModal } = useAdminPrompt();
 
   useEffect(() => {
     setMounted(true);
@@ -197,6 +204,37 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
     queryFn: () => fetchApplicationFinance(row!, page),
     enabled: Boolean(row?.eventId && row?.id),
   });
+
+  const resetPassword = useMutation({
+    mutationFn: (password: string) =>
+      resetRegistrationPassword(row!.id, password),
+    onSuccess: () => adminToast.success("비밀번호가 초기화되었습니다."),
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error ? err.message : "비밀번호 초기화에 실패했습니다.",
+      ),
+  });
+
+  const handleResetPassword = async () => {
+    if (!row || row.kind === "group") return;
+    const label =
+      row.personName?.trim() || row.name?.trim() || "해당 신청자";
+    const ok = await confirm({
+      title: "비밀번호 초기화",
+      message: `${label} 계정의 비밀번호를 초기화하시겠습니까?`,
+    });
+    if (!ok) return;
+    const password = await prompt({
+      title: "비밀번호 초기화",
+      description: `신청조회용 새 비밀번호를 입력해 주세요. (${APPLICATION_PASSWORD_MIN}자 이상)`,
+      label: "새 비밀번호",
+      placeholder: `${APPLICATION_PASSWORD_MIN}자 이상 입력`,
+      type: "password",
+      minLength: APPLICATION_PASSWORD_MIN,
+    });
+    if (!password) return;
+    resetPassword.mutate(password);
+  };
 
   if (!row || !mounted) return null;
 
@@ -243,9 +281,21 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
         <header className="admin-drawer__hero">
           <div className="admin-drawer__hero-bar">
             <span className="admin-drawer__hero-kind">{applicationKindLabel(row.kind)}</span>
-            <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
-              닫기
-            </button>
+            <div className="admin-drawer__actions">
+              {!isGroup ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  disabled={resetPassword.isPending || loading || Boolean(error)}
+                  onClick={handleResetPassword}
+                >
+                  비밀번호 초기화
+                </button>
+              ) : null}
+              <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
+                닫기
+              </button>
+            </div>
           </div>
           <h1 className="admin-drawer__hero-title">{title}</h1>
           <div className="admin-drawer__hero-meta">
@@ -292,6 +342,8 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
           />
         </div>
       </aside>
+      {confirmModal}
+      {inputModal}
     </div>,
     document.body,
   );
