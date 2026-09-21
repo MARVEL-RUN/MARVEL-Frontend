@@ -3,6 +3,7 @@ import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
 import {
   paymentStatusBadge,
+  paymentStatusFromUnknown,
   paymentStatusLabel,
   registrationStatusBadge,
   registrationStatusLabel,
@@ -131,6 +132,9 @@ type RegistrationDetail = {
   orderId?: unknown;
   paymentMethod?: unknown;
   paymentStatus?: unknown;
+  payStatus?: unknown;
+  status?: unknown;
+  registrationStatus?: unknown;
   address?: unknown;
   addressDetail?: unknown;
   organizationId?: unknown;
@@ -359,9 +363,12 @@ export function applyRegistrationDetail(
     amount: asAmount(data.amount, row.amount),
     orderNo: firstText(data.orderId) || row.orderNo,
     cardPaymentInfo: firstText(data.paymentMethod) || row.cardPaymentInfo,
-    paymentStatus: statusKey(asText(data.paymentStatus)) || row.paymentStatus,
-    address: firstText(data.address) || row.address,
-    addressDetail: firstText(data.addressDetail) || row.addressDetail,
+    status: statusKey(firstText(data.status, data.registrationStatus)) || row.status,
+    paymentStatus:
+      paymentStatusFromUnknown(firstText(data.paymentStatus, data.payStatus)) ||
+      row.paymentStatus,
+    address: firstText(data.address, leader?.address) || row.address,
+    addressDetail: firstText(data.addressDetail, leader?.addressDetail) || row.addressDetail,
     organizationId,
     leaderName: leader?.name || row.leaderName,
     leader: leader ?? row.leader,

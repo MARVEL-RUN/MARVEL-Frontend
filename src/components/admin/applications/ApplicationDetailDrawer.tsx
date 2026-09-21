@@ -38,10 +38,12 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
       { label: "대표자", value: dash(row.leader.name) },
       { label: "대표자 연락처", value: dash(row.leader.phNum) },
       { label: "대표자 생년월일", value: dash(row.leader.birth) },
-      { label: "대표자 주소", value: dash(row.leader.address) },
-      { label: "대표자 상세주소", value: dash(row.leader.addressDetail) },
     );
   }
+
+  const groupAddress = row.kind === "group" || Boolean(row.leader) || Boolean(row.organizationId);
+  const address = row.leader?.address || row.address;
+  const addressDetail = row.leader?.addressDetail || row.addressDetail;
 
   fields.push(
     { label: "코스", value: applicationCourseLabel(row) },
@@ -75,8 +77,14 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
         </span>
       ),
     },
-    { label: "주소", value: dash(row.address) },
-    { label: "상세주소", value: dash(row.addressDetail) },
+    {
+      label: groupAddress ? "단체장 주소 확인" : "주소",
+      value: dash(address),
+    },
+    {
+      label: groupAddress ? "단체장 상세주소 확인" : "상세주소",
+      value: dash(addressDetail),
+    },
   );
 
   return (
