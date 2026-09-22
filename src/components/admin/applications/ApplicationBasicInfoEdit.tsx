@@ -130,7 +130,7 @@ export function ApplicationBasicInfoEdit({
 }: Props) {
   const initial = useMemo(() => formFromRow(row), [row]);
   const [form, setForm] = useState(initial);
-  const lockSharedFields = mode === "organization-member" && row.kind === "group";
+  const lockSharedFields = mode === "organization-member";
 
   const save = useMutation({
     mutationFn: () => updateRegistrationBasicInfo(row.id, toPayload(form)),
@@ -185,7 +185,7 @@ export function ApplicationBasicInfoEdit({
         </p>
       )}
 
-      <EditSection title={row.kind === "group" ? "참가자" : "신청자"}>
+      <EditSection title={lockSharedFields || row.kind === "group" ? "참가자" : "신청자"}>
         <EditRow label="이름">
           <input
             className="admin-drawer__edit-input"

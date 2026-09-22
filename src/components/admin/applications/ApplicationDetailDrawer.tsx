@@ -313,8 +313,8 @@ export function ApplicationDetailDrawer({
   if (!row || !mounted) return null;
 
   const isGroup = row.kind === "group";
+  const isOrgMemberContext = source === "organization-members";
   const blockGroupEdit = source === "applications" && isGroup;
-  const orgMemberGroup = source === "organization-members" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
@@ -434,7 +434,7 @@ export function ApplicationDetailDrawer({
           {!loading && !error && editing ? (
             <ApplicationBasicInfoEdit
               row={row}
-              mode={orgMemberGroup ? "organization-member" : "full"}
+              mode={isOrgMemberContext ? "organization-member" : "full"}
               onCancel={() => {
                 setEditing(false);
                 setEditError("");
@@ -442,7 +442,7 @@ export function ApplicationDetailDrawer({
               onSaved={() => void handleBasicInfoSaved()}
               onError={setEditError}
               onOpenGroupBasicInfo={
-                orgMemberGroup && onOpenGroupBasicInfo
+                isOrgMemberContext && onOpenGroupBasicInfo
                   ? () => {
                       setEditing(false);
                       setEditError("");
@@ -467,7 +467,7 @@ export function ApplicationDetailDrawer({
                   수정해 주세요.
                 </DrawerGuide>
               ) : null}
-              {orgMemberGroup ? (
+              {isOrgMemberContext ? (
                 <DrawerGuide
                   action={
                     onOpenGroupBasicInfo ? (
@@ -481,7 +481,7 @@ export function ApplicationDetailDrawer({
                     ) : null
                   }
                 >
-                  이메일·주소는 단체 공통 정보입니다. 변경이 필요하면 이 페이지 상단
+                  이메일·주소는 단체 공통 정보입니다. 변경이 필요하면 단체 상세 상단
                   「기본정보 수정」을 이용해 주세요.
                 </DrawerGuide>
               ) : null}
@@ -490,7 +490,7 @@ export function ApplicationDetailDrawer({
                 <DetailSection title="단체" fields={sections.groupFields} />
               ) : null}
               <DetailSection
-                title={isGroup ? "참가자" : "신청자"}
+                title={isGroup || isOrgMemberContext ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
               <DetailSection
