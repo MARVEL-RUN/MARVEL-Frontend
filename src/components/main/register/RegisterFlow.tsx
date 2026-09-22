@@ -36,16 +36,13 @@ import {
   findSouvenir,
   shirtAssignment,
   souvenirSizes,
-  sortedCategories,
 } from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
 import { createRegistration } from "@/services/main/registrations";
-import { fetchRegistrationOptions } from "@/services/main/registration-options";
-import type {
-  RegistrationCategory,
-  RegistrationCreateResponse,
-} from "@/services/main/types";
+import type { RegistrationCreateResponse } from "@/services/main/types";
+import { RegisterUnavailable } from "./RegisterUnavailable";
+import { useRegistrationOptions } from "./useRegistrationOptions";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "@/components/main/SheetModal";
 import { DockNav } from "@/components/main/DockNav";
@@ -142,45 +139,16 @@ function IndividualFlow({
   const base = useAppBasePath();
   const [payOpen, setPayOpen] = useState(false);
   const [payCheckOpen, setPayCheckOpen] = useState(false);
-  const [categories, setCategories] = useState<RegistrationCategory[]>([]);
-  const [optionsLoading, setOptionsLoading] = useState(true);
-  const [optionsError, setOptionsError] = useState("");
+  const {
+    categories,
+    loading: optionsLoading,
+    errorMessage: optionsError,
+    down: optionsDown,
+    retry: retryOptions,
+  } = useRegistrationOptions();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
-
-  useEffect(() => {
-    if (!hasMainApi) {
-      setOptionsLoading(false);
-      setOptionsError("API 주소가 설정되지 않았습니다.");
-      return;
-    }
-
-    let cancelled = false;
-    setOptionsLoading(true);
-    setOptionsError("");
-
-    fetchRegistrationOptions(DEFAULT_EVENT_ID)
-      .then((data) => {
-        if (cancelled) return;
-        setCategories(sortedCategories(data.categories ?? []));
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setOptionsError(
-          err instanceof MainHttpError
-            ? err.message
-            : "신청 옵션을 불러오지 못했습니다.",
-        );
-      })
-      .finally(() => {
-        if (!cancelled) setOptionsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     if (optionsLoading || !categories.length) return;
@@ -321,6 +289,10 @@ function IndividualFlow({
   );
   const guardianRequired = guardianRequiredFor(draft);
   const guardianMinor = needsGuardian(draft.birth);
+
+  if (optionsDown) {
+    return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
+  }
 
   return (
     <div className="flow">

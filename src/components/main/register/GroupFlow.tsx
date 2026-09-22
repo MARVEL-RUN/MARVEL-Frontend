@@ -25,7 +25,6 @@ import {
   shirtAssignment,
   shirtSouvenir,
   souvenirSizes,
-  sortedCategories,
 } from "@/lib/registration-options";
 import { scrollPageTop } from "@/lib/scroll-page";
 import { isMobileView } from "@/lib/viewport";
@@ -62,8 +61,9 @@ import {
   checkOrganizationDuplicateName,
   createOrganizationRegistration,
 } from "@/services/main/registrations";
-import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
+import { RegisterUnavailable } from "./RegisterUnavailable";
+import { useRegistrationOptions } from "./useRegistrationOptions";
 import { SheetModal } from "../SheetModal";
 import { DockNav } from "../DockNav";
 import { RegisterPayCheckModal } from "./RegisterPayCheckModal";
@@ -171,9 +171,13 @@ export function GroupFlow({
   const [payment, setPayment] = useState<PaymentOrder | null>(null);
   const [payOpen, setPayOpen] = useState(false);
   const [payCheckOpen, setPayCheckOpen] = useState(false);
-  const [categories, setCategories] = useState<RegistrationCategory[]>([]);
-  const [optionsLoading, setOptionsLoading] = useState(true);
-  const [optionsError, setOptionsError] = useState("");
+  const {
+    categories,
+    loading: optionsLoading,
+    errorMessage: optionsError,
+    down: optionsDown,
+    retry: retryOptions,
+  } = useRegistrationOptions();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [accountLangWarn, setAccountLangWarn] = useState(false);
@@ -199,39 +203,6 @@ export function GroupFlow({
     }
     setPayOpen(true);
   }
-
-  useEffect(() => {
-    if (!hasMainApi) {
-      setOptionsLoading(false);
-      setOptionsError("API 주소가 설정되지 않았습니다.");
-      return;
-    }
-
-    let cancelled = false;
-    setOptionsLoading(true);
-    setOptionsError("");
-
-    fetchRegistrationOptions(DEFAULT_EVENT_ID)
-      .then((data) => {
-        if (cancelled) return;
-        setCategories(sortedCategories(data.categories ?? []));
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setOptionsError(
-          err instanceof MainHttpError
-            ? err.message
-            : "신청 옵션을 불러오지 못했습니다.",
-        );
-      })
-      .finally(() => {
-        if (!cancelled) setOptionsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     if (optionsLoading || !categories.length) return;
@@ -567,6 +538,10 @@ export function GroupFlow({
     draft.organizationPassword,
     draft.passwordConfirm,
   );
+
+  if (optionsDown) {
+    return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
+  }
 
   return (
     <div className="flow">
