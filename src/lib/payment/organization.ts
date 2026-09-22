@@ -1,5 +1,6 @@
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import {
+  filterNoSpaceName,
   formatPhone,
   termsAgreementFields,
   type GroupDraft,
@@ -13,7 +14,7 @@ export function toOrganizationRegistrationRequest(
 ): OrganizationRegistrationRequest {
   return {
     account: {
-      organizationName: draft.groupName.trim(),
+      organizationName: filterNoSpaceName(draft.groupName),
       organizationLoginId: draft.organizationAccount.trim(),
       organizationPassword: draft.organizationPassword.trim(),
     },
