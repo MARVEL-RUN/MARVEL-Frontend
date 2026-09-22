@@ -12,7 +12,7 @@ export const EVENT = {
   /* 홈 팝업 — 끄려면 enabled: false. image에 경로 넣으면 본문에 표시 */
   popup: {
     enabled: true,
-    id: "shuttle-survey-2026-v2",
+    id: "shuttle-survey-2026-v3",
     title: "마블런 셔틀버스 추가 운행지역 수요조사",
     image: MAIN_ASSETS.popupShuttleSurvey,
     href: "https://forms.gle/x9925cioc1HGnSEs8",
