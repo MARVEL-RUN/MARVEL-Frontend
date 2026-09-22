@@ -1,6 +1,6 @@
 "use client";
 
-import { formatPhone } from "@/lib/register";
+import { emailOk, formatPhone } from "@/lib/register";
 import { toApiGender } from "@/lib/registration-gender";
 import {
   updateRegistrationBasicInfo,
@@ -22,6 +22,7 @@ type FormState = {
   phNum: string;
   birth: string;
   gender: "M" | "F" | "";
+  email: string;
   address: string;
   addressDetail: string;
   guardianName: string;
@@ -37,6 +38,7 @@ function formFromRow(row: AdminApplicationRow): FormState {
     phNum: (row.phone ?? "").replace(/\D/g, ""),
     birth: (row.birth ?? "").replace(/\D/g, "").slice(0, 8),
     gender: toApiGender(row.gender),
+    email: row.email?.trim() ?? "",
     address: address.trim(),
     addressDetail: addressDetail.trim(),
     guardianName: row.guardianName?.trim() ?? "",
@@ -66,6 +68,7 @@ function validate(form: FormState) {
   if (form.gender !== "M" && form.gender !== "F") return "성별을 선택하세요.";
   if (!form.address.trim()) return "주소를 입력하세요.";
   if (!form.addressDetail.trim()) return "상세주소를 입력하세요.";
+  if (form.email.trim() && !emailOk(form.email)) return "이메일 형식을 확인하세요.";
   return "";
 }
 
@@ -75,6 +78,7 @@ function toPayload(form: FormState): RegistrationBasicInfoUpdate {
     phNum: form.phNum.replace(/\D/g, ""),
     birth: toApiBirth(form.birth),
     gender: form.gender as "M" | "F",
+    ...(form.email.trim() ? { email: form.email.trim() } : {}),
     address: form.address.trim(),
     addressDetail: form.addressDetail.trim(),
     guardianName: form.guardianName.trim(),
@@ -185,6 +189,16 @@ export function ApplicationBasicInfoEdit({ row, onCancel, onSaved, onError }: Pr
             <option value="M">남성</option>
             <option value="F">여성</option>
           </select>
+        </EditRow>
+        <EditRow label="이메일">
+          <input
+            className="admin-drawer__edit-input"
+            type="email"
+            value={form.email}
+            placeholder="없으면 비워두세요"
+            onChange={(e) => patch({ email: e.target.value })}
+            autoComplete="email"
+          />
         </EditRow>
       </EditSection>
 

@@ -7,9 +7,24 @@ import { createPortal } from "react-dom";
 type Props = {
   open: boolean;
   onClose: () => void;
+  mode?: "register" | "lookup-modify";
 };
 
-export function RegisterPayCheckModal({ open, onClose }: Props) {
+const COPY = {
+  register: {
+    submitLabel: "신청서 제출",
+    submitGuide: "참가신청이 등록됩니다. 이후 신청조회에서 결제하시면 참가가 확정됩니다.",
+    payGuide: "지금 결제하시면 바로 참가가 확정됩니다.",
+  },
+  "lookup-modify": {
+    submitLabel: "수정된 신청서 제출",
+    submitGuide: "변경 내용이 저장됩니다. 이후 신청조회에서 결제하시면 참가가 확정됩니다.",
+    payGuide: "변경 내용 저장 후 바로 결제합니다.",
+  },
+} as const;
+
+export function RegisterPayCheckModal({ open, onClose, mode = "register" }: Props) {
+  const copy = COPY[mode];
   const titleId = useId();
   const descId = useId();
   const [mounted, setMounted] = useState(false);
@@ -43,7 +58,7 @@ export function RegisterPayCheckModal({ open, onClose }: Props) {
         aria-label="닫기"
       />
       <div
-        className="inquiry-secret__panel"
+        className="inquiry-secret__panel inquiry-secret__panel--pay-check"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -53,9 +68,7 @@ export function RegisterPayCheckModal({ open, onClose }: Props) {
           <span className="inquiry-secret__icon" aria-hidden>
             <CircleAlert size={20} strokeWidth={2.25} />
           </span>
-          <h2 id={titleId}>
-            아직 <em>결제 전</em>입니다
-          </h2>
+          <h2 id={titleId}>아래 접수 내용을 확인해 주세요.</h2>
           <button
             type="button"
             className="inquiry-secret__x"
@@ -65,13 +78,16 @@ export function RegisterPayCheckModal({ open, onClose }: Props) {
             <X size={20} strokeWidth={2.25} />
           </button>
         </header>
-        <p id={descId} className="inquiry-secret__desc">
-          아래 접수 내용을 확인해 주세요.
-          <br />
-          <strong>신청서 제출</strong>을 누르면 나중에 결제를 진행하게 됩니다.
-          <br />
-          <strong>결제하기</strong>를 누르면 바로 결제가 시작됩니다.
-        </p>
+        <ul id={descId} className="inquiry-secret__guides">
+          <li>
+            <span className="btn btn--ghost inquiry-secret__chip">{copy.submitLabel}</span>
+            <span>{copy.submitGuide}</span>
+          </li>
+          <li>
+            <span className="btn btn--red inquiry-secret__chip">결제하기</span>
+            <span>{copy.payGuide}</span>
+          </li>
+        </ul>
         <div className="inquiry-secret__actions">
           <button type="button" className="btn btn--red" onClick={onClose}>
             확인

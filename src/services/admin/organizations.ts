@@ -38,9 +38,26 @@ export type AdminOrganizationDetail = {
   groupName: string;
   eventName: string;
   leaderName: string;
+  leaderBirth: string;
+  leaderPhNum: string;
   loginId: string;
+  email: string;
+  address: string;
+  addressDetail: string;
+  guardianConsent?: boolean;
   createdAt: string;
   members: AdminOrganizationMember[];
+};
+
+export type OrganizationBasicInfoUpdate = {
+  groupName: string;
+  leaderName: string;
+  leaderBirth: string;
+  leaderPhNum: string;
+  email?: string;
+  address: string;
+  addressDetail: string;
+  guardianConsent?: boolean;
 };
 
 export type OrganizationListParams = {
@@ -72,6 +89,20 @@ function firstText(...values: unknown[]) {
 function marketingConsentYes(value?: string) {
   const v = asText(value).toLowerCase();
   return v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의";
+}
+
+function asOptionalBool(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return undefined;
+  }
+  const v = asText(value).toLowerCase();
+  if (!v) return undefined;
+  if (v === "true" || v === "y" || v === "yes" || v === "1" || v === "동의") return true;
+  if (v === "false" || v === "n" || v === "no" || v === "0" || v === "미동의") return false;
+  return undefined;
 }
 
 function emptyPage(size: number, page: number): SpringPage<AdminOrganizationListItem> {
@@ -199,7 +230,13 @@ function asOrganizationDetail(data: unknown): AdminOrganizationDetail | null {
     groupName: asText(row.groupName),
     eventName: asText(row.eventName),
     leaderName: asText(row.leaderName),
+    leaderBirth: asText(row.leaderBirth),
+    leaderPhNum: firstText(row.leaderPhNum, row.leaderPhoneNumber),
     loginId: asText(row.loginId),
+    email: asText(row.email),
+    address: asText(row.address),
+    addressDetail: asText(row.addressDetail),
+    guardianConsent: asOptionalBool(row.guardianConsent),
     createdAt: asText(row.createdAt),
     members,
   };
@@ -239,6 +276,17 @@ export function resetOrganizationPassword(
   return adminFetch<void>(
     `v1/admin/organizations/${encodeURIComponent(organizationId)}/password`,
     { method: "PUT", body: JSON.stringify({ newPassword: password }) },
+  );
+}
+
+export function updateOrganizationBasicInfo(
+  organizationId: string,
+  body: OrganizationBasicInfoUpdate,
+) {
+  if (!organizationId.trim()) throw new Error("단체 정보를 찾을 수 없습니다.");
+  return adminFetch<void>(
+    `v1/admin/organizations/${encodeURIComponent(organizationId)}/basic-info`,
+    { method: "PATCH", body: JSON.stringify(body) },
   );
 }
 

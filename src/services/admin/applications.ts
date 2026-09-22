@@ -140,12 +140,15 @@ type RegistrationDetail = {
   amount?: unknown;
   orderId?: unknown;
   paymentMethod?: unknown;
+  paymentStatus?: unknown;
   status?: unknown;
   registrationStatus?: unknown;
   address?: unknown;
   addressDetail?: unknown;
   organizationId?: unknown;
   orgId?: unknown;
+  leaderBirth?: unknown;
+  leaderPhNum?: unknown;
   leaderInfo?: unknown;
   leaderInfoResponse?: unknown;
   leader?: unknown;
@@ -213,8 +216,8 @@ function asLeaderInfo(value: unknown): AdminLeaderInfo | undefined {
   const leader: AdminLeaderInfo = {
     groupName: firstText(info.groupName, info.orgName, info.organizationName),
     name: asText(info.name),
-    phNum: firstText(info.phNum, info.phoneNumber, info.phone),
-    birth: asText(info.birth),
+    phNum: firstText(info.leaderPhNum, info.phNum, info.phoneNumber, info.phone),
+    birth: firstText(info.leaderBirth, info.birth),
     address: asText(info.address),
     addressDetail: asText(info.addressDetail),
   };
@@ -365,7 +368,14 @@ export function applyRegistrationDetail(
   detail: unknown,
 ): AdminApplicationRow {
   const data = asDetail(detail);
-  const leader = asLeaderInfo(data.leaderInfo ?? data.leader ?? data.leaderInfoResponse);
+  const leaderRaw = asLeaderInfo(data.leaderInfo ?? data.leader ?? data.leaderInfoResponse);
+  const leader = leaderRaw
+    ? {
+        ...leaderRaw,
+        phNum: firstText(data.leaderPhNum, leaderRaw.phNum),
+        birth: firstText(data.leaderBirth, leaderRaw.birth),
+      }
+    : undefined;
   const personName = firstText(data.name) || row.personName;
   const groupName =
     firstText(data.orgName, data.groupName, data.organizationName, leader?.groupName) ||
@@ -516,6 +526,7 @@ export type RegistrationBasicInfoUpdate = {
   phNum: string;
   birth: string;
   gender: "M" | "F";
+  email?: string;
   address: string;
   addressDetail: string;
   guardianName: string;
