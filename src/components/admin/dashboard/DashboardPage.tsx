@@ -1,11 +1,17 @@
 "use client";
 
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
+import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
-import { getAdminDashboardStats } from "@/services/admin/stats";
-import { useQuery } from "@tanstack/react-query";
+import { hasAdminApi } from "@/lib/admin/config";
+import {
+  fetchRegistrationStatistics,
+  getAdminDashboardStats,
+} from "@/services/admin/stats";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import "./dashboard-stats.css";
 
 function TaskLink({
   href,
@@ -38,10 +44,69 @@ function TaskLink({
   );
 }
 
-function SoonBlock() {
+function IntakeStatsSection({
+  events,
+  loadingEvents,
+}: {
+  events: { eventId: string; eventName: string }[];
+  loadingEvents: boolean;
+}) {
+  const statsQueries = useQueries({
+    queries: events.map((event) => ({
+      queryKey: ["admin", "registration-statistics", event.eventId],
+      queryFn: () => fetchRegistrationStatistics(event.eventId),
+      enabled: hasAdminApi && Boolean(event.eventId),
+    })),
+  });
+
+  if (!hasAdminApi) {
+    return <p className="admin-empty">관리자 API 주소가 설정되지 않았습니다.</p>;
+  }
+
+  if (loadingEvents) {
+    return <p className="admin-empty">불러오는 중…</p>;
+  }
+
+  if (events.length === 0) {
+    return <p className="admin-empty">등록된 대회가 없습니다.</p>;
+  }
+
+  const loading = statsQueries.some((query) => query.isLoading);
+  const allFailed = statsQueries.every((query) => query.isError);
+  const anyData = statsQueries.some((query) => query.data);
+
+  if (loading && !anyData) {
+    return <p className="admin-empty">불러오는 중…</p>;
+  }
+
+  if (allFailed && !anyData) {
+    return <p className="admin-empty">접수 현황을 불러오지 못했습니다.</p>;
+  }
+
+  const showEventName = events.length > 1;
+
   return (
-    <div className="admin-dash__soon" role="status">
-      <p>준비 중입니다.</p>
+    <div className="admin-reg-stats-stack">
+      {events.map((event, index) => {
+        const query = statsQueries[index];
+        if (!query?.data) {
+          if (query?.isError) {
+            return (
+              <p key={event.eventId} className="admin-empty">
+                {event.eventName} 통계를 불러오지 못했습니다.
+              </p>
+            );
+          }
+          return null;
+        }
+        return (
+          <RegistrationStatsTables
+            key={event.eventId}
+            data={query.data}
+            eventName={showEventName ? event.eventName : undefined}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -55,6 +120,8 @@ export function DashboardPage({
     queryKey: ["admin", "dashboard"],
     queryFn: getAdminDashboardStats,
   });
+
+  const events = data?.events ?? [];
 
   return (
     <div className="admin-page">
@@ -91,12 +158,7 @@ export function DashboardPage({
 
       <section className="admin-dash__section">
         <h2>접수 현황</h2>
-        <SoonBlock />
-      </section>
-
-      <section className="admin-dash__section">
-        <h2>날짜별 신청</h2>
-        <SoonBlock />
+        <IntakeStatsSection events={events} loadingEvents={isLoading} />
       </section>
 
       <OpsGuide gaRealtimeUrl={gaRealtimeUrl} />
