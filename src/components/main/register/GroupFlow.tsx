@@ -65,6 +65,7 @@ import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
 import { SheetModal } from "../SheetModal";
 import { DockNav } from "../DockNav";
+import { RegisterPayCheckModal } from "./RegisterPayCheckModal";
 import {
   AddressField,
   ApplyHint,
@@ -168,6 +169,7 @@ export function GroupFlow({
   const [draft, setDraft] = useState<GroupDraft>({ ...EMPTY_GROUP, ...consents });
   const [payment, setPayment] = useState<PaymentOrder | null>(null);
   const [payOpen, setPayOpen] = useState(false);
+  const [payCheckOpen, setPayCheckOpen] = useState(false);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [optionsError, setOptionsError] = useState("");
@@ -501,6 +503,7 @@ export function GroupFlow({
     if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
     setError("");
     setStep(1);
+    setPayCheckOpen(true);
   }
 
   useLayoutEffect(() => {
@@ -587,6 +590,8 @@ export function GroupFlow({
                   placeholder="단체명을 띄어쓰기 없이 입력해주세요"
                   value={draft.groupName}
                   onChange={(e) => patch({ groupName: e.target.value })}
+                  className={nameHint?.tone === "is-err" ? "is-err" : undefined}
+                  aria-invalid={nameHint?.tone === "is-err"}
                   required
                 />
                 <button
@@ -614,6 +619,8 @@ export function GroupFlow({
                   spellCheck={false}
                   placeholder="5~20자, 영문·숫자·특수문자"
                   value={draft.organizationAccount}
+                  className={accountHint.tone === "is-err" ? "is-err" : undefined}
+                  aria-invalid={accountHint.tone === "is-err"}
                   onChange={(e) => {
                     const raw = e.target.value;
                     const next = filterOrgAccountInput(raw);
@@ -1070,6 +1077,7 @@ export function GroupFlow({
               type="button"
               className="btn btn--ghost"
               onClick={() => {
+                setPayCheckOpen(false);
                 setPayOpen(false);
                 setStep(0);
                 requestAnimationFrame(scrollPageTop);
@@ -1088,6 +1096,11 @@ export function GroupFlow({
           </DockNav>
         </section>
       ) : null}
+
+      <RegisterPayCheckModal
+        open={payCheckOpen}
+        onClose={() => setPayCheckOpen(false)}
+      />
 
       {payOpen && payment ? (
         <SheetModal
