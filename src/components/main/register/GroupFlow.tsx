@@ -601,6 +601,9 @@ export function GroupFlow({
                   type="text"
                   placeholder="단체명을 띄어쓰기 없이 입력해주세요"
                   value={draft.groupName}
+                  onKeyDown={(e) => {
+                    if (e.key === " " && !e.nativeEvent.isComposing) e.preventDefault();
+                  }}
                   onChange={(e) =>
                     patch({ groupName: filterNoSpaceName(e.target.value) })
                   }
