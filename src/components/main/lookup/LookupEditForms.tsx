@@ -608,7 +608,7 @@ export function IndividualLookupEdit({
     ) : null}
 
     {step === 1 ? (
-      <section className="block">
+      <section className="block block--lookup-confirm">
         <h2>수정 내용을 확인하세요</h2>
         <dl className="spec">
           <div>
@@ -1222,7 +1222,7 @@ export function GroupLookupEdit({
     ) : null}
 
     {step === 1 ? (
-      <section className="block">
+      <section className="block block--lookup-confirm">
         <h2>수정 내용을 확인하세요</h2>
         <dl className="spec">
           <div>

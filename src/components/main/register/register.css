@@ -1416,6 +1416,16 @@
   margin-top: 1.6rem;
 }
 
+.block--lookup-confirm .flow__nav .btn {
+  flex: 1 1 8.75rem;
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: 0.85rem;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+}
+
 .flow__err {
   flex: 1 0 100%;
   margin: 0;
@@ -2488,6 +2498,24 @@
     flex: 1;
     min-height: var(--tap);
     justify-content: center;
+  }
+
+  .block--lookup-confirm .flow__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .block--lookup-confirm .flow__nav .btn:first-of-type {
+    grid-column: 1 / -1;
+  }
+
+  .block--lookup-confirm .flow__nav .btn {
+    flex: none;
+    width: 100%;
+    min-height: var(--tap);
+    font-size: 0.84rem;
+    letter-spacing: 0.05em;
   }
 
   .form {
