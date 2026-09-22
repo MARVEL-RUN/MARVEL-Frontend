@@ -497,8 +497,7 @@ export async function listAllApplications() {
       ),
     );
     return events.flatMap((event, index) => {
-      const slug = raceEventSlug(event) ?? event.eventId;
-      return (pages[index]?.content ?? []).map((item) => toRow(item, slug));
+      return (pages[index]?.content ?? []).map((item) => toRow(item, event.eventId));
     });
   } catch {
     return [];

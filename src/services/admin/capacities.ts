@@ -1,6 +1,4 @@
 import { adminFetch, isAdminHttp } from "@/lib/admin/fetch";
-import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
-import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 
 export type CapacityType =
   | "EVENT_TOTAL"
@@ -49,12 +47,6 @@ const TYPE_LABEL: Record<CapacityType, string> = {
   CATEGORY_GROUP: "종목 합산 정원",
   SOUVENIR: "기념품 재고",
 };
-
-/** 마블런만 공개 신청과 같은 대회 id. 버추얼은 아직 없음 */
-export function capacityApiEventId(eventId: AdminRaceEventId) {
-  if (eventId === "marvel") return DEFAULT_EVENT_ID;
-  return null;
-}
 
 export function capacityTypeLabel(type: string) {
   return TYPE_LABEL[type as CapacityType] ?? type;

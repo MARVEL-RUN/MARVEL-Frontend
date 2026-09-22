@@ -4,8 +4,10 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
+import { hasAdminApi } from "@/lib/admin/config";
+import { adminInquiryDetailHref } from "@/lib/admin/eventLinks";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { DEFAULT_EVENT_ID } from "@/lib/main/config";
+import { fetchAdminEvents } from "@/services/admin/applications";
 import {
   deleteAdminQuestion,
   listAdminQuestions,
@@ -16,8 +18,9 @@ import type {
 } from "@/services/admin/boards/inquiries.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type SearchField = "all" | "name" | "title";
 type StatusFilter = "all" | "open" | "done";
@@ -57,6 +60,8 @@ function toIsAnswered(status: StatusFilter): boolean | undefined {
 
 export function InquiryListPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const apiEventId = searchParams.get("eventId")?.trim() ?? "";
   const queryClient = useQueryClient();
   const { confirm, modal } = useAdminConfirm();
   const [q, setQ] = useState("");
@@ -65,11 +70,22 @@ export function InquiryListPage() {
   const [applied, setApplied] = useState<Applied>(INITIAL);
   const [page, setPage] = useState(1);
 
+  const eventsQuery = useQuery({
+    queryKey: ["admin", "events"],
+    queryFn: fetchAdminEvents,
+    enabled: hasAdminApi,
+  });
+
+  const eventTitle = useMemo(() => {
+    const events = eventsQuery.data ?? [];
+    return events.find((event) => event.eventId === apiEventId)?.eventName || "문의사항";
+  }, [apiEventId, eventsQuery.data]);
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin", "inquiries", applied, page],
+    queryKey: ["admin", "inquiries", apiEventId, applied, page],
     queryFn: () =>
       listAdminQuestions({
-        eventId: DEFAULT_EVENT_ID,
+        eventId: apiEventId,
         target: toTarget(applied.field),
         keyword: applied.q.trim() || undefined,
         isAnswered: toIsAnswered(applied.status),
@@ -77,7 +93,12 @@ export function InquiryListPage() {
         size: PAGE_SIZE,
         sort: "LATEST",
       }),
+    enabled: hasAdminApi && Boolean(apiEventId),
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [apiEventId]);
 
   const remove = useMutation({
     mutationFn: deleteAdminQuestion,
@@ -113,10 +134,14 @@ export function InquiryListPage() {
   return (
     <div className="admin-page">
       <AdminTableShell<AdminQuestionListItem>
-        title="문의사항"
+        title={eventTitle}
         rows={rows}
         loading={isLoading}
-        empty="등록된 문의가 없습니다."
+        empty={
+          !hasAdminApi
+            ? "관리자 API 주소가 설정되지 않았습니다."
+            : "등록된 문의가 없습니다."
+        }
         rowKey={(row) => row.questionId}
         page={page}
         pageCount={pageCount}
@@ -124,10 +149,15 @@ export function InquiryListPage() {
         onPage={setPage}
         pageUnit="게시물"
         onRowClick={(row) =>
-          router.push(`/admin/boards/inquiry/detail?id=${row.questionId}`)
+          router.push(
+            adminInquiryDetailHref(row.questionId, { apiEventId }),
+          )
         }
         tools={
           <>
+            <Link href="/admin/boards/inquiry" className="admin-btn admin-btn--ghost">
+              대회 목록
+            </Link>
             <AdminSelect
               value={field}
               options={FIELD_OPTIONS}

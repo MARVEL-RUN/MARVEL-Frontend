@@ -2,6 +2,7 @@
 
 import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { adminToast } from "@/components/admin/Toast";
+import { adminInquiriesHref } from "@/lib/admin/eventLinks";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import {
   createAnswer,
@@ -10,6 +11,7 @@ import {
 } from "@/services/admin/boards/answers";
 import { getAdminQuestion } from "@/services/admin/boards/inquiries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -17,7 +19,12 @@ const ANSWER_TITLE = "답변";
 
 export function InquiryDetailPage() {
   const router = useRouter();
-  const id = useSearchParams().get("id") ?? "";
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id") ?? "";
+  const apiEventId = searchParams.get("eventId")?.trim() ?? "";
+  const listHref = apiEventId
+    ? adminInquiriesHref(apiEventId)
+    : "/admin/boards/inquiry";
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "inquiries", id],
@@ -48,7 +55,7 @@ export function InquiryDetailPage() {
       adminToast.success(
         answerDetail?.id ? "답변이 수정되었습니다." : "답변이 등록되었습니다.",
       );
-      router.replace("/admin/boards/inquiry");
+      router.replace(listHref);
     },
     onError: () =>
       adminToast.error(
@@ -73,6 +80,9 @@ export function InquiryDetailPage() {
     return (
       <div className="admin-page">
         <p className="admin-empty">문의를 찾을 수 없습니다.</p>
+        <Link href={listHref} className="admin-btn admin-btn--ghost">
+          목록
+        </Link>
       </div>
     );
   }
@@ -113,13 +123,9 @@ export function InquiryDetailPage() {
               />
             </label>
             <div className="admin-form__actions">
-              <button
-                type="button"
-                className="admin-btn admin-btn--ghost"
-                onClick={() => router.push("/admin/boards/inquiry")}
-              >
+              <Link href={listHref} className="admin-btn admin-btn--ghost">
                 목록
-              </button>
+              </Link>
               {answerDetail?.id ? (
                 <button
                   type="button"
@@ -131,12 +137,12 @@ export function InquiryDetailPage() {
                   답변 삭제
                 </button>
               ) : null}
-              <button type="submit" className="admin-btn admin-btn--red" disabled={save.isPending}>
-                {save.isPending
-                  ? "저장 중..."
-                  : answerDetail?.id
-                    ? "답변 수정"
-                    : "답변 등록"}
+              <button
+                type="submit"
+                className="admin-btn admin-btn--primary"
+                disabled={save.isPending}
+              >
+                {answerDetail?.id ? "답변 수정" : "답변 등록"}
               </button>
             </div>
           </form>

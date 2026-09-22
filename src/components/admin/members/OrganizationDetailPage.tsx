@@ -6,7 +6,6 @@ import { adminToast } from "@/components/admin/Toast";
 import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { adminMembersListBackHref } from "@/lib/admin/eventLinks";
-import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { formatAmount } from "@/services/admin/applications";
@@ -42,8 +41,6 @@ export function OrganizationDetailPage() {
   const queryClient = useQueryClient();
   const organizationId = searchParams.get("organizationId")?.trim() ?? "";
   const apiEventId = searchParams.get("eventId")?.trim() ?? "";
-  const slugParam = searchParams.get("slug")?.trim() ?? "";
-  const slug = slugParam === "marvel" || slugParam === "virtual" ? slugParam : null;
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
   const [loginIdOpen, setLoginIdOpen] = useState(false);
@@ -115,7 +112,7 @@ export function OrganizationDetailPage() {
   const members = detail?.members ?? [];
   const totalAmount = members.reduce((sum, member) => sum + (member.amount || 0), 0);
   const listHref = apiEventId
-    ? adminMembersListBackHref(apiEventId, slug as AdminRaceEventId | null)
+    ? adminMembersListBackHref(apiEventId)
     : "/admin/members";
 
   if (!organizationId || !apiEventId) {
