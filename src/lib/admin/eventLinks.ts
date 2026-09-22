@@ -3,46 +3,54 @@ const CAPS = "/admin/capacities";
 const MEMBERS = "/admin/members";
 const INQUIRY = "/admin/boards/inquiry";
 
-type AdminRaceSlug = "marvel" | "virtual";
-type EventRef = { eventId: string };
-
-export function isAdminRaceSlug(id: string): id is AdminRaceSlug {
+function isRaceSlug(id: string) {
   return id === "marvel" || id === "virtual";
+}
+
+function withQuery(path: string, slugPath: boolean, query?: string) {
+  if (!query) return path;
+  return slugPath ? `${path}?${query}` : `${path}&${query}`;
 }
 
 /** API eventId → list?eventId=, marvel·virtual slug → /{slug} (북마크용) */
 export function adminApplicationsHref(eventIdOrSlug: string, query?: string) {
-  const path = isAdminRaceSlug(eventIdOrSlug)
+  const slug = isRaceSlug(eventIdOrSlug);
+  const path = slug
     ? `${APPS}/${eventIdOrSlug}`
     : `${APPS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
-  if (!query) return path;
-  return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
+  return withQuery(path, slug, query);
 }
 
-export function adminApplicationsHrefFromEvent(event: EventRef, query?: string) {
+export function adminApplicationsHrefFromEvent(
+  event: { eventId: string },
+  query?: string,
+) {
   return adminApplicationsHref(event.eventId, query);
 }
 
 /** 대회 API eventId로 정원 상세 진입 */
-export function adminCapacitiesHrefFromEvent(event: EventRef) {
+export function adminCapacitiesHrefFromEvent(event: { eventId: string }) {
   return adminCapacitiesHref(event.eventId);
 }
 
 export function adminCapacitiesHref(eventIdOrSlug: string) {
-  if (isAdminRaceSlug(eventIdOrSlug)) return `${CAPS}/${eventIdOrSlug}`;
+  if (isRaceSlug(eventIdOrSlug)) return `${CAPS}/${eventIdOrSlug}`;
   return `${CAPS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
 }
 
 /** API eventId → list?eventId=, marvel·virtual slug → /{slug} (북마크용) */
 export function adminMembersHref(eventIdOrSlug: string, query?: string) {
-  const path = isAdminRaceSlug(eventIdOrSlug)
+  const slug = isRaceSlug(eventIdOrSlug);
+  const path = slug
     ? `${MEMBERS}/${eventIdOrSlug}`
     : `${MEMBERS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
-  if (!query) return path;
-  return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
+  return withQuery(path, slug, query);
 }
 
-export function adminMembersHrefFromEvent(event: EventRef, query?: string) {
+export function adminMembersHrefFromEvent(
+  event: { eventId: string },
+  query?: string,
+) {
   return adminMembersHref(event.eventId, query);
 }
 
@@ -65,7 +73,7 @@ export function adminInquiriesHref(eventId: string) {
   return `${INQUIRY}/list?eventId=${encodeURIComponent(eventId)}`;
 }
 
-export function adminInquiriesHrefFromEvent(event: EventRef) {
+export function adminInquiriesHrefFromEvent(event: { eventId: string }) {
   return adminInquiriesHref(event.eventId);
 }
 
@@ -78,4 +86,8 @@ export function adminInquiryDetailHref(
     eventId: options.apiEventId,
   });
   return `${INQUIRY}/detail?${params}`;
+}
+
+export function isAdminRaceSlug(id: string) {
+  return isRaceSlug(id);
 }
