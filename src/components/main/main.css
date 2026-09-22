@@ -759,6 +759,11 @@ button.course:disabled:hover {
   overflow-wrap: anywhere;
 }
 
+.inquiry-secret__head h2 em {
+  color: var(--marvel);
+  font-style: normal;
+}
+
 .inquiry-secret__x {
   display: grid;
   place-items: center;

@@ -577,11 +577,6 @@ export function CapacityStatusPage({ slug }: Props) {
       ? errorHint(list.error)
       : "해당 상태의 참가자가 없습니다.";
 
-  const listEmpty =
-    list.isError && !listMatches
-      ? errorHint(list.error)
-      : "해당 상태의 참가자가 없습니다.";
-
   return (
     <div
       className={`admin-page admin-capacity${pick ? " is-detail-open" : ""}${capacities.isFetching ? " is-fetching" : ""}`}

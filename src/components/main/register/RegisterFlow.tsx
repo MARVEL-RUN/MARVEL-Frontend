@@ -49,6 +49,7 @@ import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "@/components/main/SheetModal";
 import { DockNav } from "@/components/main/DockNav";
 import { ApplyTerms } from "./ApplyTerms";
+import { RegisterPayCheckModal } from "./RegisterPayCheckModal";
 import {
   AddressField,
   ApplyHint,
@@ -139,6 +140,7 @@ function IndividualFlow({
   const router = useRouter();
   const base = useAppBasePath();
   const [payOpen, setPayOpen] = useState(false);
+  const [payCheckOpen, setPayCheckOpen] = useState(false);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [optionsError, setOptionsError] = useState("");
@@ -262,6 +264,7 @@ function IndividualFlow({
     if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
     setError("");
     setStep(1);
+    setPayCheckOpen(true);
   }
 
   async function onPay() {
@@ -633,6 +636,7 @@ function IndividualFlow({
               type="button"
               className="btn btn--ghost"
               onClick={() => {
+                setPayCheckOpen(false);
                 setPayOpen(false);
                 setStep(0);
                 requestAnimationFrame(scrollPageTop);
@@ -651,6 +655,11 @@ function IndividualFlow({
           </DockNav>
         </section>
       ) : null}
+
+      <RegisterPayCheckModal
+        open={payCheckOpen}
+        onClose={() => setPayCheckOpen(false)}
+      />
 
       {payOpen && registration ? (
         <SheetModal

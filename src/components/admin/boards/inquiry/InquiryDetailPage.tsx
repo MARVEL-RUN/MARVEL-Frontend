@@ -17,14 +17,17 @@ import { useEffect, useState } from "react";
 
 const ANSWER_TITLE = "답변";
 
+function inquiryListHref(eventId: string) {
+  if (!eventId) return "/admin/boards/inquiry";
+  return `/admin/boards/inquiry/list?eventId=${encodeURIComponent(eventId)}`;
+}
+
 export function InquiryDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id") ?? "";
   const apiEventId = searchParams.get("eventId")?.trim() ?? "";
-  const listHref = apiEventId
-    ? adminInquiriesHref(apiEventId)
-    : "/admin/boards/inquiry";
+  const listHref = inquiryListHref(apiEventId);
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "inquiries", id],
