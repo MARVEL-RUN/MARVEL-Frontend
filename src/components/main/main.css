@@ -790,6 +790,11 @@ button.course:disabled:hover {
   word-break: keep-all;
 }
 
+.inquiry-secret__desc strong {
+  color: var(--marvel);
+  font-weight: 800;
+}
+
 .inquiry-secret__field {
   display: grid;
   gap: 0.45rem;
