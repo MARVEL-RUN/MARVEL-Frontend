@@ -4,6 +4,7 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { useAdminPrompt } from "@/components/admin/InputModal";
 import { adminToast } from "@/components/admin/Toast";
 import {
+  canDeleteUnpaidRegistration,
   registrationStatusBadge,
   registrationStatusLabel,
 } from "@/lib/registration-status";
@@ -16,6 +17,7 @@ import {
   applicationCourseLabel,
   applicationGenderLabel,
   applicationKindLabel,
+  deleteAdminRegistration,
   resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
@@ -278,6 +280,31 @@ export function ApplicationDetailDrawer({
       ),
   });
 
+  const removeUnpaid = useMutation({
+    mutationFn: () => deleteAdminRegistration(row!.id),
+    onSuccess: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "registration"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin", "registration-statistics"],
+        }),
+        row?.organizationId
+          ? queryClient.invalidateQueries({
+              queryKey: ["admin", "organization", row.organizationId],
+            })
+          : Promise.resolve(),
+      ]);
+      const message = data?.message?.trim();
+      adminToast.success(message || "미결제 신청이 삭제되었습니다.");
+      onClose();
+    },
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error ? err.message : "미결제 신청 삭제에 실패했습니다.",
+      ),
+  });
+
   const handleResetPassword = async () => {
     if (!row || row.kind === "group") return;
     const label =
@@ -299,6 +326,19 @@ export function ApplicationDetailDrawer({
     resetPassword.mutate(password);
   };
 
+  const handleDeleteUnpaid = async () => {
+    if (!row || !canDeleteUnpaidRegistration(row.status)) return;
+    const label =
+      row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
+    const ok = await confirm({
+      title: "미결제 신청 삭제",
+      message: `${label} 신청 데이터를 삭제할까요? 삭제 후 복구할 수 없습니다.`,
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
+    removeUnpaid.mutate();
+  };
+
   const handleBasicInfoSaved = async () => {
     if (!row) return;
     await Promise.all([
@@ -316,6 +356,7 @@ export function ApplicationDetailDrawer({
   const isOrgMemberContext = source === "organization-members";
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
+  const canDeleteUnpaid = !editing && canDeleteUnpaidRegistration(row.status);
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
@@ -404,6 +445,16 @@ export function ApplicationDetailDrawer({
                   onClick={handleResetPassword}
                 >
                   비밀번호 초기화
+                </button>
+              ) : null}
+              {canDeleteUnpaid ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                  disabled={removeUnpaid.isPending || loading || Boolean(error)}
+                  onClick={() => void handleDeleteUnpaid()}
+                >
+                  삭제
                 </button>
               ) : null}
               <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>

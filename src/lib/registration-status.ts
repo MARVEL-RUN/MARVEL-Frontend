@@ -69,3 +69,7 @@ export function canPrepareRegistrationPayment(status?: string | null) {
   const key = statusKey(status);
   return key === "PENDING" || key === "PAYMENT_PENDING" || key === "ADDITIONAL_PAYMENT_REQUIRED";
 }
+
+export function canDeleteUnpaidRegistration(status?: string | null) {
+  return statusKey(status) === "PAYMENT_PENDING";
+}

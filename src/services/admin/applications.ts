@@ -521,6 +521,14 @@ export function fetchAdminRegistration(registrationId: string) {
   );
 }
 
+export function deleteAdminRegistration(registrationId: string) {
+  if (!registrationId.trim()) throw new Error("신청 정보를 찾을 수 없습니다.");
+  return adminFetch<{ message?: string }>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}`,
+    { method: "DELETE" },
+  );
+}
+
 export type RegistrationBasicInfoUpdate = {
   name: string;
   phNum: string;
