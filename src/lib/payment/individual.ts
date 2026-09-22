@@ -57,9 +57,10 @@ export function toRegistrationCreateRequest(
     ),
     addressDetail: (draft.addressDetail ?? "").trim(),
     ...(guardianName ? { guardianName } : {}),
-    ...(guardianPhone ? { guardianPhone } : {}),
+    ...(guardianPhone ? { guardianPhNum: guardianPhone } : {}),
     ...(guardianRelation ? { guardianRelationship: guardianRelation } : {}),
     guardianConsent: requireGuardian ? draft.guardianConsent : false,
+    ...(draft.email.trim() ? { email: draft.email.trim() } : {}),
     ...termsAgreementFields(draft),
   };
 }

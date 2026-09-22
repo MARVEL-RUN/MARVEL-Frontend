@@ -22,6 +22,7 @@ import {
   lookupOrganizationRegistrations,
   modifyIndividualRegistration,
   modifyOrganizationRegistration,
+  organizationLookupParticipants,
   retryIndividualPayment,
   retryOrganizationPayment,
 } from "@/services/main/registrations";
@@ -48,6 +49,7 @@ import {
   GroupLookupEdit,
   IndividualLookupEdit,
   LookupRefundModal,
+  type LookupModifyAction,
 } from "./LookupEditForms";
 
 type View = "form" | "hit" | "miss";
@@ -137,6 +139,16 @@ function memberSouvenirs(
   return [];
 }
 
+function participantPhone(
+  row: RegistrationReceiptMember | OrganizationLookupParticipant,
+) {
+  const phone =
+    "phoneNumber" in row && row.phoneNumber
+      ? row.phoneNumber
+      : row.phNum;
+  return phone?.trim() ?? "";
+}
+
 function toMemberView(
   row: RegistrationReceiptMember | OrganizationLookupParticipant,
   index: number,
@@ -157,9 +169,7 @@ function toMemberView(
 }
 
 function receiptMembers(receipt: RegistrationReceipt): ReceiptMemberView[] {
-  if (receipt.members?.length) return receipt.members.map(toMemberView);
-  if (receipt.registrations?.length) return receipt.registrations.map(toMemberView);
-  return [];
+  return organizationLookupParticipants(receipt).map(toMemberView);
 }
 
 function receiptSouvenirs(receipt: RegistrationReceipt) {
@@ -685,7 +695,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     setView(rows.length ? "hit" : "miss");
   }
 
-  async function onModify(body: IndividualRegistrationModifyRequest) {
+  async function onModify(body: IndividualRegistrationModifyRequest, action: LookupModifyAction) {
     if (!active?.registrationId) {
       setError("수정할 접수 정보를 확인하지 못했습니다.");
       return;
@@ -705,18 +715,39 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         birth: body.birth,
         phNum: body.phNum,
       };
-      if (order) {
-        if (!hasTossClientKey) {
-          setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+      if (action === "pay") {
+        if (order) {
+          if (!hasTossClientKey) {
+            setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+            return;
+          }
+          savePendingPayment({
+            registration: paymentOrderFromRetry(order),
+            customerName: body.name.trim(),
+            savedAt: Date.now(),
+          });
+          setAccess(nextAccess);
+          router.push(paymentHref);
           return;
         }
-        savePendingPayment({
-          registration: paymentOrderFromRetry(order),
-          customerName: body.name.trim(),
-          savedAt: Date.now(),
-        });
-        setAccess(nextAccess);
-        router.push(paymentHref);
+        if (access && active.paymentId && canPreparePayment(active)) {
+          const retried = await retryIndividualPayment(
+            DEFAULT_EVENT_ID,
+            active.registrationId,
+            active.paymentId,
+            access,
+          );
+          savePendingPayment({
+            registration: paymentOrderFromRetry(retried),
+            customerName: body.name.trim(),
+            savedAt: Date.now(),
+          });
+          setAccess(nextAccess);
+          router.push(paymentHref);
+          return;
+        }
+        setError("결제를 시작할 수 없습니다. 수정 내용은 저장되었는지 조회 화면에서 확인해 주세요.");
+        await refreshIndividual(nextAccess);
         return;
       }
       await refreshIndividual(nextAccess);
@@ -777,7 +808,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           setError("");
           setPanel("list");
         }}
-        onSubmit={(body) => void onModify(body)}
+        onSubmit={(body, action) => void onModify(body, action)}
       />
     );
   }
@@ -979,7 +1010,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     setView(rows.length ? "hit" : "miss");
   }
 
-  async function onModify(body: OrganizationRegistrationModifyRequest) {
+  async function onModify(body: OrganizationRegistrationModifyRequest, action: LookupModifyAction) {
     if (!active?.organizationId) {
       setError("수정할 접수 정보를 확인하지 못했습니다.");
       return;
@@ -993,17 +1024,37 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         body,
       );
       const order = payableOrder(settled);
-      if (order) {
-        if (!hasTossClientKey) {
-          setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+      if (action === "pay") {
+        if (order) {
+          if (!hasTossClientKey) {
+            setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
+            return;
+          }
+          savePendingPayment({
+            registration: paymentOrderFromRetry(order),
+            customerName: (active.leaderName || active.organizationName || account).trim(),
+            savedAt: Date.now(),
+          });
+          router.push(paymentHref);
           return;
         }
-        savePendingPayment({
-          registration: paymentOrderFromRetry(order),
-          customerName: (active.leaderName || active.organizationName || account).trim(),
-          savedAt: Date.now(),
-        });
-        router.push(paymentHref);
+        if (access && active.paymentId && canPreparePayment(active)) {
+          const retried = await retryOrganizationPayment(
+            DEFAULT_EVENT_ID,
+            active.organizationId,
+            active.paymentId,
+            access,
+          );
+          savePendingPayment({
+            registration: paymentOrderFromRetry(retried),
+            customerName: (active.leaderName || active.organizationName || account).trim(),
+            savedAt: Date.now(),
+          });
+          router.push(paymentHref);
+          return;
+        }
+        setError("결제를 시작할 수 없습니다. 수정 내용은 저장되었는지 조회 화면에서 확인해 주세요.");
+        await refreshOrganization(body.access);
         return;
       }
       await refreshOrganization(body.access);
@@ -1064,7 +1115,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           setError("");
           setPanel("list");
         }}
-        onSubmit={(body) => void onModify(body)}
+        onSubmit={(body, action) => void onModify(body, action)}
       />
     );
   }

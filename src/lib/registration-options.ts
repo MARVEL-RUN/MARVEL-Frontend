@@ -26,6 +26,22 @@ export function findCategory(
   return categories.find((item) => item.categoryId === categoryId);
 }
 
+export function findCategoryByLabel(
+  categories: RegistrationCategory[],
+  label: string,
+) {
+  const key = label.trim();
+  if (!key) return undefined;
+  return categories.find(
+    (item) =>
+      item.categoryId === key ||
+      item.categoryName === key ||
+      item.distance === key ||
+      categoryLabel(item) === key ||
+      `${item.distance} ${item.categoryName}`.trim() === key,
+  );
+}
+
 export function sortedSouvenirs(category: RegistrationCategory | undefined) {
   return [...(category?.souvenirs ?? [])].sort((a, b) => a.order - b.order);
 }
