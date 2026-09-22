@@ -7,9 +7,24 @@ import { createPortal } from "react-dom";
 type Props = {
   open: boolean;
   onClose: () => void;
+  mode?: "register" | "lookup-modify";
 };
 
-export function RegisterPayCheckModal({ open, onClose }: Props) {
+const COPY = {
+  register: {
+    submitLabel: "신청서 제출",
+    submitGuide: "참가신청이 등록됩니다. 이후 신청조회에서 결제하시면 참가가 확정됩니다.",
+    payGuide: "지금 결제하시면 바로 참가가 확정됩니다.",
+  },
+  "lookup-modify": {
+    submitLabel: "수정된 신청서 제출",
+    submitGuide: "변경 내용이 저장됩니다. 이후 신청조회에서 결제하시면 참가가 확정됩니다.",
+    payGuide: "변경 내용 저장 후 바로 결제합니다.",
+  },
+} as const;
+
+export function RegisterPayCheckModal({ open, onClose, mode = "register" }: Props) {
+  const copy = COPY[mode];
   const titleId = useId();
   const descId = useId();
   const [mounted, setMounted] = useState(false);
@@ -65,14 +80,12 @@ export function RegisterPayCheckModal({ open, onClose }: Props) {
         </header>
         <ul id={descId} className="inquiry-secret__guides">
           <li>
-            <span className="btn btn--ghost inquiry-secret__chip">신청서 제출</span>
-            <span>
-              참가신청이 등록됩니다. 이후 신청조회에서 결제하시면 참가가 확정됩니다.
-            </span>
+            <span className="btn btn--ghost inquiry-secret__chip">{copy.submitLabel}</span>
+            <span>{copy.submitGuide}</span>
           </li>
           <li>
             <span className="btn btn--red inquiry-secret__chip">결제하기</span>
-            <span>지금 결제하시면 바로 참가가 확정됩니다.</span>
+            <span>{copy.payGuide}</span>
           </li>
         </ul>
         <div className="inquiry-secret__actions">

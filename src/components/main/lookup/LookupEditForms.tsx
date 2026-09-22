@@ -11,6 +11,7 @@ import {
   ageBand,
   emailOk,
   formatFee,
+  formatPhone,
   needsGuardian,
   guardianRequiredFor,
   groupNeedsGuardian,
@@ -18,6 +19,7 @@ import {
   type CourseId,
   type Gender,
 } from "@/lib/register";
+import { genderLabel } from "@/lib/registration-gender";
 import {
   categoryClosedReason,
   categoryFeeAmount,
@@ -52,6 +54,7 @@ import {
   ApplyHint,
   BirthPick,
   BirthText,
+  birthView,
   CoursePick,
   EmailField,
   FeeText,
@@ -64,7 +67,11 @@ import {
   PhoneField,
   ShirtPick,
 } from "../register/ApplyUi";
+import { DockNav } from "../DockNav";
+import { RegisterPayCheckModal } from "../register/RegisterPayCheckModal";
 import { scrollPageTop } from "@/lib/scroll-page";
+
+export type LookupModifyAction = "submit" | "pay";
 
 function toApiBirth(raw: string) {
   const digits = raw.replace(/\D/g, "");
@@ -265,9 +272,12 @@ export function IndividualLookupEdit({
   busy: boolean;
   error: string;
   onBack: () => void;
-  onSubmit: (body: IndividualRegistrationModifyRequest) => void;
+  onSubmit: (body: IndividualRegistrationModifyRequest, action: LookupModifyAction) => void;
 }) {
   const parsedAddress = splitApiAddress(receipt.address);
+  const [step, setStep] = useState(0);
+  const [payCheckOpen, setPayCheckOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<LookupModifyAction | null>(null);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsError, setOptionsError] = useState("");
   const [name] = useState(receipt.name?.trim() || access.name);
@@ -295,6 +305,14 @@ export function IndividualLookupEdit({
   useLayoutEffect(() => {
     scrollPageTop();
   }, []);
+
+  useLayoutEffect(() => {
+    if (step !== 0) scrollPageTop();
+  }, [step]);
+
+  useEffect(() => {
+    if (!busy) setPendingAction(null);
+  }, [busy]);
 
   useEffect(() => {
     let alive = true;
@@ -346,8 +364,7 @@ export function IndividualLookupEdit({
     applyCategory(next);
   }
 
-  function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function validateForm() {
     const invalid =
       personFormError(name, birth, phone, gender) ||
       (!zonecode.trim() || !address.trim() ? "우편번호 찾기로 주소를 선택하세요." : "") ||
@@ -361,13 +378,14 @@ export function IndividualLookupEdit({
       (email.trim() && !emailOk(email) ? "이메일 형식을 확인하세요." : "") ||
       (!eventCategoryId ? "참가종목을 선택하세요." : "") ||
       (souvenir && !selectedSize ? "티셔츠 사이즈를 선택하세요." : "");
-    if (invalid) {
-      setHint(invalid);
-      return;
-    }
-    if (gender !== "M" && gender !== "F") return;
-    setHint("");
-    onSubmit({
+    if (invalid) return invalid;
+    if (gender !== "M" && gender !== "F") return "성별을 선택하세요.";
+    return "";
+  }
+
+  function buildPayload(): IndividualRegistrationModifyRequest | null {
+    if (gender !== "M" && gender !== "F") return null;
+    return {
       access,
       eventCategoryId,
       selectedSouvenirList: souvenirs,
@@ -382,11 +400,36 @@ export function IndividualLookupEdit({
       guardianRelationship: guardianRelation.trim() || undefined,
       guardianConsent: guardianRequired ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
-    });
+    };
   }
 
+  function goReview(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const invalid = validateForm();
+    if (invalid) {
+      setHint(invalid);
+      return;
+    }
+    setHint("");
+    setStep(1);
+    setPayCheckOpen(true);
+  }
+
+  function runModify(action: LookupModifyAction) {
+    const body = buildPayload();
+    if (!body) return;
+    setPendingAction(action);
+    onSubmit(body, action);
+  }
+
+  const addressView = [zonecode.trim() ? `(${zonecode})` : "", address, addressDetail]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <form className="form lookup-edit" onSubmit={submit} noValidate>
+    <>
+    {step === 0 ? (
+    <form className="form lookup-edit" onSubmit={goReview} noValidate>
       <div className="form__head">
         <h2>개인 접수 수정</h2>
         <p className="form__note">조회한 접수 정보를 수정합니다.</p>
@@ -558,10 +601,99 @@ export function IndividualLookupEdit({
           돌아가기
         </button>
         <button type="submit" className="btn btn--red" disabled={busy}>
-          {busy ? "저장 중..." : "수정하기"}
+          확인하기
         </button>
       </div>
     </form>
+    ) : null}
+
+    {step === 1 ? (
+      <section className="block">
+        <h2>수정 내용을 확인하세요</h2>
+        <dl className="spec">
+          <div>
+            <dt>이름</dt>
+            <dd>{name.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>생년월일</dt>
+            <dd>{birthView(birth) || "—"}</dd>
+          </div>
+          <div>
+            <dt>성별</dt>
+            <dd>{genderLabel(toUiGender(gender))}</dd>
+          </div>
+          <div>
+            <dt>휴대폰번호</dt>
+            <dd>{formatPhone(phone) || "—"}</dd>
+          </div>
+          <div>
+            <dt>이메일</dt>
+            <dd>{email.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>주소</dt>
+            <dd>{addressView || "—"}</dd>
+          </div>
+          <div>
+            <dt>참가종목</dt>
+            <dd>{category ? categoryLabel(category) : "—"}</dd>
+          </div>
+          <div>
+            <dt>티셔츠 사이즈</dt>
+            <dd>{selectedSize || "—"}</dd>
+          </div>
+          {guardianRequired ? (
+            <div>
+              <dt>보호자 동의</dt>
+              <dd>{guardianConsent ? "동의함" : "—"}</dd>
+            </div>
+          ) : null}
+        </dl>
+        <DockNav>
+          {hint || error ? (
+            <p className="form__err flow__err" role="alert">
+              {hint || error}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            className="btn btn--ghost"
+            disabled={busy}
+            onClick={() => {
+              setPayCheckOpen(false);
+              setStep(0);
+              scrollPageTop();
+            }}
+          >
+            수정
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            disabled={busy}
+            onClick={() => runModify("submit")}
+          >
+            {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
+          </button>
+          <button
+            type="button"
+            className="btn btn--red"
+            disabled={busy}
+            onClick={() => runModify("pay")}
+          >
+            {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+          </button>
+        </DockNav>
+      </section>
+    ) : null}
+
+    <RegisterPayCheckModal
+      mode="lookup-modify"
+      open={payCheckOpen}
+      onClose={() => setPayCheckOpen(false)}
+    />
+    </>
   );
 }
 
@@ -637,8 +769,11 @@ export function GroupLookupEdit({
   busy: boolean;
   error: string;
   onBack: () => void;
-  onSubmit: (body: OrganizationRegistrationModifyRequest) => void;
+  onSubmit: (body: OrganizationRegistrationModifyRequest, action: LookupModifyAction) => void;
 }) {
+  const [step, setStep] = useState(0);
+  const [payCheckOpen, setPayCheckOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<LookupModifyAction | null>(null);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsError, setOptionsError] = useState("");
   const [members, setMembers] = useState<GroupMemberDraft[]>(() =>
@@ -666,6 +801,14 @@ export function GroupLookupEdit({
   useLayoutEffect(() => {
     scrollPageTop();
   }, []);
+
+  useLayoutEffect(() => {
+    if (step !== 0) scrollPageTop();
+  }, [step]);
+
+  useEffect(() => {
+    if (!busy) setPendingAction(null);
+  }, [busy]);
 
   useEffect(() => {
     let alive = true;
@@ -736,12 +879,8 @@ export function GroupLookupEdit({
     });
   }
 
-  function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!members.length) {
-      setHint("수정할 참가자가 없습니다.");
-      return;
-    }
+  function validateForm() {
+    if (!members.length) return "수정할 참가자가 없습니다.";
     for (let i = 0; i < members.length; i += 1) {
       const member = members[i];
       const prefix = `참가자 ${i + 1}: `;
@@ -753,21 +892,17 @@ export function GroupLookupEdit({
         (souvenir && !memberShirtSize(member.selectedSouvenirList, category)
           ? "티셔츠 사이즈를 선택하세요."
           : "");
-      if (invalid) {
-        setHint(`${prefix}${invalid}`);
-        return;
-      }
+      if (invalid) return `${prefix}${invalid}`;
     }
     if (needsGroupGuardian && !guardianConsent) {
-      setHint("만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.");
-      return;
+      return "만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.";
     }
-    if (email.trim() && !emailOk(email)) {
-      setHint("이메일 형식을 확인하세요.");
-      return;
-    }
-    setHint("");
-    onSubmit({
+    if (email.trim() && !emailOk(email)) return "이메일 형식을 확인하세요.";
+    return "";
+  }
+
+  function buildPayload(): OrganizationRegistrationModifyRequest {
+    return {
       access,
       guardianConsent: needsGroupGuardian ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
@@ -783,11 +918,30 @@ export function GroupLookupEdit({
         if (row.registrationId) next.registrationId = row.registrationId;
         return next;
       }),
-    });
+    };
+  }
+
+  function goReview(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const invalid = validateForm();
+    if (invalid) {
+      setHint(invalid);
+      return;
+    }
+    setHint("");
+    setStep(1);
+    setPayCheckOpen(true);
+  }
+
+  function runModify(action: LookupModifyAction) {
+    setPendingAction(action);
+    onSubmit(buildPayload(), action);
   }
 
   return (
-    <form className="form lookup-edit" onSubmit={submit} noValidate>
+    <>
+    {step === 0 ? (
+    <form className="form lookup-edit" onSubmit={goReview} noValidate>
       <div className="form__head">
         <h2>단체 접수 수정</h2>
         <p className="form__note">
@@ -1061,9 +1215,103 @@ export function GroupLookupEdit({
           돌아가기
         </button>
         <button type="submit" className="btn btn--red" disabled={busy || members.length === 0}>
-          {busy ? "저장 중..." : "수정하기"}
+          확인하기
         </button>
       </div>
     </form>
+    ) : null}
+
+    {step === 1 ? (
+      <section className="block">
+        <h2>수정 내용을 확인하세요</h2>
+        <dl className="spec">
+          <div>
+            <dt>단체명</dt>
+            <dd>{receipt.organizationName?.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>이메일</dt>
+            <dd>{email.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>인원</dt>
+            <dd>{members.length}명</dd>
+          </div>
+          <div>
+            <dt>합계</dt>
+            <dd>{formatFee(total)}</dd>
+          </div>
+          {needsGroupGuardian ? (
+            <div>
+              <dt>단체장 동의</dt>
+              <dd>{guardianConsent ? "동의함" : "—"}</dd>
+            </div>
+          ) : null}
+        </dl>
+        <ul className="member-list">
+          {members.map((member, i) => {
+            const category = findCategory(categories, member.eventCategoryId);
+            const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
+            const size = memberShirtSize(member.selectedSouvenirList, category);
+            return (
+              <li key={member.key}>
+                <strong>
+                  {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
+                </strong>
+                <span>
+                  {category ? categoryLabel(category) : "—"} · {size || "—"} ·{" "}
+                  {birthView(member.birth) || "—"} ·{" "}
+                  {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
+                  {formatPhone(member.phNum) || "—"}
+                </span>
+                <KitFixed courseId={courseId} />
+              </li>
+            );
+          })}
+        </ul>
+        <DockNav>
+          {hint || error ? (
+            <p className="form__err flow__err" role="alert">
+              {hint || error}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            className="btn btn--ghost"
+            disabled={busy}
+            onClick={() => {
+              setPayCheckOpen(false);
+              setStep(0);
+              scrollPageTop();
+            }}
+          >
+            수정
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            disabled={busy}
+            onClick={() => runModify("submit")}
+          >
+            {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
+          </button>
+          <button
+            type="button"
+            className="btn btn--red"
+            disabled={busy}
+            onClick={() => runModify("pay")}
+          >
+            {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+          </button>
+        </DockNav>
+      </section>
+    ) : null}
+
+    <RegisterPayCheckModal
+      mode="lookup-modify"
+      open={payCheckOpen}
+      onClose={() => setPayCheckOpen(false)}
+    />
+    </>
   );
 }
