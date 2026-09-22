@@ -9,7 +9,6 @@ import { RegisterCta } from "../register/RegisterCta";
 import { MOBILE_MQ } from "@/lib/viewport";
 import type { CourseId } from "@/lib/register";
 import { CoursePreview } from "../guide/CoursePreview";
-import { OpeningIntro } from "../fx/OpeningIntro";
 import { OpenCountdown, OpenDday } from "./OpenCountdown";
 import { HomeBoard } from "./HomeBoard";
 import { HomePopup } from "./HomePopup";
@@ -105,8 +104,6 @@ export function HomePage() {
 
   return (
     <main className="home" ref={rootRef}>
-      <OpeningIntro />
-
       <section className="hero" id="hero" ref={heroRef}>
         <div className="hero__art" aria-hidden>
           <Image
