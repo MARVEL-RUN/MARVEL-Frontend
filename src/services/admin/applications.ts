@@ -1,4 +1,4 @@
-import { adminFetch } from "@/lib/admin/fetch";
+import { adminFetch, adminFetchBlob } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { genderLabel, uiGenderFromApi } from "@/lib/registration-gender";
@@ -154,13 +154,16 @@ type RegistrationDetail = {
   termsMarketingChannelAgreed?: unknown;
 };
 
-export type RegistrationListParams = {
+export type RegistrationExcelParams = {
   eventId: string;
   organizationId?: string;
   type?: ApplicationKind | "";
   status?: RegistrationStatus | "";
   keyword?: string;
   eventCategoryId?: string;
+};
+
+export type RegistrationListParams = RegistrationExcelParams & {
   page: number;
   size: number;
 };
@@ -431,12 +434,8 @@ export function fetchAdminEventCategories(eventId: string) {
   ).then(asEventCategoryList);
 }
 
-export function fetchAdminRegistrations(params: RegistrationListParams) {
-  const query = new URLSearchParams({
-    eventId: params.eventId,
-    page: String(params.page),
-    size: String(params.size),
-  });
+function registrationFilterQuery(params: RegistrationExcelParams) {
+  const query = new URLSearchParams({ eventId: params.eventId });
   const apiType = registrationTypeFromKind(params.type ?? "");
   if (apiType) query.set("type", apiType);
   if (params.status) query.set("status", params.status);
@@ -447,10 +446,37 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   if (params.organizationId?.trim()) {
     query.set("organizationId", params.organizationId.trim());
   }
+  return query;
+}
+
+export function fetchAdminRegistrations(params: RegistrationListParams) {
+  const query = registrationFilterQuery(params);
+  query.set("page", String(params.page));
+  query.set("size", String(params.size));
 
   return adminFetch<unknown>(`v1/admin/registrations?${query}`).then((data) =>
     asRegistrationPage(data, params.size, params.page),
   );
+}
+
+export function fetchRegistrationsExcel(params: RegistrationExcelParams) {
+  return adminFetchBlob(
+    `v1/admin/registrations/excel/download?${registrationFilterQuery(params)}`,
+  );
+}
+
+export function fetchSelectedRegistrationsExcel(
+  eventId: string,
+  registrationIds: string[],
+) {
+  const ids = registrationIds.map((id) => id.trim()).filter(Boolean);
+  if (!eventId.trim()) throw new Error("대회 정보가 없습니다.");
+  if (ids.length === 0) throw new Error("선택된 신청이 없습니다.");
+  const query = new URLSearchParams({ eventId });
+  return adminFetchBlob(`v1/admin/registrations/excel/download?${query}`, {
+    method: "POST",
+    body: JSON.stringify({ registrationIds: ids }),
+  });
 }
 
 export function fetchAdminRegistration(registrationId: string) {

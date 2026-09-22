@@ -193,13 +193,30 @@ export function HomePopup() {
       {mobile ? <span className="home-pop__handle" aria-hidden /> : null}
       <div className={POP.image ? "home-pop__shot has-img" : "home-pop__shot"}>
         {POP.image ? (
-          <Image
-            src={POP.image}
-            alt={POP.title}
-            fill
-            sizes={mobile ? "100vw" : "36rem"}
-            draggable={false}
-          />
+          POP.href ? (
+            <a
+              href={POP.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={POP.title}
+            >
+              <Image
+                src={POP.image}
+                alt=""
+                fill
+                sizes={mobile ? "100vw" : "36rem"}
+                draggable={false}
+              />
+            </a>
+          ) : (
+            <Image
+              src={POP.image}
+              alt={POP.title}
+              fill
+              sizes={mobile ? "100vw" : "36rem"}
+              draggable={false}
+            />
+          )
         ) : (
           <span>이미지 영역</span>
         )}

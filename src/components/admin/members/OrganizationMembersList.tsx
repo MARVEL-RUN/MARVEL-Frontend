@@ -1,8 +1,10 @@
 "use client";
 
 import { ApplicationDetailDrawer } from "@/components/admin/applications/ApplicationDetailDrawer";
+import { ExcelDownloadActions } from "@/components/admin/applications/ExcelDownloadActions";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
+import { RowCheck } from "@/components/admin/Table/RowCheck";
 import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatPhone } from "@/lib/register";
@@ -128,6 +130,7 @@ export function OrganizationMembersList({
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const categoriesQuery = useQuery({
     queryKey: ["admin", "event-categories", apiEventId],
@@ -163,11 +166,17 @@ export function OrganizationMembersList({
   useEffect(() => {
     setPage(1);
     setSelectedId(null);
+    setCheckedIds([]);
   }, [apiEventId, organizationId, members]);
 
   useEffect(() => {
     setSelectedId(null);
-  }, [applied, page]);
+    setCheckedIds([]);
+  }, [applied]);
+
+  useEffect(() => {
+    setSelectedId(null);
+  }, [page]);
 
   const categoryName =
     categoriesQuery.data?.find((category) => category.id === applied.eventCategoryId)?.name ??
@@ -214,7 +223,48 @@ export function OrganizationMembersList({
       ? "등록된 멤버가 없습니다."
       : "조건에 맞는 멤버가 없습니다.";
 
+  const pageIds = rows.map((row) => row.id).filter(Boolean);
+  const allPageChecked =
+    pageIds.length > 0 && pageIds.every((id) => checkedIds.includes(id));
+  const somePageChecked = pageIds.some((id) => checkedIds.includes(id));
+
+  const toggleRow = (id: string, checked: boolean) => {
+    setCheckedIds((prev) => {
+      if (checked) return prev.includes(id) ? prev : [...prev, id];
+      return prev.filter((item) => item !== id);
+    });
+  };
+
+  const togglePage = (checked: boolean) => {
+    setCheckedIds((prev) => {
+      if (checked) return [...new Set([...prev, ...pageIds])];
+      return prev.filter((id) => !pageIds.includes(id));
+    });
+  };
+
   const columns = [
+    {
+      key: "check",
+      header: (
+        <RowCheck
+          checked={allPageChecked}
+          indeterminate={somePageChecked}
+          disabled={pageIds.length === 0}
+          label="현재 페이지 전체 선택"
+          onChange={togglePage}
+        />
+      ),
+      className: "is-check",
+      width: "36px",
+      render: (row: AdminApplicationRow) =>
+        row.id ? (
+          <RowCheck
+            checked={checkedIds.includes(row.id)}
+            label={`${row.name || "신청"} 선택`}
+            onChange={(checked) => toggleRow(row.id, checked)}
+          />
+        ) : null,
+    },
     {
       key: "no",
       header: "번호",
@@ -316,7 +366,20 @@ export function OrganizationMembersList({
         }}
         isRowSelected={(row) => Boolean(selectedId && row.id === selectedId)}
         actions={
-          <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
+          <div className="admin-table-shell__actions admin-apps-list__head-actions">
+            <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
+            <ExcelDownloadActions
+              eventId={apiEventId}
+              selectedIds={checkedIds}
+              filters={{
+                organizationId,
+                status: applied.status,
+                keyword: applied.q,
+                eventCategoryId: applied.eventCategoryId,
+              }}
+              disabled={!hasAdminApi}
+            />
+          </div>
         }
         tools={
           <>
