@@ -2,6 +2,7 @@
 
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
+import { RowCheck } from "@/components/admin/Table/RowCheck";
 import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
@@ -35,6 +36,7 @@ import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
+import { ExcelDownloadActions } from "./ExcelDownloadActions";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 const PAGE_SIZE = 15;
@@ -127,6 +129,7 @@ export function ApplicationsListPage({ slug }: Props) {
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const eventsQuery = useQuery({
     queryKey: ["admin", "events"],
@@ -210,7 +213,12 @@ export function ApplicationsListPage({ slug }: Props) {
 
   useEffect(() => {
     setSelectedId(null);
-  }, [apiEventId, applied, page]);
+    setCheckedIds([]);
+  }, [apiEventId, applied]);
+
+  useEffect(() => {
+    setSelectedId(null);
+  }, [page]);
 
   const rows = listQuery.data?.content ?? [];
   const totalCount = listQuery.data?.totalElements ?? 0;
@@ -262,7 +270,50 @@ export function ApplicationsListPage({ slug }: Props) {
           ? "대회 정보가 없습니다."
           : "신청 내역이 없습니다.";
 
+  const pageIds = rows.map((row) => row.id).filter(Boolean);
+  const allPageChecked =
+    pageIds.length > 0 && pageIds.every((id) => checkedIds.includes(id));
+  const somePageChecked = pageIds.some((id) => checkedIds.includes(id));
+
+  const toggleRow = (id: string, checked: boolean) => {
+    setCheckedIds((prev) => {
+      if (checked) return prev.includes(id) ? prev : [...prev, id];
+      return prev.filter((item) => item !== id);
+    });
+  };
+
+  const togglePage = (checked: boolean) => {
+    setCheckedIds((prev) => {
+      if (checked) {
+        return [...new Set([...prev, ...pageIds])];
+      }
+      return prev.filter((id) => !pageIds.includes(id));
+    });
+  };
+
   const columns = [
+    {
+      key: "check",
+      header: (
+        <RowCheck
+          checked={allPageChecked}
+          indeterminate={somePageChecked}
+          disabled={pageIds.length === 0}
+          label="현재 페이지 전체 선택"
+          onChange={togglePage}
+        />
+      ),
+      className: "is-check",
+      width: "36px",
+      render: (row: AdminApplicationRow) =>
+        row.id ? (
+          <RowCheck
+            checked={checkedIds.includes(row.id)}
+            label={`${row.name || "신청"} 선택`}
+            onChange={(checked) => toggleRow(row.id, checked)}
+          />
+        ) : null,
+    },
     {
       key: "no",
       header: "번호",
@@ -386,6 +437,17 @@ export function ApplicationsListPage({ slug }: Props) {
         actions={
           <div className="admin-table-shell__actions admin-apps-list__head-actions">
             <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
+            <ExcelDownloadActions
+              eventId={apiEventId}
+              selectedIds={checkedIds}
+              filters={{
+                type: applied.kind,
+                status: applied.status,
+                keyword: applied.q,
+                eventCategoryId: applied.eventCategoryId,
+              }}
+              disabled={!hasAdminApi}
+            />
             <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
               대회 목록
             </Link>
