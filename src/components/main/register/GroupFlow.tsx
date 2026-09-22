@@ -56,7 +56,6 @@ import {
   type GroupDraft,
   type ParticipantDraft,
 } from "@/lib/register";
-import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import {
   checkOrganizationDuplicateId,
   checkOrganizationDuplicateName,
@@ -64,6 +63,7 @@ import {
 } from "@/services/main/registrations";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
+import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "../SheetModal";
 import { DockNav } from "../DockNav";
 import { RegisterPayCheckModal } from "./RegisterPayCheckModal";
@@ -174,7 +174,7 @@ export function GroupFlow({
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [optionsError, setOptionsError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<"submit" | "pay" | null>(null);
   const [error, setError] = useState("");
   const [accountLangWarn, setAccountLangWarn] = useState(false);
   const [nameCheck, setNameCheck] = useState<FieldCheck>(EMPTY_FIELD_CHECK);
@@ -198,6 +198,18 @@ export function GroupFlow({
       return;
     }
     setPayOpen(true);
+  }
+
+  async function ensureOrganizationPayment() {
+    if (payment) return payment;
+    if (!hasMainApi) throw new Error("API 주소가 설정되지 않았습니다.");
+    const created = await createOrganizationRegistration(
+      DEFAULT_EVENT_ID,
+      toOrganizationRegistrationRequest(draft),
+    );
+    const order = organizationPaymentOrder(created);
+    setPayment(order);
+    return order;
   }
 
   useEffect(() => {
@@ -514,31 +526,52 @@ export function GroupFlow({
     if (step !== 0) scrollPageTop();
   }, [step]);
 
-  async function onPay() {
+  function goSubmitted() {
+    setPayCheckOpen(false);
+    router.push(withAppBase(base, "/register/complete"));
+  }
+
+  async function onSubmitApplication() {
     if (payment) {
-      openPay();
+      goSubmitted();
       return;
     }
+
+    setBusyAction("submit");
+    setError("");
+    try {
+      await ensureOrganizationPayment();
+      goSubmitted();
+    } catch (err) {
+      fail(
+        err instanceof MainHttpError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "신청서를 제출하지 못했습니다.",
+      );
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  async function onPay() {
     if (!hasMainApi || !hasTossClientKey) {
       return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
       );
     }
 
-    setBusy(true);
+    setBusyAction("pay");
     setError("");
     try {
-      const created = await createOrganizationRegistration(
-        DEFAULT_EVENT_ID,
-        toOrganizationRegistrationRequest(draft),
-      );
-      const order = organizationPaymentOrder(created);
+      const order = await ensureOrganizationPayment();
       savePendingPayment({
         registration: order,
         customerName: draft.leaderName.trim(),
         savedAt: Date.now(),
       });
-      setPayment(order);
+      setPayCheckOpen(false);
       openPay();
     } catch (err) {
       fail(
@@ -549,7 +582,7 @@ export function GroupFlow({
             : "결제를 시작하지 못했습니다.",
       );
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
@@ -1093,11 +1126,23 @@ export function GroupFlow({
             </button>
             <button
               type="button"
+              className="btn btn--ghost"
+              onClick={onSubmitApplication}
+              disabled={busyAction !== null || Boolean(payment)}
+            >
+              {busyAction === "submit"
+                ? "제출 중..."
+                : payment
+                  ? "제출 완료"
+                  : "신청서 제출"}
+            </button>
+            <button
+              type="button"
               className="btn btn--red"
               onClick={onPay}
-              disabled={busy}
+              disabled={busyAction !== null}
             >
-              {busy ? "결제 준비 중..." : "결제하기"}
+              {busyAction === "pay" ? "결제 준비 중..." : "결제하기"}
             </button>
           </DockNav>
         </section>
