@@ -43,6 +43,7 @@ import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
+import { ExcelDownloadActions } from "./ExcelDownloadActions";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 const PAGE_SIZE = 15;
@@ -220,7 +221,12 @@ export function ApplicationsListPage({ slug }: Props) {
 
   useEffect(() => {
     setSelectedId(null);
-  }, [apiEventId, applied, page]);
+    setCheckedIds([]);
+  }, [apiEventId, applied]);
+
+  useEffect(() => {
+    setSelectedId(null);
+  }, [page]);
 
   useEffect(() => {
     setPicked(new Set());
@@ -318,6 +324,27 @@ export function ApplicationsListPage({ slug }: Props) {
         : eventsQuery.isFetched && slug && !apiEvent
           ? "대회 정보가 없습니다."
           : "신청 내역이 없습니다.";
+
+  const pageIds = rows.map((row) => row.id).filter(Boolean);
+  const allPageChecked =
+    pageIds.length > 0 && pageIds.every((id) => checkedIds.includes(id));
+  const somePageChecked = pageIds.some((id) => checkedIds.includes(id));
+
+  const toggleRow = (id: string, checked: boolean) => {
+    setCheckedIds((prev) => {
+      if (checked) return prev.includes(id) ? prev : [...prev, id];
+      return prev.filter((item) => item !== id);
+    });
+  };
+
+  const togglePage = (checked: boolean) => {
+    setCheckedIds((prev) => {
+      if (checked) {
+        return [...new Set([...prev, ...pageIds])];
+      }
+      return prev.filter((id) => !pageIds.includes(id));
+    });
+  };
 
   const columns = [
     {

@@ -40,6 +40,11 @@ async function refreshAccess() {
   await refreshLock;
 }
 
+export type AdminFile = {
+  blob: Blob;
+  filename: string;
+};
+
 export async function adminFetch<T>(
   endpoint: string,
   init: RequestInit = {},
@@ -121,6 +126,8 @@ async function adminRequest(
     const text = await response.text().catch(() => "");
     throw new AdminHttpError(response.status, errorMessage(response.status, text));
   }
+  return response;
+}
 
   return response;
 }
