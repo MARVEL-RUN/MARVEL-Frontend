@@ -7,6 +7,7 @@
 @import "./directions/directions.css";
 @import "./register/register.css";
 @import "./register/standby.css";
+@import "./register/register-down.css";
 @import "./board/board.css";
 @import "./legal/legal.css";
 
@@ -787,6 +788,11 @@ button.course:disabled:hover {
   font-size: 0.92rem;
   line-height: 1.55;
   word-break: keep-all;
+}
+
+.inquiry-secret__desc strong {
+  color: var(--marvel);
+  font-weight: 800;
 }
 
 .inquiry-secret__field {

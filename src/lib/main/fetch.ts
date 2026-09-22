@@ -12,6 +12,16 @@ export class MainHttpError extends Error {
   }
 }
 
+/** 0은 API 주소 없음. 429·5xx·타임아웃·네트워크만 장애로 본다 */
+export function isServerDownError(error: unknown) {
+  if (error instanceof MainHttpError) {
+    if (error.status === 0) return false;
+    return error.status === 408 || error.status === 429 || error.status >= 500;
+  }
+  if (error instanceof DOMException && error.name === "AbortError") return true;
+  return error instanceof TypeError;
+}
+
 function joinUrl(endpoint: string) {
   return `${MAIN_API_BASE}/${endpoint.replace(/^\/+/, "")}`;
 }
