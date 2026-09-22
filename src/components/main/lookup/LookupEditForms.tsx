@@ -819,6 +819,8 @@ export function GroupLookupEdit({
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
+  const organizationName = receipt.organizationName?.trim() || "";
+  const organizationLoginId = access.loginId.trim() || receipt.loginId?.trim() || "";
   const optionsReady = categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(members);
   const total = useMemo(
@@ -994,11 +996,25 @@ export function GroupLookupEdit({
           참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
         </p>
         <p className="lookup-edit__lock-note">
-          대표자 정보(성명·생년월일)와 휴대폰 번호, 이미 등록된 참가자의
-          개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
+          단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호, 이미 등록된
+          참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
         </p>
       </div>
-      <FormSec kicker="01 / LEADER" title="대표자 정보">
+      <FormSec kicker="01 / GROUP" title="단체">
+        <FormRow label="단체명" locked>
+          <input type="text" value={organizationName} disabled readOnly />
+        </FormRow>
+        <FormRow label="단체 계정" locked>
+          <input
+            type="text"
+            value={organizationLoginId}
+            disabled
+            readOnly
+            autoComplete="username"
+          />
+        </FormRow>
+      </FormSec>
+      <FormSec kicker="02 / LEADER" title="대표자 정보">
         <FormRow label="대표자 성명" required locked>
           <input
             type="text"
@@ -1013,7 +1029,7 @@ export function GroupLookupEdit({
           <BirthPick value={leaderBirth} onChange={() => {}} disabled />
         </FormRow>
       </FormSec>
-      <FormSec kicker="02 / CONTACT" title="연락처">
+      <FormSec kicker="03 / CONTACT" title="연락처">
         <FormRow label="휴대폰번호" required locked>
           <PhoneField
             placeholder="휴대폰번호를 입력해주세요."
@@ -1028,7 +1044,7 @@ export function GroupLookupEdit({
           <EmailField value={email} onChange={setEmail} />
         </FormRow>
       </FormSec>
-      <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+      <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
         <FormRow label="주소" required>
           <AddressField
             zonecode={zonecode}
@@ -1043,7 +1059,7 @@ export function GroupLookupEdit({
           />
         </FormRow>
       </FormSec>
-      <FormSec kicker="04" title="참가자">
+      <FormSec kicker="05" title="참가자">
         <div className="party-bar">
           <p>{members.length}명 등록</p>
           <button
@@ -1281,7 +1297,7 @@ export function GroupLookupEdit({
         <p className="party-sum">합계 {formatFee(total)}</p>
       </FormSec>
       {needsGroupGuardian ? (
-        <FormSec kicker="05 / CONSENT" title="단체장 동의">
+        <FormSec kicker="06 / CONSENT" title="단체장 동의">
           <ApplyHint>
             <p>{GUARDIAN_AGE_NOTE}</p>
             <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>
@@ -1318,7 +1334,11 @@ export function GroupLookupEdit({
         <dl className="spec">
           <div>
             <dt>단체명</dt>
-            <dd>{receipt.organizationName?.trim() || "—"}</dd>
+            <dd>{organizationName || "—"}</dd>
+          </div>
+          <div>
+            <dt>단체 계정</dt>
+            <dd>{organizationLoginId || "—"}</dd>
           </div>
           <div>
             <dt>대표자</dt>
