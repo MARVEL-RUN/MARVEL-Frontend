@@ -17,3 +17,10 @@ export function genderLabel(gender?: Exclude<Gender, "none"> | ApiGender | strin
   if (ui === "female") return "여성";
   return "-";
 }
+
+export function toApiGender(raw?: string | null): ApiGender | "" {
+  const key = (raw ?? "").trim().toUpperCase();
+  if (key === "M" || key === "MALE" || key === "남" || key === "남성") return "M";
+  if (key === "F" || key === "FEMALE" || key === "여" || key === "여성") return "F";
+  return "";
+}
