@@ -26,6 +26,7 @@ npm run dev:main             # 본사이트
 | `NEXT_PUBLIC_REGISTRATION_OPEN` | `0` 닫기, `1` 열기, `3` 접수 시각 자동 |
 | `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제·게시판 API |
 | `NEXT_PUBLIC_API_BASE_URL_ADMIN` | 관리자 API |
+| `NEXT_PUBLIC_EVENT_ID` | 공개 접수·조회·문의 대회 ID |
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 (로컬·운영 빌드) |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | 오시는길 지도 |
 | `NEXT_PUBLIC_BGM` | `off` 끄기, `on` 기본 음원 |
@@ -34,12 +35,17 @@ npm run dev:main             # 본사이트
 | `GA_MEASUREMENT_ID` | Google Analytics |
 | `NAVER_ANALYTICS_ID` | 네이버 애널리틱스 |
 
-배포 시 토스 클라이언트 키는 GitHub Secret으로 나눈다.
+배포 시 토스 클라이언트 키는 GitHub Secret으로 나눈다. 대회 ID는 Secret이 아니라 Variable이다.
 
 | Secret | 용도 |
 |--------|------|
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 운영(`main`) |
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY_TEST` | 테스트(`develop`) |
+
+| Variable | 용도 |
+|----------|------|
+| `TEST_FRONTEND_EVENT_ID` | 테스트 대회 ID (`test-marvelrun`) |
+| `PROD_FRONTEND_EVENT_ID` | 운영 대회 ID (`marvelrun2026`) |
 
 ## 폴더
 
