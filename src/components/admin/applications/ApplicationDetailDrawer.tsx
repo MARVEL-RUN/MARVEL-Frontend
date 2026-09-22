@@ -7,7 +7,7 @@ import {
   registrationStatusBadge,
   registrationStatusLabel,
 } from "@/lib/registration-status";
-import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
+import { APPLICATION_PASSWORD_MIN, formatPhone } from "@/lib/register";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
@@ -41,6 +41,12 @@ function dash(value?: string | number | null) {
   if (value == null || value === "") return "-";
   const text = String(value).trim();
   return text || "-";
+}
+
+function displayPhone(value?: string | null) {
+  const raw = (value ?? "").trim();
+  if (!raw) return "-";
+  return formatPhone(raw.replace(/\D/g, "")) || raw;
 }
 
 function agreeLabel(value?: boolean) {
@@ -121,8 +127,8 @@ function buildSections(row: AdminApplicationRow) {
     { label: "성명", value: dash(row.personName) },
     { label: "성별", value: applicationGenderLabel(row.gender) },
     { label: "생년월일", value: dash(row.birth) },
-    { label: "연락처", value: dash(row.phone) },
-    { label: "이메일", value: dash(row.email) },
+    { label: "연락처", value: displayPhone(row.phone) },
+    ...(isGroup ? [] : [{ label: "이메일", value: dash(row.email) }]),
   ];
 
   const guardianFields: DetailField[] = isGroup
@@ -151,11 +157,15 @@ function buildSections(row: AdminApplicationRow) {
   if (row.leader) {
     groupFields.push(
       { label: "대표자", value: dash(row.leader.name) },
-      { label: "연락처", value: dash(row.leader.phNum) },
+      { label: "연락처", value: displayPhone(row.leader.phNum) },
       { label: "생년월일", value: dash(row.leader.birth) },
     );
   } else if (row.leaderName) {
     groupFields.push({ label: "대표자", value: dash(row.leaderName) });
+  }
+
+  if (isGroup) {
+    groupFields.push({ label: "이메일", value: dash(row.email) });
   }
 
   const addressFields: DetailField[] = [
