@@ -4,7 +4,7 @@ import { AdminPagination } from "@/components/admin/Pagination";
 
 type Column<T> = {
   key: string;
-  header: string;
+  header: React.ReactNode;
   className?: string;
   width?: string;
   render: (row: T) => React.ReactNode;
