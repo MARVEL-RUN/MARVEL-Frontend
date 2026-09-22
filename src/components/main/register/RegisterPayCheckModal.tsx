@@ -66,7 +66,9 @@ export function RegisterPayCheckModal({ open, onClose }: Props) {
           </button>
         </header>
         <p id={descId} className="inquiry-secret__desc">
-          아래 접수 내용이 맞는지 확인한 뒤, 결제하기를 눌러야 결제가 진행됩니다.
+          아래 접수 내용을 확인해 주세요.
+          <br />
+          신청서 제출 시 미결제 상태로 저장되며, 결제하기를 누르면 바로 결제가 진행됩니다.
         </p>
         <div className="inquiry-secret__actions">
           <button type="button" className="btn btn--red" onClick={onClose}>

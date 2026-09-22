@@ -227,10 +227,6 @@ export function ApplicationsListPage({ slug }: Props) {
     setPicked(new Set());
   }, [apiEventId, applied]);
 
-  useEffect(() => {
-    setPicked(new Set());
-  }, [apiEventId, applied]);
-
   const rows = listQuery.data?.content ?? [];
   const totalCount = listQuery.data?.totalElements ?? 0;
   const pageCount = Math.max(1, listQuery.data?.totalPages ?? 1);

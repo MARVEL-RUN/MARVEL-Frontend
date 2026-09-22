@@ -511,6 +511,29 @@ export function fetchAdminRegistration(registrationId: string) {
   );
 }
 
+export type RegistrationBasicInfoUpdate = {
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+  address: string;
+  addressDetail: string;
+  guardianName: string;
+  guardianPhNum: string;
+  guardianRelationship: string;
+};
+
+export function updateRegistrationBasicInfo(
+  registrationId: string,
+  body: RegistrationBasicInfoUpdate,
+) {
+  if (!registrationId.trim()) throw new Error("신청 정보를 찾을 수 없습니다.");
+  return adminFetch<void>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}/basic-info`,
+    { method: "PATCH", body: JSON.stringify(body) },
+  );
+}
+
 export function resetRegistrationPassword(
   registrationId: string,
   newPassword: string,
