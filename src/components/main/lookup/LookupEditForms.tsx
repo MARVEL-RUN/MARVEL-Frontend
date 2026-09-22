@@ -612,6 +612,19 @@ export function IndividualLookupEdit({
         <h2>수정 내용을 확인하세요</h2>
         <dl className="spec">
           <div>
+            <dt>참가종목</dt>
+            <dd>
+              {category ? (
+                <>
+                  {categoryLabel(category)}
+                  <small>{formatFee(categoryFeeAmount(category, birth))}</small>
+                </>
+              ) : (
+                "—"
+              )}
+            </dd>
+          </div>
+          <div>
             <dt>이름</dt>
             <dd>{name.trim() || "—"}</dd>
           </div>
@@ -636,19 +649,31 @@ export function IndividualLookupEdit({
             <dd>{addressView || "—"}</dd>
           </div>
           <div>
-            <dt>참가종목</dt>
-            <dd>{category ? categoryLabel(category) : "—"}</dd>
+            <dt>보호자 이름</dt>
+            <dd>{guardianName.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>보호자 관계</dt>
+            <dd>{guardianRelation.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>보호자 연락처</dt>
+            <dd>{formatPhone(guardianPhone) || guardianPhone.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>보호자 동의</dt>
+            <dd>{guardianConsent ? "동의함" : "—"}</dd>
           </div>
           <div>
             <dt>티셔츠 사이즈</dt>
             <dd>{selectedSize || "—"}</dd>
           </div>
-          {guardianRequired ? (
-            <div>
-              <dt>보호자 동의</dt>
-              <dd>{guardianConsent ? "동의함" : "—"}</dd>
-            </div>
-          ) : null}
+          <div>
+            <dt>패키지</dt>
+            <dd>
+              <KitFixed courseId={courseId} />
+            </dd>
+          </div>
         </dl>
         <DockNav>
           {hint || error ? (
