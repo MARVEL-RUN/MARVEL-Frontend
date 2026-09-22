@@ -808,10 +808,19 @@ export function GroupLookupEdit({
   );
   const [openMember, setOpenMember] = useState(0);
   const [hint, setHint] = useState("");
+  const parsedAddress = splitApiAddress(receipt.address);
   const [guardianConsent, setGuardianConsent] = useState(
     () => receipt.guardianConsent === true,
   );
   const [email, setEmail] = useState(receipt.email?.trim() || "");
+  const [leaderName, setLeaderName] = useState(receipt.leaderName?.trim() || "");
+  const [leaderBirth, setLeaderBirth] = useState(
+    (receipt.leaderBirth || "").replace(/\D/g, "").slice(0, 8),
+  );
+  const [leaderPhNum, setLeaderPhNum] = useState(receipt.leaderPhNum || "");
+  const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
+  const [address, setAddress] = useState(parsedAddress.address);
+  const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
   const optionsReady = categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(members);
   const total = useMemo(
@@ -919,6 +928,11 @@ export function GroupLookupEdit({
           : "");
       if (invalid) return `${prefix}${invalid}`;
     }
+    if (!leaderName.trim()) return "대표자 성명을 입력하세요.";
+    if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 생년월일을 입력하세요.";
+    if (leaderPhNum.replace(/\D/g, "").length < 10) return "대표자 연락처를 입력하세요.";
+    if (!zonecode.trim() || !address.trim()) return "우편번호 찾기로 주소를 선택하세요.";
+    if (!addressDetail.trim()) return "상세주소를 입력하세요.";
     if (needsGroupGuardian && !guardianConsent) {
       return "만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.";
     }
@@ -926,11 +940,20 @@ export function GroupLookupEdit({
     return "";
   }
 
+  const addressView = [zonecode.trim() ? `(${zonecode})` : "", address, addressDetail]
+    .filter(Boolean)
+    .join(" ");
+
   function buildPayload(): OrganizationRegistrationModifyRequest {
     return {
       access,
       guardianConsent: needsGroupGuardian ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
+      address: formatAddressForApi(zonecode, address),
+      addressDetail: addressDetail.trim(),
+      leaderName: leaderName.trim(),
+      leaderBirth: toApiBirth(leaderBirth),
+      leaderPhNum: formatPhone(leaderPhNum.replace(/\D/g, "")) || leaderPhNum.trim(),
       registrations: members.map((row) => {
         const next: OrganizationParticipantModifyRequest = {
           eventCategoryId: row.eventCategoryId,
@@ -976,12 +999,50 @@ export function GroupLookupEdit({
           이미 등록된 참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
         </p>
       </div>
-      <FormSec kicker="01 / CONTACT" title="연락처">
+      <FormSec kicker="01 / LEADER" title="대표자 정보">
+        <FormRow label="대표자 성명" required>
+          <input
+            type="text"
+            placeholder="대표자 성명을 입력해주세요"
+            value={leaderName}
+            onChange={(e) => setLeaderName(e.target.value)}
+            required
+          />
+        </FormRow>
+        <FormRow label="대표자 생년월일" required>
+          <BirthPick value={leaderBirth} onChange={setLeaderBirth} />
+        </FormRow>
+      </FormSec>
+      <FormSec kicker="02 / CONTACT" title="연락처">
+        <FormRow label="휴대폰번호" required>
+          <PhoneField
+            placeholder="휴대폰번호를 입력해주세요."
+            value={leaderPhNum}
+            onChange={setLeaderPhNum}
+            autoComplete="tel"
+            required
+          />
+        </FormRow>
         <FormRow label="이메일">
           <EmailField value={email} onChange={setEmail} />
         </FormRow>
       </FormSec>
-      <FormSec kicker="02" title="참가자">
+      <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+        <FormRow label="주소" required>
+          <AddressField
+            zonecode={zonecode}
+            address={address}
+            addressDetail={addressDetail}
+            onChange={(next) => {
+              if (next.zonecode != null) setZonecode(next.zonecode);
+              if (next.address != null) setAddress(next.address);
+              if (next.addressDetail != null) setAddressDetail(next.addressDetail);
+            }}
+            required
+          />
+        </FormRow>
+      </FormSec>
+      <FormSec kicker="04" title="참가자">
         <div className="party-bar">
           <p>{members.length}명 등록</p>
           <button
@@ -1215,7 +1276,7 @@ export function GroupLookupEdit({
         <p className="party-sum">합계 {formatFee(total)}</p>
       </FormSec>
       {needsGroupGuardian ? (
-        <FormSec kicker="03 / CONSENT" title="단체장 동의">
+        <FormSec kicker="05 / CONSENT" title="단체장 동의">
           <ApplyHint>
             <p>{GUARDIAN_AGE_NOTE}</p>
             <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>
@@ -1255,8 +1316,24 @@ export function GroupLookupEdit({
             <dd>{receipt.organizationName?.trim() || "—"}</dd>
           </div>
           <div>
+            <dt>대표자</dt>
+            <dd>{leaderName.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>대표자 생년월일</dt>
+            <dd>{birthView(leaderBirth) || "—"}</dd>
+          </div>
+          <div>
+            <dt>대표자 연락처</dt>
+            <dd>{formatPhone(leaderPhNum) || "—"}</dd>
+          </div>
+          <div>
             <dt>이메일</dt>
             <dd>{email.trim() || "—"}</dd>
+          </div>
+          <div>
+            <dt>주소</dt>
+            <dd>{addressView || "—"}</dd>
           </div>
           <div>
             <dt>인원</dt>
