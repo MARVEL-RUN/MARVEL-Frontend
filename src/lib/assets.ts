@@ -16,7 +16,7 @@ export const MAIN_ASSETS = {
   hero: "/images/main/hero-characters.png",
   sideBanner: "/images/main/sidebanner.png",
   sideBannerMobile: "/images/main/sidebanner-mobile.png",
-  popupShuttleSurvey: "/images/main/popup/shuttle-survey.jpeg",
+  popupShuttleSurvey: "/images/main/popup/shuttle-survey-v2.jpeg",
   footerHost: "/images/main/footer/hosted.png",
   footerOrganizer: "/images/main/footer/organizer.png",
   introMarvel: "/images/main/intro-marvel.svg",
