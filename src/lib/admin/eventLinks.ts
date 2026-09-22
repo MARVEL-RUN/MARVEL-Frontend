@@ -79,3 +79,33 @@ export function adminInquiryDetailHref(
   });
   return `${INQUIRY}/detail?${params}`;
 }
+
+/** marvel·virtual → /members/{slug}, 그 외 API id → /members/list?eventId= */
+export function adminMembersHref(eventIdOrSlug: string, query?: string) {
+  const path = isAdminRaceSlug(eventIdOrSlug)
+    ? `${MEMBERS}/${eventIdOrSlug}`
+    : `${MEMBERS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
+  if (!query) return path;
+  return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
+}
+
+export function adminMembersHrefFromEvent(event: AdminEvent, query?: string) {
+  return adminMembersHref(raceEventSlug(event) ?? event.eventId, query);
+}
+
+export function adminMembersListBackHref(apiEventId: string, slug?: AdminRaceEventId | null) {
+  if (slug) return `${MEMBERS}/${slug}`;
+  return `${MEMBERS}/list?eventId=${encodeURIComponent(apiEventId)}`;
+}
+
+export function adminOrganizationDetailHref(
+  organizationId: string,
+  options: { apiEventId: string; slug?: AdminRaceEventId | null },
+) {
+  const params = new URLSearchParams({
+    organizationId,
+    eventId: options.apiEventId,
+  });
+  if (options.slug) params.set("slug", options.slug);
+  return `${MEMBERS}/detail?${params}`;
+}
