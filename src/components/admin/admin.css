@@ -1557,6 +1557,31 @@ html.admin-mode body {
   font-size: 13px;
 }
 
+.admin-drawer__edit {
+  display: grid;
+  gap: 0;
+}
+
+.admin-drawer__edit label {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+
+.admin-drawer__edit .admin-drawer__foot {
+  position: sticky;
+  bottom: 0;
+  margin-top: 8px;
+  padding: 10px 0 0;
+  background: #fff;
+  border-top: 1px solid var(--admin-line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .admin-drawer-stack {
   --admin-detail-w: 440px;
   --admin-payments-w: 360px;

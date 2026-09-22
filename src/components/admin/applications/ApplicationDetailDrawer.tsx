@@ -16,10 +16,11 @@ import {
   type AdminApplicationRow,
 } from "@/services/admin/applications";
 import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { ApplicationBasicInfoEdit } from "./ApplicationBasicInfoEdit";
 import { ApplicationPaySummary } from "./ApplicationPaySummary";
 import { PaymentListDrawer } from "./PaymentListDrawer";
 import { PaymentLogDrawer } from "./PaymentLogDrawer";
@@ -182,8 +183,11 @@ function buildSections(row: AdminApplicationRow) {
 }
 
 export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props) {
+  const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const [editError, setEditError] = useState("");
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
@@ -195,6 +199,8 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
   useEffect(() => {
     setLogPayment(null);
     setPage(0);
+    setEditing(false);
+    setEditError("");
   }, [row?.id]);
 
   useEffect(() => {
@@ -252,6 +258,17 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
     resetPassword.mutate(password);
   };
 
+  const handleBasicInfoSaved = async () => {
+    if (!row) return;
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "registration", row.id] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
+    ]);
+    adminToast.success("기본정보가 수정되었습니다.");
+    setEditing(false);
+    setEditError("");
+  };
+
   if (!row || !mounted) return null;
 
   const isGroup = row.kind === "group";
@@ -298,7 +315,20 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
           <div className="admin-drawer__hero-bar">
             <span className="admin-drawer__hero-kind">{applicationKindLabel(row.kind)}</span>
             <div className="admin-drawer__actions">
-              {!isGroup ? (
+              {!editing ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  disabled={loading || Boolean(error)}
+                  onClick={() => {
+                    setEditError("");
+                    setEditing(true);
+                  }}
+                >
+                  기본정보 수정
+                </button>
+              ) : null}
+              {!isGroup && !editing ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -331,8 +361,21 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
         <div className="admin-drawer__body">
           {loading ? <p className="admin-empty">불러오는 중…</p> : null}
           {error ? <p className="admin-empty">{error}</p> : null}
+          {editError ? <p className="admin-empty">{editError}</p> : null}
 
-          {!loading && !error ? (
+          {!loading && !error && editing ? (
+            <ApplicationBasicInfoEdit
+              row={row}
+              onCancel={() => {
+                setEditing(false);
+                setEditError("");
+              }}
+              onSaved={() => void handleBasicInfoSaved()}
+              onError={setEditError}
+            />
+          ) : null}
+
+          {!loading && !error && !editing ? (
             <>
               <DetailSection title="신청 정보" fields={sections.applyFields} />
               {isGroup ? (
@@ -355,12 +398,14 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
               />
             </>
           ) : null}
-          <ApplicationPaySummary
-            data={finance.data}
-            loading={finance.isLoading}
-            error={finance.isError ? finance.error : undefined}
-            paymentCount={totalCount ?? payments.length}
-          />
+          {!editing ? (
+            <ApplicationPaySummary
+              data={finance.data}
+              loading={finance.isLoading}
+              error={finance.isError ? finance.error : undefined}
+              paymentCount={totalCount ?? payments.length}
+            />
+          ) : null}
         </div>
       </aside>
       {confirmModal}
