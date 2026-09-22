@@ -22,6 +22,7 @@ import {
   lookupOrganizationRegistrations,
   modifyIndividualRegistration,
   modifyOrganizationRegistration,
+  organizationLookupParticipants,
   retryIndividualPayment,
   retryOrganizationPayment,
 } from "@/services/main/registrations";
@@ -137,6 +138,16 @@ function memberSouvenirs(
   return [];
 }
 
+function participantPhone(
+  row: RegistrationReceiptMember | OrganizationLookupParticipant,
+) {
+  const phone =
+    "phoneNumber" in row && row.phoneNumber
+      ? row.phoneNumber
+      : row.phNum;
+  return phone?.trim() ?? "";
+}
+
 function toMemberView(
   row: RegistrationReceiptMember | OrganizationLookupParticipant,
   index: number,
@@ -157,9 +168,7 @@ function toMemberView(
 }
 
 function receiptMembers(receipt: RegistrationReceipt): ReceiptMemberView[] {
-  if (receipt.members?.length) return receipt.members.map(toMemberView);
-  if (receipt.registrations?.length) return receipt.registrations.map(toMemberView);
-  return [];
+  return organizationLookupParticipants(receipt).map(toMemberView);
 }
 
 function receiptSouvenirs(receipt: RegistrationReceipt) {

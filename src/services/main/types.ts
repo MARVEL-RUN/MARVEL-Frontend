@@ -150,6 +150,7 @@ export type OrganizationLookupParticipant = {
   email?: string;
   birth?: string;
   phNum?: string;
+  phoneNumber?: string;
   gender?: string;
   eventCategoryId?: string;
   eventCategoryName?: string;

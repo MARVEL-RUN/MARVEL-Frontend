@@ -26,11 +26,13 @@ import {
   categoryOpenForBirth,
   courseForCategory,
   findCategory,
+  findCategoryByLabel,
   shirtAssignment,
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
+import { organizationLookupParticipants } from "@/services/main/registrations";
 import type {
   IndividualRegistrationLookupRequest,
   IndividualRegistrationModifyRequest,
@@ -120,12 +122,12 @@ function withShirtSize(
     item.souvenirId === assigned.souvenirId
       ? { souvenirId: item.souvenirId, selectedSize: assigned.selectedSize }
       : {
-          souvenirId: item.souvenirId,
-          selectedSize:
-            prev.find((row) => row.souvenirId === item.souvenirId)?.selectedSize ||
-            item.sizes[0] ||
-            "",
-        },
+        souvenirId: item.souvenirId,
+        selectedSize:
+          prev.find((row) => row.souvenirId === item.souvenirId)?.selectedSize ||
+          item.sizes[0] ||
+          "",
+      },
   );
 }
 
@@ -407,13 +409,13 @@ export function IndividualLookupEdit({
           />
         </FormRow>
         <FormRow label="생년월일" required locked>
-          <BirthPick value={birth} onChange={() => {}} disabled />
+          <BirthPick value={birth} onChange={() => { }} disabled />
         </FormRow>
         <FormRow label="성별" required locked>
           <GenderPick
             name="gender"
             value={toUiGender(gender)}
-            onChange={() => {}}
+            onChange={() => { }}
             disabled
           />
         </FormRow>
@@ -425,7 +427,7 @@ export function IndividualLookupEdit({
             name="phone"
             placeholder="휴대폰번호를 입력해주세요."
             value={phone}
-            onChange={() => {}}
+            onChange={() => { }}
             autoComplete="tel"
             required
             disabled
@@ -566,6 +568,8 @@ export function IndividualLookupEdit({
 type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
   key: string;
   gender: "M" | "F" | "";
+  eventCategoryName?: string;
+  shirtSize?: string;
 };
 
 function memberKey() {
@@ -594,16 +598,27 @@ function emptyMember(): GroupMemberDraft {
   };
 }
 
+function participantPhone(row: OrganizationLookupParticipant) {
+  return (row.phNum || row.phoneNumber || "").replace(/\D/g, "");
+}
+
 function participantDraft(
   row: OrganizationLookupParticipant,
 ): GroupMemberDraft {
+  const selectedSouvenirList = souvenirSelections(row.selectedSouvenirList);
   return {
     key: row.registrationId || memberKey(),
     registrationId: row.registrationId,
     eventCategoryId: row.eventCategoryId || "",
-    selectedSouvenirList: souvenirSelections(row.selectedSouvenirList),
+    eventCategoryName: row.eventCategoryName || "",
+    selectedSouvenirList,
+    shirtSize:
+      selectedSouvenirList.find((item) => item.selectedSize)?.selectedSize ||
+      row.selectedSouvenirList?.[0]?.selectedSize ||
+      row.selectedSouvenirList?.[0]?.size ||
+      "",
     name: row.name,
-    phNum: row.phNum || "",
+    phNum: participantPhone(row),
     birth: (row.birth || "").replace(/\D/g, ""),
     gender: toApiGender(row.gender) || "M",
   };
@@ -627,7 +642,9 @@ export function GroupLookupEdit({
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsError, setOptionsError] = useState("");
   const [members, setMembers] = useState<GroupMemberDraft[]>(() =>
-    (receipt.registrations ?? []).filter((row) => !row.canceled).map(participantDraft),
+    organizationLookupParticipants(receipt)
+      .filter((row) => !row.canceled)
+      .map(participantDraft),
   );
   const [openMember, setOpenMember] = useState(0);
   const [hint, setHint] = useState("");
@@ -665,6 +682,32 @@ export function GroupLookupEdit({
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!categories.length) return;
+    setMembers((rows) =>
+      rows.map((member) => {
+        let eventCategoryId = member.eventCategoryId;
+        if (!eventCategoryId && member.eventCategoryName) {
+          eventCategoryId =
+            findCategoryByLabel(categories, member.eventCategoryName)?.categoryId ?? "";
+        }
+        if (!eventCategoryId) return member;
+        const category = findCategory(categories, eventCategoryId);
+        if (!category) return { ...member, eventCategoryId };
+        const size = member.shirtSize || memberShirtSize(member.selectedSouvenirList, category);
+        return {
+          ...member,
+          eventCategoryId,
+          selectedSouvenirList: size
+            ? withShirtSize(category, member.selectedSouvenirList, size, member.birth)
+            : member.selectedSouvenirList.length
+              ? member.selectedSouvenirList
+              : selectionsForCategory(category, member.selectedSouvenirList),
+        };
+      }),
+    );
+  }, [categories]);
 
   function patchMember(index: number, next: Partial<GroupMemberDraft>) {
     setMembers((rows) =>
@@ -841,24 +884,24 @@ export function GroupLookupEdit({
                               index,
                               keep
                                 ? {
+                                  birth,
+                                  selectedSouvenirList: withShirtSize(
+                                    current,
+                                    member.selectedSouvenirList,
+                                    memberShirtSize(member.selectedSouvenirList, current),
                                     birth,
-                                    selectedSouvenirList: withShirtSize(
-                                      current,
-                                      member.selectedSouvenirList,
-                                      memberShirtSize(member.selectedSouvenirList, current),
-                                      birth,
-                                    ),
-                                  }
+                                  ),
+                                }
                                 : {
+                                  birth,
+                                  eventCategoryId: "",
+                                  selectedSouvenirList: withShirtSize(
+                                    undefined,
+                                    member.selectedSouvenirList,
+                                    "",
                                     birth,
-                                    eventCategoryId: "",
-                                    selectedSouvenirList: withShirtSize(
-                                      undefined,
-                                      member.selectedSouvenirList,
-                                      "",
-                                      birth,
-                                    ),
-                                  },
+                                  ),
+                                },
                             );
                           }}
                           required
