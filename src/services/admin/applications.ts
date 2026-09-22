@@ -168,6 +168,8 @@ export type RegistrationListParams = RegistrationFilterParams & {
   size: number;
 };
 
+export type RegistrationExcelParams = RegistrationFilterParams;
+
 function compactName(name: string) {
   return name.replace(/\s/g, "");
 }
@@ -465,17 +467,16 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   );
 }
 
-export async function downloadRegistrationsExcel(params: RegistrationFilterParams) {
+export async function fetchRegistrationsExcel(params: RegistrationExcelParams) {
   const query = registrationFilterQuery(params);
-  const file = await adminFetchBlob(
+  return adminFetchBlob(
     `v1/admin/registrations/excel/download?${query}`,
     { method: "GET" },
     excelFallbackName(),
   );
-  saveAdminDownload(file.blob, file.filename);
 }
 
-export async function downloadRegistrationsExcelByIds(
+export async function fetchSelectedRegistrationsExcel(
   eventId: string,
   registrationIds: string[],
 ) {
@@ -484,11 +485,23 @@ export async function downloadRegistrationsExcelByIds(
   if (ids.length === 0) throw new Error("내려받을 신청을 선택하세요.");
 
   const query = new URLSearchParams({ eventId });
-  const file = await adminFetchBlob(
+  return adminFetchBlob(
     `v1/admin/registrations/excel/download?${query}`,
     { method: "POST", body: JSON.stringify({ registrationIds: ids }) },
     excelFallbackName(),
   );
+}
+
+export async function downloadRegistrationsExcel(params: RegistrationFilterParams) {
+  const file = await fetchRegistrationsExcel(params);
+  saveAdminDownload(file.blob, file.filename);
+}
+
+export async function downloadRegistrationsExcelByIds(
+  eventId: string,
+  registrationIds: string[],
+) {
+  const file = await fetchSelectedRegistrationsExcel(eventId, registrationIds);
   saveAdminDownload(file.blob, file.filename);
 }
 

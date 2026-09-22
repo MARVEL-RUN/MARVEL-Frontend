@@ -129,9 +129,6 @@ async function adminRequest(
   return response;
 }
 
-  return response;
-}
-
 function filenameFromDisposition(header: string | null, fallback: string) {
   if (!header) return fallback;
 
