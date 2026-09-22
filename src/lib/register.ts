@@ -456,6 +456,11 @@ export function emailOk(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 }
 
+/** 이름·단체명 — 공백 입력 차단 */
+export function filterNoSpaceName(value: string) {
+  return value.replace(/\s/g, "");
+}
+
 /** 백엔드: 5~20자, 영문/숫자/ASCII 특수문자 */
 export function filterOrgAccountInput(value: string) {
   return value.replace(/[^\x21-\x7E]/g, "");
@@ -571,6 +576,7 @@ function assertDraft(draft: EntryDraft): asserts draft is EntryDraft & {
   const picked = courseById(draft.courseId);
   if (!picked) throw new Error("참가종목을 선택하세요.");
   if (!draft.name.trim()) throw new Error("이름을 입력하세요.");
+  if (/\s/.test(draft.name)) throw new Error("이름은 띄어쓰기 없이 입력하세요.");
   if (!/^\d{8}$/.test(draft.birth)) throw new Error("생년월일을 선택하세요.");
   assertAgeTicket(draft.birth, draft.ticket, picked);
   if (!draft.gender) throw new Error("성별을 선택하세요.");
@@ -632,6 +638,9 @@ function assertGroup(draft: GroupDraft): asserts draft is GroupDraft & {
   >;
 } {
   if (!draft.groupName.trim()) throw new Error("단체명을 입력하세요.");
+  if (/\s/.test(draft.groupName)) {
+    throw new Error("단체명은 띄어쓰기 없이 입력하세요.");
+  }
   const accountErr = orgAccountError(draft.organizationAccount);
   if (accountErr) throw new Error(accountErr);
   const passwordErr = applicationPasswordError(draft.organizationPassword);

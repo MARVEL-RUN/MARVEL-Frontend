@@ -14,6 +14,7 @@ import {
   ageBand,
   courseById,
   emailOk,
+  filterNoSpaceName,
   applicationPasswordError,
   genderLabel,
   needsGuardian,
@@ -227,6 +228,7 @@ function IndividualFlow({
   function onReview(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!draft.name.trim()) return fail("이름을 입력하세요.");
+    if (/\s/.test(draft.name)) return fail("이름은 띄어쓰기 없이 입력하세요.");
     if (!/^\d{8}$/.test(draft.birth)) return fail("생년월일을 선택하세요.");
     if (ageBand(draft.birth) === "tooYoung") {
       return fail("대회일 이후 출생자는 참가할 수 없습니다.");
@@ -345,7 +347,7 @@ function IndividualFlow({
                 name="name"
                 placeholder="띄어쓰기 없이 입력해주세요."
                 value={draft.name}
-                onChange={(e) => patch({ name: e.target.value })}
+                onChange={(e) => patch({ name: filterNoSpaceName(e.target.value) })}
                 autoComplete="name"
                 required
               />
