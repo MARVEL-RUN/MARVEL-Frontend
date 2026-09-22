@@ -8,7 +8,6 @@ import type {
 type TableDef = {
   key: string;
   title: string;
-  tone: "gender" | "age" | "child";
   rows: RegistrationStatRow[];
 };
 
@@ -31,24 +30,18 @@ function num(value: number | null | undefined) {
 
 function StatsTable({
   title,
-  tone,
   courses,
   rows,
 }: {
   title: string;
-  tone: TableDef["tone"];
   courses: string[];
   rows: RegistrationStatRow[];
 }) {
   return (
-    <section className={`admin-reg-stats__group admin-reg-stats__group--${tone}`}>
-      <div className="admin-reg-stats__group-head">
-        <h3 className="admin-reg-stats__group-title">
-          <span className="admin-reg-stats__group-mark" aria-hidden />
-          {title}
-        </h3>
-      </div>
-      <div className="admin-reg-stats__table-wrap">
+    <section className="admin-reg-stats__group">
+      <h3 className="admin-reg-stats__group-title">{title}</h3>
+      <div className="admin-reg-stats__table-box">
+        <div className="admin-reg-stats__table-wrap">
         <table className="admin-table admin-reg-stats__table">
           <thead>
             <tr className="admin-reg-stats__group-row">
@@ -111,6 +104,7 @@ function StatsTable({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </section>
   );
@@ -125,9 +119,9 @@ export function RegistrationStatsTables({
 }) {
   const courses = orderedCourses(data.courseHeaders);
   const tables: TableDef[] = [
-    { key: "gender", title: "성별 별", tone: "gender", rows: data.genderStats },
-    { key: "age", title: "나이대 별", tone: "age", rows: data.ageGroupStats },
-    { key: "child", title: "아동 유무 별", tone: "child", rows: data.childStats },
+    { key: "gender", title: "성별 별", rows: data.genderStats },
+    { key: "age", title: "나이대 별", rows: data.ageGroupStats },
+    { key: "child", title: "아동 유무 별", rows: data.childStats },
   ];
 
   return (
@@ -138,7 +132,6 @@ export function RegistrationStatsTables({
           <StatsTable
             key={table.key}
             title={table.title}
-            tone={table.tone}
             courses={courses}
             rows={table.rows}
           />

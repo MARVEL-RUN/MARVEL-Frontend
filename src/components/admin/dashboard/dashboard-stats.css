@@ -4,6 +4,50 @@
   gap: 20px;
 }
 
+.admin-reg-stats-event {
+  border: 1px solid var(--admin-line);
+  background: #fff;
+}
+
+.admin-reg-stats-event__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: #fafbfc;
+  color: var(--admin-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-reg-stats-event__head:hover {
+  background: #f2f5f9;
+}
+
+.admin-reg-stats-event__title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-reg-stats-event__chev {
+  flex-shrink: 0;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.admin-reg-stats-event.is-open .admin-reg-stats-event__chev {
+  transform: rotate(180deg);
+}
+
+.admin-reg-stats-event__body {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--admin-line);
+}
+
 .admin-dash__section--ops {
   padding-top: 25px;
 }
@@ -24,62 +68,26 @@
 .admin-reg-stats__groups {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
 }
 
 .admin-reg-stats__group {
-  background: #fff;
-  border: 1px solid var(--admin-line);
-  overflow: hidden;
-}
-
-.admin-reg-stats__group-head {
   display: flex;
-  align-items: center;
-  padding: 10px 14px;
-  background: #fafbfc;
-  border-bottom: 1px solid #eef1f5;
-}
-
-.admin-reg-stats__group--gender .admin-reg-stats__group-head {
-  background: #d2e2f6;
-  border-bottom-color: #adc6e4;
-}
-
-.admin-reg-stats__group--age .admin-reg-stats__group-head {
-  background: #e0ebf7;
-  border-bottom-color: #bfd0e6;
-}
-
-.admin-reg-stats__group--child .admin-reg-stats__group-head {
-  background: #e6eef8;
-  border-bottom-color: #c4d4e6;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .admin-reg-stats__group-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--admin-ink);
+  color: var(--admin-muted);
 }
 
-.admin-reg-stats__group-mark {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: #245289;
-}
-
-.admin-reg-stats__group--age .admin-reg-stats__group-mark {
-  background: #4a7ab8;
-}
-
-.admin-reg-stats__group--child .admin-reg-stats__group-mark {
-  background: #6f97c8;
+.admin-reg-stats__table-box {
+  background: #fff;
+  border: 1px solid var(--admin-line);
+  overflow: hidden;
 }
 
 .admin-reg-stats__table-wrap {
@@ -139,33 +147,6 @@
   font-size: 11px;
   font-weight: 600;
   color: #5a6270;
-}
-
-.admin-reg-stats__group--gender .admin-reg-stats__table thead th {
-  background: #e0ebf7;
-  border-bottom-color: #c5d6e8;
-}
-
-.admin-reg-stats__group--gender .admin-reg-stats__table thead .admin-reg-stats__leaf-row th {
-  background: #e8f0f9;
-}
-
-.admin-reg-stats__group--age .admin-reg-stats__table thead th {
-  background: #e8f0f8;
-  border-bottom-color: #d0dce8;
-}
-
-.admin-reg-stats__group--age .admin-reg-stats__table thead .admin-reg-stats__leaf-row th {
-  background: #eef4f9;
-}
-
-.admin-reg-stats__group--child .admin-reg-stats__table thead th {
-  background: #ebf2f8;
-  border-bottom-color: #d2deea;
-}
-
-.admin-reg-stats__group--child .admin-reg-stats__table thead .admin-reg-stats__leaf-row th {
-  background: #f2f6fa;
 }
 
 .admin-reg-stats__table tbody td {
