@@ -1,12 +1,12 @@
-import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
-import type { AdminEvent } from "@/services/admin/applications";
-
 const APPS = "/admin/applications";
 const CAPS = "/admin/capacities";
 const MEMBERS = "/admin/members";
 const INQUIRY = "/admin/boards/inquiry";
 
-export function isAdminRaceSlug(id: string): id is AdminRaceEventId {
+type AdminRaceSlug = "marvel" | "virtual";
+type EventRef = { eventId: string };
+
+export function isAdminRaceSlug(id: string): id is AdminRaceSlug {
   return id === "marvel" || id === "virtual";
 }
 
@@ -19,12 +19,12 @@ export function adminApplicationsHref(eventIdOrSlug: string, query?: string) {
   return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
 }
 
-export function adminApplicationsHrefFromEvent(event: AdminEvent, query?: string) {
+export function adminApplicationsHrefFromEvent(event: EventRef, query?: string) {
   return adminApplicationsHref(event.eventId, query);
 }
 
 /** 대회 API eventId로 정원 상세 진입 */
-export function adminCapacitiesHrefFromEvent(event: AdminEvent) {
+export function adminCapacitiesHrefFromEvent(event: EventRef) {
   return adminCapacitiesHref(event.eventId);
 }
 
@@ -42,7 +42,7 @@ export function adminMembersHref(eventIdOrSlug: string, query?: string) {
   return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
 }
 
-export function adminMembersHrefFromEvent(event: AdminEvent, query?: string) {
+export function adminMembersHrefFromEvent(event: EventRef, query?: string) {
   return adminMembersHref(event.eventId, query);
 }
 
@@ -65,7 +65,7 @@ export function adminInquiriesHref(eventId: string) {
   return `${INQUIRY}/list?eventId=${encodeURIComponent(eventId)}`;
 }
 
-export function adminInquiriesHrefFromEvent(event: AdminEvent) {
+export function adminInquiriesHrefFromEvent(event: EventRef) {
   return adminInquiriesHref(event.eventId);
 }
 
