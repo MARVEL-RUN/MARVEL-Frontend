@@ -145,7 +145,7 @@ function IndividualFlow({
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [optionsError, setOptionsError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<"submit" | "pay" | null>(null);
   const [error, setError] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
 
@@ -209,6 +209,17 @@ function IndividualFlow({
     setPayOpen(true);
   }
 
+  async function ensureRegistration() {
+    if (registration) return registration;
+    if (!hasMainApi) throw new Error("API 주소가 설정되지 않았습니다.");
+    const created = await createRegistration(
+      DEFAULT_EVENT_ID,
+      toRegistrationCreateRequest(draft, categories),
+    );
+    setRegistration(created);
+    return created;
+  }
+
   useLayoutEffect(() => {
     if (step === 1) scrollPageTop();
   }, [step]);
@@ -269,30 +280,52 @@ function IndividualFlow({
     setPayCheckOpen(true);
   }
 
-  async function onPay() {
+  function goSubmitted() {
+    setPayCheckOpen(false);
+    router.push(withAppBase(base, "/register/complete"));
+  }
+
+  async function onSubmitApplication() {
     if (registration) {
-      openPay();
+      goSubmitted();
       return;
     }
+
+    setBusyAction("submit");
+    setError("");
+    try {
+      await ensureRegistration();
+      goSubmitted();
+    } catch (err) {
+      const message =
+        err instanceof MainHttpError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "신청서를 제출하지 못했습니다.";
+      fail(message);
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  async function onPay() {
     if (!hasMainApi || !hasTossClientKey) {
       return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
       );
     }
 
-    setBusy(true);
+    setBusyAction("pay");
     setError("");
     try {
-      const created = await createRegistration(
-        DEFAULT_EVENT_ID,
-        toRegistrationCreateRequest(draft, categories),
-      );
+      const created = await ensureRegistration();
       savePendingPayment({
         registration: created,
         customerName: draft.name.trim(),
         savedAt: Date.now(),
       });
-      setRegistration(created);
+      setPayCheckOpen(false);
       openPay();
     } catch (err) {
       const message =
@@ -303,7 +336,7 @@ function IndividualFlow({
             : "결제를 시작하지 못했습니다.";
       fail(message);
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
@@ -648,11 +681,23 @@ function IndividualFlow({
             </button>
             <button
               type="button"
+              className="btn btn--ghost"
+              onClick={onSubmitApplication}
+              disabled={busyAction !== null || Boolean(registration)}
+            >
+              {busyAction === "submit"
+                ? "제출 중..."
+                : registration
+                  ? "제출 완료"
+                  : "신청서 제출"}
+            </button>
+            <button
+              type="button"
               className="btn btn--red"
               onClick={onPay}
-              disabled={busy}
+              disabled={busyAction !== null}
             >
-              {busy ? "결제 준비 중..." : "결제하기"}
+              {busyAction === "pay" ? "결제 준비 중..." : "결제하기"}
             </button>
           </DockNav>
         </section>
