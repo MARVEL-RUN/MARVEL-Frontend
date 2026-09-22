@@ -2208,6 +2208,22 @@ button.admin-pay-list__item:hover {
   color: var(--admin-muted);
 }
 
+.admin-dash__soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 24px 16px;
+  background: #fff;
+  border: 1px solid var(--admin-line);
+}
+
+.admin-dash__soon p {
+  margin: 0;
+  font-size: 14px;
+  color: #8a93a3;
+}
+
 .admin-ops-guide__lead {
   margin: 0 0 10px;
   color: var(--admin-muted);

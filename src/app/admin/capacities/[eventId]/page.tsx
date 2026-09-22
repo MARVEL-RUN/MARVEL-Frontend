@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { CapacityStatusPage } from "@/components/admin/capacities/CapacityStatusPage";
 import {
   ADMIN_RACE_EVENTS,
@@ -27,5 +28,9 @@ export default async function Page({ params }: Props) {
   const { eventId } = await params;
   const event = getAdminRaceEvent(eventId);
   if (!event) notFound();
-  return <CapacityStatusPage eventId={event.id as AdminRaceEventId} />;
+  return (
+    <Suspense>
+      <CapacityStatusPage slug={event.id as AdminRaceEventId} />
+    </Suspense>
+  );
 }

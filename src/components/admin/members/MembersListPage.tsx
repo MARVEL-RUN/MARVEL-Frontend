@@ -210,7 +210,6 @@ export function MembersListPage({ slug }: Props) {
           <Link
             href={adminOrganizationDetailHref(row.organizationId, {
               apiEventId,
-              slug: slug ?? null,
             })}
             className="admin-members-list__go"
             onClick={(event) => event.stopPropagation()}
