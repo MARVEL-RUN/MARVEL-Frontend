@@ -342,6 +342,11 @@ export function OrganizationDetailPage() {
             organizationId={organizationId}
             members={members}
             loading={detailQuery.isLoading}
+            onOpenGroupBasicInfo={() => {
+              setEditError("");
+              setEditing(true);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
           />
         </>
       ) : (

@@ -7,6 +7,10 @@ import {
   registrationStatusBadge,
   registrationStatusLabel,
 } from "@/lib/registration-status";
+import {
+  adminMembersHref,
+  adminOrganizationDetailHref,
+} from "@/lib/admin/eventLinks";
 import { APPLICATION_PASSWORD_MIN, formatPhone } from "@/lib/register";
 import {
   applicationCourseLabel,
@@ -17,6 +21,7 @@ import {
 } from "@/services/admin/applications";
 import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -25,11 +30,15 @@ import { ApplicationPaySummary } from "./ApplicationPaySummary";
 import { PaymentListDrawer } from "./PaymentListDrawer";
 import { PaymentLogDrawer } from "./PaymentLogDrawer";
 
+export type ApplicationDetailSource = "applications" | "organization-members";
+
 type Props = {
   row: AdminApplicationRow | null;
   loading?: boolean;
   error?: string;
   onClose: () => void;
+  source?: ApplicationDetailSource;
+  onOpenGroupBasicInfo?: () => void;
 };
 
 type DetailField = {
@@ -92,6 +101,21 @@ function DetailSection({
         ))}
       </dl>
     </section>
+  );
+}
+
+function DrawerGuide({
+  children,
+  action,
+}: {
+  children: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="admin-drawer__guide" role="note">
+      <p>{children}</p>
+      {action ? <div className="admin-drawer__guide-action">{action}</div> : null}
+    </div>
   );
 }
 
@@ -192,7 +216,14 @@ function buildSections(row: AdminApplicationRow) {
   };
 }
 
-export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props) {
+export function ApplicationDetailDrawer({
+  row,
+  loading,
+  error,
+  onClose,
+  source = "applications",
+  onOpenGroupBasicInfo,
+}: Props) {
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(0);
@@ -282,8 +313,14 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
   if (!row || !mounted) return null;
 
   const isGroup = row.kind === "group";
+  const isOrgMemberContext = source === "organization-members";
+  const blockGroupEdit = source === "applications" && isGroup;
+  const canEditBasicInfo = !blockGroupEdit;
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
+  const membersHref = row.organizationId
+    ? adminOrganizationDetailHref(row.organizationId, { apiEventId: row.eventId })
+    : adminMembersHref(row.eventId);
   const payments = finance.data?.payments?.content ?? [];
   const totalPages = Math.max(1, finance.data?.payments?.totalPages ?? 1);
   const totalCount = finance.data?.payments?.totalElements;
@@ -335,7 +372,7 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
               ) : null}
             </div>
             <div className="admin-drawer__actions">
-              {!editing ? (
+              {!editing && canEditBasicInfo ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -347,7 +384,7 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 >
                   기본정보 수정
                 </button>
-              ) : (
+              ) : !editing ? null : (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -397,23 +434,63 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
           {!loading && !error && editing ? (
             <ApplicationBasicInfoEdit
               row={row}
+              mode={isOrgMemberContext ? "organization-member" : "full"}
               onCancel={() => {
                 setEditing(false);
                 setEditError("");
               }}
               onSaved={() => void handleBasicInfoSaved()}
               onError={setEditError}
+              onOpenGroupBasicInfo={
+                isOrgMemberContext && onOpenGroupBasicInfo
+                  ? () => {
+                      setEditing(false);
+                      setEditError("");
+                      onOpenGroupBasicInfo();
+                    }
+                  : undefined
+              }
             />
           ) : null}
 
           {!loading && !error && !editing ? (
             <>
+              {blockGroupEdit ? (
+                <DrawerGuide
+                  action={
+                    <Link href={membersHref} className="admin-drawer__guide-link">
+                      {row.organizationId ? "단체 상세 바로가기" : "단체회원 관리 바로가기"}
+                    </Link>
+                  }
+                >
+                  단체 소속 참가자는 이 화면에서 수정할 수 없습니다. 단체회원 관리에서
+                  수정해 주세요.
+                </DrawerGuide>
+              ) : null}
+              {isOrgMemberContext ? (
+                <DrawerGuide
+                  action={
+                    onOpenGroupBasicInfo ? (
+                      <button
+                        type="button"
+                        className="admin-drawer__guide-link"
+                        onClick={onOpenGroupBasicInfo}
+                      >
+                        기본정보 수정 바로가기
+                      </button>
+                    ) : null
+                  }
+                >
+                  이메일·주소는 단체 공통 정보입니다. 변경이 필요하면 단체 상세 상단
+                  「기본정보 수정」을 이용해 주세요.
+                </DrawerGuide>
+              ) : null}
               <DetailSection title="신청 정보" fields={sections.applyFields} />
               {isGroup ? (
                 <DetailSection title="단체" fields={sections.groupFields} />
               ) : null}
               <DetailSection
-                title={isGroup ? "참가자" : "신청자"}
+                title={isGroup || isOrgMemberContext ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
               <DetailSection

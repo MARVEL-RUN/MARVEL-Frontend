@@ -161,6 +161,10 @@ export function OrganizationBasicInfoEdit({
       onSubmit={submit}
       noValidate
     >
+      <p className="admin-org-detail__edit-note">
+        대표 이메일·단체 주소는 구성원 전원에게 적용됩니다. 참가자별 이름·연락처 등은
+        아래 구성원 목록에서 수정하세요.
+      </p>
       <section className="admin-org-detail__card">
         <h2>기본 정보</h2>
         <dl>

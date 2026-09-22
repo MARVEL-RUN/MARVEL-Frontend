@@ -535,6 +535,7 @@ export function ApplicationsListPage({ slug }: Props) {
       />
       <ApplicationDetailDrawer
         row={selected}
+        source="applications"
         loading={Boolean(selectedId) && detailQuery.isLoading}
         error={
           Boolean(selectedId) && detailQuery.isError
