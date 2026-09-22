@@ -7,7 +7,7 @@ import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { adminMembersListBackHref } from "@/lib/admin/eventLinks";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
+import { APPLICATION_PASSWORD_MIN, formatPhone } from "@/lib/register";
 import { formatAmount } from "@/services/admin/applications";
 import {
   fetchAdminOrganization,
@@ -18,6 +18,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import {
+  ORG_BASIC_EDIT_FORM_ID,
+  OrganizationBasicInfoEdit,
+} from "./OrganizationBasicInfoEdit";
 import { OrganizationLoginIdModal } from "./OrganizationLoginIdModal";
 import { OrganizationMembersList } from "./OrganizationMembersList";
 
@@ -36,6 +40,18 @@ function dash(value?: string | number | null) {
   return text || "-";
 }
 
+function displayPhone(value?: string | null) {
+  const raw = (value ?? "").trim();
+  if (!raw) return "-";
+  return formatPhone(raw.replace(/\D/g, "")) || raw;
+}
+
+function agreeLabel(value?: boolean) {
+  if (value === true) return "동의함";
+  if (value === false) return "미동의";
+  return "-";
+}
+
 export function OrganizationDetailPage() {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -44,6 +60,9 @@ export function OrganizationDetailPage() {
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
   const [loginIdOpen, setLoginIdOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   const detailQuery = useQuery({
     queryKey: ["admin", "organization", organizationId],
@@ -148,6 +167,41 @@ export function OrganizationDetailPage() {
           <p className="admin-org-detail__lead">{detail?.groupName || "불러오는 중…"}</p>
         </div>
         <div className="admin-org-detail__actions">
+          {!editing ? (
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost"
+              disabled={detailQuery.isLoading || !detail}
+              onClick={() => {
+                setEditError("");
+                setEditing(true);
+              }}
+            >
+              기본정보 수정
+            </button>
+          ) : (
+            <>
+              <button
+                type="submit"
+                form={ORG_BASIC_EDIT_FORM_ID}
+                className="admin-btn admin-btn--primary"
+                disabled={editSaving}
+              >
+                {editSaving ? "저장 중…" : "저장"}
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                disabled={editSaving}
+                onClick={() => {
+                  setEditing(false);
+                  setEditError("");
+                }}
+              >
+                수정 취소
+              </button>
+            </>
+          )}
           <button
             type="button"
             className="admin-btn admin-btn--ghost"
@@ -155,7 +209,8 @@ export function OrganizationDetailPage() {
               changeLoginId.isPending ||
               detailQuery.isLoading ||
               !detail ||
-              !apiEventId
+              !apiEventId ||
+              editing
             }
             onClick={() => setLoginIdOpen(true)}
           >
@@ -165,7 +220,7 @@ export function OrganizationDetailPage() {
             type="button"
             className="admin-btn admin-btn--ghost"
             disabled={
-              resetPassword.isPending || detailQuery.isLoading || !detail
+              resetPassword.isPending || detailQuery.isLoading || !detail || editing
             }
             onClick={handleResetPassword}
           >
@@ -190,55 +245,97 @@ export function OrganizationDetailPage() {
         <p className="admin-empty">불러오는 중…</p>
       ) : detail ? (
         <>
-          <div className="admin-org-detail__summary">
-            <section className="admin-org-detail__card">
-              <h2>기본 정보</h2>
-              <dl>
-                <div className="admin-org-detail__row">
-                  <dt>단체명</dt>
-                  <dd>{dash(detail.groupName)}</dd>
-                </div>
-                <div className="admin-org-detail__row">
-                  <dt>대표자명</dt>
-                  <dd>{dash(detail.leaderName)}</dd>
-                </div>
-                <div className="admin-org-detail__row">
-                  <dt>대표 아이디</dt>
-                  <dd>{dash(detail.loginId)}</dd>
-                </div>
-                <div className="admin-org-detail__row">
-                  <dt>대표 이메일</dt>
-                  <dd>{dash(detail.email)}</dd>
-                </div>
-              </dl>
-            </section>
-            <section className="admin-org-detail__card">
-              <h2>신청 정보</h2>
-              <dl>
-                <div className="admin-org-detail__row">
-                  <dt>신청일시</dt>
-                  <dd>{formatAdminBoardDate(detail.createdAt)}</dd>
-                </div>
-                <div className="admin-org-detail__row">
-                  <dt>대회명</dt>
-                  <dd>{dash(detail.eventName)}</dd>
-                </div>
-                <div className="admin-org-detail__row">
-                  <dt>총 구성원</dt>
-                  <dd>{members.length > 0 ? `${members.length}명` : "-"}</dd>
-                </div>
-              </dl>
-            </section>
-            <section className="admin-org-detail__card">
-              <h2>결제 정보</h2>
-              <dl>
-                <div className="admin-org-detail__row">
-                  <dt>총 금액</dt>
-                  <dd>{totalAmount > 0 ? formatAmount(totalAmount) : "-"}</dd>
-                </div>
-              </dl>
-            </section>
-          </div>
+          {editError ? <p className="admin-drawer__edit-alert">{editError}</p> : null}
+          {editing ? (
+            <OrganizationBasicInfoEdit
+              detail={detail}
+              onPendingChange={setEditSaving}
+              onSaved={async () => {
+                await queryClient.invalidateQueries({
+                  queryKey: ["admin", "organization", organizationId],
+                });
+                adminToast.success("기본정보가 수정되었습니다.");
+                setEditing(false);
+                setEditError("");
+              }}
+              onError={setEditError}
+            />
+          ) : (
+            <div className="admin-org-detail__summary">
+              <section className="admin-org-detail__card">
+                <h2>기본 정보</h2>
+                <dl>
+                  <div className="admin-org-detail__row">
+                    <dt>단체명</dt>
+                    <dd>{dash(detail.groupName)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>대표자명</dt>
+                    <dd>{dash(detail.leaderName)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>대표자 생년월일</dt>
+                    <dd>{dash(detail.leaderBirth)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>대표자 연락처</dt>
+                    <dd>{displayPhone(detail.leaderPhNum)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>대표 아이디</dt>
+                    <dd>{dash(detail.loginId)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>대표 이메일</dt>
+                    <dd>{dash(detail.email)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>법정대리인 동의</dt>
+                    <dd>{agreeLabel(detail.guardianConsent)}</dd>
+                  </div>
+                </dl>
+              </section>
+              <section className="admin-org-detail__card">
+                <h2>주소</h2>
+                <dl>
+                  <div className="admin-org-detail__row">
+                    <dt>주소</dt>
+                    <dd>{dash(detail.address)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>상세주소</dt>
+                    <dd>{dash(detail.addressDetail)}</dd>
+                  </div>
+                </dl>
+              </section>
+              <section className="admin-org-detail__card">
+                <h2>신청 정보</h2>
+                <dl>
+                  <div className="admin-org-detail__row">
+                    <dt>신청일시</dt>
+                    <dd>{formatAdminBoardDate(detail.createdAt)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>대회명</dt>
+                    <dd>{dash(detail.eventName)}</dd>
+                  </div>
+                  <div className="admin-org-detail__row">
+                    <dt>총 구성원</dt>
+                    <dd>{members.length > 0 ? `${members.length}명` : "-"}</dd>
+                  </div>
+                </dl>
+              </section>
+              <section className="admin-org-detail__card">
+                <h2>결제 정보</h2>
+                <dl>
+                  <div className="admin-org-detail__row">
+                    <dt>총 금액</dt>
+                    <dd>{totalAmount > 0 ? formatAmount(totalAmount) : "-"}</dd>
+                  </div>
+                </dl>
+              </section>
+            </div>
+          )}
 
           <OrganizationMembersList
             apiEventId={apiEventId}

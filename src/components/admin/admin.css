@@ -2199,6 +2199,47 @@ button.admin-pay-list__item:hover {
   word-break: break-word;
 }
 
+.admin-org-detail__hint {
+  display: block;
+  margin-top: 2px;
+  color: var(--admin-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.admin-org-detail__summary--edit {
+  margin-bottom: 12px;
+}
+
+.admin-org-detail__input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 3px;
+  background: #fff;
+  padding: 5px 8px;
+  font: inherit;
+  color: inherit;
+}
+
+.admin-org-detail__input:focus {
+  outline: none;
+  border-color: var(--admin-accent, #2563eb);
+  box-shadow: 0 0 0 1px var(--admin-accent, #2563eb);
+}
+
+.admin-org-detail__card--readonly {
+  background: #fafafa;
+}
+
+.admin-org-detail__consent {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
 .admin-org-detail__members {
   flex: 0 1 auto;
   min-height: 0;
