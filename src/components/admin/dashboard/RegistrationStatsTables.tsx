@@ -79,7 +79,7 @@ function StatsTable({
                 </th>
               ))}
               <th className="is-num is-total is-section-start">인원</th>
-              <th className="is-num is-pay is-section-start">카드</th>
+              <th className="is-num is-pay is-section-start">카드결제</th>
               <th className="is-num is-pay">간편결제</th>
               <th className="is-num is-pay">미결제</th>
               <th className="is-num is-kind is-section-start">개인</th>
