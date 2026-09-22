@@ -25,8 +25,8 @@ function isTotalRow(classification: string) {
   return classification.includes("합계");
 }
 
-function num(value: number) {
-  return value.toLocaleString();
+function num(value: number | null | undefined) {
+  return (value ?? 0).toLocaleString();
 }
 
 function StatsTable({
@@ -80,8 +80,8 @@ function StatsTable({
               ))}
               <th className="is-num is-total is-section-start">인원</th>
               <th className="is-num is-pay is-section-start">카드</th>
-              <th className="is-num is-pay">통장</th>
-              <th className="is-num is-pay">무료</th>
+              <th className="is-num is-pay">간편결제</th>
+              <th className="is-num is-pay">미결제</th>
               <th className="is-num is-kind is-section-start">개인</th>
               <th className="is-num is-kind">단체</th>
             </tr>
@@ -103,8 +103,8 @@ function StatsTable({
                 ))}
                 <td className="is-num is-total is-section-start">{num(row.totalCount)}</td>
                 <td className="is-num is-pay is-section-start">{num(row.cardCount)}</td>
-                <td className="is-num is-pay">{num(row.transferCount)}</td>
-                <td className="is-num is-pay">{num(row.freeCount)}</td>
+                <td className="is-num is-pay">{num(row.easyPayCount)}</td>
+                <td className="is-num is-pay">{num(row.unpaidCount)}</td>
                 <td className="is-num is-kind is-section-start">{num(row.personalCount)}</td>
                 <td className="is-num is-kind">{num(row.groupCount)}</td>
               </tr>

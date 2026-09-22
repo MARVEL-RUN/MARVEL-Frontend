@@ -32,8 +32,8 @@ export type RegistrationStatRow = {
   courseCounts: Record<string, number>;
   totalCount: number;
   cardCount: number;
-  transferCount: number;
-  freeCount: number;
+  easyPayCount?: number;
+  unpaidCount?: number;
   personalCount: number;
   groupCount: number;
 };
