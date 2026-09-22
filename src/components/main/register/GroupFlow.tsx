@@ -43,6 +43,7 @@ import {
   formatFee,
   genderLabel,
   emailOk,
+  filterNoSpaceName,
   filterOrgAccountInput,
   groupNeedsGuardian,
   orgAccountError,
@@ -412,6 +413,9 @@ export function GroupFlow({
       return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
     }
     if (!draft.groupName.trim()) return fail("단체명을 입력하세요.");
+    if (/\s/.test(draft.groupName)) {
+      return fail("단체명은 띄어쓰기 없이 입력하세요.");
+    }
     const accountErr = orgAccountError(draft.organizationAccount);
     if (accountErr) return fail(accountErr);
     if (hasMainApi) {
@@ -589,7 +593,9 @@ export function GroupFlow({
                   type="text"
                   placeholder="단체명을 띄어쓰기 없이 입력해주세요"
                   value={draft.groupName}
-                  onChange={(e) => patch({ groupName: e.target.value })}
+                  onChange={(e) =>
+                    patch({ groupName: filterNoSpaceName(e.target.value) })
+                  }
                   className={nameHint?.tone === "is-err" ? "is-err" : undefined}
                   aria-invalid={nameHint?.tone === "is-err"}
                   required
