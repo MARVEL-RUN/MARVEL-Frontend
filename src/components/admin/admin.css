@@ -670,6 +670,34 @@ html.admin-mode body {
   gap: 10px;
 }
 
+.admin-apps-list .admin-table th.is-check,
+.admin-apps-list .admin-table td.is-check {
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.admin-apps-list__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 20px;
+}
+
+.admin-apps-list__check input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  accent-color: #1a73e8;
+  cursor: pointer;
+}
+
+.admin-apps-list__check input:disabled {
+  cursor: not-allowed;
+}
+
 .admin-apps-list__hint {
   margin: 0;
   font-size: 12px;

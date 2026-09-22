@@ -2,7 +2,7 @@
 
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
-import { RowCheck } from "@/components/admin/Table/RowCheck";
+import { adminToast } from "@/components/admin/Toast";
 import { hasAdminApi } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
@@ -22,6 +22,8 @@ import {
   applicationGenderLabel,
   applicationKindLabel,
   applyRegistrationDetail,
+  downloadRegistrationsExcel,
+  downloadRegistrationsExcelByIds,
   fetchAdminEventCategories,
   fetchAdminEvents,
   fetchAdminRegistration,
@@ -31,6 +33,11 @@ import {
   type AdminApplicationRow,
   type ApplicationKind,
 } from "@/services/admin/applications";
+import {
+  ExcelDownloadButtons,
+  ExcelPageCheck,
+  ExcelRowCheck,
+} from "./ExcelDownloadBar";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
@@ -129,7 +136,8 @@ export function ApplicationsListPage({ slug }: Props) {
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [excelBusy, setExcelBusy] = useState(false);
 
   const eventsQuery = useQuery({
     queryKey: ["admin", "events"],
@@ -220,6 +228,10 @@ export function ApplicationsListPage({ slug }: Props) {
     setSelectedId(null);
   }, [page]);
 
+  useEffect(() => {
+    setPicked(new Set());
+  }, [apiEventId, applied]);
+
   const rows = listQuery.data?.content ?? [];
   const totalCount = listQuery.data?.totalElements ?? 0;
   const pageCount = Math.max(1, listQuery.data?.totalPages ?? 1);
@@ -247,6 +259,49 @@ export function ApplicationsListPage({ slug }: Props) {
     setCourse("");
     setApplied({ q: "", kind: "", status: "", eventCategoryId: "" });
     setPage(1);
+  };
+
+  const pageIds = rows.map((row) => row.id).filter(Boolean);
+
+  const togglePick = (id: string) => {
+    setPicked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const togglePage = () => {
+    setPicked((prev) => {
+      const next = new Set(prev);
+      const allPicked = pageIds.length > 0 && pageIds.every((id) => next.has(id));
+      if (allPicked) pageIds.forEach((id) => next.delete(id));
+      else pageIds.forEach((id) => next.add(id));
+      return next;
+    });
+  };
+
+  const excelFilters = {
+    eventId: apiEventId,
+    type: applied.kind,
+    status: applied.status,
+    keyword: applied.q,
+    eventCategoryId: applied.eventCategoryId,
+  };
+
+  const runExcel = async (task: () => Promise<void>) => {
+    if (!apiEventId || excelBusy) return;
+    setExcelBusy(true);
+    try {
+      await task();
+    } catch (error) {
+      adminToast.error(
+        error instanceof Error ? error.message : "엑셀 다운로드에 실패했습니다.",
+      );
+    } finally {
+      setExcelBusy(false);
+    }
   };
 
   if (slug && !getAdminRaceEvent(slug)) {
@@ -295,22 +350,16 @@ export function ApplicationsListPage({ slug }: Props) {
     {
       key: "check",
       header: (
-        <RowCheck
-          checked={allPageChecked}
-          indeterminate={somePageChecked}
-          disabled={pageIds.length === 0}
-          label="현재 페이지 전체 선택"
-          onChange={togglePage}
-        />
+        <ExcelPageCheck ids={pageIds} picked={picked} onTogglePage={togglePage} />
       ),
       className: "is-check",
       width: "36px",
       render: (row: AdminApplicationRow) =>
         row.id ? (
-          <RowCheck
-            checked={checkedIds.includes(row.id)}
+          <ExcelRowCheck
+            checked={picked.has(row.id)}
             label={`${row.name || "신청"} 선택`}
-            onChange={(checked) => toggleRow(row.id, checked)}
+            onChange={() => togglePick(row.id)}
           />
         ) : null,
     },
@@ -437,16 +486,16 @@ export function ApplicationsListPage({ slug }: Props) {
         actions={
           <div className="admin-table-shell__actions admin-apps-list__head-actions">
             <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
-            <ExcelDownloadActions
-              eventId={apiEventId}
-              selectedIds={checkedIds}
-              filters={{
-                type: applied.kind,
-                status: applied.status,
-                keyword: applied.q,
-                eventCategoryId: applied.eventCategoryId,
-              }}
-              disabled={!hasAdminApi}
+            <ExcelDownloadButtons
+              busy={excelBusy}
+              selectedCount={picked.size}
+              disabled={!hasAdminApi || !apiEventId}
+              onFiltered={() => void runExcel(() => downloadRegistrationsExcel(excelFilters))}
+              onSelected={() =>
+                void runExcel(() =>
+                  downloadRegistrationsExcelByIds(apiEventId, [...picked]),
+                )
+              }
             />
             <Link href="/admin/applications" className="admin-btn admin-btn--ghost">
               대회 목록

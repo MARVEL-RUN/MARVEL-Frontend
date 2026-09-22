@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
-import { LOOKUP_HREF, NAV_ITEMS } from "@/lib/mode";
+import { useAppHref } from "@/lib/main/useAppBasePath";
+import { NAV_ITEMS } from "@/lib/mode";
 import { RegisterCta } from "../register/RegisterCta";
 import { pinToHeader } from "@/lib/pin-header";
 
@@ -52,6 +53,7 @@ function SponsorInquiry({ className }: { className?: string }) {
 
 export function Header() {
   const pathname = usePathname();
+  const lookupHref = useAppHref("/lookup");
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -218,7 +220,7 @@ export function Header() {
           <div className="site-header__actions">
             <RegisterCta className="btn btn--red site-header__cta" compact />
             <Link
-              href={LOOKUP_HREF}
+              href={lookupHref}
               className="btn btn--ghost site-header__cta site-header__lookup"
             >
               <span>신청조회</span>
@@ -317,7 +319,7 @@ export function Header() {
         <div className="site-header__drawer-actions">
           <RegisterCta className="btn btn--red" plain />
           <Link
-            href={LOOKUP_HREF}
+            href={lookupHref}
             className="btn btn--ghost site-header__lookup"
           >
             <span>신청조회</span>
