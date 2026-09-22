@@ -36,7 +36,7 @@ function formFromDetail(detail: AdminOrganizationDetail): FormState {
     groupName: detail.groupName.trim(),
     leaderName: detail.leaderName.trim(),
     leaderBirth: detail.leaderBirth.replace(/\D/g, "").slice(0, 8),
-    leaderPhNum: detail.leaderPhNum.replace(/\D/g, ""),
+    leaderPhNum: formatPhone(detail.leaderPhNum),
     email: detail.email.trim(),
     address: detail.address.trim(),
     addressDetail: detail.addressDetail.trim(),
@@ -62,7 +62,7 @@ function validate(form: FormState) {
   if (!form.groupName.trim()) return "단체명을 입력하세요.";
   if (!form.leaderName.trim()) return "대표자명을 입력하세요.";
   if (form.leaderBirth.replace(/\D/g, "").length !== 8) return "생년월일 8자리를 입력하세요.";
-  if (!form.leaderPhNum.trim()) return "대표자 연락처를 입력하세요.";
+  if (form.leaderPhNum.replace(/\D/g, "").length < 10) return "대표자 연락처를 입력하세요.";
   if (form.email.trim() && !emailOk(form.email)) return "이메일 형식을 확인하세요.";
   if (!form.address.trim()) return "주소를 입력하세요.";
   if (!form.addressDetail.trim()) return "상세주소를 입력하세요.";
@@ -74,7 +74,7 @@ function toPayload(form: FormState): OrganizationBasicInfoUpdate {
     groupName: form.groupName.trim(),
     leaderName: form.leaderName.trim(),
     leaderBirth: toApiBirth(form.leaderBirth),
-    leaderPhNum: form.leaderPhNum.replace(/\D/g, ""),
+    leaderPhNum: formatPhone(form.leaderPhNum),
     ...(form.email.trim() ? { email: form.email.trim() } : {}),
     address: form.address.trim(),
     addressDetail: form.addressDetail.trim(),
@@ -154,8 +154,6 @@ export function OrganizationBasicInfoEdit({
     save.mutate();
   };
 
-  const phonePreview = form.leaderPhNum ? formatPhone(form.leaderPhNum) : "";
-
   return (
     <form
       id={ORG_BASIC_EDIT_FORM_ID}
@@ -192,15 +190,15 @@ export function OrganizationBasicInfoEdit({
               }
             />
           </EditRow>
-          <EditRow label="대표자 연락처" hint={phonePreview || undefined}>
+          <EditRow label="대표자 연락처">
             <input
               className="admin-org-detail__input"
+              type="tel"
               value={form.leaderPhNum}
               inputMode="numeric"
-              placeholder="숫자만 입력"
-              onChange={(e) =>
-                patch({ leaderPhNum: e.target.value.replace(/\D/g, "").slice(0, 11) })
-              }
+              placeholder="010-1234-5678"
+              maxLength={13}
+              onChange={(e) => patch({ leaderPhNum: formatPhone(e.target.value) })}
               autoComplete="tel"
             />
           </EditRow>
