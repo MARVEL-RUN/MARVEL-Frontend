@@ -44,7 +44,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ApplicationDetailDrawer } from "./ApplicationDetailDrawer";
 import { ExcelDownloadActions } from "./ExcelDownloadActions";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 15;
 
@@ -426,20 +426,9 @@ export function ApplicationsListPage({ slug }: Props) {
     },
   ];
 
-  const tableRowCount = rows.length;
-  const fixedTableHeight =
-    hasAdminApi &&
-    Boolean(apiEventId) &&
-    listQuery.data !== undefined &&
-    tableRowCount > 0;
-  const listPageStyle = fixedTableHeight
-    ? ({ "--admin-apps-list-rows": tableRowCount } as CSSProperties)
-    : undefined;
-
   return (
     <div
-      className={`admin-page admin-apps-list${fixedTableHeight ? " is-fixed-table" : ""}${listQuery.isFetching ? " is-fetching" : ""}`}
-      style={listPageStyle}
+      className={`admin-page admin-apps-list${listQuery.isFetching ? " is-fetching" : ""}`}
     >
       <AdminTableShell<AdminApplicationRow>
         title={eventTitle}

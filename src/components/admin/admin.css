@@ -527,6 +527,11 @@ html.admin-mode body {
   min-height: 0;
 }
 
+.admin-page.admin-apps-list:not(.admin-members-list) {
+  flex: none;
+  min-height: auto;
+}
+
 .admin-apps-list .admin-table-shell {
   display: flex;
   flex-direction: column;
@@ -554,6 +559,12 @@ html.admin-mode body {
   flex: 0 1 auto;
   overflow-x: auto;
   overflow-y: auto;
+}
+
+.admin-page.admin-apps-list:not(.admin-members-list) .admin-table-wrap {
+  flex: none;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 /* 행 높이는 셀에 고정. wrap 높이를 수식으로 맞추면 보더·서브픽셀 때문에 미세 스크롤이 남음 */
