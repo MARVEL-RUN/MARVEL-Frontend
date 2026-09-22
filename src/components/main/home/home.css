@@ -47,6 +47,12 @@
   background: #07081c;
 }
 
+.home-pop__shot a {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
 .home-pop__shot img {
   display: block;
   width: 100%;
