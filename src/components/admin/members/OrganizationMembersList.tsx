@@ -112,6 +112,7 @@ type Props = {
   organizationId: string;
   members: AdminOrganizationMember[];
   loading?: boolean;
+  onOpenGroupBasicInfo?: () => void;
 };
 
 export function OrganizationMembersList({
@@ -119,6 +120,7 @@ export function OrganizationMembersList({
   organizationId,
   members,
   loading = false,
+  onOpenGroupBasicInfo,
 }: Props) {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<RegistrationStatus | "">("");
@@ -440,6 +442,7 @@ export function OrganizationMembersList({
       />
       <ApplicationDetailDrawer
         row={selected}
+        source="organization-members"
         loading={Boolean(selectedId) && detailQuery.isLoading}
         error={
           Boolean(selectedId) && detailQuery.isError
@@ -447,6 +450,10 @@ export function OrganizationMembersList({
             : undefined
         }
         onClose={() => setSelectedId(null)}
+        onOpenGroupBasicInfo={() => {
+          setSelectedId(null);
+          onOpenGroupBasicInfo?.();
+        }}
       />
     </div>
   );
