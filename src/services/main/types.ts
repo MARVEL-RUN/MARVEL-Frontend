@@ -237,17 +237,25 @@ export type OrganizationRegistrationModifyRequest = {
   registrations: OrganizationParticipantModifyRequest[];
   guardianConsent?: boolean;
   email?: string;
+  address: string;
+  addressDetail: string;
+  leaderName: string;
+  leaderBirth: string;
+  leaderPhNum: string;
+};
+
+export type RegistrationSettlementRefund = {
+  paymentCancelId?: string;
+  paymentId?: string;
+  amount?: number;
+  status?: string;
+  correlationId?: string;
 };
 
 export type RegistrationSettlementResult = {
   members?: RegistrationReceiptMember[];
   orders?: PaymentRetryResponse[];
-  refunds?: {
-    paymentCancelId?: string;
-    paymentId?: string;
-    amount?: number;
-    status?: string;
-  }[];
+  refunds?: RegistrationSettlementRefund[];
 };
 
 export type PaymentConfirmRequest = {
