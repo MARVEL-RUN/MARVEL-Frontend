@@ -68,7 +68,9 @@ export function RegisterPayCheckModal({ open, onClose }: Props) {
         <p id={descId} className="inquiry-secret__desc">
           아래 접수 내용을 확인해 주세요.
           <br />
-          신청서 제출 시 미결제 상태로 저장되며, 결제하기를 누르면 바로 결제가 진행됩니다.
+          <strong>신청서 제출</strong>을 누르면 나중에 결제를 진행하게 됩니다.
+          <br />
+          <strong>결제하기</strong>를 누르면 바로 결제가 시작됩니다.
         </p>
         <div className="inquiry-secret__actions">
           <button type="button" className="btn btn--red" onClick={onClose}>

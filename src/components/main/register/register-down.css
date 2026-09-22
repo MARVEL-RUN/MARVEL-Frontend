@@ -1,0 +1,26 @@
+.register-down {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.register-down__chip {
+  display: inline-flex;
+  margin: 0 0 1.1rem;
+  padding: 0.52rem 1.15rem 0.5rem 1.2rem;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .register-down__chip {
+    margin: 0 0 0.9rem;
+    padding: 0.42rem 0.8rem 0.4rem 0.85rem;
+    font-size: 0.8rem;
+  }
+}
