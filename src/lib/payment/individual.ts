@@ -5,6 +5,7 @@ import {
   souvenirSizes,
 } from "@/lib/registration-options";
 import {
+  filterNoSpaceName,
   guardianRequiredFor,
   termsAgreementFields,
   type EntryDraft,
@@ -46,7 +47,7 @@ export function toRegistrationCreateRequest(
       { souvenirId: souvenir.souvenirId, selectedSize: size },
     ],
     password: (draft.password ?? "").trim(),
-    name: draft.name.trim(),
+    name: filterNoSpaceName(draft.name),
     phNum: phoneDigits(draft.phone),
     birth: birthToApi(draft.birth),
     gender: genderToApi(draft.gender),
