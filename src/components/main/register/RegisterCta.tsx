@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Lock } from "lucide-react";
 import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
-import { REGISTER_HREF } from "@/lib/mode";
+import { useAppHref } from "@/lib/main/useAppBasePath";
 import { RegisterClosedModal } from "./RegisterClosedModal";
 import { useRegistrationOpen } from "./useRegistrationOpen";
 
@@ -18,10 +18,11 @@ type Props = {
 export function RegisterCta({ className, compact, plain }: Props) {
   const [open, setOpen] = useState(false);
   const registrationOpen = useRegistrationOpen();
+  const registerHref = useAppHref("/register");
 
   if (registrationOpen) {
     return (
-      <Link href={REGISTER_HREF} className={className}>
+      <Link href={registerHref} className={className}>
         참가신청
       </Link>
     );
