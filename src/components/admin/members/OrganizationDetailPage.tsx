@@ -206,6 +206,10 @@ export function OrganizationDetailPage() {
                   <dt>대표 아이디</dt>
                   <dd>{dash(detail.loginId)}</dd>
                 </div>
+                <div className="admin-org-detail__row">
+                  <dt>대표 이메일</dt>
+                  <dd>{dash(detail.email)}</dd>
+                </div>
               </dl>
             </section>
             <section className="admin-org-detail__card">

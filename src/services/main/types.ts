@@ -35,12 +35,13 @@ export type RegistrationCreateRequest = {
   address: string;
   addressDetail: string;
   guardianName?: string;
-  guardianPhone?: string;
+  guardianPhNum?: string;
   guardianRelationship?: string;
   guardianConsent?: boolean;
   termsEssentialAgreed: boolean;
   termsMarketingAgreed: boolean;
   termsMarketingChannelAgreed: boolean;
+  email?: string;
 };
 
 export type RegistrationCreateResponse = {
@@ -146,12 +147,17 @@ export type RegistrationReceiptSouvenir = {
 export type OrganizationLookupParticipant = {
   registrationId: string;
   name: string;
+  email?: string;
   birth?: string;
   phNum?: string;
   gender?: string;
   eventCategoryId?: string;
   eventCategoryName?: string;
   selectedSouvenirList?: RegistrationReceiptSouvenir[];
+  address?: string;
+  addressDetail?: string;
+  guardianName?: string;
+  guardianPhNum?: string;
   canceled?: boolean;
   registrationStatus?: string;
 };
@@ -160,6 +166,7 @@ export type RegistrationReceipt = {
   registrationId?: string | null;
   organizationId?: string | null;
   organizationName?: string | null;
+  loginId?: string | null;
   leaderName?: string | null;
   leaderBirth?: string | null;
   leaderPhNum?: string | null;
@@ -211,6 +218,7 @@ export type IndividualRegistrationModifyRequest = {
   guardianPhNum?: string;
   guardianRelationship?: string;
   guardianConsent?: boolean;
+  email?: string;
 };
 
 export type OrganizationParticipantModifyRequest = {
@@ -227,6 +235,7 @@ export type OrganizationRegistrationModifyRequest = {
   access: OrganizationLookupRequest;
   registrations: OrganizationParticipantModifyRequest[];
   guardianConsent?: boolean;
+  email?: string;
 };
 
 export type RegistrationSettlementResult = {

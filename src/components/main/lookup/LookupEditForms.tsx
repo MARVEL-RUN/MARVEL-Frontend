@@ -9,6 +9,7 @@ import {
   MAX_GROUP_SIZE,
   TIMING_CHIP_NOTE,
   ageBand,
+  emailOk,
   formatFee,
   needsGuardian,
   guardianRequiredFor,
@@ -50,6 +51,7 @@ import {
   BirthPick,
   BirthText,
   CoursePick,
+  EmailField,
   FeeText,
   FormRow,
   FormSec,
@@ -269,6 +271,7 @@ export function IndividualLookupEdit({
   const [name] = useState(receipt.name?.trim() || access.name);
   const [birth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
   const [phone] = useState(receipt.phNum || access.phNum);
+  const [email, setEmail] = useState(receipt.email?.trim() || "");
   const [gender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
@@ -353,6 +356,7 @@ export function IndividualLookupEdit({
         ? "보호자 연락처를 입력하세요."
         : "") ||
       (guardianRequired && !guardianConsent ? "보호자 동의가 필요합니다." : "") ||
+      (email.trim() && !emailOk(email) ? "이메일 형식을 확인하세요." : "") ||
       (!eventCategoryId ? "참가종목을 선택하세요." : "") ||
       (souvenir && !selectedSize ? "티셔츠 사이즈를 선택하세요." : "");
     if (invalid) {
@@ -375,6 +379,7 @@ export function IndividualLookupEdit({
       guardianPhNum: toApiPhone(guardianPhone) || undefined,
       guardianRelationship: guardianRelation.trim() || undefined,
       guardianConsent: guardianRequired ? guardianConsent : false,
+      ...(email.trim() ? { email: email.trim() } : {}),
     });
   }
 
@@ -425,6 +430,9 @@ export function IndividualLookupEdit({
             required
             disabled
           />
+        </FormRow>
+        <FormRow label="이메일">
+          <EmailField value={email} onChange={setEmail} />
         </FormRow>
       </FormSec>
 
@@ -626,6 +634,7 @@ export function GroupLookupEdit({
   const [guardianConsent, setGuardianConsent] = useState(
     () => receipt.guardianConsent === true,
   );
+  const [email, setEmail] = useState(receipt.email?.trim() || "");
   const optionsReady = categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(members);
   const total = useMemo(
@@ -710,10 +719,15 @@ export function GroupLookupEdit({
       setHint("만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.");
       return;
     }
+    if (email.trim() && !emailOk(email)) {
+      setHint("이메일 형식을 확인하세요.");
+      return;
+    }
     setHint("");
     onSubmit({
       access,
       guardianConsent: needsGroupGuardian ? guardianConsent : false,
+      ...(email.trim() ? { email: email.trim() } : {}),
       registrations: members.map((row) => {
         const next: OrganizationParticipantModifyRequest = {
           eventCategoryId: row.eventCategoryId,
@@ -740,7 +754,12 @@ export function GroupLookupEdit({
           이미 등록된 참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
         </p>
       </div>
-      <FormSec kicker="01" title="참가자">
+      <FormSec kicker="01 / CONTACT" title="연락처">
+        <FormRow label="이메일">
+          <EmailField value={email} onChange={setEmail} />
+        </FormRow>
+      </FormSec>
+      <FormSec kicker="02" title="참가자">
         <div className="party-bar">
           <p>{members.length}명 등록</p>
           <button
@@ -974,7 +993,7 @@ export function GroupLookupEdit({
         <p className="party-sum">합계 {formatFee(total)}</p>
       </FormSec>
       {needsGroupGuardian ? (
-        <FormSec kicker="02 / CONSENT" title="단체장 동의">
+        <FormSec kicker="03 / CONSENT" title="단체장 동의">
           <ApplyHint>
             <p>{GUARDIAN_AGE_NOTE}</p>
             <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>

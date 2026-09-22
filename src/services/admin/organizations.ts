@@ -39,6 +39,7 @@ export type AdminOrganizationDetail = {
   eventName: string;
   leaderName: string;
   loginId: string;
+  email: string;
   createdAt: string;
   members: AdminOrganizationMember[];
 };
@@ -200,6 +201,7 @@ function asOrganizationDetail(data: unknown): AdminOrganizationDetail | null {
     eventName: asText(row.eventName),
     leaderName: asText(row.leaderName),
     loginId: asText(row.loginId),
+    email: asText(row.email),
     createdAt: asText(row.createdAt),
     members,
   };

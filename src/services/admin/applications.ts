@@ -140,6 +140,7 @@ type RegistrationDetail = {
   amount?: unknown;
   orderId?: unknown;
   paymentMethod?: unknown;
+  paymentStatus?: unknown;
   status?: unknown;
   registrationStatus?: unknown;
   address?: unknown;
@@ -516,6 +517,7 @@ export type RegistrationBasicInfoUpdate = {
   phNum: string;
   birth: string;
   gender: "M" | "F";
+  email?: string;
   address: string;
   addressDetail: string;
   guardianName: string;
