@@ -9,9 +9,37 @@ import {
   getAdminDashboardStats,
 } from "@/services/admin/stats";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { ChevronRight, MessageSquare } from "lucide-react";
+import { ChevronDown, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { useState, type ReactNode } from "react";
 import "./dashboard-stats.css";
+
+function EventStatsPanel({
+  eventName,
+  defaultExpanded,
+  children,
+}: {
+  eventName: string;
+  defaultExpanded: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultExpanded);
+
+  return (
+    <div className={`admin-reg-stats-event${open ? " is-open" : ""}`}>
+      <button
+        type="button"
+        className="admin-reg-stats-event__head"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+      >
+        <span className="admin-reg-stats-event__title">{eventName}</span>
+        <ChevronDown size={18} className="admin-reg-stats-event__chev" aria-hidden />
+      </button>
+      {open ? <div className="admin-reg-stats-event__body">{children}</div> : null}
+    </div>
+  );
+}
 
 function TaskLink({
   href,
@@ -83,8 +111,6 @@ function IntakeStatsSection({
     return <p className="admin-empty">접수 현황을 불러오지 못했습니다.</p>;
   }
 
-  const showEventName = events.length > 1;
-
   return (
     <div className="admin-reg-stats-stack">
       {events.map((event, index) => {
@@ -100,11 +126,13 @@ function IntakeStatsSection({
           return null;
         }
         return (
-          <RegistrationStatsTables
+          <EventStatsPanel
             key={event.eventId}
-            data={query.data}
-            eventName={showEventName ? event.eventName : undefined}
-          />
+            eventName={event.eventName}
+            defaultExpanded={index === 0}
+          >
+            <RegistrationStatsTables data={query.data} />
+          </EventStatsPanel>
         );
       })}
     </div>
