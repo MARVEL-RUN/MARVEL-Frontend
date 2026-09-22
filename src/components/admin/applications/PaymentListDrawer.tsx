@@ -176,11 +176,13 @@ export function PaymentListDrawer({
         <div className="admin-pay-list">
           {payments.map((payment, index) => {
             const id = payment.paymentId ?? `pay-${index}`;
+            // 목록은 최신순 유지, 번호만 맨 아래=01
+            const displayIndex = payments.length - 1 - index;
             return (
               <PaymentListItem
                 key={id}
                 payment={payment}
-                index={index}
+                index={displayIndex}
                 logOpen={Boolean(activeLogPaymentId && activeLogPaymentId === id)}
                 onOpenLog={() =>
                   onOpenLog(activeLogPaymentId === id ? null : payment)
