@@ -37,7 +37,7 @@ function GuideBlock({
 
 export function OpsGuide({ gaRealtimeUrl }: Props) {
   return (
-    <section className="admin-dash__section">
+    <section className="admin-dash__section admin-dash__section--ops">
       <h2>운영 가이드</h2>
       <p className="admin-ops-guide__lead">
         자주 쓰는 메뉴 위치와 확인 순서입니다.

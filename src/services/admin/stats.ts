@@ -1,3 +1,4 @@
+import { adminFetch } from "@/lib/admin/fetch";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { statusKey } from "@/lib/registration-status";
 import {
@@ -25,6 +26,30 @@ export type AdminDashboardStats = {
   cancellationPendingEventId: string | null;
   events: EventIntakeStats[];
 };
+
+export type RegistrationStatRow = {
+  classification: string;
+  courseCounts: Record<string, number>;
+  totalCount: number;
+  cardCount: number;
+  transferCount: number;
+  freeCount: number;
+  personalCount: number;
+  groupCount: number;
+};
+
+export type RegistrationStatistics = {
+  courseHeaders: string[];
+  genderStats: RegistrationStatRow[];
+  ageGroupStats: RegistrationStatRow[];
+  childStats: RegistrationStatRow[];
+};
+
+export function fetchRegistrationStatistics(eventId: string) {
+  return adminFetch<RegistrationStatistics>(
+    `v1/admin/registrations/${encodeURIComponent(eventId)}/statistics`,
+  );
+}
 
 function intakeFor(
   rows: AdminApplicationRow[],
