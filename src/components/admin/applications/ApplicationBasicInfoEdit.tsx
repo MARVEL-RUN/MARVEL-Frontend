@@ -10,11 +10,15 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
+export type ApplicationBasicInfoEditMode = "full" | "organization-member";
+
 type Props = {
   row: AdminApplicationRow;
+  mode?: ApplicationBasicInfoEditMode;
   onCancel: () => void;
   onSaved: () => void;
   onError: (message: string) => void;
+  onOpenGroupBasicInfo?: () => void;
 };
 
 type FormState = {
@@ -116,9 +120,17 @@ function EditRow({
   );
 }
 
-export function ApplicationBasicInfoEdit({ row, onCancel, onSaved, onError }: Props) {
+export function ApplicationBasicInfoEdit({
+  row,
+  mode = "full",
+  onCancel,
+  onSaved,
+  onError,
+  onOpenGroupBasicInfo,
+}: Props) {
   const initial = useMemo(() => formFromRow(row), [row]);
   const [form, setForm] = useState(initial);
+  const lockSharedFields = mode === "organization-member";
 
   const save = useMutation({
     mutationFn: () => updateRegistrationBasicInfo(row.id, toPayload(form)),
@@ -147,11 +159,33 @@ export function ApplicationBasicInfoEdit({ row, onCancel, onSaved, onError }: Pr
 
   return (
     <form className="admin-drawer__edit" onSubmit={submit} noValidate>
-      <p className="admin-drawer__edit-note">
-        신청자·주소·보호자 정보만 수정됩니다. 코스·기념품·결제 정보는 변경되지 않습니다.
-      </p>
+      {lockSharedFields ? (
+        <div className="admin-drawer__guide" role="note">
+          <p>
+            이름·연락처·생년월일·성별·보호자만 수정할 수 있습니다.
+            <br />
+            이메일·주소는 단체 상세의 「기본정보 수정」에서 변경해 주세요.
+          </p>
+          {onOpenGroupBasicInfo ? (
+            <div className="admin-drawer__guide-action">
+              <button
+                type="button"
+                className="admin-drawer__guide-link"
+                onClick={onOpenGroupBasicInfo}
+              >
+                기본정보 수정 바로가기
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <p className="admin-drawer__edit-note">
+          신청자·주소·보호자 정보만 수정됩니다. 코스·기념품·결제 정보는 변경되지
+          않습니다.
+        </p>
+      )}
 
-      <EditSection title={row.kind === "group" ? "참가자" : "신청자"}>
+      <EditSection title={lockSharedFields || row.kind === "group" ? "참가자" : "신청자"}>
         <EditRow label="이름">
           <input
             className="admin-drawer__edit-input"
@@ -190,12 +224,17 @@ export function ApplicationBasicInfoEdit({ row, onCancel, onSaved, onError }: Pr
             <option value="F">여성</option>
           </select>
         </EditRow>
-        <EditRow label="이메일">
+        <EditRow
+          label="이메일"
+          hint={lockSharedFields ? "단체 공통 정보" : undefined}
+        >
           <input
             className="admin-drawer__edit-input"
             type="email"
             value={form.email}
             placeholder="없으면 비워두세요"
+            readOnly={lockSharedFields}
+            disabled={lockSharedFields}
             onChange={(e) => patch({ email: e.target.value })}
             autoComplete="email"
           />
@@ -203,17 +242,24 @@ export function ApplicationBasicInfoEdit({ row, onCancel, onSaved, onError }: Pr
       </EditSection>
 
       <EditSection title="주소">
-        <EditRow label="주소">
+        <EditRow label="주소" hint={lockSharedFields ? "단체 공통 정보" : undefined}>
           <input
             className="admin-drawer__edit-input"
             value={form.address}
+            readOnly={lockSharedFields}
+            disabled={lockSharedFields}
             onChange={(e) => patch({ address: e.target.value })}
           />
         </EditRow>
-        <EditRow label="상세주소">
+        <EditRow
+          label="상세주소"
+          hint={lockSharedFields ? "단체 공통 정보" : undefined}
+        >
           <input
             className="admin-drawer__edit-input"
             value={form.addressDetail}
+            readOnly={lockSharedFields}
+            disabled={lockSharedFields}
             onChange={(e) => patch({ addressDetail: e.target.value })}
           />
         </EditRow>
