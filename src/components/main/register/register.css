@@ -480,6 +480,10 @@
   padding-bottom: 0;
 }
 
+.form-row .field-with-btn input.is-err {
+  border-color: var(--marvel);
+}
+
 .field-with-btn__btn {
   flex: none;
   height: 2.75rem;
