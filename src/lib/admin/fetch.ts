@@ -63,32 +63,33 @@ export async function adminFetch<T>(
 export async function adminFetchBlob(
   endpoint: string,
   init: RequestInit = {},
-  withAuth = true,
-): Promise<AdminFile> {
+  fallbackName = "download.bin",
+): Promise<{ blob: Blob; filename: string }> {
   const headers = new Headers(init.headers);
   if (!headers.has("Accept")) {
     headers.set(
       "Accept",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/octet-stream, */*",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/octet-stream",
     );
   }
-  const response = await adminRequest(
-    endpoint,
-    { ...init, headers },
-    withAuth,
-    false,
-  );
-  if (response.status === 204) {
-    throw new AdminHttpError(204, "내려받을 파일이 없습니다.");
-  }
+
+  const response = await adminRequest(endpoint, { ...init, headers }, true, false);
   const blob = await response.blob();
-  if (blob.size === 0) {
-    throw new AdminHttpError(204, "내려받을 파일이 없습니다.");
-  }
   return {
     blob,
-    filename: filenameFromDisposition(response.headers.get("content-disposition")),
+    filename: filenameFromDisposition(response.headers.get("content-disposition"), fallbackName),
   };
+}
+
+export function saveAdminDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 async function adminRequest(
@@ -128,19 +129,26 @@ async function adminRequest(
   return response;
 }
 
-function filenameFromDisposition(header: string | null): string {
-  if (!header) return "";
-  const utf8 = /filename\*=(?:UTF-8''|utf-8'')([^;]+)/i.exec(header);
-  if (utf8?.[1]) {
+function filenameFromDisposition(header: string | null, fallback: string) {
+  if (!header) return fallback;
+
+  const encoded = header.match(/filename\*\s*=\s*(?:UTF-8''|utf-8'')([^;]+)/i);
+  if (encoded?.[1]) {
     try {
-      return decodeURIComponent(utf8[1].trim().replace(/^["']|["']$/g, ""));
+      const name = decodeURIComponent(encoded[1].trim().replace(/^["']|["']$/g, ""));
+      if (name) return name;
     } catch {
-      return utf8[1].trim();
+      /* 헤더 깨지면 fallback */
     }
   }
-  const plain = /filename=([^;]+)/i.exec(header);
-  if (!plain?.[1]) return "";
-  return plain[1].trim().replace(/^["']|["']$/g, "");
+
+  const plain = header.match(/filename\s*=\s*("(?:\\.|[^"])*"|[^;]+)/i);
+  if (plain?.[1]) {
+    const name = plain[1].trim().replace(/^["']|["']$/g, "").replace(/\\"/g, '"');
+    if (name) return name;
+  }
+
+  return fallback;
 }
 
 export function isAdminHttp(error: unknown, status?: number): error is AdminHttpError {

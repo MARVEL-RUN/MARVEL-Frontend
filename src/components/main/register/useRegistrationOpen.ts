@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { EVENT } from "@/lib/event";
+import { useIsPreviewPath } from "@/lib/main/useAppBasePath";
 import { isRegistrationOpen, registrationForced } from "@/lib/mode";
 
 export function useRegistrationOpen() {
-  const [open, setOpen] = useState(registrationForced === true);
+  const preview = useIsPreviewPath();
+  const [open, setOpen] = useState(preview || registrationForced === true);
 
   useEffect(() => {
+    if (preview) {
+      setOpen(true);
+      return;
+    }
     setOpen(isRegistrationOpen());
     if (registrationForced !== null) return;
     const remain = Date.parse(EVENT.openAt) - Date.now();
@@ -17,7 +23,7 @@ export function useRegistrationOpen() {
       remain + 50,
     );
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [preview]);
 
-  return open;
+  return preview || open;
 }
