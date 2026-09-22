@@ -79,7 +79,7 @@ export default function RootLayout({
     <html lang="ko" className={notoSansKr.variable} suppressHydrationWarning>
       <body>
         <Script id="site-zoom-guard" strategy="beforeInteractive">
-          {`(function(){var p=location.pathname;if(p.indexOf("/admin")===0)return;var preview=${JSON.stringify(PREVIEW_BASE_PATH)};var onPreview=p===preview||p.indexOf(preview+"/")===0;if(${JSON.stringify(APP_MODE)}!=="main"&&!onPreview)return;document.documentElement.classList.add("is-main");if((p==="/"||p==="")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("is-intro");}})();`}
+          {`(function(){var p=location.pathname;if(p.indexOf("/admin")===0)return;var preview=${JSON.stringify(PREVIEW_BASE_PATH)};var onPreview=p===preview||p.indexOf(preview+"/")===0;if(${JSON.stringify(APP_MODE)}!=="main"&&!onPreview)return;document.documentElement.classList.add("is-main");if(p==="/"||p===""){document.documentElement.classList.add("is-live");}})();`}
         </Script>
         <SiteZoom />
         {children}
