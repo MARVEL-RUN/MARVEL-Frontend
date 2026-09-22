@@ -310,10 +310,20 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
           onPage={setPage}
         />
       ) : null}
-      <aside className="admin-drawer admin-drawer--detail" role="dialog" aria-modal="true" aria-label="신청 상세">
+      <aside
+        className={`admin-drawer admin-drawer--detail${editing ? " is-editing" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="신청 상세"
+      >
         <header className="admin-drawer__hero">
           <div className="admin-drawer__hero-bar">
-            <span className="admin-drawer__hero-kind">{applicationKindLabel(row.kind)}</span>
+            <div className="admin-drawer__hero-bar-start">
+              <span className="admin-drawer__hero-kind">{applicationKindLabel(row.kind)}</span>
+              {editing ? (
+                <span className="admin-drawer__edit-badge">기본정보 수정</span>
+              ) : null}
+            </div>
             <div className="admin-drawer__actions">
               {!editing ? (
                 <button
@@ -327,7 +337,18 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
                 >
                   기본정보 수정
                 </button>
-              ) : null}
+              ) : (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  onClick={() => {
+                    setEditing(false);
+                    setEditError("");
+                  }}
+                >
+                  수정 취소
+                </button>
+              )}
               {!isGroup && !editing ? (
                 <button
                   type="button"
@@ -361,7 +382,7 @@ export function ApplicationDetailDrawer({ row, loading, error, onClose }: Props)
         <div className="admin-drawer__body">
           {loading ? <p className="admin-empty">불러오는 중…</p> : null}
           {error ? <p className="admin-empty">{error}</p> : null}
-          {editError ? <p className="admin-empty">{editError}</p> : null}
+          {editError ? <p className="admin-drawer__edit-alert">{editError}</p> : null}
 
           {!loading && !error && editing ? (
             <ApplicationBasicInfoEdit
