@@ -34,6 +34,12 @@ type FormState = {
   guardianRelationship: string;
 };
 
+function editableText(value?: string | null) {
+  const text = (value ?? "").trim();
+  if (!text || text === "-" || text === "—") return "";
+  return text;
+}
+
 function formFromRow(row: AdminApplicationRow): FormState {
   const address = row.leader?.address || row.address || "";
   const addressDetail = row.leader?.addressDetail || row.addressDetail || "";
@@ -42,7 +48,7 @@ function formFromRow(row: AdminApplicationRow): FormState {
     phNum: (row.phone ?? "").replace(/\D/g, ""),
     birth: (row.birth ?? "").replace(/\D/g, "").slice(0, 8),
     gender: toApiGender(row.gender),
-    email: row.email?.trim() ?? "",
+    email: editableText(row.email),
     address: address.trim(),
     addressDetail: addressDetail.trim(),
     guardianName: row.guardianName?.trim() ?? "",
@@ -72,17 +78,19 @@ function validate(form: FormState) {
   if (form.gender !== "M" && form.gender !== "F") return "성별을 선택하세요.";
   if (!form.address.trim()) return "주소를 입력하세요.";
   if (!form.addressDetail.trim()) return "상세주소를 입력하세요.";
-  if (form.email.trim() && !emailOk(form.email)) return "이메일 형식을 확인하세요.";
+  const email = editableText(form.email);
+  if (email && !emailOk(email)) return "이메일 형식을 확인하세요.";
   return "";
 }
 
 function toPayload(form: FormState): RegistrationBasicInfoUpdate {
+  const email = editableText(form.email);
   return {
     name: form.name.trim(),
     phNum: form.phNum.replace(/\D/g, ""),
     birth: toApiBirth(form.birth),
     gender: form.gender as "M" | "F",
-    ...(form.email.trim() ? { email: form.email.trim() } : {}),
+    ...(email ? { email } : {}),
     address: form.address.trim(),
     addressDetail: form.addressDetail.trim(),
     guardianName: form.guardianName.trim(),

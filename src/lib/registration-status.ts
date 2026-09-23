@@ -73,3 +73,8 @@ export function canPrepareRegistrationPayment(status?: string | null) {
 export function canDeleteUnpaidRegistration(status?: string | null) {
   return statusKey(status) === "PAYMENT_PENDING";
 }
+
+export function canPartialRefundRegistration(status?: string | null) {
+  const key = statusKey(status);
+  return key === "CONFIRMED" || key === "PARTIAL_REFUND_REQUIRED";
+}
