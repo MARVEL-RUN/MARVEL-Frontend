@@ -22,6 +22,7 @@ import { useState } from "react";
 type Props = {
   eventId: string;
   result: AdminRefundBatchResponse;
+  title?: string;
   lookingUp?: boolean;
   onLookup?: () => void;
   onClose: () => void;
@@ -56,7 +57,14 @@ function ItemList({ items }: { items: AdminRefundItem[] }) {
   );
 }
 
-export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClose }: Props) {
+export function RefundResultPanel({
+  eventId,
+  result,
+  title = "환불 처리 결과",
+  lookingUp,
+  onLookup,
+  onClose,
+}: Props) {
   const batchId = result.summary.batchId ?? "";
   const [page, setPage] = useState(0);
   const [exceptionsOnly, setExceptionsOnly] = useState(false);
@@ -90,9 +98,9 @@ export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClos
   const itemPages = Math.max(1, Math.ceil(itemTotal / (itemsQuery.data?.size ?? 20)));
 
   return (
-    <section className="admin-pay admin-refund-result" aria-label="환불 처리 결과">
+    <section className="admin-pay admin-refund-result" aria-label={title}>
       <div className="admin-refund-result__head">
-        <h2 className="admin-drawer__section-title">환불 처리 결과</h2>
+        <h2 className="admin-drawer__section-title">{title}</h2>
         <div className="admin-refund-result__actions">
           {onLookup ? (
             <button
