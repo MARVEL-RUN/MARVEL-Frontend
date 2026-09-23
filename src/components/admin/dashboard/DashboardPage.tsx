@@ -16,6 +16,9 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import "./dashboard-stats.css";
 
+/** API 안정화 전까지 운영 홈 일별 그래프·엑셀 비표시 */
+const INTAKE_DAILY_TOOLS_ENABLED = false;
+
 function EventStatsPanel({
   eventId,
   eventName,
@@ -42,8 +45,12 @@ function EventStatsPanel({
       </button>
       {open ? (
         <div className="admin-reg-stats-event__body">
-          <PaymentDailyGraph eventId={eventId} />
-          <DailyReportDownload eventId={eventId} />
+          {INTAKE_DAILY_TOOLS_ENABLED ? (
+            <>
+              <PaymentDailyGraph eventId={eventId} />
+              <DailyReportDownload eventId={eventId} />
+            </>
+          ) : null}
           {children}
         </div>
       ) : null}
