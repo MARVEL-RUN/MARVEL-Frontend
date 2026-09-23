@@ -260,6 +260,7 @@ export function ApplicationDetailDrawer({
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
   const [evidenceCancelId, setEvidenceCancelId] = useState<string | null>(null);
   const [refundResult, setRefundResult] = useState<AdminRefundBatchResponse | null>(null);
+  const [lookupPending, setLookupPending] = useState(false);
   const refundRequest = useRef<PendingRefund | null>(null);
   const refundToastKey = useRef<string | null>(null);
   const { confirm, modal: confirmModal } = useAdminConfirm();
@@ -277,6 +278,7 @@ export function ApplicationDetailDrawer({
     setAdjusting(false);
     setEditError("");
     setRefundResult(null);
+    setLookupPending(false);
     refundRequest.current = null;
     refundToastKey.current = null;
   }, [row?.id]);
@@ -319,6 +321,8 @@ export function ApplicationDetailDrawer({
         queryKey: ["admin", "registration-statistics"],
       }),
       queryClient.invalidateQueries({ queryKey: ["admin", "finance"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "refund-batch"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "refund-batch-items"] }),
       row.organizationId
         ? queryClient.invalidateQueries({
             queryKey: ["admin", "organization", row.organizationId],
@@ -327,6 +331,9 @@ export function ApplicationDetailDrawer({
     ]);
   }, [queryClient, row]);
 
+  const refundResultRef = useRef<HTMLDivElement>(null);
+  const focusRefundResult = useRef(false);
+
   const showRefundToast = useCallback((data: AdminRefundBatchResponse) => {
     const key = data.summary.requestId || data.summary.batchId;
     if (!key || refundToastKey.current === key) return;
@@ -334,8 +341,17 @@ export function ApplicationDetailDrawer({
     if (!toast) return;
     refundToastKey.current = key;
     if (toast.ok) adminToast.success(toast.message);
-    else adminToast.error(toast.message);
+    else {
+      adminToast.error(toast.message);
+      focusRefundResult.current = true;
+    }
   }, []);
+
+  useEffect(() => {
+    if (!focusRefundResult.current || !refundResult) return;
+    focusRefundResult.current = false;
+    refundResultRef.current?.scrollIntoView({ block: "start" });
+  }, [refundResult]);
 
   const resetPassword = useMutation({
     mutationFn: (password: string) =>
@@ -408,7 +424,8 @@ export function ApplicationDetailDrawer({
   const lookupRefundResult = async () => {
     const requestId =
       refundRequest.current?.body.requestId || refundResult?.summary.requestId;
-    if (!row?.eventId || !requestId) return;
+    if (!row?.eventId || !requestId || lookupPending) return;
+    setLookupPending(true);
     try {
       const data = await fetchRefundResult(row.eventId, requestId);
       setRefundResult(data);
@@ -427,6 +444,8 @@ export function ApplicationDetailDrawer({
       adminToast.error(
         err instanceof Error ? err.message : "저장 결과 조회에 실패했습니다.",
       );
+    } finally {
+      setLookupPending(false);
     }
   };
 
@@ -766,6 +785,18 @@ export function ApplicationDetailDrawer({
           {error ? <p className="admin-empty">{error}</p> : null}
           {editError ? <p className="admin-drawer__edit-alert">{editError}</p> : null}
 
+          {!editing && refundResult ? (
+            <div ref={refundResultRef}>
+              <RefundResultPanel
+                eventId={row.eventId}
+                result={refundResult}
+                lookingUp={lookupPending}
+                onLookup={() => void lookupRefundResult()}
+                onClose={() => setRefundResult(null)}
+              />
+            </div>
+          ) : null}
+
           {!loading && !error && editing ? (
             <ApplicationBasicInfoEdit
               row={row}
@@ -855,23 +886,12 @@ export function ApplicationDetailDrawer({
             </>
           ) : null}
           {!editing ? (
-            <>
-              {refundResult ? (
-                <RefundResultPanel
-                  eventId={row.eventId}
-                  result={refundResult}
-                  lookingUp={runRefund.isPending}
-                  onLookup={() => void lookupRefundResult()}
-                  onClose={() => setRefundResult(null)}
-                />
-              ) : null}
-              <ApplicationPaySummary
-                data={finance.data}
-                loading={finance.isLoading}
-                error={finance.isError ? finance.error : undefined}
-                paymentCount={totalCount ?? payments.length}
-              />
-            </>
+            <ApplicationPaySummary
+              data={finance.data}
+              loading={finance.isLoading}
+              error={finance.isError ? finance.error : undefined}
+              paymentCount={totalCount ?? payments.length}
+            />
           ) : null}
         </div>
       </aside>

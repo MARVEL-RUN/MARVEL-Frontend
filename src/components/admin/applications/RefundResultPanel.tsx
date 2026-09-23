@@ -97,14 +97,21 @@ export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClos
           {onLookup ? (
             <button
               type="button"
-              className="admin-btn admin-btn--ghost"
+              className="admin-btn admin-btn--text"
               disabled={lookingUp}
               onClick={onLookup}
             >
-              결과 다시 조회
+              {lookingUp ? (
+                <>
+                  <span className="admin-refund-result__spin" aria-hidden />
+                  다시 조회 중…
+                </>
+              ) : (
+                "다시 조회"
+              )}
             </button>
           ) : null}
-          <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
+          <button type="button" className="admin-btn admin-btn--text" onClick={onClose}>
             닫기
           </button>
         </div>
