@@ -603,6 +603,7 @@ export function ApplicationDetailDrawer({
       ? !closedRegistration(row.status)
       : statusKey(row.status) === "CONFIRMED");
   const canPartialRefund =
+    false && /* 추가 납부 검증 전까지 숨김 */
     hasAdminRefundBatch &&
     !editing &&
     !adjusting &&
