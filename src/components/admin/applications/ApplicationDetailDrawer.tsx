@@ -7,10 +7,8 @@ import { hasAdminRefundBatch } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
-  closedRegistration,
   registrationStatusBadge,
   registrationStatusLabel,
-  statusKey,
 } from "@/lib/registration-status";
 import {
   adminMembersHref,
@@ -592,14 +590,7 @@ export function ApplicationDetailDrawer({
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
   const canDeleteUnpaid = !editing && !adjusting && canDeleteUnpaidRegistration(row.status);
-  const canFullRefund =
-    hasAdminRefundBatch &&
-    !editing &&
-    !adjusting &&
-    !canDeleteUnpaid &&
-    (row.kind === "group"
-      ? !closedRegistration(row.status)
-      : statusKey(row.status) === "CONFIRMED");
+  const canFullRefund = false;
   const canPartialRefund = false;
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
