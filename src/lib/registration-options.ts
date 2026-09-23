@@ -66,7 +66,7 @@ export function shirtAssignment(
 ) {
   const souvenir = shirtSouvenir(category);
   if (!souvenir) return { souvenirId: "", selectedSize: "" };
-  const ticket = birth ? ticketForBirth(birth) : "adult";
+  const ticket = /^\d{8}$/.test(birth) ? ticketForBirth(birth) : "adult";
   const sizes = souvenirSizes(souvenir, ticket);
   const keep = sizes.includes(selectedSize) ? selectedSize : "";
   return {
@@ -85,11 +85,10 @@ export function souvenirSizes(
   souvenir: RegistrationSouvenir | undefined,
   ticket: TicketKind = "adult",
 ): string[] {
-  const allowed = shirtSizesForTicket(ticket);
-  const sizes = souvenir?.sizes ?? [];
-  if (!sizes.length) return allowed;
-  const hit = allowed.filter((size) => sizes.includes(size));
-  return hit.length ? hit : allowed;
+  const allowed = new Set<string>(shirtSizesForTicket(ticket));
+  const fromApi = (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
+  if (!fromApi.length) return [...allowed];
+  return fromApi.filter((size) => allowed.has(size));
 }
 
 function compactDistance(value: string) {

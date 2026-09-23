@@ -1,5 +1,7 @@
 "use client";
 
+import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDownload";
+import { PaymentDailyGraph } from "@/components/admin/dashboard/PaymentDailyGraph";
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
@@ -14,11 +16,16 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import "./dashboard-stats.css";
 
+/** API 안정화 전까지 운영 홈 일별 그래프·엑셀 비표시 */
+const INTAKE_DAILY_TOOLS_ENABLED = false;
+
 function EventStatsPanel({
+  eventId,
   eventName,
   defaultExpanded,
   children,
 }: {
+  eventId: string;
   eventName: string;
   defaultExpanded: boolean;
   children: ReactNode;
@@ -36,7 +43,17 @@ function EventStatsPanel({
         <span className="admin-reg-stats-event__title">{eventName}</span>
         <ChevronDown size={18} className="admin-reg-stats-event__chev" aria-hidden />
       </button>
-      {open ? <div className="admin-reg-stats-event__body">{children}</div> : null}
+      {open ? (
+        <div className="admin-reg-stats-event__body">
+          {INTAKE_DAILY_TOOLS_ENABLED ? (
+            <>
+              <PaymentDailyGraph eventId={eventId} />
+              <DailyReportDownload eventId={eventId} />
+            </>
+          ) : null}
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -128,6 +145,7 @@ function IntakeStatsSection({
         return (
           <EventStatsPanel
             key={event.eventId}
+            eventId={event.eventId}
             eventName={event.eventName}
             defaultExpanded={index === 0}
           >
