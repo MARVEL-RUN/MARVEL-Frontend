@@ -71,6 +71,7 @@ type Props = {
 type DetailField = {
   label: string;
   value: ReactNode;
+  keep?: boolean;
 };
 
 function dash(value?: string | number | null) {
@@ -101,7 +102,7 @@ function isEmptyValue(value: ReactNode) {
 }
 
 function visibleFields(fields: DetailField[]) {
-  return fields.filter((field) => !isEmptyValue(field.value));
+  return fields.filter((field) => field.keep || !isEmptyValue(field.value));
 }
 
 function DetailSection({
@@ -179,7 +180,7 @@ function buildSections(row: AdminApplicationRow) {
     { label: "성별", value: applicationGenderLabel(row.gender) },
     { label: "생년월일", value: dash(row.birth) },
     { label: "연락처", value: displayPhone(row.phone) },
-    ...(isGroup ? [] : [{ label: "이메일", value: dash(row.email) }]),
+    ...(isGroup ? [] : [{ label: "이메일", value: dash(row.email), keep: true }]),
   ];
 
   const guardianFields: DetailField[] = isGroup
@@ -216,7 +217,7 @@ function buildSections(row: AdminApplicationRow) {
   }
 
   if (isGroup) {
-    groupFields.push({ label: "이메일", value: dash(row.email) });
+    groupFields.push({ label: "이메일", value: dash(row.email), keep: true });
   }
 
   const addressFields: DetailField[] = [
