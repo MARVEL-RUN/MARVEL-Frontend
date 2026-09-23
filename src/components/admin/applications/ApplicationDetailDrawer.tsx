@@ -7,8 +7,11 @@ import { hasAdminRefundBatch } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
+  canPartialRefundRegistration,
+  closedRegistration,
   registrationStatusBadge,
   registrationStatusLabel,
+  statusKey,
 } from "@/lib/registration-status";
 import {
   adminMembersHref,
@@ -20,6 +23,7 @@ import {
   applicationGenderLabel,
   applicationKindLabel,
   deleteAdminRegistration,
+  hasPartialRefundIds,
   resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
@@ -590,8 +594,22 @@ export function ApplicationDetailDrawer({
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
   const canDeleteUnpaid = !editing && !adjusting && canDeleteUnpaidRegistration(row.status);
-  const canFullRefund = false;
-  const canPartialRefund = false;
+  const canPartialRefund =
+    hasAdminRefundBatch &&
+    !editing &&
+    !adjusting &&
+    !canDeleteUnpaid &&
+    !isGroup &&
+    hasPartialRefundIds(row) &&
+    canPartialRefundRegistration(row.status);
+  const canFullRefund =
+    hasAdminRefundBatch &&
+    !editing &&
+    !adjusting &&
+    !canDeleteUnpaid &&
+    (row.kind === "group"
+      ? !closedRegistration(row.status)
+      : statusKey(row.status) === "CONFIRMED");
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
