@@ -77,6 +77,7 @@ export type AdminFinance = {
   leader?: AdminPaymentLeader;
   contractAmount?: number;
   registrationStatus?: string;
+  paymentStatus?: string;
   payments?: AdminPaymentPage;
 };
 
@@ -88,6 +89,8 @@ export type AdminPaymentLog = {
   httpStatus?: number;
   errorCode?: string;
   errorMessage?: string;
+  comparisonStatus?: string;
+  metadata?: Record<string, unknown>;
 };
 
 export type AdminPaymentLogPage = {

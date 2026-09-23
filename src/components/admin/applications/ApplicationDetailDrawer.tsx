@@ -3,6 +3,8 @@
 import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { useAdminPrompt } from "@/components/admin/InputModal";
 import { adminToast } from "@/components/admin/Toast";
+import { hasAdminRefundBatch } from "@/lib/admin/config";
+import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
   registrationStatusBadge,
@@ -21,18 +23,37 @@ import {
   resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
+import { refundBatchToast, refundBatchUnfinished } from "@/lib/refund-result";
 import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
+import {
+  fetchRefundResult,
+  newRefundRequestId,
+  postFullRefund,
+  postPartialRefund,
+  REFUND_REASON_MAX,
+  type AdminFullRefundBody,
+  type AdminPartialRefundBody,
+  type AdminPartialRefundTarget,
+  type AdminRefundBatchResponse,
+} from "@/services/admin/refunds";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ApplicationBasicInfoEdit } from "./ApplicationBasicInfoEdit";
 import { ApplicationPaySummary } from "./ApplicationPaySummary";
+import { PartialRefundEdit } from "./PartialRefundEdit";
 import { PaymentListDrawer } from "./PaymentListDrawer";
 import { PaymentLogDrawer } from "./PaymentLogDrawer";
+import { RefundEvidencePanel } from "./RefundEvidencePanel";
+import { RefundResultPanel } from "./RefundResultPanel";
 
 export type ApplicationDetailSource = "applications" | "organization-members";
+
+type PendingRefund =
+  | { kind: "full"; body: AdminFullRefundBody }
+  | { kind: "partial"; body: AdminPartialRefundBody };
 
 type Props = {
   row: AdminApplicationRow | null;
@@ -46,6 +67,7 @@ type Props = {
 type DetailField = {
   label: string;
   value: ReactNode;
+  keep?: boolean;
 };
 
 function dash(value?: string | number | null) {
@@ -76,7 +98,7 @@ function isEmptyValue(value: ReactNode) {
 }
 
 function visibleFields(fields: DetailField[]) {
-  return fields.filter((field) => !isEmptyValue(field.value));
+  return fields.filter((field) => field.keep || !isEmptyValue(field.value));
 }
 
 function DetailSection({
@@ -154,7 +176,7 @@ function buildSections(row: AdminApplicationRow) {
     { label: "성별", value: applicationGenderLabel(row.gender) },
     { label: "생년월일", value: dash(row.birth) },
     { label: "연락처", value: displayPhone(row.phone) },
-    ...(isGroup ? [] : [{ label: "이메일", value: dash(row.email) }]),
+    ...(isGroup ? [] : [{ label: "이메일", value: dash(row.email), keep: true }]),
   ];
 
   const guardianFields: DetailField[] = isGroup
@@ -191,7 +213,7 @@ function buildSections(row: AdminApplicationRow) {
   }
 
   if (isGroup) {
-    groupFields.push({ label: "이메일", value: dash(row.email) });
+    groupFields.push({ label: "이메일", value: dash(row.email), keep: true });
   }
 
   const addressFields: DetailField[] = [
@@ -230,8 +252,14 @@ export function ApplicationDetailDrawer({
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(false);
+  const [adjusting, setAdjusting] = useState(false);
   const [editError, setEditError] = useState("");
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
+  const [evidenceCancelId, setEvidenceCancelId] = useState<string | null>(null);
+  const [refundResult, setRefundResult] = useState<AdminRefundBatchResponse | null>(null);
+  const [lookupPending, setLookupPending] = useState(false);
+  const refundRequest = useRef<PendingRefund | null>(null);
+  const refundToastKey = useRef<string | null>(null);
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
 
@@ -241,19 +269,30 @@ export function ApplicationDetailDrawer({
 
   useEffect(() => {
     setLogPayment(null);
+    setEvidenceCancelId(null);
     setPage(0);
     setEditing(false);
+    setAdjusting(false);
     setEditError("");
+    setRefundResult(null);
+    setLookupPending(false);
+    refundRequest.current = null;
+    refundToastKey.current = null;
   }, [row?.id]);
 
   useEffect(() => {
     setLogPayment(null);
+    setEvidenceCancelId(null);
   }, [page]);
 
   useEffect(() => {
     if (!row) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
+      if (evidenceCancelId) {
+        setEvidenceCancelId(null);
+        return;
+      }
       if (logPayment) {
         setLogPayment(null);
         return;
@@ -262,13 +301,54 @@ export function ApplicationDetailDrawer({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [logPayment, onClose, row]);
+  }, [evidenceCancelId, logPayment, onClose, row]);
 
   const finance = useQuery({
     queryKey: ["admin", "finance", row?.eventId, row?.id, row?.kind, row?.organizationId, page],
     queryFn: () => fetchApplicationFinance(row!, page),
     enabled: Boolean(row?.eventId && row?.id),
   });
+
+  const invalidateAfterFinanceChange = useCallback(async () => {
+    if (!row) return;
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "registration"] }),
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "registration-statistics"],
+      }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "finance"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "refund-batch"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "refund-batch-items"] }),
+      row.organizationId
+        ? queryClient.invalidateQueries({
+            queryKey: ["admin", "organization", row.organizationId],
+          })
+        : Promise.resolve(),
+    ]);
+  }, [queryClient, row]);
+
+  const refundResultRef = useRef<HTMLDivElement>(null);
+  const focusRefundResult = useRef(false);
+
+  const showRefundToast = useCallback((data: AdminRefundBatchResponse) => {
+    const key = data.summary.requestId || data.summary.batchId;
+    if (!key || refundToastKey.current === key) return;
+    const toast = refundBatchToast(data);
+    if (!toast) return;
+    refundToastKey.current = key;
+    if (toast.ok) adminToast.success(toast.message);
+    else {
+      adminToast.error(toast.message);
+      focusRefundResult.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!focusRefundResult.current || !refundResult) return;
+    focusRefundResult.current = false;
+    refundResultRef.current?.scrollIntoView({ block: "start" });
+  }, [refundResult]);
 
   const resetPassword = useMutation({
     mutationFn: (password: string) =>
@@ -283,27 +363,88 @@ export function ApplicationDetailDrawer({
   const removeUnpaid = useMutation({
     mutationFn: () => deleteAdminRegistration(row!.id),
     onSuccess: async (data) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
-        queryClient.invalidateQueries({ queryKey: ["admin", "registration"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin", "registration-statistics"],
-        }),
-        row?.organizationId
-          ? queryClient.invalidateQueries({
-              queryKey: ["admin", "organization", row.organizationId],
-            })
-          : Promise.resolve(),
-      ]);
+      await invalidateAfterFinanceChange();
       const message = data?.message?.trim();
-      adminToast.success(message || "미결제 신청이 삭제되었습니다.");
+      adminToast.success(message || "미결제 신청이 취소되었습니다.");
       onClose();
     },
     onError: (err) =>
       adminToast.error(
-        err instanceof Error ? err.message : "미결제 신청 삭제에 실패했습니다.",
+        err instanceof Error ? err.message : "미결제 신청 취소에 실패했습니다.",
       ),
   });
+
+  const runRefund = useMutation({
+    mutationFn: async () => {
+      const pending = refundRequest.current;
+      if (!row || !pending) throw new Error("환불 요청이 없습니다.");
+      try {
+        return pending.kind === "full"
+          ? await postFullRefund(row.eventId, pending.body)
+          : await postPartialRefund(row.eventId, pending.body);
+      } catch (err) {
+        if (
+          isAdminHttp(err, 0) ||
+          isAdminHttp(err, 502) ||
+          isAdminHttp(err, 504)
+        ) {
+          try {
+            return await fetchRefundResult(row.eventId, pending.body.requestId);
+          } catch (lookupErr) {
+            if (isAdminHttp(lookupErr, 404)) {
+              throw new Error(
+                "요청 접수 여부를 아직 확인할 수 없습니다. 잠시 후 같은 요청으로 다시 조회하세요.",
+              );
+            }
+            throw lookupErr;
+          }
+        }
+        throw err;
+      }
+    },
+    onSuccess: async (data) => {
+      setRefundResult(data);
+      showRefundToast(data);
+      if (!refundBatchUnfinished(data.summary.status)) {
+        refundRequest.current = null;
+      }
+      await invalidateAfterFinanceChange();
+    },
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error
+          ? err.message
+          : "환불 요청 결과를 확인할 수 없습니다. 같은 요청으로 다시 조회하세요.",
+      ),
+  });
+
+  const lookupRefundResult = async () => {
+    const requestId =
+      refundRequest.current?.body.requestId || refundResult?.summary.requestId;
+    if (!row?.eventId || !requestId || lookupPending) return;
+    setLookupPending(true);
+    try {
+      const data = await fetchRefundResult(row.eventId, requestId);
+      setRefundResult(data);
+      showRefundToast(data);
+      if (!refundBatchUnfinished(data.summary.status)) {
+        refundRequest.current = null;
+      }
+      await invalidateAfterFinanceChange();
+    } catch (err) {
+      if (isAdminHttp(err, 404)) {
+        adminToast.error(
+          "요청 접수 여부를 아직 확인할 수 없습니다. 잠시 후 같은 요청으로 다시 조회하세요.",
+        );
+        return;
+      }
+      adminToast.error(
+        err instanceof Error ? err.message : "저장 결과 조회에 실패했습니다.",
+      );
+    } finally {
+      setLookupPending(false);
+    }
+  };
 
   const handleResetPassword = async () => {
     if (!row || row.kind === "group") return;
@@ -331,13 +472,105 @@ export function ApplicationDetailDrawer({
     const label =
       row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
     const ok = await confirm({
-      title: "미결제 신청 삭제",
-      message: `${label} 신청 데이터를 삭제할까요? 삭제 후 복구할 수 없습니다.`,
-      confirmLabel: "삭제",
+      title: "미결제 신청 취소",
+      message: `${label} 미결제 신청을 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`,
+      confirmLabel: "취소 처리",
     });
     if (!ok) return;
     removeUnpaid.mutate();
   };
+
+  const handleFullRefund = async () => {
+    if (!row || !hasAdminRefundBatch) return;
+    if (!refundRequest.current) {
+      const label =
+        row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
+      const ok = await confirm({
+        title: "참가 취소 및 전액 환불",
+        message: `${label} 참가 취소와 정원 반환을 동반합니다. 신청 취소가 먼저 반영된 뒤 PG 환불이 진행되며, PG가 실패해도 신청·정원이 자동으로 원복되지 않습니다.`,
+        confirmLabel: "환불 요청",
+      });
+      if (!ok) return;
+      const reason = await prompt({
+        title: "환불 사유",
+        description: `관리자 환불 사유를 입력해 주세요. (${REFUND_REASON_MAX}자 이내)`,
+        label: "사유",
+        placeholder: "참가자 요청에 따른 참가 취소",
+        confirmLabel: "요청",
+      });
+      if (!reason) return;
+      refundRequest.current = {
+        kind: "full",
+        body: {
+          requestId: newRefundRequestId(),
+          reason: reason.slice(0, REFUND_REASON_MAX),
+          registrationIds: row.kind === "group" ? [] : [row.id],
+          organizationIds:
+            row.kind === "group" ? [row.organizationId || row.id] : [],
+        },
+      };
+    }
+    runRefund.mutate();
+  };
+
+  const handlePartialRefund = async (target: AdminPartialRefundTarget) => {
+    if (!row || !hasAdminRefundBatch) return;
+    if (!refundRequest.current) {
+      const label =
+        row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
+      const ok = await confirm({
+        title: "종목·기념품 변경",
+        message: `${label} 종목·기념품·생년월일 변경을 요청합니다. 차액 환불·추가 납부·동일 금액은 서버가 처리하며, PG가 실패해도 신청이 자동으로 원복되지 않습니다.`,
+        confirmLabel: "변경 요청",
+      });
+      if (!ok) return;
+      const reason = await prompt({
+        title: "변경 사유",
+        description: `관리자 변경 사유를 입력해 주세요. (${REFUND_REASON_MAX}자 이내)`,
+        label: "사유",
+        placeholder: "종목 변경",
+        confirmLabel: "요청",
+      });
+      if (!reason) return;
+      refundRequest.current = {
+        kind: "partial",
+        body: {
+          requestId: newRefundRequestId(),
+          reason: reason.slice(0, REFUND_REASON_MAX),
+          targets: [target],
+        },
+      };
+    }
+    runRefund.mutate();
+    setAdjusting(false);
+  };
+
+  useEffect(() => {
+    if (!row?.eventId) return;
+    const requestId =
+      refundRequest.current?.body.requestId || refundResult?.summary.requestId;
+    if (!requestId || !refundBatchUnfinished(refundResult?.summary.status)) return;
+    let n = 0;
+    const timer = window.setInterval(() => {
+      n += 1;
+      if (n > 15) {
+        window.clearInterval(timer);
+        return;
+      }
+      void fetchRefundResult(row.eventId, requestId)
+        .then((data) => {
+          setRefundResult(data);
+          showRefundToast(data);
+          if (!refundBatchUnfinished(data.summary.status)) {
+            refundRequest.current = null;
+            window.clearInterval(timer);
+            void invalidateAfterFinanceChange();
+          }
+        })
+        .catch(() => undefined);
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [row?.eventId, refundResult?.summary.requestId, refundResult?.summary.status, invalidateAfterFinanceChange, showRefundToast]);
 
   const handleBasicInfoSaved = async () => {
     if (!row) return;
@@ -356,7 +589,9 @@ export function ApplicationDetailDrawer({
   const isOrgMemberContext = source === "organization-members";
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
-  const canDeleteUnpaid = !editing && canDeleteUnpaidRegistration(row.status);
+  const canDeleteUnpaid = !editing && !adjusting && canDeleteUnpaidRegistration(row.status);
+  const canFullRefund = false;
+  const canPartialRefund = false;
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
@@ -367,12 +602,23 @@ export function ApplicationDetailDrawer({
   const totalCount = finance.data?.payments?.totalElements;
   const showPayments = !finance.isLoading && !finance.isError && payments.length > 0;
   const showLog = Boolean(logPayment);
+  const showEvidence = Boolean(evidenceCancelId);
+
+  const openLog = (payment: AdminPayment | null) => {
+    setEvidenceCancelId(null);
+    setLogPayment(payment);
+  };
+
+  const openEvidence = (paymentCancelId: string | null) => {
+    setLogPayment(null);
+    setEvidenceCancelId(paymentCancelId);
+  };
 
   return createPortal(
     <div
       className="admin-drawer-stack"
       data-pay-open={showPayments ? "" : undefined}
-      data-log-open={showLog ? "" : undefined}
+      data-log-open={showLog || showEvidence ? "" : undefined}
     >
       <div
         className="admin-drawer__dim"
@@ -380,6 +626,13 @@ export function ApplicationDetailDrawer({
         aria-hidden="true"
         onClick={onClose}
       />
+      {showEvidence && evidenceCancelId ? (
+        <RefundEvidencePanel
+          eventId={row.eventId}
+          paymentCancelId={evidenceCancelId}
+          onClose={() => setEvidenceCancelId(null)}
+        />
+      ) : null}
       {showLog && logPayment ? (
         <PaymentLogDrawer
           eventId={row.eventId}
@@ -393,13 +646,16 @@ export function ApplicationDetailDrawer({
           page={page}
           totalPages={totalPages}
           totalCount={totalCount}
+          highlightRegistrationId={isGroup ? undefined : row.id}
           activeLogPaymentId={logPayment?.paymentId ?? null}
-          onOpenLog={setLogPayment}
+          activeEvidenceCancelId={evidenceCancelId}
+          onOpenLog={openLog}
+          onOpenEvidence={openEvidence}
           onPage={setPage}
         />
       ) : null}
       <aside
-        className={`admin-drawer admin-drawer--detail${editing ? " is-editing" : ""}`}
+        className={`admin-drawer admin-drawer--detail${editing || adjusting ? " is-editing" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label="신청 상세"
@@ -411,9 +667,16 @@ export function ApplicationDetailDrawer({
               {editing ? (
                 <span className="admin-drawer__edit-badge">기본정보 수정</span>
               ) : null}
+              {adjusting ? (
+                <span className="admin-drawer__edit-badge">종목 변경</span>
+              ) : null}
             </div>
-            <div className="admin-drawer__actions">
-              {!editing && canEditBasicInfo ? (
+            <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
+              닫기
+            </button>
+          </div>
+          <div className="admin-drawer__actions admin-drawer__actions--detail">
+              {!editing && !adjusting && canEditBasicInfo ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -425,19 +688,20 @@ export function ApplicationDetailDrawer({
                 >
                   기본정보 수정
                 </button>
-              ) : !editing ? null : (
+              ) : editing || adjusting ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
                   onClick={() => {
                     setEditing(false);
+                    setAdjusting(false);
                     setEditError("");
                   }}
                 >
                   수정 취소
                 </button>
-              )}
-              {!isGroup && !editing ? (
+              ) : null}
+              {!isGroup && !editing && !adjusting ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -447,6 +711,32 @@ export function ApplicationDetailDrawer({
                   비밀번호 초기화
                 </button>
               ) : null}
+              {canPartialRefund ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  disabled={runRefund.isPending || loading || Boolean(error)}
+                  onClick={() => {
+                    setEditError("");
+                    if (!refundBatchUnfinished(refundResult?.summary.status)) {
+                      refundRequest.current = null;
+                    }
+                    setAdjusting(true);
+                  }}
+                >
+                  부분 환불
+                </button>
+              ) : null}
+              {canFullRefund ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                  disabled={runRefund.isPending || loading || Boolean(error)}
+                  onClick={() => void handleFullRefund()}
+                >
+                  전액 환불
+                </button>
+              ) : null}
               {canDeleteUnpaid ? (
                 <button
                   type="button"
@@ -454,13 +744,9 @@ export function ApplicationDetailDrawer({
                   disabled={removeUnpaid.isPending || loading || Boolean(error)}
                   onClick={() => void handleDeleteUnpaid()}
                 >
-                  삭제
+                  미결제 취소
                 </button>
               ) : null}
-              <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
-                닫기
-              </button>
-            </div>
           </div>
           <h1 className="admin-drawer__hero-title">{title}</h1>
           <div className="admin-drawer__hero-meta">
@@ -481,6 +767,18 @@ export function ApplicationDetailDrawer({
           {loading ? <p className="admin-empty">불러오는 중…</p> : null}
           {error ? <p className="admin-empty">{error}</p> : null}
           {editError ? <p className="admin-drawer__edit-alert">{editError}</p> : null}
+
+          {!editing && refundResult ? (
+            <div ref={refundResultRef}>
+              <RefundResultPanel
+                eventId={row.eventId}
+                result={refundResult}
+                lookingUp={lookupPending}
+                onLookup={() => void lookupRefundResult()}
+                onClose={() => setRefundResult(null)}
+              />
+            </div>
+          ) : null}
 
           {!loading && !error && editing ? (
             <ApplicationBasicInfoEdit
@@ -504,7 +802,20 @@ export function ApplicationDetailDrawer({
             />
           ) : null}
 
-          {!loading && !error && !editing ? (
+          {!loading && !error && adjusting ? (
+            <PartialRefundEdit
+              row={row}
+              pending={runRefund.isPending}
+              onCancel={() => {
+                setAdjusting(false);
+                setEditError("");
+              }}
+              onError={setEditError}
+              onSubmit={(target) => void handlePartialRefund(target)}
+            />
+          ) : null}
+
+          {!loading && !error && !editing && !adjusting ? (
             <>
               {blockGroupEdit ? (
                 <DrawerGuide

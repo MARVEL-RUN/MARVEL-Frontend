@@ -91,6 +91,13 @@ export type AdminApplicationRow = {
   status: string;
   appliedAt: string;
   organizationId?: string;
+  eventCategoryId?: string;
+  selectedSouvenirList?: AdminSelectedSouvenir[];
+};
+
+export type AdminSelectedSouvenir = {
+  souvenirId: string;
+  selectedSize?: string | null;
 };
 
 type RegistrationListItem = {
@@ -155,6 +162,8 @@ type RegistrationDetail = {
   termsEssentialAgreed?: unknown;
   termsMarketingAgreed?: unknown;
   termsMarketingChannelAgreed?: unknown;
+  eventCategoryId?: unknown;
+  selectedSouvenirList?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -189,6 +198,17 @@ function firstText(...values: unknown[]): string {
     if (text) return text;
   }
   return "";
+}
+
+function asSelectedSouvenirList(value: unknown): AdminSelectedSouvenir[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as { souvenirId?: unknown; selectedSize?: unknown };
+    const souvenirId = asText(row.souvenirId);
+    if (!souvenirId) return [];
+    return [{ souvenirId, selectedSize: asText(row.selectedSize) || null }];
+  });
 }
 
 function asAmount(value: unknown, fallback: number): number {
@@ -421,7 +441,18 @@ export function applyRegistrationDetail(
       row.termsMarketingChannelAgreed,
     marketingConsent:
       asOptionalBool(data.termsMarketingAgreed) ?? row.marketingConsent,
+    eventCategoryId: firstText(data.eventCategoryId) || row.eventCategoryId,
+    selectedSouvenirList: (() => {
+      const list = asSelectedSouvenirList(data.selectedSouvenirList);
+      return list.length ? list : row.selectedSouvenirList;
+    })(),
   };
+}
+
+export function hasPartialRefundIds(row: AdminApplicationRow) {
+  const categoryId = row.eventCategoryId?.trim();
+  const list = row.selectedSouvenirList ?? [];
+  return Boolean(categoryId) && list.length > 0 && list.every((item) => item.souvenirId.trim());
 }
 
 export function fetchAdminEvents() {
