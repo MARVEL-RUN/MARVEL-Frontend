@@ -12,7 +12,11 @@ import {
 } from "@/lib/payment-status";
 import { statusKey } from "@/lib/registration-status";
 import { formatAmount } from "@/services/admin/applications";
-import { paymentMethodLabel, type AdminPayment } from "@/services/admin/payments";
+import {
+  paymentMethodLabel,
+  type AdminPayment,
+  type AdminPaymentCancel,
+} from "@/services/admin/payments";
 import type { KeyboardEvent } from "react";
 
 type Props = {
@@ -50,6 +54,13 @@ function allocationNote(item: {
   if (item.excludedFromCurrentRoster) notes.push("명단 제외");
   if (item.registrationMissing) notes.push("확인 필요");
   return notes;
+}
+
+function cancelOwnerNames(item: AdminPaymentCancel) {
+  const names = (item.allocations ?? [])
+    .map((allocation) => allocation.name?.trim() ?? "")
+    .filter(Boolean);
+  return names.filter((name, index) => names.indexOf(name) === index);
 }
 
 function PaymentListItem({
@@ -172,6 +183,7 @@ function PaymentListItem({
           const cancelId = item.paymentCancelId ?? "";
           const evidenceOpen = Boolean(cancelId && activeEvidenceCancelId === cancelId);
           const needsCheck = statusKey(item.status) === "UNKNOWN";
+          const owners = cancelOwnerNames(item);
           return (
             <div
               className="admin-pay-list__row admin-pay-list__row--cancel"
@@ -180,10 +192,14 @@ function PaymentListItem({
               <dt>{i === 0 ? "환불" : ""}</dt>
               <dd>
                 <p className="admin-pay-list__cancel-text">
+                  {owners.length ? `${owners.join(", ")} · ` : null}
                   {item.cancelAmount != null ? formatAmount(item.cancelAmount) : "-"}
                   {purposeLabel ? ` · ${purposeLabel}` : null}
                   {item.cancelReason ? ` · ${item.cancelReason}` : null}
                 </p>
+                {!owners.length && item.allocationMissing ? (
+                  <p className="admin-pay-list__note admin-pay-list__cancel-note">확인 필요</p>
+                ) : null}
                 {item.errorCode || item.errorMessage ? (
                   <p className="admin-pay-list__note admin-pay-list__cancel-note">
                     {paymentCancelErrorText(item.errorCode, item.errorMessage)}

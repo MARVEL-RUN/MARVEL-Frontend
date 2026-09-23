@@ -742,7 +742,7 @@ export function ApplicationDetailDrawer({
                     setAdjusting(true);
                   }}
                 >
-                  부분 환불
+                  결제연관정보 수정
                 </button>
               ) : null}
               {canFullRefund ? (
