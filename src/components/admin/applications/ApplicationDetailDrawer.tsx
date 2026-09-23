@@ -7,6 +7,7 @@ import { hasAdminRefundBatch } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
+  canPartialRefundRegistration,
   closedRegistration,
   registrationStatusBadge,
   registrationStatusLabel,
@@ -22,6 +23,7 @@ import {
   applicationGenderLabel,
   applicationKindLabel,
   deleteAdminRegistration,
+  hasPartialRefundIds,
   resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
@@ -31,8 +33,11 @@ import {
   fetchRefundResult,
   newRefundRequestId,
   postFullRefund,
+  postPartialRefund,
   REFUND_REASON_MAX,
   type AdminFullRefundBody,
+  type AdminPartialRefundBody,
+  type AdminPartialRefundTarget,
   type AdminRefundBatchResponse,
 } from "@/services/admin/refunds";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,12 +47,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ApplicationBasicInfoEdit } from "./ApplicationBasicInfoEdit";
 import { ApplicationPaySummary } from "./ApplicationPaySummary";
+import { PartialRefundEdit } from "./PartialRefundEdit";
 import { PaymentListDrawer } from "./PaymentListDrawer";
 import { PaymentLogDrawer } from "./PaymentLogDrawer";
 import { RefundEvidencePanel } from "./RefundEvidencePanel";
 import { RefundResultPanel } from "./RefundResultPanel";
 
 export type ApplicationDetailSource = "applications" | "organization-members";
+
+type PendingRefund =
+  | { kind: "full"; body: AdminFullRefundBody }
+  | { kind: "partial"; body: AdminPartialRefundBody };
 
 type Props = {
   row: AdminApplicationRow | null;
@@ -245,11 +255,12 @@ export function ApplicationDetailDrawer({
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(false);
+  const [adjusting, setAdjusting] = useState(false);
   const [editError, setEditError] = useState("");
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
   const [evidenceCancelId, setEvidenceCancelId] = useState<string | null>(null);
   const [refundResult, setRefundResult] = useState<AdminRefundBatchResponse | null>(null);
-  const refundRequest = useRef<AdminFullRefundBody | null>(null);
+  const refundRequest = useRef<PendingRefund | null>(null);
   const refundToastKey = useRef<string | null>(null);
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
@@ -263,6 +274,7 @@ export function ApplicationDetailDrawer({
     setEvidenceCancelId(null);
     setPage(0);
     setEditing(false);
+    setAdjusting(false);
     setEditError("");
     setRefundResult(null);
     refundRequest.current = null;
@@ -349,12 +361,14 @@ export function ApplicationDetailDrawer({
       ),
   });
 
-  const runFullRefund = useMutation({
+  const runRefund = useMutation({
     mutationFn: async () => {
-      const body = refundRequest.current;
-      if (!row || !body) throw new Error("환불 요청이 없습니다.");
+      const pending = refundRequest.current;
+      if (!row || !pending) throw new Error("환불 요청이 없습니다.");
       try {
-        return await postFullRefund(row.eventId, body);
+        return pending.kind === "full"
+          ? await postFullRefund(row.eventId, pending.body)
+          : await postPartialRefund(row.eventId, pending.body);
       } catch (err) {
         if (
           isAdminHttp(err, 0) ||
@@ -362,7 +376,7 @@ export function ApplicationDetailDrawer({
           isAdminHttp(err, 504)
         ) {
           try {
-            return await fetchRefundResult(row.eventId, body.requestId);
+            return await fetchRefundResult(row.eventId, pending.body.requestId);
           } catch (lookupErr) {
             if (isAdminHttp(lookupErr, 404)) {
               throw new Error(
@@ -393,7 +407,7 @@ export function ApplicationDetailDrawer({
 
   const lookupRefundResult = async () => {
     const requestId =
-      refundRequest.current?.requestId || refundResult?.summary.requestId;
+      refundRequest.current?.body.requestId || refundResult?.summary.requestId;
     if (!row?.eventId || !requestId) return;
     try {
       const data = await fetchRefundResult(row.eventId, requestId);
@@ -470,20 +484,55 @@ export function ApplicationDetailDrawer({
       });
       if (!reason) return;
       refundRequest.current = {
-        requestId: newRefundRequestId(),
-        reason: reason.slice(0, REFUND_REASON_MAX),
-        registrationIds: row.kind === "group" ? [] : [row.id],
-        organizationIds:
-          row.kind === "group" ? [row.organizationId || row.id] : [],
+        kind: "full",
+        body: {
+          requestId: newRefundRequestId(),
+          reason: reason.slice(0, REFUND_REASON_MAX),
+          registrationIds: row.kind === "group" ? [] : [row.id],
+          organizationIds:
+            row.kind === "group" ? [row.organizationId || row.id] : [],
+        },
       };
     }
-    runFullRefund.mutate();
+    runRefund.mutate();
+  };
+
+  const handlePartialRefund = async (target: AdminPartialRefundTarget) => {
+    if (!row || !hasAdminRefundBatch) return;
+    if (!refundRequest.current) {
+      const label =
+        row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
+      const ok = await confirm({
+        title: "종목·기념품 변경",
+        message: `${label} 종목·기념품·생년월일 변경을 요청합니다. 차액 환불·추가 납부·동일 금액은 서버가 처리하며, PG가 실패해도 신청이 자동으로 원복되지 않습니다.`,
+        confirmLabel: "변경 요청",
+      });
+      if (!ok) return;
+      const reason = await prompt({
+        title: "변경 사유",
+        description: `관리자 변경 사유를 입력해 주세요. (${REFUND_REASON_MAX}자 이내)`,
+        label: "사유",
+        placeholder: "종목 변경",
+        confirmLabel: "요청",
+      });
+      if (!reason) return;
+      refundRequest.current = {
+        kind: "partial",
+        body: {
+          requestId: newRefundRequestId(),
+          reason: reason.slice(0, REFUND_REASON_MAX),
+          targets: [target],
+        },
+      };
+    }
+    runRefund.mutate();
+    setAdjusting(false);
   };
 
   useEffect(() => {
     if (!row?.eventId) return;
     const requestId =
-      refundRequest.current?.requestId || refundResult?.summary.requestId;
+      refundRequest.current?.body.requestId || refundResult?.summary.requestId;
     if (!requestId || !refundBatchUnfinished(refundResult?.summary.status)) return;
     let n = 0;
     const timer = window.setInterval(() => {
@@ -524,14 +573,23 @@ export function ApplicationDetailDrawer({
   const isOrgMemberContext = source === "organization-members";
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
-  const canDeleteUnpaid = !editing && canDeleteUnpaidRegistration(row.status);
+  const canDeleteUnpaid = !editing && !adjusting && canDeleteUnpaidRegistration(row.status);
   const canFullRefund =
     hasAdminRefundBatch &&
     !editing &&
+    !adjusting &&
     !canDeleteUnpaid &&
     (row.kind === "group"
       ? !closedRegistration(row.status)
       : statusKey(row.status) === "CONFIRMED");
+  const canPartialRefund =
+    hasAdminRefundBatch &&
+    !editing &&
+    !adjusting &&
+    !canDeleteUnpaid &&
+    !isGroup &&
+    hasPartialRefundIds(row) &&
+    canPartialRefundRegistration(row.status);
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
@@ -595,7 +653,7 @@ export function ApplicationDetailDrawer({
         />
       ) : null}
       <aside
-        className={`admin-drawer admin-drawer--detail${editing ? " is-editing" : ""}`}
+        className={`admin-drawer admin-drawer--detail${editing || adjusting ? " is-editing" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label="신청 상세"
@@ -607,9 +665,16 @@ export function ApplicationDetailDrawer({
               {editing ? (
                 <span className="admin-drawer__edit-badge">기본정보 수정</span>
               ) : null}
+              {adjusting ? (
+                <span className="admin-drawer__edit-badge">종목 변경</span>
+              ) : null}
             </div>
-            <div className="admin-drawer__actions">
-              {!editing && canEditBasicInfo ? (
+            <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
+              닫기
+            </button>
+          </div>
+          <div className="admin-drawer__actions admin-drawer__actions--detail">
+              {!editing && !adjusting && canEditBasicInfo ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -621,19 +686,20 @@ export function ApplicationDetailDrawer({
                 >
                   기본정보 수정
                 </button>
-              ) : !editing ? null : (
+              ) : editing || adjusting ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
                   onClick={() => {
                     setEditing(false);
+                    setAdjusting(false);
                     setEditError("");
                   }}
                 >
                   수정 취소
                 </button>
-              )}
-              {!isGroup && !editing ? (
+              ) : null}
+              {!isGroup && !editing && !adjusting ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost"
@@ -643,14 +709,30 @@ export function ApplicationDetailDrawer({
                   비밀번호 초기화
                 </button>
               ) : null}
+              {canPartialRefund ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  disabled={runRefund.isPending || loading || Boolean(error)}
+                  onClick={() => {
+                    setEditError("");
+                    if (!refundBatchUnfinished(refundResult?.summary.status)) {
+                      refundRequest.current = null;
+                    }
+                    setAdjusting(true);
+                  }}
+                >
+                  부분 환불
+                </button>
+              ) : null}
               {canFullRefund ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--ghost admin-btn--danger-text"
-                  disabled={runFullRefund.isPending || loading || Boolean(error)}
+                  disabled={runRefund.isPending || loading || Boolean(error)}
                   onClick={() => void handleFullRefund()}
                 >
-                  참가 취소·환불
+                  전액 환불
                 </button>
               ) : null}
               {canDeleteUnpaid ? (
@@ -663,10 +745,6 @@ export function ApplicationDetailDrawer({
                   미결제 취소
                 </button>
               ) : null}
-              <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
-                닫기
-              </button>
-            </div>
           </div>
           <h1 className="admin-drawer__hero-title">{title}</h1>
           <div className="admin-drawer__hero-meta">
@@ -710,7 +788,20 @@ export function ApplicationDetailDrawer({
             />
           ) : null}
 
-          {!loading && !error && !editing ? (
+          {!loading && !error && adjusting ? (
+            <PartialRefundEdit
+              row={row}
+              pending={runRefund.isPending}
+              onCancel={() => {
+                setAdjusting(false);
+                setEditError("");
+              }}
+              onError={setEditError}
+              onSubmit={(target) => void handlePartialRefund(target)}
+            />
+          ) : null}
+
+          {!loading && !error && !editing && !adjusting ? (
             <>
               {blockGroupEdit ? (
                 <DrawerGuide
@@ -769,7 +860,7 @@ export function ApplicationDetailDrawer({
                 <RefundResultPanel
                   eventId={row.eventId}
                   result={refundResult}
-                  lookingUp={runFullRefund.isPending}
+                  lookingUp={runRefund.isPending}
                   onLookup={() => void lookupRefundResult()}
                   onClose={() => setRefundResult(null)}
                 />

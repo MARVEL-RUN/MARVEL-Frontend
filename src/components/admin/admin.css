@@ -1512,6 +1512,11 @@ html.admin-mode body {
   gap: 4px;
 }
 
+.admin-drawer__actions--detail {
+  justify-content: flex-end;
+  margin: 0 0 10px;
+}
+
 .admin-drawer__actions .admin-btn {
   min-height: 26px;
   padding: 0 8px;
@@ -2353,7 +2358,7 @@ html.admin-mode body {
 
 .admin-refund-result {
   margin: 0 0 18px;
-  padding-bottom: 16px;
+  padding: 16px 16px 18px;
   border-bottom: 1px solid var(--admin-line);
 }
 
@@ -2371,14 +2376,14 @@ html.admin-mode body {
 }
 
 .admin-refund-result__batch {
-  margin: 6px 0 10px;
+  margin: 10px 0 14px;
   color: #667085;
   font-size: 12px;
   line-height: 1.45;
 }
 
 .admin-refund-result__items {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
@@ -2386,7 +2391,7 @@ html.admin-mode body {
 }
 
 .admin-refund-result__items li {
-  padding: 8px 10px;
+  padding: 12px 14px;
   border: 1px solid #eef1f5;
   border-radius: 4px;
 }
@@ -2423,7 +2428,8 @@ html.admin-mode body {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
+  padding: 2px 0;
   color: #475467;
   font-size: 12px;
   font-weight: 600;
