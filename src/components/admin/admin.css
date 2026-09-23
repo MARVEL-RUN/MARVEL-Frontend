@@ -1512,6 +1512,11 @@ html.admin-mode body {
   gap: 4px;
 }
 
+.admin-drawer__actions--detail {
+  justify-content: flex-end;
+  margin: 0 0 10px;
+}
+
 .admin-drawer__actions .admin-btn {
   min-height: 26px;
   padding: 0 8px;
@@ -1953,17 +1958,18 @@ html.admin-mode body {
 }
 
 .admin-pay-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
   padding: 8px 12px 12px;
   overflow: auto;
   flex: 1;
-  align-content: start;
 }
 
 .admin-pay-list__item {
   display: block;
   width: 100%;
+  flex-shrink: 0;
   margin: 0;
   padding: 0;
   background: #fff;
@@ -1976,12 +1982,11 @@ html.admin-mode body {
   cursor: default;
 }
 
-button.admin-pay-list__item {
-  appearance: none;
+.admin-pay-list__item.is-loggable {
   cursor: pointer;
 }
 
-button.admin-pay-list__item:hover {
+.admin-pay-list__item.is-loggable:hover {
   border-color: #d0d5dd;
 }
 
@@ -2016,6 +2021,12 @@ button.admin-pay-list__item:hover {
   font-variant-numeric: tabular-nums;
   color: var(--admin-ink);
   line-height: 1.3;
+}
+
+.admin-pay-list__amount-hint {
+  color: #98a2b3;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .admin-pay-list__no {
@@ -2070,6 +2081,12 @@ button.admin-pay-list__item:hover {
   font-weight: 700;
 }
 
+.admin-pay-list__evidence-btn {
+  min-height: 24px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
 .admin-pay-list__fields {
   margin: 0;
   padding: 2px 0 4px;
@@ -2085,6 +2102,10 @@ button.admin-pay-list__item:hover {
 
 .admin-pay-list__row + .admin-pay-list__row {
   border-top: 1px solid #f4f6f8;
+}
+
+.admin-pay-list__row.is-current dd {
+  font-weight: 700;
 }
 
 .admin-pay-list__row dt {
@@ -2103,8 +2124,30 @@ button.admin-pay-list__item:hover {
   word-break: break-word;
 }
 
+.admin-pay-list__row--cancel {
+  align-items: start;
+  padding-bottom: 8px;
+}
+
 .admin-pay-list__row--cancel dd {
   color: #475467;
+}
+
+.admin-pay-list__cancel-text {
+  margin: 0;
+}
+
+.admin-pay-list__cancel-note {
+  display: block;
+  margin: 4px 0 0;
+}
+
+.admin-pay-list__cancel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .admin-pay-list__note {
@@ -2112,13 +2155,6 @@ button.admin-pay-list__item:hover {
   color: #98a2b3;
   font-size: 10px;
   font-weight: 600;
-}
-
-.admin-pay-list__inline-badge {
-  display: inline-block;
-  margin-left: 4px;
-  font-size: 10px;
-  vertical-align: baseline;
 }
 
 .admin-pay-list-drawer__pager {
@@ -2318,6 +2354,154 @@ button.admin-pay-list__item:hover {
   .admin-org-detail__summary {
     grid-template-columns: 1fr;
   }
+}
+
+.admin-refund-result {
+  padding: 0 0 18px;
+}
+
+.admin-refund-result__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 16px;
+}
+
+.admin-refund-result__head .admin-drawer__section-title {
+  flex: 1;
+  min-width: 0;
+  padding-right: 0;
+}
+
+.admin-refund-result__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.admin-refund-result__actions .admin-btn {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-refund-result__spin {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #cfd5de;
+  border-top-color: #667085;
+  border-radius: 50%;
+  animation: admin-refund-spin 0.6s linear infinite;
+}
+
+@keyframes admin-refund-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-refund-result__batch {
+  margin: 0 0 12px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.admin-refund-result__items {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-refund-result__items li {
+  padding: 12px 14px;
+  border: 1px solid #eef1f5;
+  border-radius: 4px;
+}
+
+.admin-refund-result__item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.admin-refund-result__id {
+  color: #667085;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.admin-refund-result__items p {
+  margin: 0;
+  font-size: 12px;
+  color: #344054;
+  line-height: 1.45;
+}
+
+.admin-refund-result__prep {
+  margin-top: 4px;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.admin-refund-result__filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 2px 0;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-refund-evidence__hint {
+  margin: 8px 0 0;
+}
+
+.admin-refund-evidence__run {
+  margin: 8px 0 4px;
+}
+
+.admin-refund-evidence__item {
+  padding: 8px 10px;
+  border: 1px solid #eef1f5;
+  border-radius: 4px;
+}
+
+.admin-refund-evidence__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #667085;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-refund-evidence__item p {
+  margin: 0;
+  font-size: 12px;
+  color: #344054;
+  line-height: 1.45;
+}
+
+.admin-refund-evidence__meta {
+  margin-top: 4px;
+  color: #98a2b3;
+  font-size: 11px;
 }
 
 .admin-pay {

@@ -18,8 +18,9 @@ function joinUrl(endpoint: string) {
 function errorMessage(status: number, text: string) {
   if (!text) return `HTTP ${status}`;
   try {
-    const body = JSON.parse(text) as { message?: string };
+    const body = JSON.parse(text) as { message?: string; code?: string };
     if (body.message) return body.message;
+    if (body.code) return body.code;
   } catch {
     /* plain text */
   }
