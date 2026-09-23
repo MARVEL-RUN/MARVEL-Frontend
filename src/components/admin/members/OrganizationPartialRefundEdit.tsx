@@ -129,7 +129,7 @@ function seedDraft(
         category,
         listed.length
           ? listed
-          : seedSingleSouvenir(category, member.souvenirSize),
+          : seedSingleSouvenir(category, member.souvenirSize, birth),
         birth,
       )
     : listed;
@@ -146,11 +146,15 @@ function seedDraft(
   };
 }
 
-function seedSingleSouvenir(category: RegistrationCategory, size?: string | null) {
+function seedSingleSouvenir(
+  category: RegistrationCategory,
+  size: string | null | undefined,
+  birth: string,
+) {
   const souvenirs = sortedSouvenirs(category);
   if (souvenirs.length !== 1) return [];
   const picked = (size ?? "").trim();
-  const sizes = souvenirSizes(souvenirs[0]);
+  const sizes = souvenirSizes(souvenirs[0], ticketFromBirthInput(birth));
   if (!picked || !sizes.includes(picked)) return [];
   return [{ souvenirId: souvenirs[0].souvenirId, selectedSize: picked }];
 }
