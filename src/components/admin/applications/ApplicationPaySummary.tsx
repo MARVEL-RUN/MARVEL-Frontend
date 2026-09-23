@@ -1,6 +1,8 @@
 "use client";
 
 import { isAdminHttp } from "@/lib/admin/fetch";
+import { paymentOrderStatusLabel } from "@/lib/payment-status";
+import { registrationStatusLabel } from "@/lib/registration-status";
 import { formatAmount } from "@/services/admin/applications";
 import type { AdminFinance } from "@/services/admin/payments";
 
@@ -44,9 +46,21 @@ export function ApplicationPaySummary({ data, loading, error, paymentCount = 0 }
                   {data?.contractAmount != null ? formatAmount(data.contractAmount) : "-"}
                 </dd>
               </div>
+              {data?.registrationStatus ? (
+                <div>
+                  <dt>신청상태</dt>
+                  <dd>{registrationStatusLabel(data.registrationStatus)}</dd>
+                </div>
+              ) : null}
+              {data?.paymentStatus ? (
+                <div>
+                  <dt>주문상태</dt>
+                  <dd>{paymentOrderStatusLabel(data.paymentStatus)}</dd>
+                </div>
+              ) : null}
               {paymentCount > 0 ? (
                 <div>
-                  <dt>결제 건수</dt>
+                  <dt>주문 건수</dt>
                   <dd>{paymentCount}건</dd>
                 </div>
               ) : null}

@@ -3,10 +3,14 @@
 import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { useAdminPrompt } from "@/components/admin/InputModal";
 import { adminToast } from "@/components/admin/Toast";
+import { hasAdminRefundBatch } from "@/lib/admin/config";
+import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
+  closedRegistration,
   registrationStatusBadge,
   registrationStatusLabel,
+  statusKey,
 } from "@/lib/registration-status";
 import {
   adminMembersHref,
@@ -21,16 +25,27 @@ import {
   resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
+import { refundBatchToast, refundBatchUnfinished } from "@/lib/refund-result";
 import { fetchApplicationFinance, type AdminPayment } from "@/services/admin/payments";
+import {
+  fetchRefundResult,
+  newRefundRequestId,
+  postFullRefund,
+  REFUND_REASON_MAX,
+  type AdminFullRefundBody,
+  type AdminRefundBatchResponse,
+} from "@/services/admin/refunds";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ApplicationBasicInfoEdit } from "./ApplicationBasicInfoEdit";
 import { ApplicationPaySummary } from "./ApplicationPaySummary";
 import { PaymentListDrawer } from "./PaymentListDrawer";
 import { PaymentLogDrawer } from "./PaymentLogDrawer";
+import { RefundEvidencePanel } from "./RefundEvidencePanel";
+import { RefundResultPanel } from "./RefundResultPanel";
 
 export type ApplicationDetailSource = "applications" | "organization-members";
 
@@ -232,6 +247,10 @@ export function ApplicationDetailDrawer({
   const [editing, setEditing] = useState(false);
   const [editError, setEditError] = useState("");
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
+  const [evidenceCancelId, setEvidenceCancelId] = useState<string | null>(null);
+  const [refundResult, setRefundResult] = useState<AdminRefundBatchResponse | null>(null);
+  const refundRequest = useRef<AdminFullRefundBody | null>(null);
+  const refundToastKey = useRef<string | null>(null);
   const { confirm, modal: confirmModal } = useAdminConfirm();
   const { prompt, modal: inputModal } = useAdminPrompt();
 
@@ -241,19 +260,28 @@ export function ApplicationDetailDrawer({
 
   useEffect(() => {
     setLogPayment(null);
+    setEvidenceCancelId(null);
     setPage(0);
     setEditing(false);
     setEditError("");
+    setRefundResult(null);
+    refundRequest.current = null;
+    refundToastKey.current = null;
   }, [row?.id]);
 
   useEffect(() => {
     setLogPayment(null);
+    setEvidenceCancelId(null);
   }, [page]);
 
   useEffect(() => {
     if (!row) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
+      if (evidenceCancelId) {
+        setEvidenceCancelId(null);
+        return;
+      }
       if (logPayment) {
         setLogPayment(null);
         return;
@@ -262,13 +290,40 @@ export function ApplicationDetailDrawer({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [logPayment, onClose, row]);
+  }, [evidenceCancelId, logPayment, onClose, row]);
 
   const finance = useQuery({
     queryKey: ["admin", "finance", row?.eventId, row?.id, row?.kind, row?.organizationId, page],
     queryFn: () => fetchApplicationFinance(row!, page),
     enabled: Boolean(row?.eventId && row?.id),
   });
+
+  const invalidateAfterFinanceChange = useCallback(async () => {
+    if (!row) return;
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "registration"] }),
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "registration-statistics"],
+      }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "finance"] }),
+      row.organizationId
+        ? queryClient.invalidateQueries({
+            queryKey: ["admin", "organization", row.organizationId],
+          })
+        : Promise.resolve(),
+    ]);
+  }, [queryClient, row]);
+
+  const showRefundToast = useCallback((data: AdminRefundBatchResponse) => {
+    const key = data.summary.requestId || data.summary.batchId;
+    if (!key || refundToastKey.current === key) return;
+    const toast = refundBatchToast(data);
+    if (!toast) return;
+    refundToastKey.current = key;
+    if (toast.ok) adminToast.success(toast.message);
+    else adminToast.error(toast.message);
+  }, []);
 
   const resetPassword = useMutation({
     mutationFn: (password: string) =>
@@ -283,27 +338,83 @@ export function ApplicationDetailDrawer({
   const removeUnpaid = useMutation({
     mutationFn: () => deleteAdminRegistration(row!.id),
     onSuccess: async (data) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
-        queryClient.invalidateQueries({ queryKey: ["admin", "registration"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin", "registration-statistics"],
-        }),
-        row?.organizationId
-          ? queryClient.invalidateQueries({
-              queryKey: ["admin", "organization", row.organizationId],
-            })
-          : Promise.resolve(),
-      ]);
+      await invalidateAfterFinanceChange();
       const message = data?.message?.trim();
-      adminToast.success(message || "미결제 신청이 삭제되었습니다.");
+      adminToast.success(message || "미결제 신청이 취소되었습니다.");
       onClose();
     },
     onError: (err) =>
       adminToast.error(
-        err instanceof Error ? err.message : "미결제 신청 삭제에 실패했습니다.",
+        err instanceof Error ? err.message : "미결제 신청 취소에 실패했습니다.",
       ),
   });
+
+  const runFullRefund = useMutation({
+    mutationFn: async () => {
+      const body = refundRequest.current;
+      if (!row || !body) throw new Error("환불 요청이 없습니다.");
+      try {
+        return await postFullRefund(row.eventId, body);
+      } catch (err) {
+        if (
+          isAdminHttp(err, 0) ||
+          isAdminHttp(err, 502) ||
+          isAdminHttp(err, 504)
+        ) {
+          try {
+            return await fetchRefundResult(row.eventId, body.requestId);
+          } catch (lookupErr) {
+            if (isAdminHttp(lookupErr, 404)) {
+              throw new Error(
+                "요청 접수 여부를 아직 확인할 수 없습니다. 잠시 후 같은 요청으로 다시 조회하세요.",
+              );
+            }
+            throw lookupErr;
+          }
+        }
+        throw err;
+      }
+    },
+    onSuccess: async (data) => {
+      setRefundResult(data);
+      showRefundToast(data);
+      if (!refundBatchUnfinished(data.summary.status)) {
+        refundRequest.current = null;
+      }
+      await invalidateAfterFinanceChange();
+    },
+    onError: (err) =>
+      adminToast.error(
+        err instanceof Error
+          ? err.message
+          : "환불 요청 결과를 확인할 수 없습니다. 같은 요청으로 다시 조회하세요.",
+      ),
+  });
+
+  const lookupRefundResult = async () => {
+    const requestId =
+      refundRequest.current?.requestId || refundResult?.summary.requestId;
+    if (!row?.eventId || !requestId) return;
+    try {
+      const data = await fetchRefundResult(row.eventId, requestId);
+      setRefundResult(data);
+      showRefundToast(data);
+      if (!refundBatchUnfinished(data.summary.status)) {
+        refundRequest.current = null;
+      }
+      await invalidateAfterFinanceChange();
+    } catch (err) {
+      if (isAdminHttp(err, 404)) {
+        adminToast.error(
+          "요청 접수 여부를 아직 확인할 수 없습니다. 잠시 후 같은 요청으로 다시 조회하세요.",
+        );
+        return;
+      }
+      adminToast.error(
+        err instanceof Error ? err.message : "저장 결과 조회에 실패했습니다.",
+      );
+    }
+  };
 
   const handleResetPassword = async () => {
     if (!row || row.kind === "group") return;
@@ -331,13 +442,70 @@ export function ApplicationDetailDrawer({
     const label =
       row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
     const ok = await confirm({
-      title: "미결제 신청 삭제",
-      message: `${label} 신청 데이터를 삭제할까요? 삭제 후 복구할 수 없습니다.`,
-      confirmLabel: "삭제",
+      title: "미결제 신청 취소",
+      message: `${label} 미결제 신청을 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`,
+      confirmLabel: "취소 처리",
     });
     if (!ok) return;
     removeUnpaid.mutate();
   };
+
+  const handleFullRefund = async () => {
+    if (!row || !hasAdminRefundBatch) return;
+    if (!refundRequest.current) {
+      const label =
+        row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
+      const ok = await confirm({
+        title: "참가 취소 및 전액 환불",
+        message: `${label} 참가 취소와 정원 반환을 동반합니다. 신청 취소가 먼저 반영된 뒤 PG 환불이 진행되며, PG가 실패해도 신청·정원이 자동으로 원복되지 않습니다.`,
+        confirmLabel: "환불 요청",
+      });
+      if (!ok) return;
+      const reason = await prompt({
+        title: "환불 사유",
+        description: `관리자 환불 사유를 입력해 주세요. (${REFUND_REASON_MAX}자 이내)`,
+        label: "사유",
+        placeholder: "참가자 요청에 따른 참가 취소",
+        confirmLabel: "요청",
+      });
+      if (!reason) return;
+      refundRequest.current = {
+        requestId: newRefundRequestId(),
+        reason: reason.slice(0, REFUND_REASON_MAX),
+        registrationIds: row.kind === "group" ? [] : [row.id],
+        organizationIds:
+          row.kind === "group" ? [row.organizationId || row.id] : [],
+      };
+    }
+    runFullRefund.mutate();
+  };
+
+  useEffect(() => {
+    if (!row?.eventId) return;
+    const requestId =
+      refundRequest.current?.requestId || refundResult?.summary.requestId;
+    if (!requestId || !refundBatchUnfinished(refundResult?.summary.status)) return;
+    let n = 0;
+    const timer = window.setInterval(() => {
+      n += 1;
+      if (n > 15) {
+        window.clearInterval(timer);
+        return;
+      }
+      void fetchRefundResult(row.eventId, requestId)
+        .then((data) => {
+          setRefundResult(data);
+          showRefundToast(data);
+          if (!refundBatchUnfinished(data.summary.status)) {
+            refundRequest.current = null;
+            window.clearInterval(timer);
+            void invalidateAfterFinanceChange();
+          }
+        })
+        .catch(() => undefined);
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [row?.eventId, refundResult?.summary.requestId, refundResult?.summary.status, invalidateAfterFinanceChange, showRefundToast]);
 
   const handleBasicInfoSaved = async () => {
     if (!row) return;
@@ -357,6 +525,13 @@ export function ApplicationDetailDrawer({
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
   const canDeleteUnpaid = !editing && canDeleteUnpaidRegistration(row.status);
+  const canFullRefund =
+    hasAdminRefundBatch &&
+    !editing &&
+    !canDeleteUnpaid &&
+    (row.kind === "group"
+      ? !closedRegistration(row.status)
+      : statusKey(row.status) === "CONFIRMED");
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
@@ -367,12 +542,23 @@ export function ApplicationDetailDrawer({
   const totalCount = finance.data?.payments?.totalElements;
   const showPayments = !finance.isLoading && !finance.isError && payments.length > 0;
   const showLog = Boolean(logPayment);
+  const showEvidence = Boolean(evidenceCancelId);
+
+  const openLog = (payment: AdminPayment | null) => {
+    setEvidenceCancelId(null);
+    setLogPayment(payment);
+  };
+
+  const openEvidence = (paymentCancelId: string | null) => {
+    setLogPayment(null);
+    setEvidenceCancelId(paymentCancelId);
+  };
 
   return createPortal(
     <div
       className="admin-drawer-stack"
       data-pay-open={showPayments ? "" : undefined}
-      data-log-open={showLog ? "" : undefined}
+      data-log-open={showLog || showEvidence ? "" : undefined}
     >
       <div
         className="admin-drawer__dim"
@@ -380,6 +566,13 @@ export function ApplicationDetailDrawer({
         aria-hidden="true"
         onClick={onClose}
       />
+      {showEvidence && evidenceCancelId ? (
+        <RefundEvidencePanel
+          eventId={row.eventId}
+          paymentCancelId={evidenceCancelId}
+          onClose={() => setEvidenceCancelId(null)}
+        />
+      ) : null}
       {showLog && logPayment ? (
         <PaymentLogDrawer
           eventId={row.eventId}
@@ -393,8 +586,11 @@ export function ApplicationDetailDrawer({
           page={page}
           totalPages={totalPages}
           totalCount={totalCount}
+          highlightRegistrationId={isGroup ? undefined : row.id}
           activeLogPaymentId={logPayment?.paymentId ?? null}
-          onOpenLog={setLogPayment}
+          activeEvidenceCancelId={evidenceCancelId}
+          onOpenLog={openLog}
+          onOpenEvidence={openEvidence}
           onPage={setPage}
         />
       ) : null}
@@ -447,6 +643,16 @@ export function ApplicationDetailDrawer({
                   비밀번호 초기화
                 </button>
               ) : null}
+              {canFullRefund ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                  disabled={runFullRefund.isPending || loading || Boolean(error)}
+                  onClick={() => void handleFullRefund()}
+                >
+                  참가 취소·환불
+                </button>
+              ) : null}
               {canDeleteUnpaid ? (
                 <button
                   type="button"
@@ -454,7 +660,7 @@ export function ApplicationDetailDrawer({
                   disabled={removeUnpaid.isPending || loading || Boolean(error)}
                   onClick={() => void handleDeleteUnpaid()}
                 >
-                  삭제
+                  미결제 취소
                 </button>
               ) : null}
               <button type="button" className="admin-btn admin-btn--ghost" onClick={onClose}>
@@ -558,12 +764,23 @@ export function ApplicationDetailDrawer({
             </>
           ) : null}
           {!editing ? (
-            <ApplicationPaySummary
-              data={finance.data}
-              loading={finance.isLoading}
-              error={finance.isError ? finance.error : undefined}
-              paymentCount={totalCount ?? payments.length}
-            />
+            <>
+              {refundResult ? (
+                <RefundResultPanel
+                  eventId={row.eventId}
+                  result={refundResult}
+                  lookingUp={runFullRefund.isPending}
+                  onLookup={() => void lookupRefundResult()}
+                  onClose={() => setRefundResult(null)}
+                />
+              ) : null}
+              <ApplicationPaySummary
+                data={finance.data}
+                loading={finance.isLoading}
+                error={finance.isError ? finance.error : undefined}
+                paymentCount={totalCount ?? payments.length}
+              />
+            </>
           ) : null}
         </div>
       </aside>
