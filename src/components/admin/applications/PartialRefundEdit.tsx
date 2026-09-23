@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  categoryClosedReason,
   categoryLabel,
+  categoryOpenForBirth,
   findCategory,
   shirtAssignment,
   shirtSouvenir,
@@ -121,9 +123,14 @@ export function PartialRefundEdit({ row, pending, onCancel, onError, onSubmit }:
 
   const applyCategory = (nextId: string, nextBirth: string) => {
     const next = findCategory(categories, nextId);
-    setEventCategoryId(nextId);
+    const open = Boolean(next && categoryOpenForBirth(next, nextBirth));
     setBirth(nextBirth);
-    if (!next) return;
+    if (!next || !open) {
+      setEventCategoryId("");
+      if (next && !open) setSouvenirs([]);
+      return;
+    }
+    setEventCategoryId(nextId);
     setSouvenirs(selectionsForCategory(next, souvenirs, nextBirth));
   };
 
@@ -139,6 +146,10 @@ export function PartialRefundEdit({ row, pending, onCancel, onError, onSubmit }:
     }
     if (!category) {
       onError("참가 종목을 선택하세요.");
+      return;
+    }
+    if (!categoryOpenForBirth(category, birthDigits(birth))) {
+      onError(categoryClosedReason(category, birthDigits(birth)) || "참가할 수 없는 종목입니다.");
       return;
     }
     const apiBirth = toApiBirth(birth);
@@ -203,11 +214,25 @@ export function PartialRefundEdit({ row, pending, onCancel, onError, onSubmit }:
                 onChange={(event) => applyCategory(event.target.value, birth)}
               >
                 <option value="">선택</option>
-                {categories.map((item) => (
-                  <option key={item.categoryId} value={item.categoryId}>
-                    {categoryLabel(item)}
-                  </option>
-                ))}
+                {categories.map((item) => {
+                  const ageOff = !categoryOpenForBirth(item, birth);
+                  const closed = item.isActive === false;
+                  const reason = closed
+                    ? "마감"
+                    : ageOff
+                      ? categoryClosedReason(item, birth)
+                      : "";
+                  return (
+                    <option
+                      key={item.categoryId}
+                      value={item.categoryId}
+                      disabled={closed || ageOff}
+                    >
+                      {categoryLabel(item)}
+                      {reason ? ` (${reason})` : ""}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>

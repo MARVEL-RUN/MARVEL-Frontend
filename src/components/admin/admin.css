@@ -2357,16 +2357,20 @@ html.admin-mode body {
 }
 
 .admin-refund-result {
-  margin: 0 0 18px;
-  padding: 16px 16px 18px;
-  border-bottom: 1px solid var(--admin-line);
+  padding: 0 0 18px;
 }
 
 .admin-refund-result__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
+  padding-right: 16px;
+}
+
+.admin-refund-result__head .admin-drawer__section-title {
+  flex: 1;
+  min-width: 0;
+  padding-right: 0;
 }
 
 .admin-refund-result__actions {
@@ -2376,7 +2380,7 @@ html.admin-mode body {
 }
 
 .admin-refund-result__batch {
-  margin: 10px 0 14px;
+  margin: 0 0 12px;
   color: #667085;
   font-size: 12px;
   line-height: 1.45;

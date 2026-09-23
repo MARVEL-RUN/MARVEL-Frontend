@@ -90,7 +90,7 @@ export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClos
   const itemPages = Math.max(1, Math.ceil(itemTotal / (itemsQuery.data?.size ?? 20)));
 
   return (
-    <section className="admin-refund-result" aria-label="환불 처리 결과">
+    <section className="admin-pay admin-refund-result" aria-label="환불 처리 결과">
       <div className="admin-refund-result__head">
         <h2 className="admin-drawer__section-title">환불 처리 결과</h2>
         <div className="admin-refund-result__actions">
@@ -109,10 +109,7 @@ export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClos
           </button>
         </div>
       </div>
-      <p className="admin-refund-result__batch">
-        {refundBatchStatusLabel(summary.status)}
-        {completed ? " · 배치가 끝났어도 실패·차단 항목이 있을 수 있습니다." : ""}
-      </p>
+      <div className="admin-pay__body">
       <dl className="admin-pay__summary">
         <div>
           <dt>성공</dt>
@@ -133,6 +130,10 @@ export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClos
           <dd>{review + pending}</dd>
         </div>
       </dl>
+      <p className="admin-refund-result__batch">
+        {refundBatchStatusLabel(summary.status)}
+        {completed ? " · 배치가 끝났어도 실패·차단 항목이 있을 수 있습니다." : ""}
+      </p>
       <label className="admin-refund-result__filter">
         <input
           type="checkbox"
@@ -174,6 +175,7 @@ export function RefundResultPanel({ eventId, result, lookingUp, onLookup, onClos
           </button>
         </div>
       ) : null}
+      </div>
     </section>
   );
 }
