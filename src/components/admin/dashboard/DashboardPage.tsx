@@ -1,6 +1,7 @@
 "use client";
 
 import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDownload";
+import { PaymentDailyGraph } from "@/components/admin/dashboard/PaymentDailyGraph";
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
@@ -41,6 +42,7 @@ function EventStatsPanel({
       </button>
       {open ? (
         <div className="admin-reg-stats-event__body">
+          <PaymentDailyGraph eventId={eventId} />
           <DailyReportDownload eventId={eventId} />
           {children}
         </div>

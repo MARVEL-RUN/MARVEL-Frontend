@@ -107,6 +107,38 @@
   gap: 6px;
 }
 
+.admin-trend--embed .admin-trend__embed-title {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--admin-line);
+  background: #f8fafc;
+}
+
+.admin-trend--embed .admin-trend__body {
+  padding: 12px 14px 14px;
+}
+
+.admin-trend__tip-sub {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--admin-muted);
+}
+
+.admin-trend__list--triple .admin-trend__list-head,
+.admin-trend__list--triple .admin-trend__list-body button {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 0.8fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-trend__list--triple .admin-trend__list-head span:nth-child(n + 2),
+.admin-trend__list--triple .admin-trend__list-body strong {
+  text-align: right;
+}
+
 .admin-dash__section--ops {
   padding-top: 25px;
 }

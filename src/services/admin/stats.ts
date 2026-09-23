@@ -85,6 +85,45 @@ export function fetchDailyReportExcel(params: DailyReportExcelParams) {
   return adminFetchBlob(path, { method: "GET" }, dailyReportFallbackName());
 }
 
+export type PaymentDailyGraphDay = {
+  date: string;
+  dailyCount: number;
+  cumulativeCount: number;
+};
+
+export type PaymentDailyGraph = {
+  eventId: string;
+  startDate: string;
+  endDate: string;
+  timeZone: string;
+  openingCumulativeCount: number;
+  periodTotal: number;
+  cumulativeTotal: number;
+  days: PaymentDailyGraphDay[];
+};
+
+export function fetchPaymentDailyGraph(params: {
+  eventId: string;
+  startDate?: string;
+  endDate?: string;
+}) {
+  const eventId = params.eventId.trim();
+  if (!eventId) throw new Error("대회 정보가 없습니다.");
+
+  const query = new URLSearchParams();
+  const startDate = params.startDate?.trim();
+  const endDate = params.endDate?.trim();
+  if (startDate) query.set("startDate", startDate);
+  if (endDate) query.set("endDate", endDate);
+
+  const qs = query.toString();
+  return adminFetch<PaymentDailyGraph>(
+    `v1/admin/registrations/${encodeURIComponent(eventId)}/graph/payment-daily${
+      qs ? `?${qs}` : ""
+    }`,
+  );
+}
+
 function intakeFor(
   rows: AdminApplicationRow[],
 ): Omit<EventIntakeStats, "eventId" | "eventName" | "slug"> {
