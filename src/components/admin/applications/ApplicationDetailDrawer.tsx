@@ -7,7 +7,6 @@ import { hasAdminRefundBatch } from "@/lib/admin/config";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
-  canPartialRefundRegistration,
   closedRegistration,
   registrationStatusBadge,
   registrationStatusLabel,
@@ -23,7 +22,6 @@ import {
   applicationGenderLabel,
   applicationKindLabel,
   deleteAdminRegistration,
-  hasPartialRefundIds,
   resetRegistrationPassword,
   type AdminApplicationRow,
 } from "@/services/admin/applications";
@@ -602,15 +600,7 @@ export function ApplicationDetailDrawer({
     (row.kind === "group"
       ? !closedRegistration(row.status)
       : statusKey(row.status) === "CONFIRMED");
-  const canPartialRefund =
-    false && /* 추가 납부 검증 전까지 숨김 */
-    hasAdminRefundBatch &&
-    !editing &&
-    !adjusting &&
-    !canDeleteUnpaid &&
-    !isGroup &&
-    hasPartialRefundIds(row) &&
-    canPartialRefundRegistration(row.status);
+  const canPartialRefund = false;
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
