@@ -194,7 +194,7 @@ export function OrganizationMembersList({
   const rows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const selected = useMemo(() => {
-    const row = filteredRows.find((item) => item.id === selectedId) ?? null;
+    const row = memberRows.find((item) => item.id === selectedId) ?? null;
     if (!row) return null;
     const base = { ...row, organizationId: row.organizationId || organizationId };
     if (!detailQuery.data) return base;
@@ -204,7 +204,7 @@ export function OrganizationMembersList({
     } catch {
       return base;
     }
-  }, [detailQuery.data, filteredRows, organizationId, selectedId]);
+  }, [detailQuery.data, memberRows, organizationId, selectedId]);
 
   const runSearch = () => {
     setApplied({ q, status, eventCategoryId: course });
