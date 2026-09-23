@@ -1,4 +1,4 @@
-import { adminFetch } from "@/lib/admin/fetch";
+import { adminFetch, adminFetchBlob } from "@/lib/admin/fetch";
 import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
 import { statusKey } from "@/lib/registration-status";
 import {
@@ -49,6 +49,40 @@ export function fetchRegistrationStatistics(eventId: string) {
   return adminFetch<RegistrationStatistics>(
     `v1/admin/registrations/${encodeURIComponent(eventId)}/statistics`,
   );
+}
+
+export type DailyReportMode = "DAILY" | "CUMULATIVE" | "BOTH";
+
+export type DailyReportExcelParams = {
+  eventId: string;
+  startDate?: string;
+  endDate?: string;
+  mode?: DailyReportMode;
+};
+
+function dailyReportFallbackName() {
+  const now = new Date();
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `일별접수집계_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.xlsx`;
+}
+
+export function fetchDailyReportExcel(params: DailyReportExcelParams) {
+  const eventId = params.eventId.trim();
+  if (!eventId) throw new Error("대회 정보가 없습니다.");
+
+  const query = new URLSearchParams();
+  const startDate = params.startDate?.trim();
+  const endDate = params.endDate?.trim();
+  if (startDate) query.set("startDate", startDate);
+  if (endDate) query.set("endDate", endDate);
+  if (params.mode) query.set("mode", params.mode);
+
+  const qs = query.toString();
+  const path = `v1/admin/registrations/${encodeURIComponent(eventId)}/daily-report/excel/download${
+    qs ? `?${qs}` : ""
+  }`;
+
+  return adminFetchBlob(path, { method: "GET" }, dailyReportFallbackName());
 }
 
 function intakeFor(

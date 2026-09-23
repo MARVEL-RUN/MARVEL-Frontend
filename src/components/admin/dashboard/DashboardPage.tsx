@@ -1,5 +1,6 @@
 "use client";
 
+import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDownload";
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
@@ -15,10 +16,12 @@ import { useState, type ReactNode } from "react";
 import "./dashboard-stats.css";
 
 function EventStatsPanel({
+  eventId,
   eventName,
   defaultExpanded,
   children,
 }: {
+  eventId: string;
   eventName: string;
   defaultExpanded: boolean;
   children: ReactNode;
@@ -36,7 +39,12 @@ function EventStatsPanel({
         <span className="admin-reg-stats-event__title">{eventName}</span>
         <ChevronDown size={18} className="admin-reg-stats-event__chev" aria-hidden />
       </button>
-      {open ? <div className="admin-reg-stats-event__body">{children}</div> : null}
+      {open ? (
+        <div className="admin-reg-stats-event__body">
+          <DailyReportDownload eventId={eventId} />
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -128,6 +136,7 @@ function IntakeStatsSection({
         return (
           <EventStatsPanel
             key={event.eventId}
+            eventId={event.eventId}
             eventName={event.eventName}
             defaultExpanded={index === 0}
           >

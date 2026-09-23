@@ -46,6 +46,65 @@
 .admin-reg-stats-event__body {
   padding: 12px 14px 14px;
   border-top: 1px solid var(--admin-line);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-daily-report {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--admin-line);
+  background: #fafbfc;
+}
+
+.admin-daily-report__head strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--admin-ink);
+}
+
+.admin-daily-report__head p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+
+.admin-daily-report__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 14px;
+}
+
+.admin-daily-report__controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5160;
+}
+
+.admin-daily-report__input,
+.admin-daily-report__select {
+  min-width: 148px;
+  padding: 7px 10px;
+  border: 1px solid var(--admin-line);
+  border-radius: 0;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  color: var(--admin-ink);
+}
+
+.admin-daily-report__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .admin-dash__section--ops {
