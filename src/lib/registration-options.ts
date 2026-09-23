@@ -7,6 +7,7 @@ import {
   ageBand,
   courseAllowsChild,
   feeAmount,
+  shirtSizesForTicket,
   ticketFee,
   ticketForBirth,
   type CourseId,
@@ -61,11 +62,12 @@ export function shirtSouvenir(category: RegistrationCategory | undefined) {
 export function shirtAssignment(
   category: RegistrationCategory | undefined,
   selectedSize = "",
-  _birth = "",
+  birth = "",
 ) {
   const souvenir = shirtSouvenir(category);
   if (!souvenir) return { souvenirId: "", selectedSize: "" };
-  const sizes = souvenirSizes(souvenir);
+  const ticket = /^\d{8}$/.test(birth) ? ticketForBirth(birth) : "adult";
+  const sizes = souvenirSizes(souvenir, ticket);
   const keep = sizes.includes(selectedSize) ? selectedSize : "";
   return {
     souvenirId: souvenir.souvenirId,
@@ -81,9 +83,12 @@ export function categoryLabel(category: RegistrationCategory) {
 
 export function souvenirSizes(
   souvenir: RegistrationSouvenir | undefined,
-  _ticket: TicketKind = "adult",
+  ticket: TicketKind = "adult",
 ): string[] {
-  return (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
+  const allowed = new Set<string>(shirtSizesForTicket(ticket));
+  const fromApi = (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
+  if (!fromApi.length) return [...allowed];
+  return fromApi.filter((size) => allowed.has(size));
 }
 
 function compactDistance(value: string) {
