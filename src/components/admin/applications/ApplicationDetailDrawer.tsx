@@ -261,6 +261,7 @@ export function ApplicationDetailDrawer({
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
   const [evidenceCancelId, setEvidenceCancelId] = useState<string | null>(null);
   const [refundResult, setRefundResult] = useState<AdminRefundBatchResponse | null>(null);
+  const [resultTitle, setResultTitle] = useState("환불 처리 결과");
   const [lookupPending, setLookupPending] = useState(false);
   const refundRequest = useRef<PendingRefund | null>(null);
   const refundToastKey = useRef<string | null>(null);
@@ -279,6 +280,7 @@ export function ApplicationDetailDrawer({
     setAdjusting(false);
     setEditError("");
     setRefundResult(null);
+    setResultTitle("환불 처리 결과");
     setLookupPending(false);
     refundRequest.current = null;
     refundToastKey.current = null;
@@ -407,6 +409,11 @@ export function ApplicationDetailDrawer({
       }
     },
     onSuccess: async (data) => {
+      setResultTitle(
+        refundRequest.current?.kind === "partial"
+          ? "결제연관정보 처리 결과"
+          : "환불 처리 결과",
+      );
       setRefundResult(data);
       showRefundToast(data);
       if (!refundBatchUnfinished(data.summary.status)) {
@@ -524,7 +531,7 @@ export function ApplicationDetailDrawer({
         row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "해당 신청";
       const ok = await confirm({
         title: "종목·기념품 변경",
-        message: `${label} 종목·기념품·생년월일 변경을 요청합니다. 차액 환불·추가 납부·동일 금액은 서버가 처리하며, PG가 실패해도 신청이 자동으로 원복되지 않습니다.`,
+        message: `${label} 종목·기념품·생년월일 변경을 요청합니다. 금액이 줄어드는 경우만 환불됩니다. 같은 금액·추가 납부는 처리되지 않습니다. PG가 실패해도 신청이 자동으로 원복되지 않습니다.`,
         confirmLabel: "변경 요청",
       });
       if (!ok) return;
@@ -791,6 +798,7 @@ export function ApplicationDetailDrawer({
               <RefundResultPanel
                 eventId={row.eventId}
                 result={refundResult}
+                title={resultTitle}
                 lookingUp={lookupPending}
                 onLookup={() => void lookupRefundResult()}
                 onClose={() => setRefundResult(null)}

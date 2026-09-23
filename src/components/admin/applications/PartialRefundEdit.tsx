@@ -192,8 +192,8 @@ export function PartialRefundEdit({ row, pending, onCancel, onError, onSubmit }:
   return (
     <form className="admin-drawer__edit" onSubmit={submit} noValidate>
       <p className="admin-drawer__edit-note">
-        종목·기념품·생년월일 변경을 요청합니다. 차액 환불·추가 납부·동일 금액은 서버가
-        계산합니다.
+        종목·기념품·생년월일 변경을 요청합니다. 금액이 줄어드는 경우만 환불되며, 같은
+        금액·추가 납부는 처리되지 않습니다.
       </p>
       {options.isLoading ? <p className="admin-pay__hint">종목 목록을 불러오는 중…</p> : null}
       {options.isError ? (
