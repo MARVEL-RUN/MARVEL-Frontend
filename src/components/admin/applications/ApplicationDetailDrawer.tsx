@@ -188,19 +188,19 @@ function buildSections(row: AdminApplicationRow) {
       ? [{ label: "동의", value: "동의함" }]
       : []
     : [
-        { label: "이름", value: dash(row.guardianName) },
-        { label: "관계", value: dash(row.guardianRelation) },
-        { label: "연락처", value: dash(row.guardianPhone) },
-        {
-          label: "동의",
-          value:
-            row.guardianConsent === true
-              ? "동의함"
-              : row.guardianConsent === false
-                ? "미동의"
-                : "-",
-        },
-      ];
+      { label: "이름", value: dash(row.guardianName) },
+      { label: "관계", value: dash(row.guardianRelation) },
+      { label: "연락처", value: dash(row.guardianPhone) },
+      {
+        label: "동의",
+        value:
+          row.guardianConsent === true
+            ? "동의함"
+            : row.guardianConsent === false
+              ? "미동의"
+              : "-",
+      },
+    ];
 
   const groupFields: DetailField[] = [
     { label: "단체명", value: dash(row.groupName) },
@@ -328,8 +328,8 @@ export function ApplicationDetailDrawer({
       queryClient.invalidateQueries({ queryKey: ["admin", "refund-batch-items"] }),
       row.organizationId
         ? queryClient.invalidateQueries({
-            queryKey: ["admin", "organization", row.organizationId],
-          })
+          queryKey: ["admin", "organization", row.organizationId],
+        })
         : Promise.resolve(),
     ]);
   }, [queryClient, row]);
@@ -617,6 +617,15 @@ export function ApplicationDetailDrawer({
     !isGroup &&
     hasPartialRefundIds(row) &&
     canPartialRefundRegistration(row.status);
+  const groupOrgId = row.organizationId || (isGroup ? row.id : "");
+  const canGroupPaymentAdjustLink =
+    hasAdminRefundBatch &&
+    !editing &&
+    !adjusting &&
+    !canDeleteUnpaid &&
+    blockGroupEdit &&
+    Boolean(groupOrgId) &&
+    !closedRegistration(row.status);
   const title = row.name?.trim() || row.personName?.trim() || row.groupName?.trim() || "-";
   const sections = buildSections(row);
   const membersHref = row.organizationId
@@ -701,77 +710,85 @@ export function ApplicationDetailDrawer({
             </button>
           </div>
           <div className="admin-drawer__actions admin-drawer__actions--detail">
-              {!editing && !adjusting && canEditBasicInfo ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost"
-                  disabled={loading || Boolean(error)}
-                  onClick={() => {
-                    setEditError("");
-                    setEditing(true);
-                  }}
-                >
-                  기본정보 수정
-                </button>
-              ) : editing || adjusting ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost"
-                  onClick={() => {
-                    setEditing(false);
-                    setAdjusting(false);
-                    setEditError("");
-                  }}
-                >
-                  수정 취소
-                </button>
-              ) : null}
-              {!isGroup && !editing && !adjusting ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost"
-                  disabled={resetPassword.isPending || loading || Boolean(error)}
-                  onClick={handleResetPassword}
-                >
-                  비밀번호 초기화
-                </button>
-              ) : null}
-              {canPartialRefund ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost"
-                  disabled={runRefund.isPending || loading || Boolean(error)}
-                  onClick={() => {
-                    setEditError("");
-                    if (!refundBatchUnfinished(refundResult?.summary.status)) {
-                      refundRequest.current = null;
-                    }
-                    setAdjusting(true);
-                  }}
-                >
-                  결제연관정보 수정
-                </button>
-              ) : null}
-              {canFullRefund ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost admin-btn--danger-text"
-                  disabled={runRefund.isPending || loading || Boolean(error)}
-                  onClick={() => void handleFullRefund()}
-                >
-                  전액 환불
-                </button>
-              ) : null}
-              {canDeleteUnpaid ? (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--ghost admin-btn--danger-text"
-                  disabled={removeUnpaid.isPending || loading || Boolean(error)}
-                  onClick={() => void handleDeleteUnpaid()}
-                >
-                  미결제 취소
-                </button>
-              ) : null}
+            {!editing && !adjusting && canEditBasicInfo ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                disabled={loading || Boolean(error)}
+                onClick={() => {
+                  setEditError("");
+                  setEditing(true);
+                }}
+              >
+                기본정보 수정
+              </button>
+            ) : editing || adjusting ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                onClick={() => {
+                  setEditing(false);
+                  setAdjusting(false);
+                  setEditError("");
+                }}
+              >
+                수정 취소
+              </button>
+            ) : null}
+            {!isGroup && !editing && !adjusting ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                disabled={resetPassword.isPending || loading || Boolean(error)}
+                onClick={handleResetPassword}
+              >
+                비밀번호 초기화
+              </button>
+            ) : null}
+            {canPartialRefund ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                disabled={runRefund.isPending || loading || Boolean(error)}
+                onClick={() => {
+                  setEditError("");
+                  if (!refundBatchUnfinished(refundResult?.summary.status)) {
+                    refundRequest.current = null;
+                  }
+                  setAdjusting(true);
+                }}
+              >
+                결제연관정보 수정
+              </button>
+            ) : null}
+            {canGroupPaymentAdjustLink ? (
+              <Link
+                href={adminOrganizationDetailHref(groupOrgId, { apiEventId: row.eventId })}
+                className="admin-btn admin-btn--ghost"
+              >
+                결제연관정보 수정
+              </Link>
+            ) : null}
+            {canFullRefund ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                disabled={runRefund.isPending || loading || Boolean(error)}
+                onClick={() => void handleFullRefund()}
+              >
+                전액 환불
+              </button>
+            ) : null}
+            {canDeleteUnpaid ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                disabled={removeUnpaid.isPending || loading || Boolean(error)}
+                onClick={() => void handleDeleteUnpaid()}
+              >
+                미결제 취소
+              </button>
+            ) : null}
           </div>
           <h1 className="admin-drawer__hero-title">{title}</h1>
           <div className="admin-drawer__hero-meta">
@@ -819,10 +836,10 @@ export function ApplicationDetailDrawer({
               onOpenGroupBasicInfo={
                 isOrgMemberContext && onOpenGroupBasicInfo
                   ? () => {
-                      setEditing(false);
-                      setEditError("");
-                      onOpenGroupBasicInfo();
-                    }
+                    setEditing(false);
+                    setEditError("");
+                    onOpenGroupBasicInfo();
+                  }
                   : undefined
               }
             />
