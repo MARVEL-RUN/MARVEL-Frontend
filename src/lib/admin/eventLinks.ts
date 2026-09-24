@@ -60,12 +60,13 @@ export function adminMembersListBackHref(apiEventId: string) {
 
 export function adminOrganizationDetailHref(
   organizationId: string,
-  options: { apiEventId: string },
+  options: { apiEventId: string; adjust?: boolean },
 ) {
   const params = new URLSearchParams({
     organizationId,
     eventId: options.apiEventId,
   });
+  if (options.adjust) params.set("adjust", "1");
   return `${MEMBERS}/detail?${params}`;
 }
 
