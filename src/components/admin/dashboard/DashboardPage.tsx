@@ -17,7 +17,7 @@ import { useState, type ReactNode } from "react";
 import "./dashboard-stats.css";
 
 /** API 안정화 전까지 운영 홈 일별 그래프·엑셀 비표시 */
-const INTAKE_DAILY_TOOLS_ENABLED = false;
+const INTAKE_DAILY_TOOLS_ENABLED = true;
 
 function EventStatsPanel({
   eventId,
