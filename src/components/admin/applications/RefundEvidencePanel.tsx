@@ -3,7 +3,10 @@
 import { adminToast } from "@/components/admin/Toast";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
-import { refundEvidenceVerdictLabel } from "@/lib/refund-result";
+import {
+  refundEvidenceVerdictBadge,
+  refundEvidenceVerdictLabel,
+} from "@/lib/refund-result";
 import {
   fetchRefundEvidence,
   postRefundEvidence,
@@ -31,21 +34,12 @@ function EvidenceRow({ item }: { item: AdminRefundEvidence }) {
   return (
     <li className="admin-refund-evidence__item">
       <div className="admin-refund-evidence__top">
-        <span className="admin-badge admin-badge--must">
+        <span className={`admin-badge admin-badge--${refundEvidenceVerdictBadge(item.verdict)}`}>
           {refundEvidenceVerdictLabel(item.verdict)}
         </span>
         <span>{formatAdminBoardDate(item.checkedAt || item.startedAt)}</span>
       </div>
       {item.reason ? <p>{item.reason}</p> : null}
-      <p className="admin-refund-evidence__meta">
-        {[
-          item.checkedBy ? `확인 ${item.checkedBy}` : "",
-          item.httpStatus != null ? `HTTP ${item.httpStatus}` : "",
-          item.errorCode || "",
-        ]
-          .filter(Boolean)
-          .join(" · ")}
-      </p>
     </li>
   );
 }
@@ -102,7 +96,7 @@ export function RefundEvidencePanel({ eventId, paymentCancelId, onClose }: Props
           disabled={check.isPending}
           onClick={() => check.mutate()}
         >
-          외부 환불 결과 확인
+          {check.isPending ? "확인 중…" : "외부 환불 결과 확인"}
         </button>
       </header>
       <div className="admin-drawer__body admin-pay-log-drawer__body">
