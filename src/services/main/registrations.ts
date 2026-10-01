@@ -325,6 +325,34 @@ export async function modifyOrganizationRegistration(
   );
 }
 
+export async function changeIndividualRegistrationPassword(
+  eventId: string,
+  registrationId: string,
+  body: { currentPassword: string; newPassword: string },
+) {
+  return mainFetch<void>(
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}/password`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function changeOrganizationPassword(
+  eventId: string,
+  organizationId: string,
+  body: { currentPassword: string; newPassword: string },
+) {
+  return mainFetch<void>(
+    `v1/public/events/${encodeURIComponent(eventId)}/organizations/${encodeURIComponent(organizationId)}/password`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
 export async function cancelOrganizationRegistration(
   eventId: string,
   organizationId: string,

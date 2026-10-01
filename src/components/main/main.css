@@ -135,6 +135,15 @@ html.is-intro {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.btn--ghost-gold {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--gold);
+}
+
+.btn--ghost-gold:hover {
+  background: rgba(224, 195, 106, 0.16);
+}
+
 .btn--ghost-red {
   background: transparent;
   box-shadow: inset 0 0 0 1.5px var(--marvel);
@@ -875,6 +884,50 @@ button.course:disabled:hover {
   transform: translateX(-140%);
 }
 
+.inquiry-secret__form--stack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.inquiry-secret__panel--password .inquiry-secret__head {
+  margin-bottom: 0.85rem;
+}
+
+.inquiry-secret__steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.inquiry-secret__steps button {
+  margin: 0;
+  padding: 0.55rem 0.35rem 0.6rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.inquiry-secret__steps button.is-on {
+  margin-bottom: -1px;
+  color: #fff;
+  border-bottom-color: var(--marvel);
+}
+
+.inquiry-secret__steps button:disabled {
+  cursor: default;
+}
+
+.inquiry-secret__panel--password .inquiry-secret__actions {
+  margin-top: 0.35rem;
+}
+
 .inquiry-secret__field {
   display: grid;
   gap: 0.45rem;
@@ -893,6 +946,10 @@ button.course:disabled:hover {
   padding: 0 0.35rem 0 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.04);
+}
+
+.inquiry-secret__control--text {
+  padding-right: 0.9rem;
 }
 
 .inquiry-secret__control:focus-within {
@@ -1099,6 +1156,39 @@ button.course:disabled:hover {
   .inquiry-secret__actions .btn {
     min-width: 6.25rem;
     clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+
+  .inquiry-secret__panel--password {
+    padding: 1.05rem 1rem 0.95rem;
+  }
+
+  .inquiry-secret__panel--password .inquiry-secret__head {
+    margin-bottom: 0.8rem;
+  }
+
+  .inquiry-secret__panel--password .inquiry-secret__form--stack {
+    gap: 0.65rem;
+  }
+
+  .inquiry-secret__panel--password .inquiry-secret__control {
+    min-height: 2.55rem;
+  }
+
+  .inquiry-secret__panel--password .inquiry-secret__control input {
+    height: 2.4rem;
+    font-size: 0.9rem;
+  }
+
+  .inquiry-secret__panel--password .inquiry-secret__actions {
+    margin-top: 0.2rem;
+    gap: 0.4rem;
+  }
+
+  .inquiry-secret__panel--password .inquiry-secret__actions .btn {
+    min-width: 4.75rem;
+    min-height: 2.2rem;
+    padding: 0 0.85rem;
+    font-size: 0.78rem;
   }
 }
 
