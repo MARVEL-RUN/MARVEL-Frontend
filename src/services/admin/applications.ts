@@ -560,6 +560,99 @@ export function deleteAdminRegistration(registrationId: string) {
   );
 }
 
+export type UnpaidCancellationSuccess = {
+  registrationId: string;
+  alreadyCanceled: boolean;
+};
+
+export type UnpaidCancellationFailure = {
+  registrationId: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  eventCategoryName: string;
+  errorCode: string;
+  message: string;
+};
+
+export type UnpaidCancellationResult = {
+  requestedCount: number;
+  targetCount: number;
+  successCount: number;
+  failureCount: number;
+  successes: UnpaidCancellationSuccess[];
+  failures: UnpaidCancellationFailure[];
+};
+
+const UNPAID_CANCEL_ERROR: Record<string, string> = {
+  INVALID_UNPAID_CANCELLATION_REQUEST: "취소 요청 값을 확인하세요.",
+  INVALID_UNPAID_CANCELLATION_TARGET: "결제 대기 신청만 취소할 수 있습니다.",
+  REGISTRATION_EVENT_MISMATCH: "다른 대회의 신청입니다.",
+  REGISTRATION_NOT_FOUND: "신청을 찾을 수 없습니다.",
+  CONCURRENT_MODIFICATION: "다른 변경이 먼저 반영되었습니다.",
+};
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
+function asUnpaidCancellationResult(data: unknown): UnpaidCancellationResult {
+  const row = asRecord(data) ?? {};
+  const successes = Array.isArray(row.successes) ? row.successes : [];
+  const failures = Array.isArray(row.failures) ? row.failures : [];
+  return {
+    requestedCount: asAmount(row.requestedCount, 0),
+    targetCount: asAmount(row.targetCount, 0),
+    successCount: asAmount(row.successCount, 0),
+    failureCount: asAmount(row.failureCount, 0),
+    successes: successes.flatMap((item) => {
+      const entry = asRecord(item);
+      if (!entry) return [];
+      const registrationId = asText(entry.registrationId);
+      if (!registrationId) return [];
+      return [{ registrationId, alreadyCanceled: entry.alreadyCanceled === true }];
+    }),
+    failures: failures.flatMap((item) => {
+      const entry = asRecord(item);
+      if (!entry) return [];
+      return [
+        {
+          registrationId: asText(entry.registrationId),
+          name: asText(entry.name),
+          phNum: asText(entry.phNum),
+          birth: asText(entry.birth),
+          eventCategoryName: asText(entry.eventCategoryName),
+          errorCode: asText(entry.errorCode),
+          message: asText(entry.message),
+        },
+      ];
+    }),
+  };
+}
+
+export function unpaidCancellationFailureText(failure: UnpaidCancellationFailure) {
+  const message = failure.message.trim();
+  if (message) return message;
+  const hint = UNPAID_CANCEL_ERROR[failure.errorCode];
+  if (hint) return hint;
+  return "취소하지 못했습니다.";
+}
+
+export async function cancelUnpaidRegistrations(
+  eventId: string,
+  registrationIds: string[],
+) {
+  const ids = registrationIds.map((id) => id.trim()).filter(Boolean);
+  if (!eventId.trim()) throw new Error("대회 정보가 없습니다.");
+  if (ids.length === 0) throw new Error("취소할 미결제 신청을 선택하세요.");
+  const data = await adminFetch<unknown>(
+    `v1/admin/events/${encodeURIComponent(eventId)}/registrations/unpaid-cancellations`,
+    { method: "POST", body: JSON.stringify({ registrationIds: ids }) },
+  );
+  return asUnpaidCancellationResult(data);
+}
+
 export type RegistrationBasicInfoUpdate = {
   name: string;
   phNum: string;
