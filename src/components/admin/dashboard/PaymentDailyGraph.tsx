@@ -1,5 +1,6 @@
 "use client";
 
+import { StatsLoading } from "@/components/admin/dashboard/StatsLoading";
 import { hasAdminApi } from "@/lib/admin/config";
 import { addDays, toYmd } from "@/lib/admin/mockTrends";
 import {
@@ -180,7 +181,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
         {isError ? (
           <p className="admin-empty">일별 결제자 그래프를 불러오지 못했습니다.</p>
         ) : isLoading && !days.length ? (
-          <p className="admin-empty">불러오는 중…</p>
+          <StatsLoading label="일별 결제자를 불러오는 중입니다" />
         ) : !days.length ? (
           <p className="admin-empty">표시할 데이터가 없습니다.</p>
         ) : (

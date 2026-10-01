@@ -4,31 +4,45 @@ import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDow
 import { PaymentDailyGraph } from "@/components/admin/dashboard/PaymentDailyGraph";
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
+import { StatsLoading } from "@/components/admin/dashboard/StatsLoading";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
 import { hasAdminApi } from "@/lib/admin/config";
+import { fetchAdminEvents } from "@/services/admin/applications";
 import {
   fetchRegistrationStatistics,
-  getAdminDashboardStats,
+  fetchUnansweredCount,
 } from "@/services/admin/stats";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import "./dashboard-stats.css";
 
 /** API 안정화 전까지 운영 홈 일별 그래프·엑셀 비표시 */
 const INTAKE_DAILY_TOOLS_ENABLED = true;
 
+function EventStatsTables({ eventId, eventName }: { eventId: string; eventName: string }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["admin", "registration-statistics", eventId],
+    queryFn: () => fetchRegistrationStatistics(eventId),
+    enabled: hasAdminApi && Boolean(eventId),
+  });
+
+  if (isLoading) return <StatsLoading label="접수 통계를 불러오는 중입니다" />;
+  if (isError || !data) {
+    return <p className="admin-empty">{eventName} 통계를 불러오지 못했습니다.</p>;
+  }
+  return <RegistrationStatsTables data={data} />;
+}
+
 function EventStatsPanel({
   eventId,
   eventName,
   defaultExpanded,
-  children,
 }: {
   eventId: string;
   eventName: string;
   defaultExpanded: boolean;
-  children: ReactNode;
 }) {
   const [open, setOpen] = useState(defaultExpanded);
 
@@ -51,7 +65,7 @@ function EventStatsPanel({
               <DailyReportDownload eventId={eventId} />
             </>
           ) : null}
-          {children}
+          <EventStatsTables eventId={eventId} eventName={eventName} />
         </div>
       ) : null}
     </div>
@@ -92,67 +106,38 @@ function TaskLink({
 function IntakeStatsSection({
   events,
   loadingEvents,
+  eventsFailed,
 }: {
   events: { eventId: string; eventName: string }[];
   loadingEvents: boolean;
+  eventsFailed: boolean;
 }) {
-  const statsQueries = useQueries({
-    queries: events.map((event) => ({
-      queryKey: ["admin", "registration-statistics", event.eventId],
-      queryFn: () => fetchRegistrationStatistics(event.eventId),
-      enabled: hasAdminApi && Boolean(event.eventId),
-    })),
-  });
-
   if (!hasAdminApi) {
     return <p className="admin-empty">관리자 API 주소가 설정되지 않았습니다.</p>;
   }
 
   if (loadingEvents) {
-    return <p className="admin-empty">불러오는 중…</p>;
+    return <StatsLoading label="대회 목록을 불러오는 중입니다" />;
+  }
+
+  if (eventsFailed) {
+    return <p className="admin-empty">접수 현황을 불러오지 못했습니다.</p>;
   }
 
   if (events.length === 0) {
     return <p className="admin-empty">등록된 대회가 없습니다.</p>;
   }
 
-  const loading = statsQueries.some((query) => query.isLoading);
-  const allFailed = statsQueries.every((query) => query.isError);
-  const anyData = statsQueries.some((query) => query.data);
-
-  if (loading && !anyData) {
-    return <p className="admin-empty">불러오는 중…</p>;
-  }
-
-  if (allFailed && !anyData) {
-    return <p className="admin-empty">접수 현황을 불러오지 못했습니다.</p>;
-  }
-
   return (
     <div className="admin-reg-stats-stack">
-      {events.map((event, index) => {
-        const query = statsQueries[index];
-        if (!query?.data) {
-          if (query?.isError) {
-            return (
-              <p key={event.eventId} className="admin-empty">
-                {event.eventName} 통계를 불러오지 못했습니다.
-              </p>
-            );
-          }
-          return null;
-        }
-        return (
-          <EventStatsPanel
-            key={event.eventId}
-            eventId={event.eventId}
-            eventName={event.eventName}
-            defaultExpanded={index === 0}
-          >
-            <RegistrationStatsTables data={query.data} />
-          </EventStatsPanel>
-        );
-      })}
+      {events.map((event, index) => (
+        <EventStatsPanel
+          key={event.eventId}
+          eventId={event.eventId}
+          eventName={event.eventName}
+          defaultExpanded={index === 0}
+        />
+      ))}
     </div>
   );
 }
@@ -162,12 +147,20 @@ export function DashboardPage({
 }: {
   gaRealtimeUrl?: string;
 }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin", "dashboard"],
-    queryFn: getAdminDashboardStats,
+  const eventsQuery = useQuery({
+    queryKey: ["admin", "events"],
+    queryFn: fetchAdminEvents,
+    enabled: hasAdminApi,
   });
 
-  const events = data?.events ?? [];
+  const events = eventsQuery.data ?? [];
+  const eventIds = events.map((event) => event.eventId);
+
+  const unansweredQuery = useQuery({
+    queryKey: ["admin", "dashboard", "unanswered", eventIds],
+    queryFn: () => fetchUnansweredCount(eventIds),
+    enabled: hasAdminApi && eventsQuery.isSuccess,
+  });
 
   return (
     <div className="admin-page">
@@ -196,15 +189,19 @@ export function DashboardPage({
             tone="inquiry"
             icon={MessageSquare}
             label="미답변 문의"
-            count={data?.unansweredCount}
-            loading={isLoading}
+            count={unansweredQuery.data}
+            loading={eventsQuery.isLoading || unansweredQuery.isLoading}
           />
         </div>
       </section>
 
       <section className="admin-dash__section">
         <h2>접수 현황</h2>
-        <IntakeStatsSection events={events} loadingEvents={isLoading} />
+        <IntakeStatsSection
+          events={events}
+          loadingEvents={eventsQuery.isLoading}
+          eventsFailed={eventsQuery.isError}
+        />
       </section>
 
       <OpsGuide gaRealtimeUrl={gaRealtimeUrl} />

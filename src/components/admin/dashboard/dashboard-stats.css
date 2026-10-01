@@ -4,6 +4,38 @@
   gap: 20px;
 }
 
+.admin-stats-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 120px;
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--admin-muted);
+}
+
+.admin-stats-loading__spin {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d8dee8;
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: admin-stats-spin 0.7s linear infinite;
+}
+
+@keyframes admin-stats-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-stats-loading__spin {
+    animation-duration: 1.6s;
+  }
+}
+
 .admin-reg-stats-event {
   border: 1px solid var(--admin-line);
   background: #fff;
