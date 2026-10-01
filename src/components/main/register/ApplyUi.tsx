@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { EVENT } from "@/lib/event";
 import { formatDaumBaseAddress, openDaumPostcode } from "@/lib/daumPostcode";
@@ -614,6 +614,11 @@ export function EmailField({
   );
 }
 
+function setTextSecurity(input: HTMLInputElement, masked: boolean) {
+  if (masked) input.style.setProperty("-webkit-text-security", "disc");
+  else input.style.setProperty("-webkit-text-security", "none");
+}
+
 export function PasswordField({
   value,
   onChange,
@@ -625,6 +630,7 @@ export function PasswordField({
   minLength = 6,
   autoComplete = "new-password",
   hideManager = false,
+  hangul = false,
 }: {
   value: string;
   onChange: (next: string) => void;
@@ -636,19 +642,34 @@ export function PasswordField({
   minLength?: number;
   autoComplete?: string;
   hideManager?: boolean;
+  hangul?: boolean;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [show, setShow] = useState(false);
-  const ignore = hideManager || autoComplete === "off";
+  const ignore = !hangul && (hideManager || autoComplete === "off");
+  // 조회 비밀번호는 한글로 된 경우가 있어 비밀번호 칸으로 두지 않는다
+  const quiet = hangul || ignore;
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input || !hangul) return;
+    if (show) {
+      input.style.removeProperty("-webkit-text-security");
+      return;
+    }
+    setTextSecurity(input, document.activeElement !== input);
+  }, [hangul, show]);
 
   return (
     <div className={`password-pick${disabled ? " is-disabled" : ""}`}>
       <input
-        type={ignore ? "text" : show ? "text" : "password"}
+        ref={inputRef}
+        type={quiet || show ? "text" : "password"}
         name={name}
         placeholder={placeholder}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
-        autoComplete={ignore ? "off" : autoComplete}
+        autoComplete={quiet ? "off" : autoComplete}
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}
@@ -656,11 +677,17 @@ export function PasswordField({
         required={required}
         disabled={disabled}
         aria-label={label}
-        className={ignore && !show ? "is-mask" : undefined}
-        data-lpignore={ignore ? "true" : undefined}
-        data-1p-ignore={ignore ? "true" : undefined}
-        data-bwignore={ignore ? "true" : undefined}
-        data-form-type={ignore ? "other" : undefined}
+        className={quiet && !show ? "is-mask" : undefined}
+        data-lpignore={quiet ? "true" : undefined}
+        data-1p-ignore={quiet ? "true" : undefined}
+        data-bwignore={quiet ? "true" : undefined}
+        data-form-type={quiet ? "other" : undefined}
+        onFocus={(event) => {
+          if (hangul && !show) setTextSecurity(event.currentTarget, false);
+        }}
+        onBlur={(event) => {
+          if (hangul && !show) setTextSecurity(event.currentTarget, true);
+        }}
       />
       <button
         type="button"

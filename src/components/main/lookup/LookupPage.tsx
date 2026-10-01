@@ -90,19 +90,14 @@ export function LookupPage() {
 function LookupNav({
   busy,
   onBack,
-  onPassword,
 }: {
   busy: boolean;
   onBack: () => void;
-  onPassword: () => void;
 }) {
   return (
-    <div className="flow__nav flow__nav--lookup">
+    <div className="flow__nav">
       <button type="button" className="btn btn--ghost" onClick={onBack}>
         유형 변경
-      </button>
-      <button type="button" className="btn btn--ghost-gold" onClick={onPassword}>
-        비밀번호 변경
       </button>
       <button type="submit" className="btn btn--red" disabled={busy}>
         {busy ? "확인 중..." : "확인하기"}
@@ -371,27 +366,38 @@ function receiptPayKey(receipt: RegistrationReceipt) {
 function ReceiptActions({
   receipt,
   busy,
+  passwordBusy,
   onPay,
   onEdit,
+  onPassword,
   onRefund,
 }: {
   receipt: RegistrationReceipt;
   busy: boolean;
+  passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onPassword: () => void;
   onRefund?: () => void;
 }) {
   const pay = Boolean(onPay && canPreparePayment(receipt));
   const edit = Boolean(onEdit && canModifyReceipt(receipt));
   const refund = Boolean(onRefund && canRefundReceipt(receipt));
-  if (!pay && !edit && !refund) return null;
   return (
-    <div className="flow__nav">
+    <div className="flow__nav flow__nav--receipt">
       {edit ? (
         <button type="button" className="btn btn--ghost" onClick={onEdit} disabled={busy}>
           수정
         </button>
       ) : null}
+      <button
+        type="button"
+        className="btn btn--ghost-gold"
+        onClick={onPassword}
+        disabled={busy || passwordBusy}
+      >
+        비밀번호 변경
+      </button>
       {refund ? (
         <button type="button" className="btn btn--ghost-red" onClick={onRefund} disabled={busy}>
           환불 신청
@@ -416,15 +422,19 @@ function IndividualReceiptCard({
   receipt,
   name,
   busy,
+  passwordBusy,
   onPay,
   onEdit,
+  onPassword,
   onRefund,
 }: {
   receipt: RegistrationReceipt;
   name: string;
   busy?: boolean;
+  passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onPassword: () => void;
   onRefund?: () => void;
 }) {
   const members = receiptMembers(receipt);
@@ -521,8 +531,10 @@ function IndividualReceiptCard({
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
+        passwordBusy={passwordBusy}
         onPay={onPay}
         onEdit={onEdit}
+        onPassword={onPassword}
         onRefund={onRefund}
       />
     </section>
@@ -532,14 +544,18 @@ function IndividualReceiptCard({
 function GroupReceiptCard({
   receipt,
   busy,
+  passwordBusy,
   onPay,
   onEdit,
+  onPassword,
   onRefund,
 }: {
   receipt: RegistrationReceipt;
   busy?: boolean;
+  passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onPassword: () => void;
   onRefund?: () => void;
 }) {
   const members = receiptMembers(receipt);
@@ -585,8 +601,10 @@ function GroupReceiptCard({
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
+        passwordBusy={passwordBusy}
         onPay={onPay}
         onEdit={onEdit}
+        onPassword={onPassword}
         onRefund={onRefund}
       />
     </section>
@@ -928,7 +946,9 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             receipt={receipt}
             name={name.trim()}
             busy={payingKey === receiptPayKey(receipt)}
+            passwordBusy={passwordBusy}
             onPay={() => void onRetryPay(receipt)}
+            onPassword={openPasswordChange}
             onEdit={() => {
               setError("");
               setActive(receipt);
@@ -956,6 +976,18 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             setPanel("list");
           }}
           onConfirm={() => void onCancel()}
+        />
+        <LookupPasswordModal
+          open={passwordOpen}
+          busy={passwordBusy}
+          error={passwordError}
+          identity={{ kind: "individual", name, birth, phone }}
+          onClose={() => {
+            if (passwordBusy) return;
+            setPasswordError("");
+            setPasswordOpen(false);
+          }}
+          onSubmit={(input) => void onChangePassword(input)}
         />
       </>
     );
@@ -1008,24 +1040,13 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           placeholder="신청조회용 비밀번호 (6자 이상)"
           minLength={APPLICATION_PASSWORD_MIN}
           autoComplete="current-password"
+          hangul
           required
         />
       </div>
       {error ? <p className="form__err">{error}</p> : null}
-      <LookupNav busy={busy} onBack={onBack} onPassword={openPasswordChange} />
+      <LookupNav busy={busy} onBack={onBack} />
     </form>
-    <LookupPasswordModal
-      open={passwordOpen}
-      busy={passwordBusy}
-      error={passwordError}
-      identity={{ kind: "individual", name, birth, phone }}
-      onClose={() => {
-        if (passwordBusy) return;
-        setPasswordError("");
-        setPasswordOpen(false);
-      }}
-      onSubmit={(input) => void onChangePassword(input)}
-    />
     </>
   );
 }
@@ -1308,7 +1329,9 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             key={receipt.organizationId || receipt.orderId || receipt.paymentId || String(i)}
             receipt={receipt}
             busy={payingKey === receiptPayKey(receipt)}
+            passwordBusy={passwordBusy}
             onPay={() => void onRetryPay(receipt)}
+            onPassword={openPasswordChange}
             onEdit={() => {
               setError("");
               setActive(receipt);
@@ -1336,6 +1359,18 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             setPanel("list");
           }}
           onConfirm={() => void onCancel()}
+        />
+        <LookupPasswordModal
+          open={passwordOpen}
+          busy={passwordBusy}
+          error={passwordError}
+          identity={{ kind: "group", account }}
+          onClose={() => {
+            if (passwordBusy) return;
+            setPasswordError("");
+            setPasswordOpen(false);
+          }}
+          onSubmit={(input) => void onChangePassword(input)}
         />
       </>
     );
@@ -1370,25 +1405,14 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           placeholder="단체 비밀번호를 입력해주세요."
           minLength={6}
           autoComplete="current-password"
+          hangul
           required
         />
         <p className="field__hint">6자 이상 입력해주세요.</p>
       </div>
       {error ? <p className="form__err">{error}</p> : null}
-      <LookupNav busy={busy} onBack={onBack} onPassword={openPasswordChange} />
+      <LookupNav busy={busy} onBack={onBack} />
     </form>
-    <LookupPasswordModal
-      open={passwordOpen}
-      busy={passwordBusy}
-      error={passwordError}
-      identity={{ kind: "group", account }}
-      onClose={() => {
-        if (passwordBusy) return;
-        setPasswordError("");
-        setPasswordOpen(false);
-      }}
-      onSubmit={(input) => void onChangePassword(input)}
-    />
     </>
   );
 }

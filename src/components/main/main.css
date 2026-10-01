@@ -893,37 +893,6 @@ button.course:disabled:hover {
   margin-bottom: 0.85rem;
 }
 
-.inquiry-secret__steps {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-}
-
-.inquiry-secret__steps button {
-  margin: 0;
-  padding: 0.55rem 0.35rem 0.6rem;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.4);
-  font: inherit;
-  font-size: 0.84rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-}
-
-.inquiry-secret__steps button.is-on {
-  margin-bottom: -1px;
-  color: #fff;
-  border-bottom-color: var(--marvel);
-}
-
-.inquiry-secret__steps button:disabled {
-  cursor: default;
-}
-
 .inquiry-secret__panel--password .inquiry-secret__actions {
   margin-top: 0.35rem;
 }
@@ -946,10 +915,6 @@ button.course:disabled:hover {
   padding: 0 0.35rem 0 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.04);
-}
-
-.inquiry-secret__control--text {
-  padding-right: 0.9rem;
 }
 
 .inquiry-secret__control:focus-within {
@@ -986,6 +951,10 @@ button.course:disabled:hover {
 
 .inquiry-secret__control input.is-mask {
   -webkit-text-security: disc;
+}
+
+.inquiry-secret__control input.is-mask::placeholder {
+  -webkit-text-security: none;
 }
 
 .inquiry-secret__eye {
