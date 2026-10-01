@@ -109,8 +109,15 @@ export function PaymentDailyGraph({ eventId }: Props) {
   const activePreset = PRESETS.find(
     (preset) => addDays(today, -preset.days) === startDate && endDate === today,
   )?.label;
-  const gradientId = `payment-daily-${eventId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const plotWidth = 640;
+  const hoverIndex = hover ? days.findIndex((row) => row.date === hover.date) : -1;
+  const hoverLeft =
+    hoverIndex < 0
+      ? null
+      : useLine
+        ? (linePoint(hoverIndex, dayCount, 0, 1, plotWidth).x / plotWidth) * 100
+        : ((hoverIndex + 0.5) / dayCount) * 100;
+  const gradientId = `payment-daily-${eventId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const applyPreset = (offset: number) => {
     setStartDate(addDays(today, -offset));
@@ -228,19 +235,6 @@ export function PaymentDailyGraph({ eventId }: Props) {
         ) : (
           <>
             <div className="admin-trend__chart" onMouseLeave={() => setHover(null)}>
-              {hover ? (
-                <div className="admin-trend__tip">
-                  <p>{formatListDate(hover.date)}</p>
-                  <strong>
-                    {hover.dailyCount.toLocaleString()}
-                    <em>명</em>
-                  </strong>
-                  <p className="admin-trend__tip-sub">
-                    누적 {hover.cumulativeCount.toLocaleString()}명
-                  </p>
-                </div>
-              ) : null}
-
               <div className="admin-trend__plot">
                 <div className="admin-trend__y">
                   {ticks.map((tick) => (
@@ -251,6 +245,21 @@ export function PaymentDailyGraph({ eventId }: Props) {
                   {ticks.map((tick) => (
                     <i key={`g-${tick}`} />
                   ))}
+                  {hover && hoverLeft !== null ? (
+                    <div
+                      className="admin-trend__tip is-follow"
+                      style={{ left: `${hoverLeft}%`, transform: `translateX(-${hoverLeft}%)` }}
+                    >
+                      <p>{formatListDate(hover.date)}</p>
+                      <strong>
+                        {hover.dailyCount.toLocaleString()}
+                        <em>명</em>
+                      </strong>
+                      <p className="admin-trend__tip-sub">
+                        누적 {hover.cumulativeCount.toLocaleString()}명
+                      </p>
+                    </div>
+                  ) : null}
                   {useLine ? (
                     <svg
                       className="admin-trend__line"

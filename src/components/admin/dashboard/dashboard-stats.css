@@ -211,6 +211,13 @@
   padding: 12px 14px 14px;
 }
 
+/* left와 같은 비율로 당겨 양 끝 날짜에서도 차트 안에 머묾 */
+.admin-trend__tip.is-follow {
+  top: -20px;
+  white-space: nowrap;
+  transition: left 0.12s ease-out, transform 0.12s ease-out;
+}
+
 .admin-trend__tip-sub {
   margin: 4px 0 0;
   font-size: 11px;
