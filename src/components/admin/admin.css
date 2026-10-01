@@ -8,15 +8,17 @@
 
 .admin-root,
 .admin-login,
+.admin-drawer-stack,
 html.admin-mode,
-html.admin-mode body {
+html.admin-mode body,
+body.admin-mode {
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   font-size: 14px;
 }
 
-.admin-root {
-  --admin-side: 220px;
-  --admin-head: 52px;
+.admin-root,
+.admin-login,
+.admin-drawer-stack {
   --admin-bg: #eef1f5;
   --admin-ink: #2b2f3a;
   --admin-muted: #6b7380;
@@ -24,6 +26,11 @@ html.admin-mode body {
   --admin-blue: #1a73e8;
   --admin-blue-dark: #1558b8;
   --admin-skin: #252a36;
+}
+
+.admin-root {
+  --admin-side: 220px;
+  --admin-head: 52px;
   min-height: 100vh;
   background: var(--admin-bg);
   color: var(--admin-ink);
@@ -34,7 +41,8 @@ html.admin-mode body {
 }
 
 .admin-root a,
-.admin-login a {
+.admin-login a,
+.admin-drawer-stack a {
   color: inherit;
   text-decoration: none;
 }
@@ -51,7 +59,10 @@ html.admin-mode body {
 .admin-root input,
 .admin-root select,
 .admin-root textarea,
-.admin-login input {
+.admin-login input,
+.admin-drawer-stack input,
+.admin-drawer-stack select,
+.admin-drawer-stack textarea {
   font: inherit;
 }
 
@@ -60,7 +71,8 @@ html.admin-mode {
 }
 
 html.admin-mode,
-html.admin-mode body {
+html.admin-mode body,
+body.admin-mode {
   background: var(--admin-bg, #eef1f5);
   color: #2b2f3a;
 }
@@ -1638,7 +1650,8 @@ html.admin-mode body {
   margin-top: 8px;
 }
 
-.admin-drawer__guide-link {
+.admin-root .admin-drawer__guide-link,
+.admin-drawer-stack .admin-drawer__guide-link {
   padding: 0;
   border: 0;
   background: none;
@@ -1769,9 +1782,11 @@ html.admin-mode body {
 }
 
 .admin-drawer-stack {
+  /* body 포탈 — 관리자 루트 토큰을 못 물려받음 */
   --admin-detail-w: 440px;
   --admin-payments-w: 360px;
   --admin-log-w: 340px;
+  color: var(--admin-ink);
 }
 
 .admin-drawer-stack .admin-drawer {
@@ -2573,7 +2588,30 @@ html.admin-mode body {
 }
 
 .admin-refund-evidence__run {
+  min-height: 28px;
   margin: 8px 0 4px;
+  padding: 0 10px;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 12px;
+}
+
+.admin-refund-evidence__run:hover:not(:disabled) {
+  background: #1558b8;
+}
+
+.admin-refund-evidence__run:disabled {
+  background: #a8c7f0;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.admin-refund-evidence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
 }
 
 .admin-refund-evidence__item {
@@ -2599,12 +2637,6 @@ html.admin-mode body {
   font-size: 12px;
   color: #344054;
   line-height: 1.45;
-}
-
-.admin-refund-evidence__meta {
-  margin-top: 4px;
-  color: #98a2b3;
-  font-size: 11px;
 }
 
 .admin-pay {
