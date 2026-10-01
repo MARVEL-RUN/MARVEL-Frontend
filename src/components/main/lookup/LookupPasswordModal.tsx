@@ -2,7 +2,7 @@
 
 import { applicationPasswordError, formatPhone } from "@/lib/register";
 import { Eye, EyeOff, Lock, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 
 export type LookupPasswordIdentity =
@@ -171,7 +171,6 @@ export function LookupPasswordModal({ open, busy, error, identity, onClose, onSu
             label="현재 비밀번호"
             value={draft.current}
             placeholder="현재 비밀번호"
-            hangul
             autoFocus
             disabled={busy}
             onChange={(value) => {
@@ -219,18 +218,12 @@ export function LookupPasswordModal({ open, busy, error, identity, onClose, onSu
   );
 }
 
-function setTextSecurity(input: HTMLInputElement, masked: boolean) {
-  if (masked) input.style.setProperty("-webkit-text-security", "disc");
-  else input.style.setProperty("-webkit-text-security", "none");
-}
-
 function PasswordRow({
   label,
   value,
   placeholder,
   disabled,
   autoFocus,
-  hangul = false,
   onChange,
 }: {
   label: string;
@@ -238,33 +231,19 @@ function PasswordRow({
   placeholder: string;
   disabled: boolean;
   autoFocus?: boolean;
-  hangul?: boolean;
   onChange: (value: string) => void;
 }) {
   const inputId = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const input = inputRef.current;
-    if (!input || !hangul) return;
-    if (show) {
-      input.style.removeProperty("-webkit-text-security");
-      return;
-    }
-    setTextSecurity(input, document.activeElement !== input);
-  }, [hangul, show]);
 
   return (
     <label className="inquiry-secret__field" htmlFor={inputId}>
       <span>{label}</span>
       <span className="inquiry-secret__control">
         <input
-          ref={inputRef}
           id={inputId}
-          // 현재 비밀번호는 한글로 된 경우가 있어 비밀번호 칸으로 두지 않는다
-          type={hangul || show ? "text" : "password"}
-          lang={hangul ? undefined : "en"}
+          type={show ? "text" : "password"}
+          lang="en"
           value={value}
           placeholder={placeholder}
           autoFocus={autoFocus}
@@ -273,13 +252,6 @@ function PasswordRow({
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
-          className={hangul && !show ? "is-mask" : undefined}
-          onFocus={(event) => {
-            if (hangul && !show) setTextSecurity(event.currentTarget, false);
-          }}
-          onBlur={(event) => {
-            if (hangul && !show) setTextSecurity(event.currentTarget, true);
-          }}
           onChange={(event) => onChange(event.target.value)}
         />
         <button

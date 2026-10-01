@@ -961,8 +961,8 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             }}
           />
         ))}
-        <div className="flow__nav">
-          <button type="button" className="btn btn--ghost" onClick={() => setView("form")}>
+        <div className="lookup-other">
+          <button type="button" className="lookup-other__btn" onClick={() => setView("form")}>
             다른 접수건
           </button>
         </div>
@@ -1040,7 +1040,6 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           placeholder="신청조회용 비밀번호 (6자 이상)"
           minLength={APPLICATION_PASSWORD_MIN}
           autoComplete="current-password"
-          hangul
           required
         />
       </div>
@@ -1344,8 +1343,8 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             }}
           />
         ))}
-        <div className="flow__nav">
-          <button type="button" className="btn btn--ghost" onClick={() => setView("form")}>
+        <div className="lookup-other">
+          <button type="button" className="lookup-other__btn" onClick={() => setView("form")}>
             다른 접수건
           </button>
         </div>
@@ -1405,7 +1404,6 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           placeholder="단체 비밀번호를 입력해주세요."
           minLength={6}
           autoComplete="current-password"
-          hangul
           required
         />
         <p className="field__hint">6자 이상 입력해주세요.</p>

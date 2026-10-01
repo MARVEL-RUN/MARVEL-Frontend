@@ -528,10 +528,6 @@
   -webkit-text-security: disc;
 }
 
-.password-pick input.is-mask::placeholder {
-  -webkit-text-security: none;
-}
-
 .password-pick__eye {
   position: absolute;
   top: 50%;
@@ -1418,6 +1414,58 @@
   justify-content: center;
   gap: 0.7rem;
   margin-top: 1.6rem;
+}
+
+.lookup-other {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.85rem;
+}
+
+.lookup-other__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.95rem;
+  margin: 0;
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  transition: color 0.18s ease;
+}
+
+.lookup-other__btn::before,
+.lookup-other__btn::after {
+  content: "";
+  width: 2.6rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.38);
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.lookup-other__btn:hover,
+.lookup-other__btn:focus-visible {
+  color: var(--gold);
+}
+
+.lookup-other__btn:hover::before,
+.lookup-other__btn:hover::after,
+.lookup-other__btn:focus-visible::before,
+.lookup-other__btn:focus-visible::after {
+  width: 3.15rem;
+  background: var(--gold);
+}
+
+.lookup-other__btn:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 6px;
 }
 
 .block--lookup-confirm .flow__nav .btn {

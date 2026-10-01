@@ -953,10 +953,6 @@ button.course:disabled:hover {
   -webkit-text-security: disc;
 }
 
-.inquiry-secret__control input.is-mask::placeholder {
-  -webkit-text-security: none;
-}
-
 .inquiry-secret__eye {
   display: grid;
   place-items: center;
