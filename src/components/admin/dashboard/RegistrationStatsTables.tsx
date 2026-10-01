@@ -5,11 +5,17 @@ import type {
   RegistrationStatRow,
 } from "@/services/admin/stats";
 
-type TableDef = {
-  key: string;
-  title: string;
-  rows: RegistrationStatRow[];
-};
+const TABLE_TITLES = [
+  { key: "gender", title: "성별 별" },
+  { key: "age", title: "나이대 별" },
+  { key: "child", title: "아동 유무 별" },
+] as const;
+
+type TableKey = (typeof TABLE_TITLES)[number]["key"];
+
+const SKELETON_COURSES = ["skel-a", "skel-b", "skel-c"];
+const SKELETON_ROWS = 3;
+const FIXED_COLS = 6;
 
 function courseKm(label: string) {
   const match = label.match(/(\d+(?:\.\d+)?)/);
@@ -35,8 +41,9 @@ function StatsTable({
 }: {
   title: string;
   courses: string[];
-  rows: RegistrationStatRow[];
+  rows: RegistrationStatRow[] | null;
 }) {
+  const skeleton = rows === null;
   return (
     <section className="admin-reg-stats__group">
       <h3 className="admin-reg-stats__group-title">{title}</h3>
@@ -68,7 +75,7 @@ function StatsTable({
                   key={course}
                   className={`is-num is-course${index === 0 ? " is-section-start" : ""}`}
                 >
-                  {course}
+                  {skeleton ? <i className="admin-skel" /> : course}
                 </th>
               ))}
               <th className="is-num is-total is-section-start">인원</th>
@@ -80,7 +87,20 @@ function StatsTable({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {skeleton
+              ? Array.from({ length: SKELETON_ROWS }, (_, r) => (
+                  <tr key={r}>
+                    <td className="is-name">
+                      <i className="admin-skel" />
+                    </td>
+                    {Array.from({ length: courses.length + FIXED_COLS }, (_, c) => (
+                      <td key={c} className="is-num">
+                        <i className="admin-skel" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              : rows.map((row) => (
               <tr
                 key={row.classification}
                 className={isTotalRow(row.classification) ? "is-total" : undefined}
@@ -114,26 +134,24 @@ export function RegistrationStatsTables({
   data,
   eventName,
 }: {
-  data: RegistrationStatistics;
+  data?: RegistrationStatistics;
   eventName?: string;
 }) {
-  const courses = orderedCourses(data.courseHeaders);
-  const tables: TableDef[] = [
-    { key: "gender", title: "성별 별", rows: data.genderStats },
-    { key: "age", title: "나이대 별", rows: data.ageGroupStats },
-    { key: "child", title: "아동 유무 별", rows: data.childStats },
-  ];
+  const courses = data ? orderedCourses(data.courseHeaders) : SKELETON_COURSES;
+  const rowsByKey: Record<TableKey, RegistrationStatRow[]> | null = data
+    ? { gender: data.genderStats, age: data.ageGroupStats, child: data.childStats }
+    : null;
 
   return (
-    <div className="admin-reg-stats">
+    <div className="admin-reg-stats" aria-busy={!data}>
       {eventName ? <p className="admin-reg-stats__event">{eventName}</p> : null}
       <div className="admin-reg-stats__groups">
-        {tables.map((table) => (
+        {TABLE_TITLES.map((table) => (
           <StatsTable
             key={table.key}
             title={table.title}
             courses={courses}
-            rows={table.rows}
+            rows={rowsByKey ? rowsByKey[table.key] : null}
           />
         ))}
       </div>

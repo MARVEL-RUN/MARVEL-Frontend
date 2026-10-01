@@ -1,13 +1,12 @@
 "use client";
 
-import { StatsLoading } from "@/components/admin/dashboard/StatsLoading";
 import { hasAdminApi } from "@/lib/admin/config";
 import { addDays, toYmd } from "@/lib/admin/mockTrends";
 import {
   fetchPaymentDailyGraph,
   type PaymentDailyGraphDay,
 } from "@/services/admin/stats";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
 const PRESETS = [
@@ -19,6 +18,7 @@ const PRESETS = [
 const CHART_H = 148;
 const BAR_MAX = 112;
 const LINE_PAD = { top: 8, right: 6, bottom: 6, left: 6 };
+const SKELETON_BARS = [18, 32, 24, 46, 30, 58, 40, 26, 52, 36, 22, 44, 34, 28];
 
 type ChartPoint = {
   date: string;
@@ -87,12 +87,14 @@ export function PaymentDailyGraph({ eventId }: Props) {
   const [endDate, setEndDate] = useState(today);
   const [hover, setHover] = useState<PaymentDailyGraphDay | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isPending, isError, isFetching } = useQuery({
     queryKey: ["admin", "payment-daily-graph", eventId, startDate, endDate],
     queryFn: () => fetchPaymentDailyGraph({ eventId, startDate, endDate }),
     enabled: hasAdminApi && Boolean(eventId),
+    placeholderData: keepPreviousData,
   });
 
+  const pending = isPending && !data;
   const days = data?.days ?? [];
   const trend = useMemo<ChartPoint[]>(
     () => days.map((row) => ({ date: row.date, count: row.dailyCount })),
@@ -117,7 +119,10 @@ export function PaymentDailyGraph({ eventId }: Props) {
   };
 
   return (
-    <section className="admin-trend admin-trend--embed">
+    <section
+      className={`admin-trend admin-trend--embed${isFetching && !pending ? " is-fetching" : ""}`}
+      aria-busy={isFetching}
+    >
       <h3 className="admin-trend__embed-title">일별 결제자</h3>
       <div className="admin-trend__body">
         <div className="admin-trend__filters">
@@ -127,7 +132,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
               type="date"
               value={startDate}
               max={endDate}
-              disabled={isLoading}
+              disabled={pending}
               onChange={(event) => {
                 setStartDate(event.target.value);
                 setHover(null);
@@ -141,7 +146,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
               value={endDate}
               min={startDate}
               max={today}
-              disabled={isLoading}
+              disabled={pending}
               onChange={(event) => {
                 setEndDate(event.target.value);
                 setHover(null);
@@ -154,7 +159,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
                 key={preset.label}
                 type="button"
                 className={activePreset === preset.label ? "is-on" : undefined}
-                disabled={isLoading}
+                disabled={pending}
                 onClick={() => applyPreset(preset.days)}
               >
                 {preset.label}
@@ -166,22 +171,58 @@ export function PaymentDailyGraph({ eventId }: Props) {
         <div className="admin-trend__stats">
           <div>
             <span>오늘</span>
-            <strong>{isLoading ? "…" : todayCount.toLocaleString()}</strong>
+            <strong>{pending ? <i className="admin-skel" /> : todayCount.toLocaleString()}</strong>
           </div>
           <div>
             <span>기간 합계</span>
-            <strong>{isLoading ? "…" : (data?.periodTotal ?? 0).toLocaleString()}</strong>
+            <strong>
+              {pending ? <i className="admin-skel" /> : (data?.periodTotal ?? 0).toLocaleString()}
+            </strong>
           </div>
           <div className="is-accent">
             <span>누적</span>
-            <strong>{isLoading ? "…" : (data?.cumulativeTotal ?? 0).toLocaleString()}</strong>
+            <strong>
+              {pending ? <i className="admin-skel" /> : (data?.cumulativeTotal ?? 0).toLocaleString()}
+            </strong>
           </div>
         </div>
 
-        {isError ? (
+        {isError && !data ? (
           <p className="admin-empty">일별 결제자 그래프를 불러오지 못했습니다.</p>
-        ) : isLoading && !days.length ? (
-          <StatsLoading label="일별 결제자를 불러오는 중입니다" />
+        ) : pending ? (
+          <>
+            <div className="admin-trend__chart">
+              <div className="admin-trend__plot">
+                <div className="admin-trend__y" />
+                <div className="admin-trend__grid">
+                  <i />
+                  <i />
+                  <i />
+                  <div className="admin-trend__bars is-skeleton" aria-hidden>
+                    {SKELETON_BARS.map((h, i) => (
+                      <span key={i} style={{ height: `${h}%` }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="admin-trend__list admin-trend__list--triple" aria-hidden>
+              <div className="admin-trend__list-head">
+                <span>날짜</span>
+                <span>당일</span>
+                <span>누적</span>
+              </div>
+              <div className="admin-trend__list-body">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="admin-trend__list-skel">
+                    <i className="admin-skel" />
+                    <i className="admin-skel" />
+                    <i className="admin-skel" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
         ) : !days.length ? (
           <p className="admin-empty">표시할 데이터가 없습니다.</p>
         ) : (

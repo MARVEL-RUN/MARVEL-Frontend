@@ -4,7 +4,6 @@ import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDow
 import { PaymentDailyGraph } from "@/components/admin/dashboard/PaymentDailyGraph";
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
-import { StatsLoading } from "@/components/admin/dashboard/StatsLoading";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
 import { hasAdminApi } from "@/lib/admin/config";
 import { fetchAdminEvents } from "@/services/admin/applications";
@@ -28,7 +27,7 @@ function EventStatsTables({ eventId, eventName }: { eventId: string; eventName: 
     enabled: hasAdminApi && Boolean(eventId),
   });
 
-  if (isLoading) return <StatsLoading label="접수 통계를 불러오는 중입니다" />;
+  if (isLoading) return <RegistrationStatsTables />;
   if (isError || !data) {
     return <p className="admin-empty">{eventName} 통계를 불러오지 못했습니다.</p>;
   }
@@ -117,7 +116,18 @@ function IntakeStatsSection({
   }
 
   if (loadingEvents) {
-    return <StatsLoading label="대회 목록을 불러오는 중입니다" />;
+    return (
+      <div className="admin-reg-stats-stack" aria-busy>
+        <div className="admin-reg-stats-event is-open">
+          <div className="admin-reg-stats-event__head">
+            <i className="admin-skel admin-skel--title" />
+          </div>
+          <div className="admin-reg-stats-event__body">
+            <RegistrationStatsTables />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (eventsFailed) {
