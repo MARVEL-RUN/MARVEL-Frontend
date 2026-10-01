@@ -3996,6 +3996,20 @@ body.admin-mode {
   font-weight: 700;
 }
 
+.admin-overlay--session {
+  z-index: 300;
+  backdrop-filter: blur(2px);
+}
+
+.admin-overlay__box.admin-session-expired p {
+  line-height: 1.6;
+}
+
+.admin-session-expired .admin-btn {
+  min-width: 140px;
+  height: 40px;
+}
+
 .admin-overlay__box.admin-confirm {
   width: min(360px, calc(100% - 32px));
   padding: 24px;

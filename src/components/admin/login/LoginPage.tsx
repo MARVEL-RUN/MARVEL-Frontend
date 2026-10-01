@@ -1,5 +1,6 @@
 "use client";
 
+import { safeAdminNext } from "@/lib/admin/session";
 import { adminToken } from "@/lib/admin/token";
 import { adminAuthService } from "@/services/admin/auth";
 import { MAIN_ASSETS } from "@/lib/assets";
@@ -7,6 +8,10 @@ import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+function nextPath() {
+  return safeAdminNext(new URLSearchParams(window.location.search).get("next"));
+}
 
 export function LoginPage() {
   const router = useRouter();
@@ -19,7 +24,7 @@ export function LoginPage() {
   useEffect(() => {
     document.documentElement.classList.add("admin-mode");
     document.body.classList.add("admin-mode");
-    if (adminToken.getAccess()) router.replace("/admin");
+    if (adminToken.getAccess()) router.replace(nextPath());
     return () => {
       document.documentElement.classList.remove("admin-mode");
       document.body.classList.remove("admin-mode");
@@ -36,7 +41,7 @@ export function LoginPage() {
       setLoading(true);
       setError("");
       await adminAuthService.login({ account: account.trim(), password });
-      router.replace("/admin");
+      router.replace(nextPath());
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인 처리 중 오류가 발생했습니다.");
     } finally {
