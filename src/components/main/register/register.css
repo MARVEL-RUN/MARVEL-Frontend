@@ -1416,6 +1416,58 @@
   margin-top: 1.6rem;
 }
 
+.lookup-other {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.85rem;
+}
+
+.lookup-other__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.95rem;
+  margin: 0;
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  transition: color 0.18s ease;
+}
+
+.lookup-other__btn::before,
+.lookup-other__btn::after {
+  content: "";
+  width: 2.6rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.38);
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.lookup-other__btn:hover,
+.lookup-other__btn:focus-visible {
+  color: var(--gold);
+}
+
+.lookup-other__btn:hover::before,
+.lookup-other__btn:hover::after,
+.lookup-other__btn:focus-visible::before,
+.lookup-other__btn:focus-visible::after {
+  width: 3.15rem;
+  background: var(--gold);
+}
+
+.lookup-other__btn:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 6px;
+}
+
 .block--lookup-confirm .flow__nav .btn {
   flex: 1 1 8.75rem;
   min-width: 0;
@@ -2498,6 +2550,27 @@
     flex: 1;
     min-height: var(--tap);
     justify-content: center;
+  }
+
+  .flow__nav--receipt {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .flow__nav--receipt .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 0 0.45rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .flow__nav--receipt .btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 0.5rem) / 2);
   }
 
   .block--lookup-confirm .flow__nav {
