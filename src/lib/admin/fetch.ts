@@ -1,4 +1,5 @@
 import { ADMIN_API_BASE } from "./config";
+import { notifySessionExpired } from "./session";
 import { adminToken } from "./token";
 
 export class AdminHttpError extends Error {
@@ -123,6 +124,9 @@ async function adminRequest(
       } catch {
         /* 원래 401을 그대로 던짐 */
       }
+    }
+    if (response.status === 401 && withAuth && adminToken.getAccess()) {
+      notifySessionExpired();
     }
     const text = await response.text().catch(() => "");
     throw new AdminHttpError(response.status, errorMessage(response.status, text));
