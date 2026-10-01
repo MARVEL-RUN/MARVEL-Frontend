@@ -218,6 +218,35 @@
   transition: left 0.12s ease-out, transform 0.12s ease-out;
 }
 
+/* 선 그래프 svg와 같은 영역이어야 점 좌표가 맞음 */
+.admin-trend__hit {
+  position: absolute;
+  inset: 0 0 22px;
+  z-index: 1;
+  cursor: crosshair;
+}
+
+.admin-trend__guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed #9db8e8;
+  pointer-events: none;
+}
+
+.admin-trend__dot {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #1a73e8;
+  box-shadow: 0 0 0 1px #1a73e8;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .admin-trend__tip-sub {
   margin: 4px 0 0;
   font-size: 11px;

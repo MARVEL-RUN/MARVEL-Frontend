@@ -104,19 +104,33 @@ export function PaymentDailyGraph({ eventId }: Props) {
   const todayCount = days.find((row) => row.date === today)?.dailyCount ?? 0;
   const maxCount = Math.max(1, ...trend.map((row) => row.count));
   const ticks = yTicks(maxCount);
-  const useLine = trend.length > 45;
   const dayCount = trend.length;
   const activePreset = PRESETS.find(
     (preset) => addDays(today, -preset.days) === startDate && endDate === today,
   )?.label;
+  const useLine = activePreset === "1년";
   const plotWidth = 640;
   const hoverIndex = hover ? days.findIndex((row) => row.date === hover.date) : -1;
+  const hoverPoint =
+    useLine && hoverIndex >= 0
+      ? linePoint(hoverIndex, dayCount, trend[hoverIndex].count, maxCount, plotWidth)
+      : null;
   const hoverLeft =
     hoverIndex < 0
       ? null
-      : useLine
-        ? (linePoint(hoverIndex, dayCount, 0, 1, plotWidth).x / plotWidth) * 100
+      : hoverPoint
+        ? (hoverPoint.x / plotWidth) * 100
         : ((hoverIndex + 0.5) / dayCount) * 100;
+
+  const onLineMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!dayCount) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * plotWidth;
+    const innerW = plotWidth - LINE_PAD.left - LINE_PAD.right;
+    const ratio = dayCount <= 1 ? 0 : (x - LINE_PAD.left) / innerW;
+    const index = Math.min(dayCount - 1, Math.max(0, Math.round(ratio * (dayCount - 1))));
+    if (days[index]?.date !== hover?.date) setHover(days[index]);
+  };
   const gradientId = `payment-daily-${eventId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const applyPreset = (offset: number) => {
@@ -284,6 +298,25 @@ export function PaymentDailyGraph({ eventId }: Props) {
                         vectorEffect="non-scaling-stroke"
                       />
                     </svg>
+                  ) : null}
+                  {useLine ? (
+                    <div className="admin-trend__hit" onMouseMove={onLineMove} aria-hidden>
+                      {hoverPoint ? (
+                        <>
+                          <i
+                            className="admin-trend__guide"
+                            style={{ left: `${hoverLeft}%` }}
+                          />
+                          <i
+                            className="admin-trend__dot"
+                            style={{
+                              left: `${hoverLeft}%`,
+                              top: `${(hoverPoint.y / CHART_H) * 100}%`,
+                            }}
+                          />
+                        </>
+                      ) : null}
+                    </div>
                   ) : (
                     <div className="admin-trend__bars">
                       {days.map((item) => {
