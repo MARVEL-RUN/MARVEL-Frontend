@@ -127,6 +127,7 @@ function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
     addressDetail: asText(receipt.addressDetail) || null,
     guardianConsent:
       typeof receipt.guardianConsent === "boolean" ? receipt.guardianConsent : null,
+    externalPayment: receipt.externalPayment === true,
     registrations: mergedRegistrations,
   };
 }
