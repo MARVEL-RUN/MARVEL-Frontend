@@ -40,6 +40,7 @@ import type {
   RegistrationSettlementResult,
 } from "@/services/main/types";
 import { useAppHref } from "@/lib/main/useAppBasePath";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useLayoutEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
@@ -412,9 +413,6 @@ function ReceiptActions({
   );
 }
 
-const EXTERNAL_PAYMENT_NOTE =
-  "외부 결제 건은 결제/수정/환불을 진행할 수 없습니다. 개인정보 수정 필요 시 관리자 측에 문의해주세요.";
-
 function ReceiptNotes({
   receipt,
   externalPayment = false,
@@ -422,11 +420,19 @@ function ReceiptNotes({
   receipt: RegistrationReceipt;
   externalPayment?: boolean;
 }) {
+  const inquiryHref = useAppHref("/inquiry/write");
   const warning = receipt.warningMessage?.trim() ?? "";
   if (!externalPayment && !warning) return null;
   return (
     <>
-      {externalPayment ? <p className="form__note">{EXTERNAL_PAYMENT_NOTE}</p> : null}
+      {externalPayment ? (
+        <p className="form__note form__note--external">
+          <strong>외부 결제 건은 결제/수정/환불을 진행할 수 없습니다.</strong>
+          <span>
+            개인정보 수정이 필요하면 <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
+          </span>
+        </p>
+      ) : null}
       {warning ? <p className="form__note">{warning}</p> : null}
     </>
   );
