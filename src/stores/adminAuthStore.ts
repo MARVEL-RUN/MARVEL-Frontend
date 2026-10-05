@@ -28,12 +28,12 @@ export const useAdminAuthStore = create<AdminAuthState>()(
       hasHydrated: false,
 
       login: (tokens, user) =>
-        set({
+        set((state) => ({
           isLoggedIn: true,
           user,
           accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken ?? null,
-        }),
+          refreshToken: tokens.refreshToken || state.refreshToken,
+        })),
 
       logout: () =>
         set({
