@@ -412,10 +412,24 @@ function ReceiptActions({
   );
 }
 
-function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
+const EXTERNAL_PAYMENT_NOTE =
+  "외부 결제 건은 결제/수정/환불을 진행할 수 없습니다. 개인정보 수정 필요 시 관리자 측에 문의해주세요.";
+
+function ReceiptNotes({
+  receipt,
+  externalPayment = false,
+}: {
+  receipt: RegistrationReceipt;
+  externalPayment?: boolean;
+}) {
   const warning = receipt.warningMessage?.trim() ?? "";
-  if (!warning) return null;
-  return <p className="form__note">{warning}</p>;
+  if (!externalPayment && !warning) return null;
+  return (
+    <>
+      {externalPayment ? <p className="form__note">{EXTERNAL_PAYMENT_NOTE}</p> : null}
+      {warning ? <p className="form__note">{warning}</p> : null}
+    </>
+  );
 }
 
 function IndividualReceiptCard({
@@ -454,6 +468,7 @@ function IndividualReceiptCard({
   const guardianPhone = receipt.guardianPhNum
     ? formatPhone(receipt.guardianPhNum)
     : "";
+  const externalPayment = receipt.externalPayment === true;
 
   return (
     <section className="ticket">
@@ -527,15 +542,15 @@ function IndividualReceiptCard({
         </div>
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
-      <ReceiptNotes receipt={receipt} />
+      <ReceiptNotes receipt={receipt} externalPayment={externalPayment} />
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
         passwordBusy={passwordBusy}
-        onPay={onPay}
-        onEdit={onEdit}
+        onPay={externalPayment ? undefined : onPay}
+        onEdit={externalPayment ? undefined : onEdit}
         onPassword={onPassword}
-        onRefund={onRefund}
+        onRefund={externalPayment ? undefined : onRefund}
       />
     </section>
   );

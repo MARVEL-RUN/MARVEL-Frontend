@@ -198,6 +198,7 @@ export type RegistrationReceipt = {
   paymentAction?: string;
   paymentId?: string | null;
   orderId?: string | null;
+  externalPayment?: boolean;
 };
 
 export type RegistrationSouvenirSelection = {
