@@ -601,8 +601,11 @@ export function ApplicationDetailDrawer({
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
   const canDeleteUnpaid = !editing && !adjusting && canDeleteUnpaidRegistration(row.status);
+  const externalPayment = !isGroup && row.externalPayment === true;
+  const hidePaymentActions = externalPayment || (!isGroup && Boolean(loading));
   const canFullRefund =
     hasAdminRefundBatch &&
+    !hidePaymentActions &&
     !editing &&
     !adjusting &&
     !canDeleteUnpaid &&
@@ -611,6 +614,7 @@ export function ApplicationDetailDrawer({
       : statusKey(row.status) === "CONFIRMED");
   const canPartialRefund =
     hasAdminRefundBatch &&
+    !hidePaymentActions &&
     !editing &&
     !adjusting &&
     !canDeleteUnpaid &&

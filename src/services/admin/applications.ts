@@ -93,6 +93,7 @@ export type AdminApplicationRow = {
   organizationId?: string;
   eventCategoryId?: string;
   selectedSouvenirList?: AdminSelectedSouvenir[];
+  externalPayment?: boolean;
 };
 
 export type AdminSelectedSouvenir = {
@@ -164,6 +165,7 @@ type RegistrationDetail = {
   termsMarketingChannelAgreed?: unknown;
   eventCategoryId?: unknown;
   selectedSouvenirList?: unknown;
+  externalPayment?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -442,6 +444,7 @@ export function applyRegistrationDetail(
     marketingConsent:
       asOptionalBool(data.termsMarketingAgreed) ?? row.marketingConsent,
     eventCategoryId: firstText(data.eventCategoryId) || row.eventCategoryId,
+    externalPayment: asOptionalBool(data.externalPayment) ?? row.externalPayment,
     selectedSouvenirList: (() => {
       const list = asSelectedSouvenirList(data.selectedSouvenirList);
       return list.length ? list : row.selectedSouvenirList;
