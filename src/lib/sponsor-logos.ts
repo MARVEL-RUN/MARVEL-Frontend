@@ -17,14 +17,11 @@ export function footerPartnerLogo(key: FooterPartnerLogoKey) {
 }
 
 export function footerPartnerLogoClass(key: FooterPartnerLogoKey) {
-  switch (key) {
-    case "organizer":
-      return "site-footer__host-logo site-footer__host-logo--organizer";
-    case "mfriends":
-      return "site-footer__host-logo site-footer__host-logo--mfriends";
-    case "highcut":
-      return "site-footer__host-logo site-footer__host-logo--highcut";
-    default:
-      return "site-footer__host-logo";
+  if (key === "organizer") {
+    return "site-footer__host-logo site-footer__host-logo--organizer";
   }
+  if (key === "mfriends") {
+    return "site-footer__host-logo site-footer__host-logo--mfriends";
+  }
+  return "site-footer__host-logo";
 }
