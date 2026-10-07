@@ -56,6 +56,8 @@ export function HomePage() {
     const root = rootRef.current;
     if (!hero || !root) return;
 
+    const mobileMq = window.matchMedia(MOBILE_MQ);
+
     const onMove = (e: globalThis.MouseEvent) => {
       const r = hero.getBoundingClientRect();
       hero.style.setProperty("--mx", `${e.clientX - r.left}px`);
@@ -80,13 +82,27 @@ export function HomePage() {
     );
     nodes.forEach((n) => io.observe(n));
 
-    hero.addEventListener("mousemove", onMove);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    const bindHeroMotion = () => {
+      hero.removeEventListener("mousemove", onMove);
+      window.removeEventListener("scroll", onScroll);
+
+      if (mobileMq.matches) {
+        hero.style.setProperty("--py", "0px");
+        return;
+      }
+
+      hero.addEventListener("mousemove", onMove);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    };
+
+    bindHeroMotion();
+    mobileMq.addEventListener("change", bindHeroMotion);
 
     return () => {
       hero.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
+      mobileMq.removeEventListener("change", bindHeroMotion);
       io.disconnect();
     };
   }, []);
@@ -229,36 +245,40 @@ export function HomePage() {
           <ul className="courses__grid">
             {EVENT.courses.map((c) => (
               <li key={c.id} className={`course course--${c.tone}`}>
-                <button
-                  type="button"
-                  className="course__map"
-                  onClick={() => setPreview(c.id)}
-                  aria-label={`${c.distance} 코스도 미리보기`}
-                >
-                  <Image
-                    src={c.map}
-                    alt=""
-                    fill
-                    sizes="(max-width: 720px) 100vw, (max-width: 960px) 100vw, 33vw"
-                  />
-                </button>
-                <p className="course__code">{c.code}</p>
-                <p className="course__dist">{c.distance}</p>
-                <p className="course__desc">{c.desc}</p>
-                <dl>
-                  <div>
-                    <dt>스타트</dt>
-                    <dd>{c.start}</dd>
+                <div className="course__hero">
+                  <button
+                    type="button"
+                    className="course__map"
+                    onClick={() => setPreview(c.id)}
+                    aria-label={`${c.distance} 코스 크게 보기`}
+                  >
+                    <Image
+                      src={c.map}
+                      alt=""
+                      fill
+                      sizes="(max-width: 720px) 100vw, (max-width: 960px) 100vw, 33vw"
+                    />
+                  </button>
+                  <div className="course__hero-cap">
+                    <p className="course__code">{c.code}</p>
+                    <p className="course__dist">{c.distance}</p>
+                    <p className="course__desc">{c.desc}</p>
                   </div>
-                  <div>
-                    <dt>참가비</dt>
-                    <dd>{c.fee}</dd>
-                  </div>
-                  <div>
-                    <dt>어린이</dt>
-                    <dd>{"childFee" in c ? c.childFee : "만 12세 이하 참가 불가"}</dd>
-                  </div>
-                </dl>
+                  <dl>
+                    <div>
+                      <dt>스타트</dt>
+                      <dd>{c.start}</dd>
+                    </div>
+                    <div>
+                      <dt>참가비</dt>
+                      <dd>{c.fee}</dd>
+                    </div>
+                    <div>
+                      <dt>어린이</dt>
+                      <dd>{"childFee" in c ? c.childFee : "만 12세 이하 참가 불가"}</dd>
+                    </div>
+                  </dl>
+                </div>
               </li>
             ))}
           </ul>
