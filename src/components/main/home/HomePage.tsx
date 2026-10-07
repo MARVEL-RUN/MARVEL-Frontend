@@ -56,6 +56,8 @@ export function HomePage() {
     const root = rootRef.current;
     if (!hero || !root) return;
 
+    const mobileMq = window.matchMedia(MOBILE_MQ);
+
     const onMove = (e: globalThis.MouseEvent) => {
       const r = hero.getBoundingClientRect();
       hero.style.setProperty("--mx", `${e.clientX - r.left}px`);
@@ -80,13 +82,27 @@ export function HomePage() {
     );
     nodes.forEach((n) => io.observe(n));
 
-    hero.addEventListener("mousemove", onMove);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    const bindHeroMotion = () => {
+      hero.removeEventListener("mousemove", onMove);
+      window.removeEventListener("scroll", onScroll);
+
+      if (mobileMq.matches) {
+        hero.style.setProperty("--py", "0px");
+        return;
+      }
+
+      hero.addEventListener("mousemove", onMove);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    };
+
+    bindHeroMotion();
+    mobileMq.addEventListener("change", bindHeroMotion);
 
     return () => {
       hero.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
+      mobileMq.removeEventListener("change", bindHeroMotion);
       io.disconnect();
     };
   }, []);

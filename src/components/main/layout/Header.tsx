@@ -10,6 +10,7 @@ import { useAppHref } from "@/lib/main/useAppBasePath";
 import { NAV_ITEMS } from "@/lib/mode";
 import { RegisterCta } from "../register/RegisterCta";
 import { pinToHeader } from "@/lib/pin-header";
+import { MOBILE_MQ } from "@/lib/viewport";
 
 function hrefPath(href: string) {
   return href.split("#")[0];
@@ -57,16 +58,29 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileHomeSolid, setMobileHomeSolid] = useState(false);
   const [closedDrop, setClosedDrop] = useState<string | null>(null);
   const [hash, setHash] = useState("");
   const home = pathname === "/";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const mq = window.matchMedia(MOBILE_MQ);
+    const syncMobileHome = () => setMobileHomeSolid(home && mq.matches);
+    syncMobileHome();
+    mq.addEventListener("change", syncMobileHome);
+    return () => mq.removeEventListener("change", syncMobileHome);
+  }, [home]);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_MQ);
+    const onScroll = () => {
+      if (home && mq.matches) return;
+      setScrolled(window.scrollY > 24);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [home]);
 
   useEffect(() => {
     setOpen(false);
@@ -140,7 +154,7 @@ export function Header() {
       className={[
         "site-header",
         home ? "site-header--home" : "",
-        scrolled || open ? "is-solid" : "",
+        scrolled || open || mobileHomeSolid ? "is-solid" : "",
       ].join(" ")}
     >
       <div className="site-header__bar">

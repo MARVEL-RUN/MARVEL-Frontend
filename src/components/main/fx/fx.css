@@ -635,6 +635,7 @@ html.is-intro .fx-letterbox span {
 }
 
 @media (max-width: 720px) {
+
   .fx-letterbox span,
   html.is-intro .fx-letterbox span {
     height: 0;
@@ -642,7 +643,9 @@ html.is-intro .fx-letterbox span {
 
   .fx-grain,
   .fx-scan,
-  .fx-dust {
+  .fx-dust,
+  .fx-vignette,
+  .fx-letterbox {
     display: none;
   }
 
