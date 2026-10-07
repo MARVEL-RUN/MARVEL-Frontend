@@ -3,7 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MAIN_ASSETS } from "@/lib/assets";
+import { EVENT } from "@/lib/event";
 import { LEGAL_DOCS, OFFICE } from "@/lib/legal";
+import {
+  footerHostLogoClass,
+  isSponsorRole,
+  mainSponsorSrc,
+  sponsorLogoSize,
+} from "@/lib/sponsor-logos";
 import { useLegalModal } from "../legal/LegalModal";
 
 const OFFICE_FACTS = [
@@ -28,6 +35,26 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
+        <ul className="site-footer__hosts">
+          {EVENT.sponsors.map((sponsor) => {
+            if (!isSponsorRole(sponsor.role)) return null;
+            const size = sponsorLogoSize(sponsor.role);
+            return (
+              <li key={sponsor.role}>
+                <p className="site-footer__host-role">{sponsor.role}</p>
+                <span className={footerHostLogoClass(sponsor.role)}>
+                  <Image
+                    src={mainSponsorSrc(sponsor.role)}
+                    alt={sponsor.name}
+                    width={size.width}
+                    height={size.height}
+                    draggable={false}
+                  />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
         <div className="site-footer__info">
           <nav className="site-footer__nav" aria-label="약관">
             {LEGAL_DOCS.map((item) => (

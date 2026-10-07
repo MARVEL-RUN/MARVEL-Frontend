@@ -88,6 +88,14 @@
   height: 1.05rem;
 }
 
+.spec__hosts-logo--mfriends {
+  height: 1.2rem;
+}
+
+.spec__hosts-logo--highcut {
+  height: 1.35rem;
+}
+
 .guide-sec .spec>div {
   align-items: center;
 }

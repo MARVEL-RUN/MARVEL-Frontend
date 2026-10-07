@@ -630,6 +630,18 @@ body:has(.sheet-modal) .bgm-toggle {
   object-position: left center;
 }
 
+.site-footer__host-logo--organizer {
+  height: 2rem;
+}
+
+.site-footer__host-logo--mfriends {
+  height: 2.35rem;
+}
+
+.site-footer__host-logo--highcut {
+  height: 2.35rem;
+}
+
 .site-footer__info {
   padding-top: 2.1rem;
 }

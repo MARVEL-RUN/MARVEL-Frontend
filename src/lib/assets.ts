@@ -5,6 +5,8 @@ export const COMING_SOON_ASSETS = {
   motifMobile: "/images/coming-soon/decor/bg_moblie.svg",
   host: "/images/coming-soon/hosted.png",
   organizer: "/images/coming-soon/organizer.png",
+  mFriends: "/images/coming-soon/m-friends.svg",
+  highcut: "/images/coming-soon/highcut.svg",
 } as const;
 
 export const MAIN_ASSETS = {
@@ -19,6 +21,8 @@ export const MAIN_ASSETS = {
   popupShuttleSurvey: "/images/main/popup/shuttle-survey-v3.jpg",
   footerHost: "/images/main/footer/hosted.png",
   footerOrganizer: "/images/main/footer/organizer.png",
+  footerMFriends: "/images/main/footer/m-friends.svg",
+  footerHighcut: "/images/main/footer/highcut.svg",
   introMarvel: "/images/main/intro-marvel.svg",
   introRun: "/images/main/intro-run.svg",
   introKorea: "/images/main/intro-korea.svg",

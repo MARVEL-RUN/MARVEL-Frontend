@@ -262,6 +262,15 @@
   margin-top: 0.55em;
 }
 
+.coming-soon .sponsors__logo--mfriends {
+  width: 58%;
+}
+
+.coming-soon .sponsors__logo--highcut {
+  width: 62%;
+  margin-top: 0.35em;
+}
+
 /* top의 em은 자기 폰트(0.72em) 기준. 로고 RUN 밑선에 맞춘 값. */
 .coming-soon .copyright {
   position: absolute;

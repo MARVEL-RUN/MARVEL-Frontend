@@ -5,6 +5,12 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
+import {
+  isSponsorRole,
+  mainSponsorSrc,
+  sponsorLogoSize,
+  virtualHostsLogoClass,
+} from "@/lib/sponsor-logos";
 import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import "./virtual.css";
 
@@ -65,23 +71,6 @@ const SOON = {
   accent: "#3dff7a",
   panel: "#020805",
 } as const;
-
-const HOSTS = [
-  {
-    role: "주최",
-    src: MAIN_ASSETS.footerHost,
-    width: 4786,
-    height: 1320,
-    name: EVENT.sponsors.find((s) => s.role === "주최")?.name ?? "주최",
-  },
-  {
-    role: "주관",
-    src: MAIN_ASSETS.footerOrganizer,
-    width: 1601,
-    height: 220,
-    name: EVENT.sponsors.find((s) => s.role === "주관")?.name ?? "주관",
-  },
-] as const;
 
 export function VirtualRunPage() {
   return (
@@ -175,24 +164,24 @@ export function VirtualRunPage() {
                 일정과 신청 안내는 추후 공개됩니다.
               </p>
               <div className="virtual-hosts">
-                <p className="virtual-hosts__label">주최 및 주관</p>
+                <p className="virtual-hosts__label">주최·협력사</p>
                 <div className="virtual-hosts__logos">
-                  {HOSTS.map((host) => (
-                    <Image
-                      key={host.role}
-                      src={host.src}
-                      alt={host.name}
-                      width={host.width}
-                      height={host.height}
-                      className={
-                        host.role === "주관"
-                          ? "virtual-hosts__logo is-organizer"
-                          : "virtual-hosts__logo"
-                      }
-                      sizes="160px"
-                      draggable={false}
-                    />
-                  ))}
+                  {EVENT.sponsors.map((sponsor) => {
+                    if (!isSponsorRole(sponsor.role)) return null;
+                    const size = sponsorLogoSize(sponsor.role);
+                    return (
+                      <Image
+                        key={sponsor.role}
+                        src={mainSponsorSrc(sponsor.role)}
+                        alt={sponsor.name}
+                        width={size.width}
+                        height={size.height}
+                        className={virtualHostsLogoClass(sponsor.role)}
+                        sizes="160px"
+                        draggable={false}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>
