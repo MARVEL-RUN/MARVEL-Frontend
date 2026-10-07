@@ -316,6 +316,19 @@ html.is-intro {
   transform: skewY(-1.4deg);
 }
 
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .hero {
+    min-height: 100dvh;
+    align-items: flex-end;
+    padding: calc(var(--header-h) + 0.9rem) 0 2.3rem;
+  }
+
+  .ticker {
+    margin-top: -2.2rem;
+  }
+}
+
 /* sections */
 .sec {
   padding: 6.5rem 0;

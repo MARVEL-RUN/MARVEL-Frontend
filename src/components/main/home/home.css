@@ -1431,12 +1431,11 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .hero {
     align-items: flex-end;
-    min-height: 100dvh;
-    padding: calc(var(--header-h) + 0.9rem) 0 4.6rem;
   }
 
   .hero__copy {
     width: min(1120px, calc(100% - var(--gutter) * 2));
+    transform: none;
   }
 
   .hero__art {
@@ -1513,11 +1512,12 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
   }
 
   .hero__guide {
-    gap: 2.5rem;
+    gap: 1.35rem;
     min-width: 0;
   }
 
   .hero__guide .kv-copy {
+    margin-bottom: 2.75rem;
     font-size: 0.58rem;
   }
 
