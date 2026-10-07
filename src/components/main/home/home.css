@@ -1487,32 +1487,6 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
     animation: none;
   }
 
-  .ticker {
-    transform: none;
-  }
-
-  .ticker__track {
-    animation: none;
-    width: 100%;
-    transform: none;
-  }
-
-  .ticker__track > ul:nth-child(2) {
-    display: none;
-  }
-
-  .ticker ul {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.55rem 1.15rem;
-    padding: 0.7rem 1rem;
-    white-space: normal;
-  }
-
-  .ticker li::before {
-    margin-right: 1.15rem;
-  }
-
   .hero__shade {
     background:
       linear-gradient(180deg, rgba(0, 3, 32, 0.12) 0%, rgba(0, 3, 32, 0.42) 38%, var(--navy) 92%),
