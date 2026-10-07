@@ -17,6 +17,9 @@ export function footerPartnerLogo(key: FooterPartnerLogoKey) {
 }
 
 export function footerPartnerLogoClass(key: FooterPartnerLogoKey) {
+  if (key === "host") {
+    return "site-footer__host-logo site-footer__host-logo--host";
+  }
   if (key === "organizer") {
     return "site-footer__host-logo site-footer__host-logo--organizer";
   }

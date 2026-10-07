@@ -608,9 +608,10 @@ body:has(.sheet-modal) .bgm-toggle {
 
 .site-footer__host-role {
   margin: 0;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.92rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.06em;
 }
 
 .site-footer__host-logos {
@@ -635,6 +636,20 @@ body:has(.sheet-modal) .bgm-toggle {
   max-height: 100%;
   object-fit: contain;
   object-position: left center;
+}
+
+.site-footer__host-logo--host {
+  width: auto;
+  max-width: none;
+  height: 3.25rem;
+}
+
+.site-footer__host-logo--host img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  max-height: none;
+  object-position: left top;
 }
 
 .site-footer__host-logo--organizer {
@@ -1016,6 +1031,20 @@ body:has(.sheet-modal) .bgm-toggle {
   html.is-main .site-footer__host-logo {
     width: 8.6rem;
     height: 1.85rem;
+  }
+
+  html.is-main .site-footer__host-logo--host {
+    width: auto;
+    max-width: none;
+    height: 3rem;
+  }
+
+  html.is-main .site-footer__host-logo--host img {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    object-position: left top;
   }
 
   html.is-main .site-footer__host-logo--mfriends {
