@@ -1,15 +1,13 @@
 import Image from "next/image";
-import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
+import {
+  footerPartnerLogo,
+  guideSpecHostsLogoClass,
+} from "@/lib/sponsor-logos";
 import { SideBanner } from "../layout/SideBanner";
 import { CourseMaps } from "./CourseMaps";
 import { GuideTabs } from "./GuideTabs";
 import { TimeTable } from "../home/TimeTable";
-
-const HOST_LOGOS = {
-  주최: { src: MAIN_ASSETS.footerHost, width: 4786, height: 1320 },
-  주관: { src: MAIN_ASSETS.footerOrganizer, width: 1601, height: 220 },
-} as const;
 
 export function GuidePage() {
   return (
@@ -29,30 +27,28 @@ export function GuidePage() {
                 </dd>
               </div>
             ))}
-            <div>
-              <dt>주최/주관</dt>
-              <dd>
-                <span className="spec__hosts">
-                  {EVENT.sponsors.map((sponsor) => {
-                    const logo = HOST_LOGOS[sponsor.role];
-                    return (
-                      <Image
-                        key={sponsor.role}
-                        src={logo.src}
-                        alt={sponsor.name}
-                        width={logo.width}
-                        height={logo.height}
-                        className={
-                          sponsor.role === "주관"
-                            ? "spec__hosts-logo spec__hosts-logo--organizer"
-                            : "spec__hosts-logo"
-                        }
-                      />
-                    );
-                  })}
-                </span>
-              </dd>
-            </div>
+            {EVENT.footerPartners.map((group) => (
+              <div key={group.role}>
+                <dt>{group.role}</dt>
+                <dd>
+                  <span className="spec__hosts">
+                    {group.items.map((item) => {
+                      const logo = footerPartnerLogo(item.key);
+                      return (
+                        <Image
+                          key={item.key}
+                          src={logo.src}
+                          alt={item.name}
+                          width={logo.width}
+                          height={logo.height}
+                          className={guideSpecHostsLogoClass(item.key)}
+                        />
+                      );
+                    })}
+                  </span>
+                </dd>
+              </div>
+            ))}
           </dl>
         </div>
       </section>

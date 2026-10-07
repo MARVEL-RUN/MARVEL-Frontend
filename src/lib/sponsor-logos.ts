@@ -16,6 +16,19 @@ export function footerPartnerLogo(key: FooterPartnerLogoKey) {
   return FOOTER_LOGO[key];
 }
 
+export function guideSpecHostsLogoClass(key: FooterPartnerLogoKey) {
+  switch (key) {
+    case "organizer":
+      return "spec__hosts-logo spec__hosts-logo--organizer";
+    case "mfriends":
+      return "spec__hosts-logo spec__hosts-logo--mfriends";
+    case "highcut":
+      return "spec__hosts-logo spec__hosts-logo--highcut";
+    default:
+      return "spec__hosts-logo";
+  }
+}
+
 export function footerPartnerLogoClass(key: FooterPartnerLogoKey) {
   if (key === "host") {
     return "site-footer__host-logo site-footer__host-logo--host";
