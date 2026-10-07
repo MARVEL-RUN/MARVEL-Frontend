@@ -19,6 +19,8 @@ export const MAIN_ASSETS = {
   popupShuttleSurvey: "/images/main/popup/shuttle-survey-v3.jpg",
   footerHost: "/images/main/footer/hosted.png",
   footerOrganizer: "/images/main/footer/organizer.png",
+  footerMFriends: "/images/main/footer/m-friends.svg",
+  footerHighcut: "/images/main/footer/highcut.svg",
   introMarvel: "/images/main/intro-marvel.svg",
   introRun: "/images/main/intro-run.svg",
   introKorea: "/images/main/intro-korea.svg",
