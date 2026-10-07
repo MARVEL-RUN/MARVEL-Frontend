@@ -214,8 +214,23 @@ export const EVENT = {
   sponsors: [
     { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
-    { role: "주관사", name: "엠프렌즈" },
-    { role: "미디어파트너", name: "하이컷" },
+  ],
+  footerPartners: [
+    {
+      role: "주최",
+      items: [{ key: "host", name: "ONEUNIVERSE STUDIO" }],
+    },
+    {
+      role: "주관",
+      items: [
+        { key: "organizer", name: "FLUX SONIC" },
+        { key: "mfriends", name: "엠프렌즈" },
+      ],
+    },
+    {
+      role: "미디어파트너",
+      items: [{ key: "highcut", name: "하이컷" }],
+    },
   ],
   sponsorMoreNotice: "※ 위 기념품 이미지는 예시이며, 실제품과 상이할 수 있습니다.",
   sponsorMore: "+??",

@@ -613,6 +613,13 @@ body:has(.sheet-modal) .bgm-toggle {
   font-weight: 700;
 }
 
+.site-footer__host-logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.1rem 1.85rem;
+}
+
 .site-footer__host-logo {
   display: flex;
   align-items: center;
@@ -635,7 +642,8 @@ body:has(.sheet-modal) .bgm-toggle {
 }
 
 .site-footer__host-logo--mfriends {
-  height: 2.35rem;
+  width: 14.5rem;
+  height: 3.1rem;
 }
 
 .site-footer__host-logo--highcut {
@@ -999,6 +1007,11 @@ body:has(.sheet-modal) .bgm-toggle {
   html.is-main .site-footer__host-logo {
     width: 8.6rem;
     height: 1.85rem;
+  }
+
+  html.is-main .site-footer__host-logo--mfriends {
+    width: 10.2rem;
+    height: 2.35rem;
   }
 
   html.is-main .site-footer__host-logo img {

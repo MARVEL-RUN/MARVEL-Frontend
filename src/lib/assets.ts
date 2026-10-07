@@ -5,8 +5,6 @@ export const COMING_SOON_ASSETS = {
   motifMobile: "/images/coming-soon/decor/bg_moblie.svg",
   host: "/images/coming-soon/hosted.png",
   organizer: "/images/coming-soon/organizer.png",
-  mFriends: "/images/coming-soon/m-friends.svg",
-  highcut: "/images/coming-soon/highcut.svg",
 } as const;
 
 export const MAIN_ASSETS = {

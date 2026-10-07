@@ -527,14 +527,6 @@
   height: 1.05rem;
 }
 
-.virtual-hosts__logo.is-mfriends {
-  height: 1.2rem;
-}
-
-.virtual-hosts__logo.is-highcut {
-  height: 1.35rem;
-}
-
 @media (max-width: 1100px) {
   .virtual-card {
     width: min(960px, 100%);
@@ -687,11 +679,6 @@
 
   .virtual-hosts__logo.is-organizer {
     height: 1.35rem;
-  }
-
-  .virtual-hosts__logo.is-mfriends,
-  .virtual-hosts__logo.is-highcut {
-    height: 1.55rem;
   }
 
   .virtual.is-soon .virtual-header__logo {
