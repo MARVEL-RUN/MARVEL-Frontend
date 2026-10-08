@@ -171,7 +171,8 @@
   gap: 10px 14px;
 }
 
-.admin-daily-report__controls label {
+.admin-daily-report__controls label,
+.admin-daily-report__field {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -192,8 +193,25 @@
   color: var(--admin-ink);
 }
 
-.admin-daily-report__input--time {
-  min-width: 210px;
+.admin-daily-report__clock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-daily-report__clock .admin-daily-report__input {
+  min-width: 148px;
+}
+
+.admin-daily-report__select--unit {
+  min-width: 0;
+  width: 52px;
+  padding: 7px 22px 7px 8px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%234a5160' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' d='M1.5 1.5 6 6.2 10.5 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 10px 7px;
 }
 
 .admin-daily-report__btn {
