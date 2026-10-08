@@ -1,6 +1,7 @@
 "use client";
 
 import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDownload";
+import { DeliveryListDownload } from "@/components/admin/dashboard/DeliveryListDownload";
 import { PaymentDailyGraph } from "@/components/admin/dashboard/PaymentDailyGraph";
 import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
@@ -62,6 +63,7 @@ function EventStatsPanel({
             <>
               <PaymentDailyGraph eventId={eventId} />
               <DailyReportDownload eventId={eventId} />
+              <DeliveryListDownload eventId={eventId} />
             </>
           ) : null}
           <EventStatsTables eventId={eventId} eventName={eventName} />

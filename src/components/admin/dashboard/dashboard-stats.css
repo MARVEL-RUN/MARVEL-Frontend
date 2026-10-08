@@ -192,6 +192,10 @@
   color: var(--admin-ink);
 }
 
+.admin-daily-report__input--time {
+  min-width: 210px;
+}
+
 .admin-daily-report__btn {
   display: inline-flex;
   align-items: center;
