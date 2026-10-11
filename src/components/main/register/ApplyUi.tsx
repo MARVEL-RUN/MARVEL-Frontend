@@ -256,10 +256,12 @@ export function CoursePick({
   value,
   birth,
   onChange,
+  disabled: fieldsDisabled,
 }: {
   value: CourseId | "";
   birth: string;
   onChange: (courseId: CourseId, ticket: TicketKind) => void;
+  disabled?: boolean;
 }) {
   const selected = value ? courseById(value) : undefined;
   const ticket =
@@ -280,10 +282,10 @@ export function CoursePick({
                   key={c.id}
                   type="button"
                   className={value === c.id ? "is-on" : undefined}
-                  disabled={!open}
+                  disabled={fieldsDisabled || !open}
                   title={open ? undefined : courseClosedReason(birth)}
                   onClick={() => {
-                    if (!open) return;
+                    if (fieldsDisabled || !open) return;
                     onChange(
                       c.id,
                       courseAllowsChild(c) ? ticketForBirth(birth) : "adult",
@@ -497,11 +499,13 @@ export function GuardianConsentField({
   onChange,
   label = GUARDIAN_CONSENT_LABEL,
   variant = "check",
+  disabled,
 }: {
   agreed: boolean;
   onChange: (next: boolean) => void;
   label?: string;
   variant?: "check" | "button";
+  disabled?: boolean;
 }) {
   if (variant === "button") {
     return (
@@ -509,7 +513,11 @@ export function GuardianConsentField({
         type="button"
         className={agreed ? "guardian-consent is-agreed" : "guardian-consent"}
         aria-pressed={agreed}
-        onClick={() => onChange(!agreed)}
+        disabled={disabled}
+        onClick={() => {
+          if (disabled) return;
+          onChange(!agreed);
+        }}
       >
         <span className="guardian-consent__label">{label}</span>
         <span className="guardian-consent__state">
@@ -528,7 +536,11 @@ export function GuardianConsentField({
       <input
         type="checkbox"
         checked={agreed}
-        onChange={(e) => onChange(e.target.checked)}
+        disabled={disabled}
+        onChange={(e) => {
+          if (disabled) return;
+          onChange(e.target.checked);
+        }}
       />
       <span className="guardian-consent-check__label">{label}</span>
     </label>

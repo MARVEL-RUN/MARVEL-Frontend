@@ -218,3 +218,23 @@ export function organizationAddMemberAllowed(receipt: RegistrationReceipt) {
   if (!org) return true;
   return org.addMemberAllowed;
 }
+
+export function policyReasonMessage(
+  reason: RegistrationPolicyReason | null | undefined,
+) {
+  return reason?.message?.trim() || "";
+}
+
+export function memberLookupPolicyNotes(
+  memberPolicy: MemberRegistrationPolicy | undefined,
+) {
+  if (!memberPolicy) return [];
+  const lines: string[] = [];
+  const push = (reason: RegistrationPolicyReason | null | undefined) => {
+    const text = policyReasonMessage(reason);
+    if (text && !lines.includes(text)) lines.push(text);
+  };
+  if (!memberPolicy.modifyAllowed) push(memberPolicy.modifyReason);
+  if (!memberPolicy.deleteMemberAllowed) push(memberPolicy.deleteMemberReason);
+  return lines;
+}
