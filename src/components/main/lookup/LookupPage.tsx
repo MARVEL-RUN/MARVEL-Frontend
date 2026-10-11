@@ -349,6 +349,20 @@ function receiptPayKey(receipt: RegistrationReceipt) {
   );
 }
 
+type LookupRefreshKeep = {
+  receipt: RegistrationReceipt;
+  panel: "edit" | "cancel";
+};
+
+function matchRegistrationReceipt(
+  rows: RegistrationReceipt[],
+  target: RegistrationReceipt,
+) {
+  const key = receiptPayKey(target);
+  if (!key) return null;
+  return rows.find((row) => receiptPayKey(row) === key) ?? null;
+}
+
 function ReceiptActions({
   receipt,
   busy,
@@ -815,12 +829,18 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+      if (access) {
+        await reloadIndividualAfterActionFailure(access);
+      }
     } finally {
       setPayingKey(null);
     }
   }
 
-  async function refreshIndividual(nextAccess: IndividualRegistrationLookupRequest) {
+  async function refreshIndividual(
+    nextAccess: IndividualRegistrationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
     const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, nextAccess);
     const rows = Array.isArray(found) ? found : [];
     setAccess(nextAccess);
@@ -828,9 +848,28 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     setName(nextAccess.name);
     setBirth(nextAccess.birth.replace(/\D/g, ""));
     setPhone(nextAccess.phNum);
+    setView(rows.length ? "hit" : "miss");
+    if (keep && rows.length) {
+      const next = matchRegistrationReceipt(rows, keep.receipt);
+      if (next) {
+        setActive(next);
+        setPanel(keep.panel);
+        return;
+      }
+    }
     setActive(null);
     setPanel("list");
-    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function reloadIndividualAfterActionFailure(
+    cred: IndividualRegistrationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
+    try {
+      await refreshIndividual(cred, keep);
+    } catch {
+      /* 요청 오류 메시지 유지 */
+    }
   }
 
   async function onModify(body: IndividualRegistrationModifyRequest, action: LookupModifyAction) {
@@ -892,6 +931,10 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       mainToast.success("수정이 완료되었습니다.");
     } catch (err) {
       setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+      const cred = access ?? body.access;
+      if (cred) {
+        await reloadIndividualAfterActionFailure(cred);
+      }
     } finally {
       setBusy(false);
     }
@@ -902,6 +945,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("환불할 접수 정보를 확인하지 못했습니다.");
       return;
     }
+    const cancelTarget = active;
     setBusy(true);
     setError("");
     try {
@@ -913,6 +957,10 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+      await reloadIndividualAfterActionFailure(access, {
+        receipt: cancelTarget,
+        panel: "cancel",
+      });
     } finally {
       setBusy(false);
     }
@@ -1214,19 +1262,44 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+      if (access) {
+        await reloadOrganizationAfterActionFailure(access);
+      }
     } finally {
       setPayingKey(null);
     }
   }
 
-  async function refreshOrganization(nextAccess: OrganizationLookupRequest) {
+  async function refreshOrganization(
+    nextAccess: OrganizationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
     const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, nextAccess);
     const rows = Array.isArray(found) ? found : [];
     setAccess(nextAccess);
     setReceipts(rows);
+    setView(rows.length ? "hit" : "miss");
+    if (keep && rows.length) {
+      const next = matchRegistrationReceipt(rows, keep.receipt);
+      if (next) {
+        setActive(next);
+        setPanel(keep.panel);
+        return;
+      }
+    }
     setActive(null);
     setPanel("list");
-    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function reloadOrganizationAfterActionFailure(
+    cred: OrganizationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
+    try {
+      await refreshOrganization(cred, keep);
+    } catch {
+      /* 요청 오류 메시지 유지 */
+    }
   }
 
   async function onModify(body: OrganizationRegistrationModifyRequest, action: LookupModifyAction) {
@@ -1280,6 +1353,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       mainToast.success("수정이 완료되었습니다.");
     } catch (err) {
       setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+      const cred = access ?? body.access;
+      if (cred) {
+        await reloadOrganizationAfterActionFailure(cred);
+      }
     } finally {
       setBusy(false);
     }
@@ -1290,6 +1367,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("환불할 접수 정보를 확인하지 못했습니다.");
       return;
     }
+    const cancelTarget = active;
     setBusy(true);
     setError("");
     try {
@@ -1301,6 +1379,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+      await reloadOrganizationAfterActionFailure(access, {
+        receipt: cancelTarget,
+        panel: "cancel",
+      });
     } finally {
       setBusy(false);
     }
