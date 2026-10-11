@@ -541,10 +541,12 @@ export function EmailField({
   value,
   onChange,
   required,
+  disabled,
 }: {
   value: string;
   onChange: (next: string) => void;
   required?: boolean;
+  disabled?: boolean;
 }) {
   const { local, domain } = splitEmail(value);
   const [pick, setPick] = useState(() =>
@@ -580,6 +582,7 @@ export function EmailField({
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         required={required}
+        disabled={disabled}
         aria-label="이메일"
       />
       <span aria-hidden>@</span>
@@ -592,6 +595,7 @@ export function EmailField({
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
           required={required}
+          disabled={disabled}
           aria-label="이메일 도메인"
         />
       ) : null}
@@ -600,6 +604,7 @@ export function EmailField({
         value={pick}
         onChange={(e) => onPick(e.target.value)}
         required={required && !custom}
+        disabled={disabled}
         aria-label="이메일 도메인 선택"
       >
         <option value="">선택</option>
@@ -681,6 +686,7 @@ export function AddressField({
   addressDetail,
   onChange,
   required,
+  disabled,
 }: {
   zonecode: string;
   address: string;
@@ -691,11 +697,13 @@ export function AddressField({
     addressDetail?: string;
   }) => void;
   required?: boolean;
+  disabled?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   async function search() {
+    if (disabled) return;
     setBusy(true);
     setError("");
     try {
@@ -732,7 +740,7 @@ export function AddressField({
           type="button"
           className="address-pick__btn"
           onClick={search}
-          disabled={busy}
+          disabled={busy || disabled}
         >
           {busy ? "여는 중..." : "우편번호 찾기"}
         </button>
@@ -747,6 +755,7 @@ export function AddressField({
         required={required}
         onClick={search}
         aria-label="기본주소"
+        tabIndex={disabled ? -1 : undefined}
       />
       <input
         type="text"
@@ -757,6 +766,7 @@ export function AddressField({
         onChange={(e) => onChange({ addressDetail: e.target.value })}
         autoComplete="address-line2"
         required={required}
+        disabled={disabled}
         aria-label="상세주소"
       />
       {error ? <p className="form__err">{error}</p> : null}

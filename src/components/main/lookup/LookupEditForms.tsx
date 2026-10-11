@@ -33,6 +33,13 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
+import {
+  lookupOrganizationCommonModifyAllowed,
+  lookupShowPaymentButton,
+  memberDeleteAllowed,
+  memberModifyAllowed,
+  organizationAddMemberAllowed,
+} from "@/lib/main/registrationActionPolicy";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import { organizationLookupParticipants } from "@/services/main/registrations";
 import type {
@@ -43,6 +50,7 @@ import type {
   OrganizationParticipantModifyRequest,
   OrganizationRegistrationModifyRequest,
   RegistrationCategory,
+  MemberRegistrationPolicy,
   RegistrationReceipt,
   RegistrationSouvenirSelection,
 } from "@/services/main/types";
@@ -349,6 +357,7 @@ export function IndividualLookupEdit({
     guardianPhone,
     guardianConsent,
   });
+  const canPayAfterModify = lookupShowPaymentButton(receipt);
 
   function applyCategory(
     next: RegistrationCategory | undefined,
@@ -701,14 +710,16 @@ export function IndividualLookupEdit({
           >
             {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
           </button>
-          <button
-            type="button"
-            className="btn btn--red"
-            disabled={busy}
-            onClick={() => runModify("pay")}
-          >
-            {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
-          </button>
+          {canPayAfterModify ? (
+            <button
+              type="button"
+              className="btn btn--red"
+              disabled={busy}
+              onClick={() => runModify("pay")}
+            >
+              {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+            </button>
+          ) : null}
         </DockNav>
       </section>
     ) : null}
@@ -727,6 +738,7 @@ type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
   gender: "M" | "F" | "";
   eventCategoryName?: string;
   shirtSize?: string;
+  memberPolicy?: MemberRegistrationPolicy;
 };
 
 function memberKey() {
@@ -778,6 +790,7 @@ function participantDraft(
     phNum: participantPhone(row),
     birth: (row.birth || "").replace(/\D/g, ""),
     gender: toApiGender(row.gender) || "M",
+    memberPolicy: row.memberPolicy,
   };
 }
 
@@ -821,6 +834,9 @@ export function GroupLookupEdit({
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
   const organizationName = receipt.organizationName?.trim() || "";
   const organizationLoginId = access.loginId.trim() || receipt.loginId?.trim() || "";
+  const canEditOrgCommon = lookupOrganizationCommonModifyAllowed(receipt);
+  const canAddMember = organizationAddMemberAllowed(receipt);
+  const canPayAfterModify = lookupShowPaymentButton(receipt);
   const optionsReady = categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(members);
   const total = useMemo(
@@ -904,7 +920,14 @@ export function GroupLookupEdit({
 
   function removeMember(index: number) {
     if (members.length <= 1) return;
-    if (members[index]?.registrationId) return;
+    const target = members[index];
+    if (!target) return;
+    if (
+      target.registrationId &&
+      !memberDeleteAllowed(target.memberPolicy, false)
+    ) {
+      return;
+    }
     setMembers((rows) => rows.filter((_, i) => i !== index));
     setOpenMember((prev) => {
       if (prev === index) return Math.max(0, index - 1);
@@ -1041,7 +1064,11 @@ export function GroupLookupEdit({
           />
         </FormRow>
         <FormRow label="이메일">
-          <EmailField value={email} onChange={setEmail} />
+          <EmailField
+            value={email}
+            onChange={setEmail}
+            disabled={!canEditOrgCommon}
+          />
         </FormRow>
       </FormSec>
       <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
@@ -1051,11 +1078,13 @@ export function GroupLookupEdit({
             address={address}
             addressDetail={addressDetail}
             onChange={(next) => {
+              if (!canEditOrgCommon) return;
               if (next.zonecode != null) setZonecode(next.zonecode);
               if (next.address != null) setAddress(next.address);
               if (next.addressDetail != null) setAddressDetail(next.addressDetail);
             }}
             required
+            disabled={!canEditOrgCommon}
           />
         </FormRow>
       </FormSec>
@@ -1066,7 +1095,7 @@ export function GroupLookupEdit({
             type="button"
             className="btn btn--ghost"
             onClick={addMember}
-            disabled={busy || members.length >= MAX_GROUP_SIZE}
+            disabled={busy || members.length >= MAX_GROUP_SIZE || !canAddMember}
           >
             참가자 추가
           </button>
@@ -1108,6 +1137,7 @@ export function GroupLookupEdit({
                 const selectedSize = memberShirtSize(member.selectedSouvenirList, category);
                 const open = openMember === index;
                 const locked = Boolean(member.registrationId);
+                const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
                 return (
                   <Fragment key={member.key}>
                     <tr className={open ? "party__info is-open" : "party__info"}>
@@ -1218,7 +1248,11 @@ export function GroupLookupEdit({
                           className="party__remove"
                           onClick={() => removeMember(index)}
                           disabled={
-                            busy || Boolean(member.registrationId) || members.length <= 1
+                            busy ||
+                            members.length <= 1 ||
+                            (member.registrationId
+                              ? !memberDeleteAllowed(member.memberPolicy, false)
+                              : false)
                           }
                         >
                           삭제
@@ -1230,6 +1264,7 @@ export function GroupLookupEdit({
                         <select
                           value={member.eventCategoryId}
                           onChange={(e) => {
+                            if (!canEditMemberFields) return;
                             const eventCategoryId = e.target.value;
                             const next = findCategory(categories, eventCategoryId);
                             patchMember(index, {
@@ -1242,7 +1277,7 @@ export function GroupLookupEdit({
                               ),
                             });
                           }}
-                          disabled={!optionsReady}
+                          disabled={!optionsReady || !canEditMemberFields}
                           required
                         >
                           <option value="">{optionsReady ? "참가종목" : "불러오는 중"}</option>
@@ -1271,8 +1306,9 @@ export function GroupLookupEdit({
                         <ShirtPick
                           value={selectedSize}
                           sizes={souvenir ? sizes : undefined}
-                          disabled={!souvenir}
-                          onChange={(size) =>
+                          disabled={!souvenir || !canEditMemberFields}
+                          onChange={(size) => {
+                            if (!canEditMemberFields) return;
                             patchMember(index, {
                               selectedSouvenirList: withShirtSize(
                                 category,
@@ -1280,8 +1316,8 @@ export function GroupLookupEdit({
                                 size,
                                 member.birth,
                               ),
-                            })
-                          }
+                            });
+                          }}
                         />
                       </td>
                       <td colSpan={2} data-label="패키지">
@@ -1422,14 +1458,16 @@ export function GroupLookupEdit({
           >
             {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
           </button>
-          <button
-            type="button"
-            className="btn btn--red"
-            disabled={busy}
-            onClick={() => runModify("pay")}
-          >
-            {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
-          </button>
+          {canPayAfterModify ? (
+            <button
+              type="button"
+              className="btn btn--red"
+              disabled={busy}
+              onClick={() => runModify("pay")}
+            >
+              {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+            </button>
+          ) : null}
         </DockNav>
       </section>
     ) : null}
