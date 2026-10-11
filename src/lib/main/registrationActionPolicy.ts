@@ -137,6 +137,13 @@ export function lookupRefundOrCancelAllowed(receipt: RegistrationReceipt) {
   return lookupModifyAllowed(receipt);
 }
 
+/** policy + 실제 환불·취소 대상 여부 (완납·0원 등) */
+export function lookupShowRefundOrCancelButton(receipt: RegistrationReceipt) {
+  if (!lookupRefundOrCancelAllowed(receipt)) return false;
+  if (isFirstUnpaidRegistration(receipt)) return true;
+  return Number(receipt.paidAmount) > 0;
+}
+
 export function lookupPaymentPolicyAllowed(receipt: RegistrationReceipt) {
   if (receipt.externalPayment) return false;
   const policy = receipt.userPolicy ?? receipt.organizationPolicy;

@@ -3,10 +3,12 @@
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { genderLabel } from "@/lib/registration-gender";
 import {
-  canPrepareRegistrationPayment,
-  closedRegistration,
-  registrationStatusLabel,
-} from "@/lib/registration-status";
+  lookupEditScreenAllowed,
+  lookupPolicyNotes,
+  lookupShowPaymentButton,
+  lookupShowRefundOrCancelButton,
+} from "@/lib/main/registrationActionPolicy";
+import { registrationStatusLabel } from "@/lib/registration-status";
 import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
 import {
   applicationPasswordError,
@@ -331,23 +333,6 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
   );
 }
 
-function canPreparePayment(receipt: RegistrationReceipt) {
-  return (
-    canPrepareRegistrationPayment(receipt.registrationStatus) && Boolean(receipt.paymentId)
-  );
-}
-
-function canModifyReceipt(receipt: RegistrationReceipt) {
-  return Boolean(
-    (receipt.registrationId || receipt.organizationId) &&
-      !closedRegistration(receipt.registrationStatus),
-  );
-}
-
-function canRefundReceipt(receipt: RegistrationReceipt) {
-  return canModifyReceipt(receipt);
-}
-
 function payableOrder(result: RegistrationSettlementResult) {
   return (
     result.orders?.find((order) => order.orderId && Number(order.amount) > 0) ?? null
@@ -381,9 +366,9 @@ function ReceiptActions({
   onPassword: () => void;
   onRefund?: () => void;
 }) {
-  const pay = Boolean(onPay && canPreparePayment(receipt));
-  const edit = Boolean(onEdit && canModifyReceipt(receipt));
-  const refund = Boolean(onRefund && canRefundReceipt(receipt));
+  const pay = Boolean(onPay && lookupShowPaymentButton(receipt));
+  const edit = Boolean(onEdit && lookupEditScreenAllowed(receipt));
+  const refund = Boolean(onRefund && lookupShowRefundOrCancelButton(receipt));
   return (
     <div className="flow__nav flow__nav--receipt">
       {edit ? (
@@ -422,7 +407,8 @@ function ReceiptNotes({
 }) {
   const inquiryHref = useAppHref("/inquiry/write");
   const warning = receipt.warningMessage?.trim() ?? "";
-  if (!externalPayment && !warning) return null;
+  const policyNotes = lookupPolicyNotes(receipt);
+  if (!externalPayment && !warning && policyNotes.length === 0) return null;
   return (
     <>
       {externalPayment ? (
@@ -434,6 +420,11 @@ function ReceiptNotes({
         </p>
       ) : null}
       {warning ? <p className="form__note">{warning}</p> : null}
+      {policyNotes.map((line) => (
+        <p key={line} className="form__note">
+          {line}
+        </p>
+      ))}
     </>
   );
 }
@@ -618,7 +609,10 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
-      <ReceiptNotes receipt={receipt} />
+      <ReceiptNotes
+        receipt={receipt}
+        externalPayment={receipt.externalPayment === true}
+      />
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
@@ -792,7 +786,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
       return;
     }
-    if (!access || !canPreparePayment(receipt) || !receipt.paymentId) {
+    if (!access || !lookupShowPaymentButton(receipt) || !receipt.paymentId) {
       setError("결제할 접수 정보를 확인하지 못했습니다.");
       return;
     }
@@ -874,7 +868,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           router.push(paymentHref);
           return;
         }
-        if (access && active.paymentId && canPreparePayment(active)) {
+        if (access && active.paymentId && lookupShowPaymentButton(active)) {
           const retried = await retryIndividualPayment(
             DEFAULT_EVENT_ID,
             active.registrationId,
@@ -1193,7 +1187,12 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
       return;
     }
-    if (!access || !canPreparePayment(receipt) || !receipt.paymentId || !receipt.organizationId) {
+    if (
+      !access ||
+      !lookupShowPaymentButton(receipt) ||
+      !receipt.paymentId ||
+      !receipt.organizationId
+    ) {
       setError("결제할 접수 정보를 확인하지 못했습니다.");
       return;
     }
@@ -1258,7 +1257,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           router.push(paymentHref);
           return;
         }
-        if (access && active.paymentId && canPreparePayment(active)) {
+        if (access && active.paymentId && lookupShowPaymentButton(active)) {
           const retried = await retryOrganizationPayment(
             DEFAULT_EVENT_ID,
             active.organizationId,
