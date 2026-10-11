@@ -9,7 +9,11 @@ import {
   lookupShowRefundOrCancelButton,
 } from "@/lib/main/registrationActionPolicy";
 import { registrationStatusLabel } from "@/lib/registration-status";
-import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
+import {
+  consumeLookupRefreshAfterPayment,
+  paymentOrderFromRetry,
+  savePendingPayment,
+} from "@/lib/payment/session";
 import {
   applicationPasswordError,
   APPLICATION_PASSWORD_MIN,
@@ -69,6 +73,12 @@ export function LookupPage() {
   useLayoutEffect(() => {
     scrollPageTop();
   }, [kind]);
+
+  useLayoutEffect(() => {
+    if (consumeLookupRefreshAfterPayment()) {
+      mainToast.success("결제가 반영되었습니다. 조회 정보로 다시 확인해 주세요.");
+    }
+  }, []);
 
   return (
     <main className="page">
@@ -825,6 +835,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         registration: paymentOrderFromRetry(retried),
         customerName: (receipt.name || receiptMembers(receipt)[0]?.name || name).trim(),
         savedAt: Date.now(),
+        fromLookup: true,
       });
       router.push(paymentHref);
     } catch (err) {
@@ -902,6 +913,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(order),
             customerName: body.name.trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           setAccess(nextAccess);
           router.push(paymentHref);
@@ -918,6 +930,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(retried),
             customerName: body.name.trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           setAccess(nextAccess);
           router.push(paymentHref);
@@ -1258,6 +1271,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         registration: paymentOrderFromRetry(retried),
         customerName: (receipt.leaderName || receipt.organizationName || account).trim(),
         savedAt: Date.now(),
+        fromLookup: true,
       });
       router.push(paymentHref);
     } catch (err) {
@@ -1326,6 +1340,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(order),
             customerName: (active.leaderName || active.organizationName || account).trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           router.push(paymentHref);
           return;
@@ -1341,6 +1356,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(retried),
             customerName: (active.leaderName || active.organizationName || account).trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           router.push(paymentHref);
           return;
