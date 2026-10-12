@@ -12,7 +12,7 @@ export const EVENT = {
   /* 1차 마감 후 ~ 2차(추가) 접수 전 대기 (KST). 신청 CTA·/register 차단 */
   round2PauseFrom: "2026-10-13T00:00:00+09:00",
   round2OpenAt: "2026-10-13T14:00:00+09:00",
-  round2OpenNoticeDate: "2026. 10. 13. 월요일",
+  round2OpenNoticeDate: "2026. 10. 13. 화요일",
   round2OpenNoticeTime: "오후 2시",
   round2OpenNoticeAction: "추가 접수 OPEN",
   /* 홈 팝업 — 끄려면 enabled: false. image에 경로 넣으면 본문에 표시 */
