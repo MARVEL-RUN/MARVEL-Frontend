@@ -14,7 +14,8 @@ export type OnsiteBoothItem = {
   body: string;
   photo: string;
   logo?: string;
-  cardArt?: string;
+  /** 검은 로고 PNG — 카드 하단에서 invert */
+  logoOnDark?: boolean;
 };
 
 /** PPT 카피 기준. 체험 3종은 배경 이미지 추후 반영 */
@@ -58,7 +59,8 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     partner: "움직임컴퍼니",
     body: "전문 스포츠 컨디셔닝팀의 맞춤형 스포츠 테이핑으로 러닝 전·후 컨디션을 챙겨 보세요.",
     photo: MAIN_ASSETS.onsiteTapingPhoto,
-    cardArt: MAIN_ASSETS.onsiteTapingCard,
+    logo: MAIN_ASSETS.onsiteMovementLogo,
+    logoOnDark: true,
   },
   {
     id: "tattoo",
@@ -70,8 +72,8 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
   {
     id: "sauna",
     title: "사우나 존",
-    partner: "사사사(SASASA)",
-    body: "사우나 매트부터 콜드 플런지까지. 완주 후 몸과 컨디션을 가볍게 풀어 보세요.",
+    partner: "사사사 · SAUNA CREATIVE GROUP",
+    body: "「좋은 삶에는 좋은 사우나가 필요하다」는 믿음으로, 누구나 좋은 사우나를 즐길 수 있도록 합니다. 사우나 버스·텐트·콜드플런지 등으로 완주 후 몸과 컨디션을 가볍게 풀어 보세요.",
     photo: MAIN_ASSETS.onsiteSaunaPhoto,
     logo: MAIN_ASSETS.onsiteSasasaLogo,
   },
