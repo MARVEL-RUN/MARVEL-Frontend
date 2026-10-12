@@ -56,7 +56,7 @@ export const MAIN_ASSETS = {
   onsiteRunningDjPhoto: "/images/main/guide/onsite/running-dj-photo.jpg",
   onsiteMsqLogo: "/images/main/guide/onsite/msq-run-club-logo.png",
   onsiteTapingPhoto: "/images/main/guide/onsite/taping-booth-photo.jpg",
-  onsiteTapingCard: "/images/main/guide/onsite/taping-booth-card.png",
+  onsiteMovementLogo: "/images/main/guide/onsite/movement-company-logo.png",
   onsiteTattooPhoto: "/images/main/guide/onsite/tattoo-sticker-photo.jpg",
   onsiteSaunaPhoto: "/images/main/guide/onsite/sauna-zone-photo.jpg",
   onsiteSasasaLogo: "/images/main/guide/onsite/sasasa-logo.png",
