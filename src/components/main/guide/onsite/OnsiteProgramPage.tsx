@@ -48,35 +48,38 @@ function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: numbe
 }
 
 function BoothCard({ item }: { item: (typeof ONSITE_BOOTHS)[number] }) {
+  const logoClass =
+    item.id === "taping"
+      ? "onsite-booth__logo onsite-booth__logo--blend"
+      : "onsite-booth__logo";
+
   return (
-    <li className={`onsite-booth onsite-tone--${item.tone}`}>
-      <div className="onsite-booth__media">
+    <li className="onsite-booth">
+      <div className="onsite-booth__frame">
         <Image
           src={item.photo}
           alt=""
           fill
           className="onsite-booth__art"
-          sizes="(max-width: 560px) 100vw, (max-width: 960px) 40vw, 240px"
+          sizes="(max-width: 720px) 88vw, 280px"
         />
-      </div>
-      <div className="onsite-booth__body">
-        <p className="onsite-booth__en">{item.en}</p>
-        <h3 className="onsite-booth__title">{item.title}</h3>
-        <div className="onsite-booth__partner">
-          <p className="onsite-booth__tagline">{item.tagline}</p>
+        <div className="onsite-booth__shade" aria-hidden />
+        <div className="onsite-booth__copy">
           {item.logo ? (
             <Image
               src={item.logo.src}
-              alt={item.partner}
+              alt=""
               width={item.logo.width}
               height={item.logo.height}
-              className="onsite-booth__logo"
+              className={logoClass}
             />
           ) : null}
-          <p className="onsite-booth__name">{item.partner}</p>
+          <p className="onsite-booth__tagline">{item.tagline}</p>
+          <h3 className="onsite-booth__title">{item.title}</h3>
+          {!item.logo ? <p className="onsite-booth__name">{item.partner}</p> : null}
           {item.about ? <p className="onsite-booth__about">{item.about}</p> : null}
+          <p className="onsite-booth__body">{item.body}</p>
         </div>
-        <p className="onsite-booth__text">{item.body}</p>
       </div>
     </li>
   );
