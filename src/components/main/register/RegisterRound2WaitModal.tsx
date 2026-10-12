@@ -68,19 +68,24 @@ export function RegisterRound2WaitModal({ open, onClose }: Props) {
             <X size={20} strokeWidth={2.25} />
           </button>
         </header>
-        <h2 id={titleId}>1차 접수가 마감되었습니다</h2>
+        <h2 id={titleId}>1차 신청이 마감되었습니다</h2>
         <p className="standby-v1__chip">
-          <span>{EVENT.round2OpenNoticeAction}</span>
+          <span>1차 신청 마감</span>
           <i aria-hidden />
-          <span>시작까지</span>
+          <span>2차 신청 시작까지</span>
         </p>
         <RegisterStandbyCount slots={display} />
+        <p className="standby-v1__when" aria-live="polite">
+          {display.d !== "00" ? `${Number(display.d)}일 ` : null}
+          {Number(display.h)}시 {display.m}분 {display.s}초
+        </p>
         <p className="standby-v1__when">
-          {EVENT.round2OpenNoticeDate} · {EVENT.round2OpenNoticeTime}
+          {EVENT.round2OpenNoticeDate} · {EVENT.round2OpenNoticeTime} {EVENT.round2OpenNoticeAction}
         </p>
         <p className="form__note">
-          추가 접수 시작 전까지는 신청할 수 없습니다. 미결제 건은 신청조회에서 결제·
-          정보 확인이 가능합니다.
+          2차 신청 시작 전까지는 새로 신청할 수 없습니다. 참가비 미결제 건은 홈페이지
+          신청조회에서 결제·확인할 수 있습니다. 17시 이후에는 신청 정보 수정 및 환불이
+          제한될 수 있습니다.
         </p>
         <div className="standby-v1__actions">
           <button type="button" className="btn btn--red" onClick={onClose}>
