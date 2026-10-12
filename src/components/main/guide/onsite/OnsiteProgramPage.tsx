@@ -7,8 +7,14 @@ function DriveCard({ item }: { item: (typeof ONSITE_DRIVE)[number] }) {
     <li className="onsite-drive">
       <p className="onsite-drive__kicker">{item.kicker}</p>
       <div className="onsite-drive__media">
-        {/* eslint-disable-next-line @next/next/no-img-element -- PPT 내보낸 SVG(비트맵 포함) */}
-        <img src={item.photo} alt="" className="onsite-drive__art" loading="lazy" />
+        <Image
+          src={item.photo}
+          alt=""
+          width={800}
+          height={600}
+          className="onsite-drive__art"
+          sizes="(max-width: 720px) 100vw, 360px"
+        />
       </div>
       <h3 className="onsite-drive__title">{item.title}</h3>
       <ul className="onsite-drive__lines">
