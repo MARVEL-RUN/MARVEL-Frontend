@@ -12,6 +12,10 @@ out/
 .env.*
 !.env.example
 
+# 로컬 handover·원본 (public/images 로 복사 후 사용)
+/docs/
+/10.02 로고 및 이미지/
+
 # 루트에 받아 둔 원본
 /KakaoTalk_*
 /*.png
