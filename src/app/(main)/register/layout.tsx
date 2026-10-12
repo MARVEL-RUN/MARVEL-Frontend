@@ -1,5 +1,6 @@
 import { SideBanner } from "@/components/main/layout/SideBanner";
 import { RegisterClosed } from "@/components/main/register/RegisterClosed";
+import { RegisterRound2Standby } from "@/components/main/register/RegisterRound2Standby";
 import { RegistrationGate } from "@/components/main/register/RegistrationGate";
 
 export default function RegisterLayout({
@@ -14,6 +15,14 @@ export default function RegisterLayout({
           <SideBanner kicker="ENTRY" title="참가신청" en="JOIN THE RUN" />
           <div className="page__body wrap">
             <RegisterClosed />
+          </div>
+        </main>
+      }
+      round2Fallback={
+        <main className="page">
+          <SideBanner kicker="ENTRY" title="참가신청" en="JOIN THE RUN" />
+          <div className="page__body wrap">
+            <RegisterRound2Standby />
           </div>
         </main>
       }
