@@ -6,20 +6,28 @@ import { createPortal } from "react-dom";
 import { EVENT } from "@/lib/event";
 import { MOBILE_MQ } from "@/lib/viewport";
 
-const POP = EVENT.popup;
-const STORE = `mr-pop-${POP.id}`;
 const EDGE = 8;
+
+function muteKey(id: string) {
+  return `mr-pop-${id}`;
+}
 
 function todayStamp() {
   return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
 }
 
-function mutedToday() {
+function mutedToday(id: string) {
   try {
-    return localStorage.getItem(STORE) === todayStamp();
+    return localStorage.getItem(muteKey(id)) === todayStamp();
   } catch {
     return false;
   }
+}
+
+function activePopup(now = Date.now()) {
+  const popup = EVENT.popup;
+  if (now >= Date.parse(popup.nextAt)) return popup.next;
+  return popup;
 }
 
 function siteZoom() {
@@ -50,10 +58,13 @@ export function HomePopup() {
   const [mute, setMute] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [pop, setPop] = useState(() => activePopup());
   const muteId = useId();
   const done = useRef(false);
   const muteRef = useRef(false);
+  const popRef = useRef(pop);
   const box = useRef<HTMLElement>(null);
+  popRef.current = pop;
 
   useLayoutEffect(() => {
     const mq = window.matchMedia(MOBILE_MQ);
@@ -68,10 +79,32 @@ export function HomePopup() {
   }, [mute]);
 
   useEffect(() => {
-    if (!POP.enabled || mutedToday()) {
+    let timer = 0;
+    const arm = () => {
+      window.clearTimeout(timer);
+      const now = Date.now();
+      setPop(activePopup(now));
+      const wait = Date.parse(EVENT.popup.nextAt) - now;
+      if (wait > 0) timer = window.setTimeout(arm, wait);
+    };
+    arm();
+    const onVis = () => {
+      if (document.visibilityState === "visible") arm();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pop.enabled || mutedToday(pop.id)) {
       done.current = true;
+      setOpen(false);
       return;
     }
+    done.current = false;
     const html = document.documentElement;
     const tryShow = () => {
       if (done.current) return;
@@ -83,7 +116,7 @@ export function HomePopup() {
     const mo = new MutationObserver(tryShow);
     mo.observe(html, { attributes: true, attributeFilter: ["class"] });
     return () => mo.disconnect();
-  }, []);
+  }, [pop]);
 
   useEffect(() => {
     if (!open) return;
@@ -169,7 +202,7 @@ export function HomePopup() {
     done.current = true;
     if (muteRef.current) {
       try {
-        localStorage.setItem(STORE, todayStamp());
+        localStorage.setItem(muteKey(popRef.current.id), todayStamp());
       } catch {
         /* ignore */
       }
@@ -187,21 +220,21 @@ export function HomePopup() {
         .join(" ")}
       role="dialog"
       aria-modal={mobile ? true : undefined}
-      aria-label={POP.title}
+      aria-label={pop.title}
       style={!mobile && pos ? { left: pos.left, top: pos.top } : undefined}
     >
       {mobile ? <span className="home-pop__handle" aria-hidden /> : null}
-      <div className={POP.image ? "home-pop__shot has-img" : "home-pop__shot"}>
-        {POP.image ? (
-          POP.href ? (
+      <div className={pop.image ? "home-pop__shot has-img" : "home-pop__shot"}>
+        {pop.image ? (
+          pop.href ? (
             <a
-              href={POP.href}
+              href={pop.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={POP.title}
+              aria-label={pop.title}
             >
               <Image
-                src={POP.image}
+                src={pop.image}
                 alt=""
                 fill
                 sizes={mobile ? "100vw" : "36rem"}
@@ -210,8 +243,8 @@ export function HomePopup() {
             </a>
           ) : (
             <Image
-              src={POP.image}
-              alt={POP.title}
+              src={pop.image}
+              alt={pop.title}
               fill
               sizes={mobile ? "100vw" : "36rem"}
               draggable={false}
