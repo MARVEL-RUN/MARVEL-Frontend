@@ -496,22 +496,34 @@
   display: grid;
   gap: 0.55rem;
   min-width: 0;
-  padding: 0 1.05rem 0.25rem;
+}
+
+.kit-medal-reel__stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  border-block: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .kit-medal-reel__frame {
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  width: 100%;
+  line-height: 0;
   background: #000;
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
 }
 
 .kit-medal-reel__video {
   display: block;
   width: 100%;
   height: auto;
-  vertical-align: middle;
   pointer-events: none;
+}
+
+@media (min-width: 721px) {
+  .kit-medal-reel__frame {
+    flex: none;
+    width: min(22.5rem, 100%);
+  }
 }
 
 .kit-medal-reel__video::-webkit-media-controls {
@@ -520,6 +532,7 @@
 
 .kit-medal-reel__note {
   margin: 0;
+  padding-inline: 1.05rem;
   color: var(--note);
   font-size: 0.72rem;
   font-weight: 500;
