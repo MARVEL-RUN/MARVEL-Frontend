@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { ONSITE_BOOTHS, ONSITE_DRIVE } from "@/lib/onsite-program";
+import { ONSITE_DRIVE } from "@/lib/onsite-program";
 import { SideBanner } from "../../layout/SideBanner";
+import { OnsiteBooths } from "./OnsiteBooths";
 
 function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: number }) {
   return (
@@ -47,44 +48,6 @@ function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: numbe
   );
 }
 
-function BoothCard({ item }: { item: (typeof ONSITE_BOOTHS)[number] }) {
-  const logoClass =
-    item.id === "taping"
-      ? "onsite-booth__logo onsite-booth__logo--blend"
-      : "onsite-booth__logo";
-
-  return (
-    <li className="onsite-booth">
-      <div className="onsite-booth__frame">
-        <Image
-          src={item.photo}
-          alt=""
-          fill
-          className="onsite-booth__art"
-          sizes="(max-width: 720px) 88vw, 280px"
-        />
-        <div className="onsite-booth__shade" aria-hidden />
-        <div className="onsite-booth__copy">
-          {item.logo ? (
-            <Image
-              src={item.logo.src}
-              alt=""
-              width={item.logo.width}
-              height={item.logo.height}
-              className={logoClass}
-            />
-          ) : null}
-          <p className="onsite-booth__tagline">{item.tagline}</p>
-          <h3 className="onsite-booth__title">{item.title}</h3>
-          {!item.logo ? <p className="onsite-booth__name">{item.partner}</p> : null}
-          {item.about ? <p className="onsite-booth__about">{item.about}</p> : null}
-          <p className="onsite-booth__body">{item.body}</p>
-        </div>
-      </div>
-    </li>
-  );
-}
-
 export function OnsiteProgramPage() {
   return (
     <main className="page onsite-page">
@@ -117,11 +80,7 @@ export function OnsiteProgramPage() {
               러닝 전후 컨디션과 즐거움을 채워 줄 파트너 부스입니다.
             </p>
           </header>
-          <ul className="onsite-booths">
-            {ONSITE_BOOTHS.map((item) => (
-              <BoothCard key={item.id} item={item} />
-            ))}
-          </ul>
+          <OnsiteBooths />
         </section>
       </div>
     </main>
