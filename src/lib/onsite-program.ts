@@ -5,6 +5,7 @@ export type OnsiteDriveItem = {
   kicker: string;
   title: string;
   lines: readonly string[];
+  photo: string;
 };
 
 export type OnsiteBoothItem = {
@@ -18,19 +19,21 @@ export type OnsiteBoothItem = {
   logoOnDark?: boolean;
 };
 
-/** PPT 카피 기준. 체험 3종은 배경 이미지 추후 반영 */
+/** PPT 카피·자산 SVG 기준 */
 export const ONSITE_DRIVE: readonly OnsiteDriveItem[] = [
   {
     id: "leisure-kart",
     kicker: "서킷 위에서 즐기는 짜릿한 레이싱",
     title: "레저카트",
     lines: ["1대당 2인 탑승", "교육 → 탑승 약 20분 소요", "차량 1대당 3만원"],
+    photo: MAIN_ASSETS.onsiteDriveLeisureKart,
   },
   {
     id: "offroad",
     kicker: "거친 지형과 장애물을 돌파하는 역동적인 주행 체험",
     title: "오프로드",
     lines: ["최대 3인 동시 참여", "체험시간 20분", "차량 1대당 8만원(인원 추가비 없음)"],
+    photo: MAIN_ASSETS.onsiteDriveOffroad,
   },
   {
     id: "drift",
@@ -41,6 +44,7 @@ export const ONSITE_DRIVE: readonly OnsiteDriveItem[] = [
       "기본 6만원 · 추가 인원 인당 3만원",
       "1인 6만원 / 2인 9만원 / 3인 12만원",
     ],
+    photo: MAIN_ASSETS.onsiteDriveDrift,
   },
 ] as const;
 

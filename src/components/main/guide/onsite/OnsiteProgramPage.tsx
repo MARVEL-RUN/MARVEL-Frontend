@@ -6,6 +6,10 @@ function DriveCard({ item }: { item: (typeof ONSITE_DRIVE)[number] }) {
   return (
     <li className="onsite-drive">
       <p className="onsite-drive__kicker">{item.kicker}</p>
+      <div className="onsite-drive__media">
+        {/* eslint-disable-next-line @next/next/no-img-element -- PPT 내보낸 SVG(비트맵 포함) */}
+        <img src={item.photo} alt="" className="onsite-drive__art" loading="lazy" />
+      </div>
       <h3 className="onsite-drive__title">{item.title}</h3>
       <ul className="onsite-drive__lines">
         {item.lines.map((line) => (
@@ -17,24 +21,9 @@ function DriveCard({ item }: { item: (typeof ONSITE_DRIVE)[number] }) {
 }
 
 function BoothCard({ item }: { item: (typeof ONSITE_BOOTHS)[number] }) {
-  const label = `${item.title} · ${item.partner}`;
-
-  if (item.cardArt) {
-    return (
-      <li className="onsite-booth">
-        <div className="onsite-booth__frame onsite-booth__frame--flat">
-          <Image
-            src={item.cardArt}
-            alt={label}
-            width={480}
-            height={720}
-            className="onsite-booth__art"
-            sizes="(max-width: 720px) 88vw, 280px"
-          />
-        </div>
-      </li>
-    );
-  }
+  const logoClass = item.logoOnDark
+    ? "onsite-booth__logo onsite-booth__logo--invert"
+    : "onsite-booth__logo";
 
   return (
     <li className="onsite-booth">
@@ -55,7 +44,7 @@ function BoothCard({ item }: { item: (typeof ONSITE_BOOTHS)[number] }) {
               alt=""
               width={200}
               height={48}
-              className="onsite-booth__logo"
+              className={logoClass}
             />
           ) : null}
           <p className="onsite-booth__partner">{item.partner}</p>
