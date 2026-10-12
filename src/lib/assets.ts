@@ -50,6 +50,7 @@ export const MAIN_ASSETS = {
   kitScarf: "/images/main/guide/kit-scarf.png",
   kitScarfFront: "/images/main/guide/kit-scarf-front.png",
   kitScarfBack: "/images/main/guide/kit-scarf-back.png",
+  kitMedalReel: "/media/main/kit/medal-reel.mp4",
   medal2_3kRibbon: "/images/main/guide/medal-2.3k-ribbon.png",
   medal5kRibbon: "/images/main/guide/medal-5k-ribbon.png",
   medal10kRibbon: "/images/main/guide/medal-10k-ribbon.png",
