@@ -1,4 +1,5 @@
 const STORAGE_KEY = "marvelrun_payment_pending";
+const LOOKUP_REFRESH_KEY = "marvelrun_lookup_refresh_after_payment";
 
 export type PaymentOrder = {
   orderId: string;
@@ -10,6 +11,8 @@ export type PendingPayment = {
   registration: PaymentOrder;
   customerName: string;
   savedAt: number;
+  /** 신청조회에서 결제 화면으로 이동한 경우 */
+  fromLookup?: boolean;
 };
 
 export function paymentOrderFromRetry(data: {
@@ -45,4 +48,18 @@ export function readPendingPayment(): PendingPayment | null {
 
 export function clearPendingPayment() {
   sessionStorage.removeItem(STORAGE_KEY);
+}
+
+export function markLookupRefreshAfterPayment() {
+  sessionStorage.setItem(LOOKUP_REFRESH_KEY, "1");
+}
+
+export function consumeLookupRefreshAfterPayment() {
+  try {
+    const hit = sessionStorage.getItem(LOOKUP_REFRESH_KEY);
+    sessionStorage.removeItem(LOOKUP_REFRESH_KEY);
+    return hit === "1";
+  } catch {
+    return false;
+  }
 }

@@ -3,11 +3,17 @@
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { genderLabel } from "@/lib/registration-gender";
 import {
-  canPrepareRegistrationPayment,
-  closedRegistration,
-  registrationStatusLabel,
-} from "@/lib/registration-status";
-import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
+  lookupEditScreenAllowed,
+  lookupPolicyNotes,
+  lookupShowPaymentButton,
+  lookupShowRefundOrCancelButton,
+} from "@/lib/main/registrationActionPolicy";
+import { registrationStatusLabel } from "@/lib/registration-status";
+import {
+  consumeLookupRefreshAfterPayment,
+  paymentOrderFromRetry,
+  savePendingPayment,
+} from "@/lib/payment/session";
 import {
   applicationPasswordError,
   APPLICATION_PASSWORD_MIN,
@@ -67,6 +73,12 @@ export function LookupPage() {
   useLayoutEffect(() => {
     scrollPageTop();
   }, [kind]);
+
+  useLayoutEffect(() => {
+    if (consumeLookupRefreshAfterPayment()) {
+      mainToast.success("결제가 반영되었습니다. 조회 정보로 다시 확인해 주세요.");
+    }
+  }, []);
 
   return (
     <main className="page">
@@ -331,23 +343,6 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
   );
 }
 
-function canPreparePayment(receipt: RegistrationReceipt) {
-  return (
-    canPrepareRegistrationPayment(receipt.registrationStatus) && Boolean(receipt.paymentId)
-  );
-}
-
-function canModifyReceipt(receipt: RegistrationReceipt) {
-  return Boolean(
-    (receipt.registrationId || receipt.organizationId) &&
-      !closedRegistration(receipt.registrationStatus),
-  );
-}
-
-function canRefundReceipt(receipt: RegistrationReceipt) {
-  return canModifyReceipt(receipt);
-}
-
 function payableOrder(result: RegistrationSettlementResult) {
   return (
     result.orders?.find((order) => order.orderId && Number(order.amount) > 0) ?? null
@@ -362,6 +357,20 @@ function receiptPayKey(receipt: RegistrationReceipt) {
     receipt.orderId ||
     ""
   );
+}
+
+type LookupRefreshKeep = {
+  receipt: RegistrationReceipt;
+  panel: "edit" | "cancel";
+};
+
+function matchRegistrationReceipt(
+  rows: RegistrationReceipt[],
+  target: RegistrationReceipt,
+) {
+  const key = receiptPayKey(target);
+  if (!key) return null;
+  return rows.find((row) => receiptPayKey(row) === key) ?? null;
 }
 
 function ReceiptActions({
@@ -381,9 +390,9 @@ function ReceiptActions({
   onPassword: () => void;
   onRefund?: () => void;
 }) {
-  const pay = Boolean(onPay && canPreparePayment(receipt));
-  const edit = Boolean(onEdit && canModifyReceipt(receipt));
-  const refund = Boolean(onRefund && canRefundReceipt(receipt));
+  const pay = Boolean(onPay && lookupShowPaymentButton(receipt));
+  const edit = Boolean(onEdit && lookupEditScreenAllowed(receipt));
+  const refund = Boolean(onRefund && lookupShowRefundOrCancelButton(receipt));
   return (
     <div className="flow__nav flow__nav--receipt">
       {edit ? (
@@ -422,7 +431,8 @@ function ReceiptNotes({
 }) {
   const inquiryHref = useAppHref("/inquiry/write");
   const warning = receipt.warningMessage?.trim() ?? "";
-  if (!externalPayment && !warning) return null;
+  const policyNotes = lookupPolicyNotes(receipt);
+  if (!externalPayment && !warning && policyNotes.length === 0) return null;
   return (
     <>
       {externalPayment ? (
@@ -434,6 +444,11 @@ function ReceiptNotes({
         </p>
       ) : null}
       {warning ? <p className="form__note">{warning}</p> : null}
+      {policyNotes.map((line) => (
+        <p key={line} className="form__note">
+          {line}
+        </p>
+      ))}
     </>
   );
 }
@@ -618,7 +633,10 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
-      <ReceiptNotes receipt={receipt} />
+      <ReceiptNotes
+        receipt={receipt}
+        externalPayment={receipt.externalPayment === true}
+      />
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
@@ -792,7 +810,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
       return;
     }
-    if (!access || !canPreparePayment(receipt) || !receipt.paymentId) {
+    if (!access || !lookupShowPaymentButton(receipt) || !receipt.paymentId) {
       setError("결제할 접수 정보를 확인하지 못했습니다.");
       return;
     }
@@ -817,16 +835,23 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         registration: paymentOrderFromRetry(retried),
         customerName: (receipt.name || receiptMembers(receipt)[0]?.name || name).trim(),
         savedAt: Date.now(),
+        fromLookup: true,
       });
       router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+      if (access) {
+        await reloadIndividualAfterActionFailure(access);
+      }
     } finally {
       setPayingKey(null);
     }
   }
 
-  async function refreshIndividual(nextAccess: IndividualRegistrationLookupRequest) {
+  async function refreshIndividual(
+    nextAccess: IndividualRegistrationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
     const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, nextAccess);
     const rows = Array.isArray(found) ? found : [];
     setAccess(nextAccess);
@@ -834,9 +859,28 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     setName(nextAccess.name);
     setBirth(nextAccess.birth.replace(/\D/g, ""));
     setPhone(nextAccess.phNum);
+    setView(rows.length ? "hit" : "miss");
+    if (keep && rows.length) {
+      const next = matchRegistrationReceipt(rows, keep.receipt);
+      if (next) {
+        setActive(next);
+        setPanel(keep.panel);
+        return;
+      }
+    }
     setActive(null);
     setPanel("list");
-    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function reloadIndividualAfterActionFailure(
+    cred: IndividualRegistrationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
+    try {
+      await refreshIndividual(cred, keep);
+    } catch {
+      /* 요청 오류 메시지 유지 */
+    }
   }
 
   async function onModify(body: IndividualRegistrationModifyRequest, action: LookupModifyAction) {
@@ -869,12 +913,13 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(order),
             customerName: body.name.trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           setAccess(nextAccess);
           router.push(paymentHref);
           return;
         }
-        if (access && active.paymentId && canPreparePayment(active)) {
+        if (access && active.paymentId && lookupShowPaymentButton(active)) {
           const retried = await retryIndividualPayment(
             DEFAULT_EVENT_ID,
             active.registrationId,
@@ -885,6 +930,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(retried),
             customerName: body.name.trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           setAccess(nextAccess);
           router.push(paymentHref);
@@ -898,6 +944,10 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       mainToast.success("수정이 완료되었습니다.");
     } catch (err) {
       setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+      const cred = access ?? body.access;
+      if (cred) {
+        await reloadIndividualAfterActionFailure(cred);
+      }
     } finally {
       setBusy(false);
     }
@@ -908,6 +958,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("환불할 접수 정보를 확인하지 못했습니다.");
       return;
     }
+    const cancelTarget = active;
     setBusy(true);
     setError("");
     try {
@@ -919,6 +970,10 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+      await reloadIndividualAfterActionFailure(access, {
+        receipt: cancelTarget,
+        panel: "cancel",
+      });
     } finally {
       setBusy(false);
     }
@@ -1193,7 +1248,12 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
       return;
     }
-    if (!access || !canPreparePayment(receipt) || !receipt.paymentId || !receipt.organizationId) {
+    if (
+      !access ||
+      !lookupShowPaymentButton(receipt) ||
+      !receipt.paymentId ||
+      !receipt.organizationId
+    ) {
       setError("결제할 접수 정보를 확인하지 못했습니다.");
       return;
     }
@@ -1211,23 +1271,49 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         registration: paymentOrderFromRetry(retried),
         customerName: (receipt.leaderName || receipt.organizationName || account).trim(),
         savedAt: Date.now(),
+        fromLookup: true,
       });
       router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+      if (access) {
+        await reloadOrganizationAfterActionFailure(access);
+      }
     } finally {
       setPayingKey(null);
     }
   }
 
-  async function refreshOrganization(nextAccess: OrganizationLookupRequest) {
+  async function refreshOrganization(
+    nextAccess: OrganizationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
     const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, nextAccess);
     const rows = Array.isArray(found) ? found : [];
     setAccess(nextAccess);
     setReceipts(rows);
+    setView(rows.length ? "hit" : "miss");
+    if (keep && rows.length) {
+      const next = matchRegistrationReceipt(rows, keep.receipt);
+      if (next) {
+        setActive(next);
+        setPanel(keep.panel);
+        return;
+      }
+    }
     setActive(null);
     setPanel("list");
-    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function reloadOrganizationAfterActionFailure(
+    cred: OrganizationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
+    try {
+      await refreshOrganization(cred, keep);
+    } catch {
+      /* 요청 오류 메시지 유지 */
+    }
   }
 
   async function onModify(body: OrganizationRegistrationModifyRequest, action: LookupModifyAction) {
@@ -1254,11 +1340,12 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(order),
             customerName: (active.leaderName || active.organizationName || account).trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           router.push(paymentHref);
           return;
         }
-        if (access && active.paymentId && canPreparePayment(active)) {
+        if (access && active.paymentId && lookupShowPaymentButton(active)) {
           const retried = await retryOrganizationPayment(
             DEFAULT_EVENT_ID,
             active.organizationId,
@@ -1269,6 +1356,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(retried),
             customerName: (active.leaderName || active.organizationName || account).trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           router.push(paymentHref);
           return;
@@ -1281,6 +1369,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       mainToast.success("수정이 완료되었습니다.");
     } catch (err) {
       setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+      const cred = access ?? body.access;
+      if (cred) {
+        await reloadOrganizationAfterActionFailure(cred);
+      }
     } finally {
       setBusy(false);
     }
@@ -1291,6 +1383,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("환불할 접수 정보를 확인하지 못했습니다.");
       return;
     }
+    const cancelTarget = active;
     setBusy(true);
     setError("");
     try {
@@ -1302,6 +1395,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+      await reloadOrganizationAfterActionFailure(access, {
+        receipt: cancelTarget,
+        panel: "cancel",
+      });
     } finally {
       setBusy(false);
     }

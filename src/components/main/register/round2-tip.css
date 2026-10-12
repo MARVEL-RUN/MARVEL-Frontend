@@ -1,0 +1,198 @@
+/* 2차 대기 — 참가신청 버튼 말풍선 */
+.round2-tip-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.round2-tip-layer__catch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: default;
+}
+
+.round2-tip {
+  --round2-tip-bg: #12182a;
+  --round2-tip-line: rgba(224, 195, 106, 0.72);
+  position: fixed;
+  z-index: 1;
+  width: min(20rem, calc(100dvw / var(--site-zoom, 1) - 1.5rem));
+  padding: 1rem 1.1rem 1rem;
+  border: 1px solid var(--round2-tip-line);
+  background: var(--round2-tip-bg);
+  color: #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 18px 44px rgba(0, 0, 0, 0.55);
+  box-sizing: border-box;
+  pointer-events: auto;
+  animation: round2TipIn 0.18s ease-out;
+}
+
+/* 꼬리: 패널과 같은 배경의 마름모, 바깥 두 변만 골드 */
+.round2-tip::before {
+  content: "";
+  position: absolute;
+  left: var(--round2-tip-tail, 50%);
+  width: 12px;
+  height: 12px;
+  background: var(--round2-tip-bg);
+  translate: -50% 0;
+  rotate: 45deg;
+}
+
+.round2-tip[data-placement="below"]::before {
+  top: -7px;
+  border-top: 1px solid var(--round2-tip-line);
+  border-left: 1px solid var(--round2-tip-line);
+}
+
+.round2-tip[data-placement="above"]::before {
+  bottom: -7px;
+  border-right: 1px solid var(--round2-tip-line);
+  border-bottom: 1px solid var(--round2-tip-line);
+}
+
+.round2-tip[data-placement="above"] {
+  animation-name: round2TipInUp;
+}
+
+.round2-tip__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.round2-tip__kicker {
+  display: inline-block;
+  padding: 0.3em 0.6em 0.22em;
+  background: var(--marvel);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+}
+
+.round2-tip__x {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.3rem -0.4rem -0.3rem 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--note);
+  cursor: pointer;
+}
+
+.round2-tip__x:hover {
+  color: #fff;
+}
+
+.round2-tip__title {
+  margin: 0.65rem 0 0.7rem;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.round2-tip-body__lead {
+  margin: 0 0 0.25rem;
+  color: var(--note);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.round2-tip-body__time {
+  margin: 0 0 0.6rem;
+  color: var(--gold);
+  font-size: 1.35rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.round2-tip-body__when {
+  margin: 0 0 0.35rem;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.round2-tip-body__note {
+  margin: 0;
+  color: var(--silver);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.round2-tip__foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.9rem;
+}
+
+.btn.round2-tip__ok {
+  min-width: 5rem;
+  min-height: 2.2rem;
+  padding: 0 1rem;
+  font-size: 0.8rem;
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+
+@keyframes round2TipIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes round2TipInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round2-tip {
+    animation: none;
+  }
+}
+
+.register-cta-anchor {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.register-round2-page .round2-tip-body__time {
+  font-size: 1.5rem;
+}
