@@ -230,9 +230,11 @@
   font-weight: 800;
 }
 
-/* 부스 · 프로그램 — 포스터 카드, 누르면 옆으로 설명 */
-.onsite-booths {
-  display: flex;
+/* 부스 · 프로그램 — 같은 크기 포스터, 열면 위 로고 카드 + 옆 설명 */
+.onsite-booths,
+.onsite-picks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin: 0;
   padding: 0;
@@ -240,25 +242,12 @@
 }
 
 .onsite-booth {
-  position: relative;
-  display: flex;
-  flex: 1 1 0;
   min-width: 0;
-  transition: flex-grow 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.onsite-booth.is-open {
-  flex-grow: 2.6;
-}
-
-/* 펼친 카드 옆은 접힌 포스터보다 조금 좁게 */
-.onsite-booths[data-open] .onsite-booth:not(.is-open) {
-  flex-grow: 0.8;
 }
 
 .onsite-booth__frame {
   position: relative;
-  flex: 0 0 auto;
+  display: block;
   width: 100%;
   aspect-ratio: 2 / 3;
   margin: 0;
@@ -271,25 +260,10 @@
   text-align: left;
   cursor: pointer;
   clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-  transition: width 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.onsite-booth.is-open .onsite-booth__frame {
-  width: 40%;
-}
-
-.onsite-booth__frame:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
 }
 
 .onsite-booth__art {
   object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.onsite-booth__frame:hover .onsite-booth__art {
-  transform: scale(1.04);
 }
 
 .onsite-booth__shade {
@@ -335,32 +309,112 @@
   letter-spacing: 0.08em;
 }
 
-.onsite-booth.is-open .onsite-booth__hint {
-  border-color: var(--tone);
-  background: var(--tone);
-  color: var(--navy);
+.onsite-open {
+  display: grid;
+  gap: 1rem;
 }
 
-.onsite-booth__panel {
-  flex: 1 1 0;
-  min-width: 0;
-  overflow: hidden;
+.onsite-pick {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: 6.5rem;
+  margin: 0;
+  padding: 0.85rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #08091d;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+.onsite-pick.is-on {
+  border-color: var(--tone);
+  box-shadow: inset 0 3px 0 var(--tone);
+}
+
+.onsite-pick:focus-visible,
+.onsite-booth__frame:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.onsite-pick__name,
+.onsite-pick__title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.onsite-pick .onsite-booth__logo {
+  max-width: 78%;
+  height: 1.35rem;
+  margin: 0;
+  object-position: center;
+}
+
+.onsite-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  min-height: 22rem;
   background: #08091d;
   border-top: 3px solid var(--tone);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-  animation: onsitePanelIn 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
 }
 
-.onsite-booth__panel[hidden] {
-  display: none;
+.onsite-detail__photo {
+  position: relative;
+  min-height: 22rem;
+  overflow: hidden;
 }
 
-.onsite-booth__panel-in {
+.onsite-detail__panel {
   display: grid;
   align-content: center;
   gap: 0.55rem;
-  min-height: 100%;
-  padding: 1.3rem 1.5rem 1.3rem 1.2rem;
+  min-width: 0;
+  padding: 1.4rem 1.5rem;
+}
+
+.onsite-detail__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.35rem 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.onsite-detail__head .onsite-booth__en {
+  grid-column: 1;
+}
+
+.onsite-detail__title {
+  grid-column: 1;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.onsite-detail__close {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+  padding: 0.28em 0.7em 0.22em;
+  border: 1px solid var(--tone);
+  background: var(--tone);
+  color: var(--navy);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
 }
 
 .onsite-booth__logo {
@@ -412,30 +466,6 @@
   word-break: keep-all;
 }
 
-@keyframes onsitePanelIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-  .onsite-booth,
-  .onsite-booth__frame,
-  .onsite-booth__art {
-    transition: none;
-  }
-
-  .onsite-booth__panel {
-    animation: none;
-  }
-}
 
 @media (max-width: 720px) {
   .onsite-sec+.onsite-sec {
@@ -476,41 +506,23 @@
   }
 }
 
-/* 모바일: 2열 그리드, 설명은 카드 아래로 */
 @media (max-width: 720px) {
-  .onsite-booths {
-    display: grid;
+  .onsite-booths,
+  .onsite-picks {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .onsite-booth,
-  .onsite-booth.is-open {
-    flex: none;
-    flex-direction: column;
-  }
-
-  .onsite-booth.is-open {
-    grid-column: 1 / -1;
-  }
-
-  .onsite-booth__frame,
-  .onsite-booth.is-open .onsite-booth__frame {
-    width: 100%;
+  .onsite-booth__frame {
     clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
   }
 
-  .onsite-booth.is-open .onsite-booth__frame {
+  .onsite-detail {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .onsite-detail__photo {
+    min-height: 0;
     aspect-ratio: 16 / 10;
-  }
-
-  .onsite-booth__panel {
-    flex: none;
-    border-top: 0;
-    border-left: 3px solid var(--tone);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%);
-  }
-
-  .onsite-booth__panel-in {
-    padding: 1rem 1.1rem 1.15rem 1rem;
   }
 }
