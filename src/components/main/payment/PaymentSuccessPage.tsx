@@ -8,7 +8,11 @@ import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import { formatFee } from "@/lib/register";
-import { clearPendingPayment, readPendingPayment } from "@/lib/payment/session";
+import {
+  clearPendingPayment,
+  markLookupRefreshAfterPayment,
+  readPendingPayment,
+} from "@/lib/payment/session";
 import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
@@ -64,6 +68,7 @@ export function PaymentSuccessPage() {
   const [copied, setCopied] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [canRetry, setCanRetry] = useState(false);
+  const [lookupPayment, setLookupPayment] = useState(false);
 
   useEffect(() => {
     const auth = authFromParams(params);
@@ -75,6 +80,7 @@ export function PaymentSuccessPage() {
 
     const pending = readPendingPayment();
     setCanRetry(Boolean(pending));
+    setLookupPayment(Boolean(pending?.fromLookup));
     if (pending?.registration.orderName) {
       setOrderName(pending.registration.orderName);
     }
@@ -85,6 +91,7 @@ export function PaymentSuccessPage() {
       try {
         const data = await confirmPayment(auth);
         if (cancelled) return;
+        if (pending?.fromLookup) markLookupRefreshAfterPayment();
         clearPendingPayment();
         setResult(data);
         setPhase("done");
@@ -178,6 +185,12 @@ export function PaymentSuccessPage() {
               <p className="form__note">
                 영수증은 토스 매출전표입니다. 전표 위 인쇄 아이콘을 누른 뒤 PDF로
                 저장하세요.
+              </p>
+            ) : null}
+            {lookupPayment ? (
+              <p className="form__note">
+                신청조회에서 결제하신 경우, 조회 화면에서 다시 확인하면 결제·수정·환불
+                가능 여부가 최신 상태로 갱신됩니다.
               </p>
             ) : null}
             <div className="flow__nav">

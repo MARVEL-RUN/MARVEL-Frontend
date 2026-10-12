@@ -144,6 +144,32 @@ export type RegistrationReceiptSouvenir = {
   quantity: number;
 };
 
+export type RegistrationPolicyReason = {
+  code: string;
+  message: string;
+};
+
+export type UserRegistrationPolicy = {
+  modifyAllowed: boolean;
+  modifyReason: RegistrationPolicyReason | null;
+  paymentAllowed: boolean;
+  paymentReason: RegistrationPolicyReason | null;
+  refundAllowed: boolean;
+  refundReason: RegistrationPolicyReason | null;
+};
+
+export type OrganizationRegistrationPolicy = UserRegistrationPolicy & {
+  addMemberAllowed: boolean;
+  addMemberReason: RegistrationPolicyReason | null;
+};
+
+export type MemberRegistrationPolicy = {
+  modifyAllowed: boolean;
+  modifyReason: RegistrationPolicyReason | null;
+  deleteMemberAllowed: boolean;
+  deleteMemberReason: RegistrationPolicyReason | null;
+};
+
 export type OrganizationLookupParticipant = {
   registrationId: string;
   name: string;
@@ -161,6 +187,7 @@ export type OrganizationLookupParticipant = {
   guardianPhNum?: string;
   canceled?: boolean;
   registrationStatus?: string;
+  memberPolicy?: MemberRegistrationPolicy;
 };
 
 export type RegistrationReceipt = {
@@ -199,6 +226,8 @@ export type RegistrationReceipt = {
   paymentId?: string | null;
   orderId?: string | null;
   externalPayment?: boolean;
+  userPolicy?: UserRegistrationPolicy;
+  organizationPolicy?: OrganizationRegistrationPolicy;
 };
 
 export type RegistrationSouvenirSelection = {

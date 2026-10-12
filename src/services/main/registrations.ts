@@ -1,3 +1,8 @@
+import {
+  parseMemberPolicy,
+  parseOrganizationPolicy,
+  parseUserPolicy,
+} from "@/lib/main/registrationActionPolicy";
 import { mainFetch } from "@/lib/main/fetch";
 import type {
   IndividualRegistrationLookupRequest,
@@ -79,6 +84,7 @@ function asLookupParticipant(raw: unknown): OrganizationLookupParticipant | null
     guardianPhNum: firstText(row.guardianPhNum, row.guardianPhoneNumber),
     canceled: row.canceled === true || status === "CANCELED",
     registrationStatus: status,
+    memberPolicy: parseMemberPolicy(row.memberPolicy),
   };
 }
 
@@ -128,6 +134,8 @@ function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
     guardianConsent:
       typeof receipt.guardianConsent === "boolean" ? receipt.guardianConsent : null,
     externalPayment: receipt.externalPayment === true,
+    userPolicy: parseUserPolicy(row.userPolicy),
+    organizationPolicy: parseOrganizationPolicy(row.organizationPolicy),
     registrations: mergedRegistrations,
   };
 }
