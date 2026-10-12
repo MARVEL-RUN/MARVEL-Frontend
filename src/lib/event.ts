@@ -15,13 +15,21 @@ export const EVENT = {
   round2OpenNoticeDate: "2026. 10. 13. 화요일",
   round2OpenNoticeTime: "오후 2시",
   round2OpenNoticeAction: "추가 접수 OPEN",
-  /* 홈 팝업 — 끄려면 enabled: false. image에 경로 넣으면 본문에 표시 */
+  /* 홈 팝업. nextAt(KST)부터 next. 끄려면 해당 구간의 enabled: false */
   popup: {
     enabled: false,
     id: "shuttle-survey-2026-v3",
     title: "마블런 셔틀버스 추가 운행지역 수요조사",
     image: MAIN_ASSETS.popupShuttleSurvey,
     href: "https://forms.gle/x9925cioc1HGnSEs8",
+    nextAt: "2026-10-13T00:00:00+09:00",
+    next: {
+      enabled: true,
+      id: "extra-registration-2026",
+      title: "2026 마블런 추가 접수 안내",
+      image: MAIN_ASSETS.popupExtraRegistration,
+      href: "",
+    },
   },
   dateShort: "2026.10.31 SAT",
   dateLong: "2026년 10월 31일 토요일",
