@@ -110,7 +110,7 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     partner: "움직임컴퍼니",
     body: "전문 스포츠 컨디셔닝팀의 맞춤형 스포츠 테이핑으로 러닝 전·후 컨디션까지 탄탄하게 챙겨 보세요!",
     photo: MAIN_ASSETS.onsiteTapingPhoto,
-    logo: { src: MAIN_ASSETS.onsiteMovementLogo, width: 906, height: 216 },
+    logo: { src: MAIN_ASSETS.onsiteMovementLogo, width: 2721, height: 648 },
   },
   {
     id: "tattoo",
