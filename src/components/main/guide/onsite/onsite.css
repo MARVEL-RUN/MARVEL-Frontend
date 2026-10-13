@@ -491,37 +491,145 @@
     margin-top: 3.25rem;
   }
 
+  .onsite-sec__head {
+    margin-bottom: 1.35rem;
+  }
+
+  /* 체험 · 주행 — 코믹 컷: 흰 테두리 사선 컷 + 제목이 그림 위로 겹침 */
+  .onsite-drives {
+    gap: 2rem;
+  }
+
   .onsite-drive {
-    grid-template-columns: 1fr;
-    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    display: block;
+    background: none;
+    clip-path: none;
+  }
+
+  .onsite-drive::before {
+    display: none;
   }
 
   .onsite-drive__media,
   .onsite-drive:nth-child(even) .onsite-drive__media {
     order: 0;
     min-height: 0;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 2 / 1;
+    border: 2px solid #fff;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 44px) 100%, 0 100%);
   }
 
   .onsite-drive__media::after,
   .onsite-drive:nth-child(even) .onsite-drive__media::after {
-    background: linear-gradient(180deg, transparent 60%, #08091d 100%);
+    background:
+      radial-gradient(rgba(255, 255, 255, 0.07) 0.5px, transparent 0.7px) 0 0 / 3px 3px,
+      linear-gradient(180deg, transparent 48%, rgba(0, 3, 32, 0.88) 100%);
   }
 
   .onsite-drive__no,
   .onsite-drive:nth-child(even) .onsite-drive__no {
-    left: 1rem;
+    top: 0;
+    left: 0;
     right: auto;
-    font-size: 2.6rem;
+    bottom: auto;
+    padding: 0.3em 0.75em 0.22em 0.6em;
+    background: var(--tone);
+    color: var(--navy);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  }
+
+  .onsite-tone--red .onsite-drive__no {
+    color: #fff;
+  }
+
+  .onsite-drive__en {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.7rem;
+    z-index: 1;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
   }
 
   .onsite-drive__body,
   .onsite-drive:nth-child(even) .onsite-drive__body {
-    padding: 0.4rem 1.15rem 1.3rem 1.4rem;
+    display: block;
+    padding: 0 0.2rem 0 0.35rem;
+  }
+
+  .onsite-drive__title {
+    position: relative;
+    z-index: 2;
+    margin: -1.25rem 0 0.3rem;
+    font-size: 1.85rem;
+    line-height: 1;
+    transform: skewX(-10deg);
+    text-shadow: 3px 3px 0 var(--tone);
+  }
+
+  .onsite-drive__lead {
+    margin-bottom: 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .onsite-drive__spec {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0;
+    border-top: none;
   }
 
   .onsite-drive__spec div {
-    grid-template-columns: 4.6rem minmax(0, 1fr);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+    padding: 0 0.85rem 0 0;
+    border-bottom: none;
+  }
+
+  .onsite-drive__spec div+div {
+    padding-left: 0.85rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .onsite-drive__spec dt {
+    color: var(--tone);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .onsite-drive__spec dd {
+    font-size: 0.86rem;
+  }
+
+  .onsite-drive__spec small {
+    margin-top: 0.1rem;
+    font-size: 0.7rem;
+  }
+
+  .onsite-drive__tiers {
+    gap: 0.3rem;
+    margin-top: 0.8rem;
+  }
+
+  .onsite-drive__tiers li {
+    padding: 0.42rem 0.3rem 0.38rem;
+    clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  }
+
+  .onsite-drive__tiers span {
+    font-size: 0.66rem;
+  }
+
+  .onsite-drive__tiers strong {
+    font-size: 0.92rem;
   }
 }
 
