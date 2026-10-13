@@ -25,11 +25,7 @@ export const EVENT = {
     nextAt: "2026-10-13T00:00:00+09:00",
     next: {
       enabled: true,
-<<<<<<< HEAD
       id: "extra-registration-2026-v2",
-=======
-      id: "extra-registration-2026",
->>>>>>> origin/main
       title: "2026 마블런 추가 접수 안내",
       image: MAIN_ASSETS.popupExtraRegistration,
       href: "",
