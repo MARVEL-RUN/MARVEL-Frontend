@@ -5,9 +5,10 @@ import { useId, useState } from "react";
 import { ONSITE_BOOTHS, type OnsiteBoothItem } from "@/lib/onsite-program";
 
 function logoClass(id: string) {
-  return id === "taping" || id === "tattoo"
-    ? "onsite-booth__logo onsite-booth__logo--blend"
-    : "onsite-booth__logo";
+  const base = "onsite-booth__logo";
+  if (id === "taping") return `${base} ${base}--blend`;
+  if (id === "tattoo") return `${base} ${base}--blend ${base}--habitat`;
+  return base;
 }
 
 function BoothPoster({

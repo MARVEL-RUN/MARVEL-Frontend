@@ -437,6 +437,15 @@
   mix-blend-mode: lighten;
 }
 
+.onsite-booth__logo--habitat {
+  height: 2.85rem;
+}
+
+.onsite-pick .onsite-booth__logo--habitat {
+  height: 2.65rem;
+  max-width: 98%;
+}
+
 .onsite-booth__tagline {
   margin: 0;
   color: var(--gold);
