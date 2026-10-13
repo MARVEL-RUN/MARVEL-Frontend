@@ -500,7 +500,7 @@
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   gap: 1.75rem;
-  align-items: center;
+  align-items: start;
 }
 
 .onsite-detail__photo {
@@ -525,8 +525,10 @@
 
 .onsite-detail__panel {
   display: grid;
+  align-content: start;
   gap: 0.6rem;
   min-width: 0;
+  padding-top: 0.35rem;
 }
 
 .onsite-detail__head {
