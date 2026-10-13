@@ -15,8 +15,9 @@ npm run dev                  # 커밍순
 npm run dev:main             # 본사이트
 ```
 
-## 환경 변수
+본사이트(`main`) 홈(`/`)에는 오프닝 인트로(`OpeningIntro`)가 재생된다. SKIP 또는 자동 종료 후 `is-live`로 전환되며 홈 팝업이 뜬다.
 
+## 환경 변수
 
 `.env.example` 기준. 값을 바꾼 뒤에는 dev 서버를 다시 켠다.
 
@@ -26,6 +27,7 @@ npm run dev:main             # 본사이트
 | `NEXT_PUBLIC_REGISTRATION_OPEN` | `0` 닫기, `1` 열기, `3` 접수 시각 자동 |
 | `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제·게시판 API |
 | `NEXT_PUBLIC_API_BASE_URL_ADMIN` | 관리자 API |
+| `NEXT_PUBLIC_ADMIN_REFUND_BATCH` | `0`이면 환불·결제연관정보 수정 API off |
 | `NEXT_PUBLIC_EVENT_ID` | 공개 접수·조회·문의 대회 ID |
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 (로컬·운영 빌드) |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | 오시는길 지도 |
@@ -51,54 +53,89 @@ npm run dev:main             # 본사이트
 
 영역은 **커밍순 / 메인 / 관리자** 세 곳. 파일이 어느 사이트인지 경로만 봐도 알게 둔다.
 
+| 영역 | 라우트 | UI | 그 밖에 |
+|------|--------|----|---------|
+| 커밍순 | `src/app/page.tsx` (모드 분기) | `src/components/coming-soon/` | 커밍순 전용 CSS·에셋 |
+| 메인 | `src/app/(main)/` | `src/components/main/` | `main.css`, `lib/main`, `services/main` |
+| 관리자 | `src/app/admin/` | `src/components/admin/` | `layouts/admin`, `lib/admin`, `services/admin` |
+
 ```
 src/
   app/
-    page.tsx                 # 모드에 따라 coming-soon | main home
-    (main)/                  # 공개 본사이트 (URL에 그룹명 없음)
-      guide/                 # 대회안내
-      kit/                   # 기념품
-      directions/            # 오시는길
-      precautions/           # 참가자 유의사항
-      lookup/                # 신청조회
-      register/              # 참가신청
-      payment/               # 토스 결제 (success/fail)
-      virtual/               # 버추얼런
-      notices/ faq/ inquiry/ # 커뮤니티
-      terms/ privacy/        # 약관
+    page.tsx                      # 모드에 따라 coming-soon | main home
+    (main)/                       # 공개 메인 (URL에 route group명 없음)
+      guide/ kit/ directions/ precautions/
+      lookup/ register/ payment/  # 신청조회 · 참가신청 · 토스 결제
+      virtual/
+      notices/ faq/ inquiry/ terms/ privacy/
+      entry-preview/              # 스테이징·UI 미리보기 (register/lookup/payment)
     admin/
+      page.tsx                    # 운영 홈
       login/
-      applications/          # 신청자 관리
-      boards/                # notice / inquiry / faq
-      legal/                 # terms / privacy
+      applications/               # 전체 신청자 관리 (list · [eventId])
+      members/                    # 단체회원 관리 (list · detail · [eventId])
+      capacities/                 # 정원 현황 (list · [eventId])
+      boards/                     # notice / inquiry / faq
+      legal/                      # terms / privacy
       content/popups/
       admins/
   components/
     coming-soon/
-    main/                    # 공개 UI + main.css
+    main/                         # fx/ · home/ · register/ · lookup/ …
     admin/
+      dashboard/                  # 운영 홈 · 접수 통계 · 그래프 · 엑셀
+      applications/               # 신청 목록·상세·환불
+      members/                    # 단체 상세·결제연관정보 수정
+      capacities/                 # 정원·기념품 재고
+      boards/ content/ legal/ admins/ login/
   layouts/admin/
   lib/
-    event.ts legal.ts privacy.ts mode.ts register.ts
-    registration-status.ts   # 신청상태(RegistrationStatus) 라벨
-    payment-log.ts           # 결제 처리 로그 processType·source 라벨
-    main/                    # 공개 API base · fetch
-    payment/                 # 토스 · 세션 · 종목 매핑
-    admin/
+    event.ts mode.ts register.ts legal.ts privacy.ts
+    registration-status.ts        # 신청상태 라벨
+    registration-options.ts       # 종목·기념품·나이·사이즈
+    refund-result.ts              # 환불 배치 결과 토스트
+    payment-log.ts                # 결제 처리 로그 라벨
+    main/ payment/ admin/
   services/
-    main/                    # 공개 신청·결제·게시판
-    admin/                   # 관리자 API
+    main/                         # 공개 신청·결제·게시판
+    admin/
+      applications.ts organizations.ts refunds.ts stats.ts
+      capacities.ts payments.ts registration-options.ts
+      boards/ auth.ts admins.ts popups.ts legal.ts faqs.ts
   types/
 
 public/images/
-  coming-soon/
-  main/
-  virtual/
+  coming-soon/ main/ virtual/
+  main/intro/                     # 오프닝 패널·로고
 ```
 
 - 공통 상수·타입만 `src/lib/` 루트. 공개 API는 `lib/main` + `services/main`, 결제는 `lib/payment`.
-- 관리자 전용은 `lib/admin`, `services/admin`. 게시판은 `boards/{notice,inquiry,faq}`, 약관은 `admin/legal`.
+- 관리자 게시판은 `boards/{notice,inquiry,faq}`. 약관 편집은 `admin/legal`.
 - 메인 UI를 관리자에 복사하지 않는다. 반대도 같다.
+
+### 관리자 메뉴 (`src/lib/admin/nav.ts`)
+
+| 메뉴 | 경로 |
+|------|------|
+| 운영 홈 | `/admin` |
+| 전체 신청자 관리 | `/admin/applications` |
+| 단체회원 관리 | `/admin/members` |
+| 정원 현황 | `/admin/capacities` |
+| 공지 · 문의 · FAQ | `/admin/boards/{notice,inquiry,faq}` |
+| 팝업 · 약관 | `/admin/content/popups`, `/admin/legal/{terms,privacy}` |
+| 관리자 계정 | `/admin/admins` |
+
+단체 상세: `/admin/members/detail?organizationId=&eventId=`
+
+### 운영 홈 API (`services/admin/stats.ts`)
+
+| API | 용도 |
+|-----|------|
+| `GET v1/admin/registrations/{eventId}/statistics` | 접수 현황 표 (성별·나이·아동) |
+| `GET v1/admin/registrations/{eventId}/graph/payment-daily` | 일별 결제자 그래프 |
+| `GET v1/admin/registrations/{eventId}/daily-report/excel/download` | 일별 신청·결제 엑셀 |
+
+날짜(`startDate`, `endDate`) 미입력 시: 시작=대회 접수 시작일, 종료=요청 전일 23:59 (백엔드 기본값).
 
 ## 상태 표기
 

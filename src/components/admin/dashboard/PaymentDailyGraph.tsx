@@ -6,7 +6,7 @@ import {
   fetchPaymentDailyGraph,
   type PaymentDailyGraphDay,
 } from "@/services/admin/stats";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
 const PRESETS = [
@@ -18,6 +18,7 @@ const PRESETS = [
 const CHART_H = 148;
 const BAR_MAX = 112;
 const LINE_PAD = { top: 8, right: 6, bottom: 6, left: 6 };
+const SKELETON_BARS = [18, 32, 24, 46, 30, 58, 40, 26, 52, 36, 22, 44, 34, 28];
 
 type ChartPoint = {
   date: string;
@@ -86,12 +87,14 @@ export function PaymentDailyGraph({ eventId }: Props) {
   const [endDate, setEndDate] = useState(today);
   const [hover, setHover] = useState<PaymentDailyGraphDay | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isPending, isError, isFetching } = useQuery({
     queryKey: ["admin", "payment-daily-graph", eventId, startDate, endDate],
     queryFn: () => fetchPaymentDailyGraph({ eventId, startDate, endDate }),
     enabled: hasAdminApi && Boolean(eventId),
+    placeholderData: keepPreviousData,
   });
 
+  const pending = isPending && !data;
   const days = data?.days ?? [];
   const trend = useMemo<ChartPoint[]>(
     () => days.map((row) => ({ date: row.date, count: row.dailyCount })),
@@ -101,13 +104,34 @@ export function PaymentDailyGraph({ eventId }: Props) {
   const todayCount = days.find((row) => row.date === today)?.dailyCount ?? 0;
   const maxCount = Math.max(1, ...trend.map((row) => row.count));
   const ticks = yTicks(maxCount);
-  const useLine = trend.length > 45;
   const dayCount = trend.length;
   const activePreset = PRESETS.find(
     (preset) => addDays(today, -preset.days) === startDate && endDate === today,
   )?.label;
-  const gradientId = `payment-daily-${eventId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const useLine = activePreset === "1년";
   const plotWidth = 640;
+  const hoverIndex = hover ? days.findIndex((row) => row.date === hover.date) : -1;
+  const hoverPoint =
+    useLine && hoverIndex >= 0
+      ? linePoint(hoverIndex, dayCount, trend[hoverIndex].count, maxCount, plotWidth)
+      : null;
+  const hoverLeft =
+    hoverIndex < 0
+      ? null
+      : hoverPoint
+        ? (hoverPoint.x / plotWidth) * 100
+        : ((hoverIndex + 0.5) / dayCount) * 100;
+
+  const onLineMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!dayCount) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * plotWidth;
+    const innerW = plotWidth - LINE_PAD.left - LINE_PAD.right;
+    const ratio = dayCount <= 1 ? 0 : (x - LINE_PAD.left) / innerW;
+    const index = Math.min(dayCount - 1, Math.max(0, Math.round(ratio * (dayCount - 1))));
+    if (days[index]?.date !== hover?.date) setHover(days[index]);
+  };
+  const gradientId = `payment-daily-${eventId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const applyPreset = (offset: number) => {
     setStartDate(addDays(today, -offset));
@@ -116,7 +140,10 @@ export function PaymentDailyGraph({ eventId }: Props) {
   };
 
   return (
-    <section className="admin-trend admin-trend--embed">
+    <section
+      className={`admin-trend admin-trend--embed${isFetching && !pending ? " is-fetching" : ""}`}
+      aria-busy={isFetching}
+    >
       <h3 className="admin-trend__embed-title">일별 결제자</h3>
       <div className="admin-trend__body">
         <div className="admin-trend__filters">
@@ -126,7 +153,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
               type="date"
               value={startDate}
               max={endDate}
-              disabled={isLoading}
+              disabled={pending}
               onChange={(event) => {
                 setStartDate(event.target.value);
                 setHover(null);
@@ -140,7 +167,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
               value={endDate}
               min={startDate}
               max={today}
-              disabled={isLoading}
+              disabled={pending}
               onChange={(event) => {
                 setEndDate(event.target.value);
                 setHover(null);
@@ -153,7 +180,7 @@ export function PaymentDailyGraph({ eventId }: Props) {
                 key={preset.label}
                 type="button"
                 className={activePreset === preset.label ? "is-on" : undefined}
-                disabled={isLoading}
+                disabled={pending}
                 onClick={() => applyPreset(preset.days)}
               >
                 {preset.label}
@@ -165,40 +192,63 @@ export function PaymentDailyGraph({ eventId }: Props) {
         <div className="admin-trend__stats">
           <div>
             <span>오늘</span>
-            <strong>{isLoading ? "…" : todayCount.toLocaleString()}</strong>
+            <strong>{pending ? <i className="admin-skel" /> : todayCount.toLocaleString()}</strong>
           </div>
           <div>
             <span>기간 합계</span>
-            <strong>{isLoading ? "…" : (data?.periodTotal ?? 0).toLocaleString()}</strong>
+            <strong>
+              {pending ? <i className="admin-skel" /> : (data?.periodTotal ?? 0).toLocaleString()}
+            </strong>
           </div>
           <div className="is-accent">
             <span>누적</span>
-            <strong>{isLoading ? "…" : (data?.cumulativeTotal ?? 0).toLocaleString()}</strong>
+            <strong>
+              {pending ? <i className="admin-skel" /> : (data?.cumulativeTotal ?? 0).toLocaleString()}
+            </strong>
           </div>
         </div>
 
-        {isError ? (
+        {isError && !data ? (
           <p className="admin-empty">일별 결제자 그래프를 불러오지 못했습니다.</p>
-        ) : isLoading && !days.length ? (
-          <p className="admin-empty">불러오는 중…</p>
+        ) : pending ? (
+          <>
+            <div className="admin-trend__chart">
+              <div className="admin-trend__plot">
+                <div className="admin-trend__y" />
+                <div className="admin-trend__grid">
+                  <i />
+                  <i />
+                  <i />
+                  <div className="admin-trend__bars is-skeleton" aria-hidden>
+                    {SKELETON_BARS.map((h, i) => (
+                      <span key={i} style={{ height: `${h}%` }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="admin-trend__list admin-trend__list--triple" aria-hidden>
+              <div className="admin-trend__list-head">
+                <span>날짜</span>
+                <span>당일</span>
+                <span>누적</span>
+              </div>
+              <div className="admin-trend__list-body">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="admin-trend__list-skel">
+                    <i className="admin-skel" />
+                    <i className="admin-skel" />
+                    <i className="admin-skel" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
         ) : !days.length ? (
           <p className="admin-empty">표시할 데이터가 없습니다.</p>
         ) : (
           <>
             <div className="admin-trend__chart" onMouseLeave={() => setHover(null)}>
-              {hover ? (
-                <div className="admin-trend__tip">
-                  <p>{formatListDate(hover.date)}</p>
-                  <strong>
-                    {hover.dailyCount.toLocaleString()}
-                    <em>명</em>
-                  </strong>
-                  <p className="admin-trend__tip-sub">
-                    누적 {hover.cumulativeCount.toLocaleString()}명
-                  </p>
-                </div>
-              ) : null}
-
               <div className="admin-trend__plot">
                 <div className="admin-trend__y">
                   {ticks.map((tick) => (
@@ -209,6 +259,21 @@ export function PaymentDailyGraph({ eventId }: Props) {
                   {ticks.map((tick) => (
                     <i key={`g-${tick}`} />
                   ))}
+                  {hover && hoverLeft !== null ? (
+                    <div
+                      className="admin-trend__tip is-follow"
+                      style={{ left: `${hoverLeft}%`, transform: `translateX(-${hoverLeft}%)` }}
+                    >
+                      <p>{formatListDate(hover.date)}</p>
+                      <strong>
+                        {hover.dailyCount.toLocaleString()}
+                        <em>명</em>
+                      </strong>
+                      <p className="admin-trend__tip-sub">
+                        누적 {hover.cumulativeCount.toLocaleString()}명
+                      </p>
+                    </div>
+                  ) : null}
                   {useLine ? (
                     <svg
                       className="admin-trend__line"
@@ -233,6 +298,25 @@ export function PaymentDailyGraph({ eventId }: Props) {
                         vectorEffect="non-scaling-stroke"
                       />
                     </svg>
+                  ) : null}
+                  {useLine ? (
+                    <div className="admin-trend__hit" onMouseMove={onLineMove} aria-hidden>
+                      {hoverPoint ? (
+                        <>
+                          <i
+                            className="admin-trend__guide"
+                            style={{ left: `${hoverLeft}%` }}
+                          />
+                          <i
+                            className="admin-trend__dot"
+                            style={{
+                              left: `${hoverLeft}%`,
+                              top: `${(hoverPoint.y / CHART_H) * 100}%`,
+                            }}
+                          />
+                        </>
+                      ) : null}
+                    </div>
                   ) : (
                     <div className="admin-trend__bars">
                       {days.map((item) => {

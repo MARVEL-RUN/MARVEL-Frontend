@@ -2,6 +2,7 @@
 
 import { decodeToken, extractRoles } from "@/lib/admin/jwt";
 import { isAdminLoginPath } from "@/lib/admin/nav";
+import { adminLoginHref } from "@/lib/admin/session";
 import { adminToken } from "@/lib/admin/token";
 import { useAdminAuthStore } from "@/stores";
 import { usePathname, useRouter } from "next/navigation";
@@ -44,7 +45,7 @@ export function AuthInitializer() {
 
     const token = accessToken || adminToken.getAccess();
     if (!token) {
-      router.replace("/admin/login");
+      router.replace(adminLoginHref());
       return;
     }
 

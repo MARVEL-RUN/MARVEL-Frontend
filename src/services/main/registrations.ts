@@ -1,3 +1,8 @@
+import {
+  parseMemberPolicy,
+  parseOrganizationPolicy,
+  parseUserPolicy,
+} from "@/lib/main/registrationActionPolicy";
 import { mainFetch } from "@/lib/main/fetch";
 import type {
   IndividualRegistrationLookupRequest,
@@ -79,6 +84,7 @@ function asLookupParticipant(raw: unknown): OrganizationLookupParticipant | null
     guardianPhNum: firstText(row.guardianPhNum, row.guardianPhoneNumber),
     canceled: row.canceled === true || status === "CANCELED",
     registrationStatus: status,
+    memberPolicy: parseMemberPolicy(row.memberPolicy),
   };
 }
 
@@ -127,6 +133,9 @@ function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
     addressDetail: asText(receipt.addressDetail) || null,
     guardianConsent:
       typeof receipt.guardianConsent === "boolean" ? receipt.guardianConsent : null,
+    externalPayment: receipt.externalPayment === true,
+    userPolicy: parseUserPolicy(row.userPolicy),
+    organizationPolicy: parseOrganizationPolicy(row.organizationPolicy),
     registrations: mergedRegistrations,
   };
 }
@@ -318,6 +327,34 @@ export async function modifyOrganizationRegistration(
 ) {
   return mainFetch<RegistrationSettlementResult>(
     `v1/public/events/${encodeURIComponent(eventId)}/organizations/${encodeURIComponent(organizationId)}/registrations`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function changeIndividualRegistrationPassword(
+  eventId: string,
+  registrationId: string,
+  body: { currentPassword: string; newPassword: string },
+) {
+  return mainFetch<void>(
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}/password`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function changeOrganizationPassword(
+  eventId: string,
+  organizationId: string,
+  body: { currentPassword: string; newPassword: string },
+) {
+  return mainFetch<void>(
+    `v1/public/events/${encodeURIComponent(eventId)}/organizations/${encodeURIComponent(organizationId)}/password`,
     {
       method: "PATCH",
       body: JSON.stringify(body),

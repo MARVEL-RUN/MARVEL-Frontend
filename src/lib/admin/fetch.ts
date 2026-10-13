@@ -1,4 +1,5 @@
 import { ADMIN_API_BASE } from "./config";
+import { notifySessionExpired } from "./session";
 import { adminToken } from "./token";
 
 export class AdminHttpError extends Error {
@@ -39,6 +40,12 @@ async function refreshAccess() {
       });
   }
   await refreshLock;
+}
+
+function refreshFailureMessage(error: unknown) {
+  const raw = error instanceof Error ? error.message : "";
+  const message = raw ? errorMessage(401, raw) : "";
+  return message || "세션 갱신에 실패했습니다.";
 }
 
 export type AdminFile = {
@@ -117,13 +124,21 @@ async function adminRequest(
   const response = await fetch(joinUrl(endpoint), { ...init, headers });
   if (!response.ok) {
     if (response.status === 401 && withAuth && !didRefresh) {
+      if (!adminToken.getRefresh()) {
+        notifySessionExpired();
+        throw new AdminHttpError(401, "리프레시 토큰이 없습니다.");
+      }
+
       try {
         await refreshAccess();
-        return adminRequest(endpoint, init, withAuth, true);
-      } catch {
-        /* 원래 401을 그대로 던짐 */
+      } catch (error) {
+        notifySessionExpired();
+        throw new AdminHttpError(401, refreshFailureMessage(error));
       }
+
+      return adminRequest(endpoint, init, withAuth, true);
     }
+
     const text = await response.text().catch(() => "");
     throw new AdminHttpError(response.status, errorMessage(response.status, text));
   }

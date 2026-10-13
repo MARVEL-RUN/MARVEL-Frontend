@@ -3,11 +3,17 @@
 import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/config";
 import { genderLabel } from "@/lib/registration-gender";
 import {
-  canPrepareRegistrationPayment,
-  closedRegistration,
-  registrationStatusLabel,
-} from "@/lib/registration-status";
-import { paymentOrderFromRetry, savePendingPayment } from "@/lib/payment/session";
+  lookupEditScreenAllowed,
+  lookupPolicyNotes,
+  lookupShowPaymentButton,
+  lookupShowRefundOrCancelButton,
+} from "@/lib/main/registrationActionPolicy";
+import { registrationStatusLabel } from "@/lib/registration-status";
+import {
+  consumeLookupRefreshAfterPayment,
+  paymentOrderFromRetry,
+  savePendingPayment,
+} from "@/lib/payment/session";
 import {
   applicationPasswordError,
   APPLICATION_PASSWORD_MIN,
@@ -18,6 +24,8 @@ import {
 import {
   cancelIndividualRegistration,
   cancelOrganizationRegistration,
+  changeIndividualRegistrationPassword,
+  changeOrganizationPassword,
   lookupIndividualRegistrations,
   lookupOrganizationRegistrations,
   modifyIndividualRegistration,
@@ -38,6 +46,7 @@ import type {
   RegistrationSettlementResult,
 } from "@/services/main/types";
 import { useAppHref } from "@/lib/main/useAppBasePath";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useLayoutEffect, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
@@ -51,6 +60,7 @@ import {
   LookupRefundModal,
   type LookupModifyAction,
 } from "./LookupEditForms";
+import { LookupPasswordModal, type LookupPasswordSubmit } from "./LookupPasswordModal";
 
 type View = "form" | "hit" | "miss";
 
@@ -63,6 +73,12 @@ export function LookupPage() {
   useLayoutEffect(() => {
     scrollPageTop();
   }, [kind]);
+
+  useLayoutEffect(() => {
+    if (consumeLookupRefreshAfterPayment()) {
+      mainToast.success("결제가 반영되었습니다. 조회 정보로 다시 확인해 주세요.");
+    }
+  }, []);
 
   return (
     <main className="page">
@@ -84,7 +100,13 @@ export function LookupPage() {
   );
 }
 
-function LookupNav({ busy, onBack }: { busy: boolean; onBack: () => void }) {
+function LookupNav({
+  busy,
+  onBack,
+}: {
+  busy: boolean;
+  onBack: () => void;
+}) {
   return (
     <div className="flow__nav">
       <button type="button" className="btn btn--ghost" onClick={onBack}>
@@ -107,13 +129,40 @@ function toLookupBirth(raw: string) {
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
 }
 
-function individualLookupFormError(name: string, birth: string, phone: string, password: string) {
+function individualIdentityError(name: string, birth: string, phone: string) {
   if (!name.trim()) return "이름을 입력하세요.";
   if (birth.replace(/\D/g, "").length !== 8) return "생년월일을 입력하세요.";
   if (phone.replace(/\D/g, "").length < 10) return "전화번호를 입력하세요.";
+  return "";
+}
+
+function individualLookupFormError(name: string, birth: string, phone: string, password: string) {
+  const identityErr = individualIdentityError(name, birth, phone);
+  if (identityErr) return identityErr;
   const passwordErr = applicationPasswordError(password);
   if (passwordErr) return passwordErr;
   return "";
+}
+
+function individualPasswordTargets(receipts: RegistrationReceipt[]) {
+  const ids = new Set<string>();
+  for (const receipt of receipts) {
+    const id = receipt.registrationId?.trim();
+    if (id) ids.add(id);
+    for (const member of organizationLookupParticipants(receipt)) {
+      if (member.registrationId) ids.add(member.registrationId);
+    }
+  }
+  return [...ids];
+}
+
+function organizationPasswordTargets(receipts: RegistrationReceipt[]) {
+  const ids = new Set<string>();
+  for (const receipt of receipts) {
+    const id = receipt.organizationId?.trim();
+    if (id) ids.add(id);
+  }
+  return [...ids];
 }
 
 function souvenirSize(item: RegistrationReceiptSouvenir) {
@@ -294,23 +343,6 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
   );
 }
 
-function canPreparePayment(receipt: RegistrationReceipt) {
-  return (
-    canPrepareRegistrationPayment(receipt.registrationStatus) && Boolean(receipt.paymentId)
-  );
-}
-
-function canModifyReceipt(receipt: RegistrationReceipt) {
-  return Boolean(
-    (receipt.registrationId || receipt.organizationId) &&
-      !closedRegistration(receipt.registrationStatus),
-  );
-}
-
-function canRefundReceipt(receipt: RegistrationReceipt) {
-  return canModifyReceipt(receipt);
-}
-
 function payableOrder(result: RegistrationSettlementResult) {
   return (
     result.orders?.find((order) => order.orderId && Number(order.amount) > 0) ?? null
@@ -327,30 +359,55 @@ function receiptPayKey(receipt: RegistrationReceipt) {
   );
 }
 
+type LookupRefreshKeep = {
+  receipt: RegistrationReceipt;
+  panel: "edit" | "cancel";
+};
+
+function matchRegistrationReceipt(
+  rows: RegistrationReceipt[],
+  target: RegistrationReceipt,
+) {
+  const key = receiptPayKey(target);
+  if (!key) return null;
+  return rows.find((row) => receiptPayKey(row) === key) ?? null;
+}
+
 function ReceiptActions({
   receipt,
   busy,
+  passwordBusy,
   onPay,
   onEdit,
+  onPassword,
   onRefund,
 }: {
   receipt: RegistrationReceipt;
   busy: boolean;
+  passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onPassword: () => void;
   onRefund?: () => void;
 }) {
-  const pay = Boolean(onPay && canPreparePayment(receipt));
-  const edit = Boolean(onEdit && canModifyReceipt(receipt));
-  const refund = Boolean(onRefund && canRefundReceipt(receipt));
-  if (!pay && !edit && !refund) return null;
+  const pay = Boolean(onPay && lookupShowPaymentButton(receipt));
+  const edit = Boolean(onEdit && lookupEditScreenAllowed(receipt));
+  const refund = Boolean(onRefund && lookupShowRefundOrCancelButton(receipt));
   return (
-    <div className="flow__nav">
+    <div className="flow__nav flow__nav--receipt">
       {edit ? (
         <button type="button" className="btn btn--ghost" onClick={onEdit} disabled={busy}>
           수정
         </button>
       ) : null}
+      <button
+        type="button"
+        className="btn btn--ghost-gold"
+        onClick={onPassword}
+        disabled={busy || passwordBusy}
+      >
+        비밀번호 변경
+      </button>
       {refund ? (
         <button type="button" className="btn btn--ghost-red" onClick={onRefund} disabled={busy}>
           환불 신청
@@ -365,25 +422,54 @@ function ReceiptActions({
   );
 }
 
-function ReceiptNotes({ receipt }: { receipt: RegistrationReceipt }) {
+function ReceiptNotes({
+  receipt,
+  externalPayment = false,
+}: {
+  receipt: RegistrationReceipt;
+  externalPayment?: boolean;
+}) {
+  const inquiryHref = useAppHref("/inquiry/write");
   const warning = receipt.warningMessage?.trim() ?? "";
-  if (!warning) return null;
-  return <p className="form__note">{warning}</p>;
+  const policyNotes = lookupPolicyNotes(receipt);
+  if (!externalPayment && !warning && policyNotes.length === 0) return null;
+  return (
+    <>
+      {externalPayment ? (
+        <p className="form__note form__note--external">
+          <strong>외부 결제 건은 결제/수정/환불을 진행할 수 없습니다.</strong>
+          <span>
+            개인정보 수정이 필요하면 <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
+          </span>
+        </p>
+      ) : null}
+      {warning ? <p className="form__note">{warning}</p> : null}
+      {policyNotes.map((line) => (
+        <p key={line} className="form__note">
+          {line}
+        </p>
+      ))}
+    </>
+  );
 }
 
 function IndividualReceiptCard({
   receipt,
   name,
   busy,
+  passwordBusy,
   onPay,
   onEdit,
+  onPassword,
   onRefund,
 }: {
   receipt: RegistrationReceipt;
   name: string;
   busy?: boolean;
+  passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onPassword: () => void;
   onRefund?: () => void;
 }) {
   const members = receiptMembers(receipt);
@@ -403,6 +489,7 @@ function IndividualReceiptCard({
   const guardianPhone = receipt.guardianPhNum
     ? formatPhone(receipt.guardianPhNum)
     : "";
+  const externalPayment = receipt.externalPayment === true;
 
   return (
     <section className="ticket">
@@ -476,13 +563,15 @@ function IndividualReceiptCard({
         </div>
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
-      <ReceiptNotes receipt={receipt} />
+      <ReceiptNotes receipt={receipt} externalPayment={externalPayment} />
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
-        onPay={onPay}
-        onEdit={onEdit}
-        onRefund={onRefund}
+        passwordBusy={passwordBusy}
+        onPay={externalPayment ? undefined : onPay}
+        onEdit={externalPayment ? undefined : onEdit}
+        onPassword={onPassword}
+        onRefund={externalPayment ? undefined : onRefund}
       />
     </section>
   );
@@ -491,14 +580,18 @@ function IndividualReceiptCard({
 function GroupReceiptCard({
   receipt,
   busy,
+  passwordBusy,
   onPay,
   onEdit,
+  onPassword,
   onRefund,
 }: {
   receipt: RegistrationReceipt;
   busy?: boolean;
+  passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onPassword: () => void;
   onRefund?: () => void;
 }) {
   const members = receiptMembers(receipt);
@@ -540,12 +633,17 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
-      <ReceiptNotes receipt={receipt} />
+      <ReceiptNotes
+        receipt={receipt}
+        externalPayment={receipt.externalPayment === true}
+      />
       <ReceiptActions
         receipt={receipt}
         busy={Boolean(busy)}
+        passwordBusy={passwordBusy}
         onPay={onPay}
         onEdit={onEdit}
+        onPassword={onPassword}
         onRefund={onRefund}
       />
     </section>
@@ -602,12 +700,76 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   const [birth, setBirth] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [passwordBusy, setPasswordBusy] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   useLayoutEffect(() => {
     if (view !== "hit" || panel !== "list") return;
     scrollPageTop();
     requestAnimationFrame(scrollPageTop);
   }, [view, panel]);
+
+  function openPasswordChange() {
+    setError("");
+    setPasswordError("");
+    setPasswordOpen(true);
+  }
+
+  async function onChangePassword(input: LookupPasswordSubmit) {
+    if (input.kind !== "individual") return;
+    const currentPassword = input.currentPassword;
+    const newPassword = input.newPassword;
+    setName(input.name);
+    setBirth(input.birth);
+    setPhone(input.phone);
+    if (!hasMainApi) {
+      setPasswordError("API 주소가 설정되지 않았습니다.");
+      return;
+    }
+    const body: IndividualRegistrationLookupRequest = {
+      name: input.name.trim(),
+      birth: toLookupBirth(input.birth),
+      phNum: input.phone.replace(/\D/g, ""),
+      password: currentPassword,
+    };
+    setPasswordBusy(true);
+    setPasswordError("");
+    try {
+      const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, body);
+      const ids = individualPasswordTargets(Array.isArray(found) ? found : []);
+      if (!ids.length) {
+        setPasswordError("이름·생년월일·전화번호·비밀번호를 다시 확인해 주세요.");
+        return;
+      }
+      const failures: string[] = [];
+      for (const registrationId of ids) {
+        try {
+          await changeIndividualRegistrationPassword(DEFAULT_EVENT_ID, registrationId, {
+            currentPassword,
+            newPassword,
+          });
+        } catch (err) {
+          failures.push(lookupErrorMessage(err, "비밀번호를 변경하지 못했습니다."));
+        }
+      }
+      if (failures.length) {
+        setPasswordError(
+          failures.length === ids.length
+            ? failures[0]
+            : "일부 접수의 비밀번호를 바꾸지 못했습니다.",
+        );
+        return;
+      }
+      setPassword(newPassword);
+      setPasswordOpen(false);
+      mainToast.success("비밀번호가 변경되었습니다.");
+    } catch (err) {
+      setPasswordError(lookupErrorMessage(err, "비밀번호를 변경하지 못했습니다."));
+    } finally {
+      setPasswordBusy(false);
+    }
+  }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -648,7 +810,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
       return;
     }
-    if (!access || !canPreparePayment(receipt) || !receipt.paymentId) {
+    if (!access || !lookupShowPaymentButton(receipt) || !receipt.paymentId) {
       setError("결제할 접수 정보를 확인하지 못했습니다.");
       return;
     }
@@ -673,16 +835,23 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
         registration: paymentOrderFromRetry(retried),
         customerName: (receipt.name || receiptMembers(receipt)[0]?.name || name).trim(),
         savedAt: Date.now(),
+        fromLookup: true,
       });
       router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+      if (access) {
+        await reloadIndividualAfterActionFailure(access);
+      }
     } finally {
       setPayingKey(null);
     }
   }
 
-  async function refreshIndividual(nextAccess: IndividualRegistrationLookupRequest) {
+  async function refreshIndividual(
+    nextAccess: IndividualRegistrationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
     const found = await lookupIndividualRegistrations(DEFAULT_EVENT_ID, nextAccess);
     const rows = Array.isArray(found) ? found : [];
     setAccess(nextAccess);
@@ -690,9 +859,28 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     setName(nextAccess.name);
     setBirth(nextAccess.birth.replace(/\D/g, ""));
     setPhone(nextAccess.phNum);
+    setView(rows.length ? "hit" : "miss");
+    if (keep && rows.length) {
+      const next = matchRegistrationReceipt(rows, keep.receipt);
+      if (next) {
+        setActive(next);
+        setPanel(keep.panel);
+        return;
+      }
+    }
     setActive(null);
     setPanel("list");
-    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function reloadIndividualAfterActionFailure(
+    cred: IndividualRegistrationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
+    try {
+      await refreshIndividual(cred, keep);
+    } catch {
+      /* 요청 오류 메시지 유지 */
+    }
   }
 
   async function onModify(body: IndividualRegistrationModifyRequest, action: LookupModifyAction) {
@@ -725,12 +913,13 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(order),
             customerName: body.name.trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           setAccess(nextAccess);
           router.push(paymentHref);
           return;
         }
-        if (access && active.paymentId && canPreparePayment(active)) {
+        if (access && active.paymentId && lookupShowPaymentButton(active)) {
           const retried = await retryIndividualPayment(
             DEFAULT_EVENT_ID,
             active.registrationId,
@@ -741,6 +930,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(retried),
             customerName: body.name.trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           setAccess(nextAccess);
           router.push(paymentHref);
@@ -754,6 +944,10 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       mainToast.success("수정이 완료되었습니다.");
     } catch (err) {
       setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+      const cred = access ?? body.access;
+      if (cred) {
+        await reloadIndividualAfterActionFailure(cred);
+      }
     } finally {
       setBusy(false);
     }
@@ -764,6 +958,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setError("환불할 접수 정보를 확인하지 못했습니다.");
       return;
     }
+    const cancelTarget = active;
     setBusy(true);
     setError("");
     try {
@@ -775,6 +970,10 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+      await reloadIndividualAfterActionFailure(access, {
+        receipt: cancelTarget,
+        panel: "cancel",
+      });
     } finally {
       setBusy(false);
     }
@@ -823,7 +1022,9 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             receipt={receipt}
             name={name.trim()}
             busy={payingKey === receiptPayKey(receipt)}
+            passwordBusy={passwordBusy}
             onPay={() => void onRetryPay(receipt)}
+            onPassword={openPasswordChange}
             onEdit={() => {
               setError("");
               setActive(receipt);
@@ -836,8 +1037,8 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
             }}
           />
         ))}
-        <div className="flow__nav">
-          <button type="button" className="btn btn--ghost" onClick={() => setView("form")}>
+        <div className="lookup-other">
+          <button type="button" className="lookup-other__btn" onClick={() => setView("form")}>
             다른 접수건
           </button>
         </div>
@@ -852,11 +1053,24 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           }}
           onConfirm={() => void onCancel()}
         />
+        <LookupPasswordModal
+          open={passwordOpen}
+          busy={passwordBusy}
+          error={passwordError}
+          identity={{ kind: "individual", name, birth, phone }}
+          onClose={() => {
+            if (passwordBusy) return;
+            setPasswordError("");
+            setPasswordOpen(false);
+          }}
+          onSubmit={(input) => void onChangePassword(input)}
+        />
       </>
     );
   }
 
   return (
+    <>
     <form className="form" onSubmit={onSubmit} noValidate>
       <div className="form__head">
         <h2>개인 신청 조회</h2>
@@ -908,6 +1122,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
       {error ? <p className="form__err">{error}</p> : null}
       <LookupNav busy={busy} onBack={onBack} />
     </form>
+    </>
   );
 }
 
@@ -924,12 +1139,72 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   const [access, setAccess] = useState<OrganizationLookupRequest | null>(null);
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [passwordBusy, setPasswordBusy] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   useLayoutEffect(() => {
     if (view !== "hit" || panel !== "list") return;
     scrollPageTop();
     requestAnimationFrame(scrollPageTop);
   }, [view, panel]);
+
+  function openPasswordChange() {
+    setError("");
+    setPasswordError("");
+    setPasswordOpen(true);
+  }
+
+  async function onChangePassword(input: LookupPasswordSubmit) {
+    if (input.kind !== "group") return;
+    const currentPassword = input.currentPassword;
+    const newPassword = input.newPassword;
+    setAccount(input.account);
+    if (!hasMainApi) {
+      setPasswordError("API 주소가 설정되지 않았습니다.");
+      return;
+    }
+    const body: OrganizationLookupRequest = {
+      loginId: input.account.trim(),
+      password: currentPassword,
+    };
+    setPasswordBusy(true);
+    setPasswordError("");
+    try {
+      const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, body);
+      const ids = organizationPasswordTargets(Array.isArray(found) ? found : []);
+      if (!ids.length) {
+        setPasswordError("단체 조회용 ID·단체 비밀번호를 다시 확인해 주세요.");
+        return;
+      }
+      const failures: string[] = [];
+      for (const organizationId of ids) {
+        try {
+          await changeOrganizationPassword(DEFAULT_EVENT_ID, organizationId, {
+            currentPassword,
+            newPassword,
+          });
+        } catch (err) {
+          failures.push(lookupErrorMessage(err, "비밀번호를 변경하지 못했습니다."));
+        }
+      }
+      if (failures.length) {
+        setPasswordError(
+          failures.length === ids.length
+            ? failures[0]
+            : "일부 단체의 비밀번호를 바꾸지 못했습니다.",
+        );
+        return;
+      }
+      setPassword(newPassword);
+      setPasswordOpen(false);
+      mainToast.success("비밀번호가 변경되었습니다.");
+    } catch (err) {
+      setPasswordError(lookupErrorMessage(err, "비밀번호를 변경하지 못했습니다."));
+    } finally {
+      setPasswordBusy(false);
+    }
+  }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -973,7 +1248,12 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("결제 연동 설정이 필요합니다. env 변경 후 다시 시도해 주세요.");
       return;
     }
-    if (!access || !canPreparePayment(receipt) || !receipt.paymentId || !receipt.organizationId) {
+    if (
+      !access ||
+      !lookupShowPaymentButton(receipt) ||
+      !receipt.paymentId ||
+      !receipt.organizationId
+    ) {
       setError("결제할 접수 정보를 확인하지 못했습니다.");
       return;
     }
@@ -991,23 +1271,49 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
         registration: paymentOrderFromRetry(retried),
         customerName: (receipt.leaderName || receipt.organizationName || account).trim(),
         savedAt: Date.now(),
+        fromLookup: true,
       });
       router.push(paymentHref);
     } catch (err) {
       setError(lookupErrorMessage(err, "결제를 시작하지 못했습니다."));
+      if (access) {
+        await reloadOrganizationAfterActionFailure(access);
+      }
     } finally {
       setPayingKey(null);
     }
   }
 
-  async function refreshOrganization(nextAccess: OrganizationLookupRequest) {
+  async function refreshOrganization(
+    nextAccess: OrganizationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
     const found = await lookupOrganizationRegistrations(DEFAULT_EVENT_ID, nextAccess);
     const rows = Array.isArray(found) ? found : [];
     setAccess(nextAccess);
     setReceipts(rows);
+    setView(rows.length ? "hit" : "miss");
+    if (keep && rows.length) {
+      const next = matchRegistrationReceipt(rows, keep.receipt);
+      if (next) {
+        setActive(next);
+        setPanel(keep.panel);
+        return;
+      }
+    }
     setActive(null);
     setPanel("list");
-    setView(rows.length ? "hit" : "miss");
+  }
+
+  async function reloadOrganizationAfterActionFailure(
+    cred: OrganizationLookupRequest,
+    keep?: LookupRefreshKeep,
+  ) {
+    try {
+      await refreshOrganization(cred, keep);
+    } catch {
+      /* 요청 오류 메시지 유지 */
+    }
   }
 
   async function onModify(body: OrganizationRegistrationModifyRequest, action: LookupModifyAction) {
@@ -1034,11 +1340,12 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(order),
             customerName: (active.leaderName || active.organizationName || account).trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           router.push(paymentHref);
           return;
         }
-        if (access && active.paymentId && canPreparePayment(active)) {
+        if (access && active.paymentId && lookupShowPaymentButton(active)) {
           const retried = await retryOrganizationPayment(
             DEFAULT_EVENT_ID,
             active.organizationId,
@@ -1049,6 +1356,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             registration: paymentOrderFromRetry(retried),
             customerName: (active.leaderName || active.organizationName || account).trim(),
             savedAt: Date.now(),
+            fromLookup: true,
           });
           router.push(paymentHref);
           return;
@@ -1061,6 +1369,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       mainToast.success("수정이 완료되었습니다.");
     } catch (err) {
       setError(lookupErrorMessage(err, "접수를 수정하지 못했습니다."));
+      const cred = access ?? body.access;
+      if (cred) {
+        await reloadOrganizationAfterActionFailure(cred);
+      }
     } finally {
       setBusy(false);
     }
@@ -1071,6 +1383,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setError("환불할 접수 정보를 확인하지 못했습니다.");
       return;
     }
+    const cancelTarget = active;
     setBusy(true);
     setError("");
     try {
@@ -1082,6 +1395,10 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       setPanel("done");
     } catch (err) {
       setError(lookupErrorMessage(err, "환불을 신청하지 못했습니다."));
+      await reloadOrganizationAfterActionFailure(access, {
+        receipt: cancelTarget,
+        panel: "cancel",
+      });
     } finally {
       setBusy(false);
     }
@@ -1129,7 +1446,9 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             key={receipt.organizationId || receipt.orderId || receipt.paymentId || String(i)}
             receipt={receipt}
             busy={payingKey === receiptPayKey(receipt)}
+            passwordBusy={passwordBusy}
             onPay={() => void onRetryPay(receipt)}
+            onPassword={openPasswordChange}
             onEdit={() => {
               setError("");
               setActive(receipt);
@@ -1142,8 +1461,8 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
             }}
           />
         ))}
-        <div className="flow__nav">
-          <button type="button" className="btn btn--ghost" onClick={() => setView("form")}>
+        <div className="lookup-other">
+          <button type="button" className="lookup-other__btn" onClick={() => setView("form")}>
             다른 접수건
           </button>
         </div>
@@ -1158,11 +1477,24 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           }}
           onConfirm={() => void onCancel()}
         />
+        <LookupPasswordModal
+          open={passwordOpen}
+          busy={passwordBusy}
+          error={passwordError}
+          identity={{ kind: "group", account }}
+          onClose={() => {
+            if (passwordBusy) return;
+            setPasswordError("");
+            setPasswordOpen(false);
+          }}
+          onSubmit={(input) => void onChangePassword(input)}
+        />
       </>
     );
   }
 
   return (
+    <>
     <form className="form" onSubmit={onSubmit} noValidate>
       <div className="form__head">
         <h2>단체 신청 조회</h2>
@@ -1197,5 +1529,6 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
       {error ? <p className="form__err">{error}</p> : null}
       <LookupNav busy={busy} onBack={onBack} />
     </form>
+    </>
   );
 }

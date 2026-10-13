@@ -16,6 +16,13 @@ export function refundEvidenceVerdictLabel(value?: string | null) {
   return REFUND_EVIDENCE_VERDICT_LABEL[key] || `${value?.trim() || key} · 확인 필요`;
 }
 
+export function refundEvidenceVerdictBadge(value?: string | null) {
+  const key = statusKey(value);
+  if (key === "EXTERNAL_CANCEL_CONFIRMED") return "paid";
+  if (key === "LOOKUP_UNAVAILABLE") return "pending";
+  return "must";
+}
+
 export const REFUND_EVIDENCE_VERDICT_LABEL: Record<string, string> = {
   EXTERNAL_CANCEL_CONFIRMED: "외부 취소 확인됨",
   NOT_IDENTIFIABLE: "특정 불가",

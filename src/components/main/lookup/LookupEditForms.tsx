@@ -33,6 +33,16 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
+import {
+  lookupModifyAllowed,
+  lookupOrganizationCommonModifyAllowed,
+  lookupShowPaymentButton,
+  memberDeleteAllowed,
+  memberLookupPolicyNotes,
+  memberModifyAllowed,
+  organizationAddMemberAllowed,
+  policyReasonMessage,
+} from "@/lib/main/registrationActionPolicy";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import { organizationLookupParticipants } from "@/services/main/registrations";
 import type {
@@ -43,6 +53,7 @@ import type {
   OrganizationParticipantModifyRequest,
   OrganizationRegistrationModifyRequest,
   RegistrationCategory,
+  MemberRegistrationPolicy,
   RegistrationReceipt,
   RegistrationSouvenirSelection,
 } from "@/services/main/types";
@@ -349,6 +360,11 @@ export function IndividualLookupEdit({
     guardianPhone,
     guardianConsent,
   });
+  const canPayAfterModify = lookupShowPaymentButton(receipt);
+  const canModify = lookupModifyAllowed(receipt);
+  const modifyPolicyNote = !canModify
+    ? policyReasonMessage(receipt.userPolicy?.modifyReason)
+    : "";
 
   function applyCategory(
     next: RegistrationCategory | undefined,
@@ -405,6 +421,10 @@ export function IndividualLookupEdit({
 
   function goReview(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!canModify) {
+      setHint(modifyPolicyNote || "현재 신청 정보를 수정할 수 없습니다.");
+      return;
+    }
     const invalid = validateForm();
     if (invalid) {
       setHint(invalid);
@@ -416,6 +436,7 @@ export function IndividualLookupEdit({
   }
 
   function runModify(action: LookupModifyAction) {
+    if (action === "submit" && !canModify) return;
     const body = buildPayload();
     if (!body) return;
     setPendingAction(action);
@@ -436,6 +457,11 @@ export function IndividualLookupEdit({
         <p className="lookup-edit__lock-note">
           개인정보(이름·생년월일·성별)와 휴대폰 번호는 수정할 수 없습니다.
         </p>
+        {modifyPolicyNote ? (
+          <p className="form__note" role="status">
+            {modifyPolicyNote}
+          </p>
+        ) : null}
       </div>
 
       <FormSec kicker="01 / PROFILE" title="개인정보">
@@ -477,7 +503,7 @@ export function IndividualLookupEdit({
           />
         </FormRow>
         <FormRow label="이메일">
-          <EmailField value={email} onChange={setEmail} />
+          <EmailField value={email} onChange={setEmail} disabled={!canModify} />
         </FormRow>
       </FormSec>
 
@@ -488,11 +514,13 @@ export function IndividualLookupEdit({
             address={address}
             addressDetail={addressDetail}
             onChange={(next) => {
+              if (!canModify) return;
               if (next.zonecode != null) setZonecode(next.zonecode);
               if (next.address != null) setAddress(next.address);
               if (next.addressDetail != null) setAddressDetail(next.addressDetail);
             }}
             required
+            disabled={!canModify}
           />
         </FormRow>
       </FormSec>
@@ -515,6 +543,7 @@ export function IndividualLookupEdit({
             onChange={(e) => setGuardianName(e.target.value)}
             autoComplete="name"
             required={guardianRequired}
+            disabled={!canModify}
           />
         </FormRow>
         <FormRow label="보호자 관계" required={guardianRequired}>
@@ -525,6 +554,7 @@ export function IndividualLookupEdit({
             value={guardianRelation}
             onChange={(e) => setGuardianRelation(e.target.value)}
             required={guardianRequired}
+            disabled={!canModify}
           />
         </FormRow>
         <FormRow label="보호자 연락처" required={guardianRequired}>
@@ -534,6 +564,7 @@ export function IndividualLookupEdit({
             value={guardianPhone}
             onChange={setGuardianPhone}
             required={guardianRequired}
+            disabled={!canModify}
           />
         </FormRow>
         <FormRow label="보호자 동의" required={guardianRequired}>
@@ -541,6 +572,7 @@ export function IndividualLookupEdit({
             variant="button"
             agreed={guardianConsent}
             onChange={setGuardianConsent}
+            disabled={!canModify}
           />
           {guardianRequired && !guardianMinor ? (
             <p className="form-row__hint">
@@ -560,7 +592,12 @@ export function IndividualLookupEdit({
           <p>{TIMING_CHIP_NOTE}</p>
         </ApplyHint>
         <FormRow label="참가종목" required>
-          <CoursePick value={courseId} birth={birth} onChange={onCourseChange} />
+          <CoursePick
+            value={courseId}
+            birth={birth}
+            onChange={onCourseChange}
+            disabled={!canModify}
+          />
           {ageBand(birth) === "child" ? (
             <p className="form-row__hint">{CHILD_ACCOMPANY_NOTE}</p>
           ) : null}
@@ -573,7 +610,7 @@ export function IndividualLookupEdit({
           <ShirtPick
             value={selectedSize}
             sizes={souvenir ? sizes : undefined}
-            disabled={!souvenir || !optionsReady}
+            disabled={!canModify || !souvenir || !optionsReady}
             onChange={(size) => applyCategory(category, size)}
           />
           {!eventCategoryId ? (
@@ -600,7 +637,7 @@ export function IndividualLookupEdit({
         <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
           돌아가기
         </button>
-        <button type="submit" className="btn btn--red" disabled={busy}>
+        <button type="submit" className="btn btn--red" disabled={busy || !canModify}>
           확인하기
         </button>
       </div>
@@ -610,6 +647,11 @@ export function IndividualLookupEdit({
     {step === 1 ? (
       <section className="block block--lookup-confirm">
         <h2>수정 내용을 확인하세요</h2>
+        {modifyPolicyNote ? (
+          <p className="form__note" role="status">
+            {modifyPolicyNote}
+          </p>
+        ) : null}
         <dl className="spec">
           <div>
             <dt>참가종목</dt>
@@ -696,19 +738,21 @@ export function IndividualLookupEdit({
           <button
             type="button"
             className="btn btn--ghost"
-            disabled={busy}
+            disabled={busy || !canModify}
             onClick={() => runModify("submit")}
           >
             {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
           </button>
-          <button
-            type="button"
-            className="btn btn--red"
-            disabled={busy}
-            onClick={() => runModify("pay")}
-          >
-            {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
-          </button>
+          {canPayAfterModify ? (
+            <button
+              type="button"
+              className="btn btn--red"
+              disabled={busy}
+              onClick={() => runModify("pay")}
+            >
+              {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+            </button>
+          ) : null}
         </DockNav>
       </section>
     ) : null}
@@ -727,6 +771,7 @@ type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
   gender: "M" | "F" | "";
   eventCategoryName?: string;
   shirtSize?: string;
+  memberPolicy?: MemberRegistrationPolicy;
 };
 
 function memberKey() {
@@ -778,6 +823,7 @@ function participantDraft(
     phNum: participantPhone(row),
     birth: (row.birth || "").replace(/\D/g, ""),
     gender: toApiGender(row.gender) || "M",
+    memberPolicy: row.memberPolicy,
   };
 }
 
@@ -821,6 +867,15 @@ export function GroupLookupEdit({
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
   const organizationName = receipt.organizationName?.trim() || "";
   const organizationLoginId = access.loginId.trim() || receipt.loginId?.trim() || "";
+  const canEditOrgCommon = lookupOrganizationCommonModifyAllowed(receipt);
+  const canAddMember = organizationAddMemberAllowed(receipt);
+  const canPayAfterModify = lookupShowPaymentButton(receipt);
+  const orgModifyPolicyNote = !canEditOrgCommon
+    ? policyReasonMessage(receipt.organizationPolicy?.modifyReason)
+    : "";
+  const addMemberPolicyNote = !canAddMember
+    ? policyReasonMessage(receipt.organizationPolicy?.addMemberReason)
+    : "";
   const optionsReady = categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(members);
   const total = useMemo(
@@ -904,7 +959,14 @@ export function GroupLookupEdit({
 
   function removeMember(index: number) {
     if (members.length <= 1) return;
-    if (members[index]?.registrationId) return;
+    const target = members[index];
+    if (!target) return;
+    if (
+      target.registrationId &&
+      !memberDeleteAllowed(target.memberPolicy, false)
+    ) {
+      return;
+    }
     setMembers((rows) => rows.filter((_, i) => i !== index));
     setOpenMember((prev) => {
       if (prev === index) return Math.max(0, index - 1);
@@ -1041,7 +1103,16 @@ export function GroupLookupEdit({
           />
         </FormRow>
         <FormRow label="이메일">
-          <EmailField value={email} onChange={setEmail} />
+          <EmailField
+            value={email}
+            onChange={setEmail}
+            disabled={!canEditOrgCommon}
+          />
+          {orgModifyPolicyNote ? (
+            <p className="form-row__hint" role="status">
+              {orgModifyPolicyNote}
+            </p>
+          ) : null}
         </FormRow>
       </FormSec>
       <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
@@ -1051,12 +1122,19 @@ export function GroupLookupEdit({
             address={address}
             addressDetail={addressDetail}
             onChange={(next) => {
+              if (!canEditOrgCommon) return;
               if (next.zonecode != null) setZonecode(next.zonecode);
               if (next.address != null) setAddress(next.address);
               if (next.addressDetail != null) setAddressDetail(next.addressDetail);
             }}
             required
+            disabled={!canEditOrgCommon}
           />
+          {orgModifyPolicyNote ? (
+            <p className="form-row__hint" role="status">
+              {orgModifyPolicyNote}
+            </p>
+          ) : null}
         </FormRow>
       </FormSec>
       <FormSec kicker="05" title="참가자">
@@ -1066,11 +1144,16 @@ export function GroupLookupEdit({
             type="button"
             className="btn btn--ghost"
             onClick={addMember}
-            disabled={busy || members.length >= MAX_GROUP_SIZE}
+            disabled={busy || members.length >= MAX_GROUP_SIZE || !canAddMember}
           >
             참가자 추가
           </button>
         </div>
+        {addMemberPolicyNote ? (
+          <p className="form__note" role="status">
+            {addMemberPolicyNote}
+          </p>
+        ) : null}
         {optionsError ? <p className="form__err">{optionsError}</p> : null}
         <div className="party-wrap">
           <table className="party">
@@ -1108,6 +1191,11 @@ export function GroupLookupEdit({
                 const selectedSize = memberShirtSize(member.selectedSouvenirList, category);
                 const open = openMember === index;
                 const locked = Boolean(member.registrationId);
+                const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
+                const memberPolicyNoteLines =
+                  locked && member.memberPolicy
+                    ? memberLookupPolicyNotes(member.memberPolicy)
+                    : [];
                 return (
                   <Fragment key={member.key}>
                     <tr className={open ? "party__info is-open" : "party__info"}>
@@ -1218,7 +1306,11 @@ export function GroupLookupEdit({
                           className="party__remove"
                           onClick={() => removeMember(index)}
                           disabled={
-                            busy || Boolean(member.registrationId) || members.length <= 1
+                            busy ||
+                            members.length <= 1 ||
+                            (member.registrationId
+                              ? !memberDeleteAllowed(member.memberPolicy, false)
+                              : false)
                           }
                         >
                           삭제
@@ -1230,6 +1322,7 @@ export function GroupLookupEdit({
                         <select
                           value={member.eventCategoryId}
                           onChange={(e) => {
+                            if (!canEditMemberFields) return;
                             const eventCategoryId = e.target.value;
                             const next = findCategory(categories, eventCategoryId);
                             patchMember(index, {
@@ -1242,7 +1335,7 @@ export function GroupLookupEdit({
                               ),
                             });
                           }}
-                          disabled={!optionsReady}
+                          disabled={!optionsReady || !canEditMemberFields}
                           required
                         >
                           <option value="">{optionsReady ? "참가종목" : "불러오는 중"}</option>
@@ -1266,13 +1359,19 @@ export function GroupLookupEdit({
                             );
                           })}
                         </select>
+                        {memberPolicyNoteLines.map((line) => (
+                          <p key={line} className="form-row__hint" role="status">
+                            {line}
+                          </p>
+                        ))}
                       </td>
                       <td data-label="사이즈">
                         <ShirtPick
                           value={selectedSize}
                           sizes={souvenir ? sizes : undefined}
-                          disabled={!souvenir}
-                          onChange={(size) =>
+                          disabled={!souvenir || !canEditMemberFields}
+                          onChange={(size) => {
+                            if (!canEditMemberFields) return;
                             patchMember(index, {
                               selectedSouvenirList: withShirtSize(
                                 category,
@@ -1280,8 +1379,8 @@ export function GroupLookupEdit({
                                 size,
                                 member.birth,
                               ),
-                            })
-                          }
+                            });
+                          }}
                         />
                       </td>
                       <td colSpan={2} data-label="패키지">
@@ -1422,14 +1521,16 @@ export function GroupLookupEdit({
           >
             {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
           </button>
-          <button
-            type="button"
-            className="btn btn--red"
-            disabled={busy}
-            onClick={() => runModify("pay")}
-          >
-            {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
-          </button>
+          {canPayAfterModify ? (
+            <button
+              type="button"
+              className="btn btn--red"
+              disabled={busy}
+              onClick={() => runModify("pay")}
+            >
+              {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+            </button>
+          ) : null}
         </DockNav>
       </section>
     ) : null}

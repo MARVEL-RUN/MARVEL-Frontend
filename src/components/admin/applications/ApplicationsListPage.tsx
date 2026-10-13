@@ -1,5 +1,6 @@
 "use client";
 
+import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
@@ -12,6 +13,7 @@ import {
 import { formatPhone } from "@/lib/register";
 import {
   REGISTRATION_STATUSES,
+  canDeleteUnpaidRegistration,
   registrationStatusFromParam,
   registrationStatusBadge,
   registrationStatusLabel,
@@ -22,6 +24,7 @@ import {
   applicationGenderLabel,
   applicationKindLabel,
   applyRegistrationDetail,
+  cancelUnpaidRegistrations,
   downloadRegistrationsExcel,
   downloadRegistrationsExcelByIds,
   fetchAdminEventCategories,
@@ -30,15 +33,17 @@ import {
   fetchAdminRegistrations,
   mapRegistrationPage,
   matchRaceEvent,
+  unpaidCancellationFailureText,
   type AdminApplicationRow,
   type ApplicationKind,
+  type UnpaidCancellationResult,
 } from "@/services/admin/applications";
 import {
   ExcelDownloadButtons,
   ExcelPageCheck,
   ExcelRowCheck,
 } from "./ExcelDownloadBar";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -115,12 +120,66 @@ function displayPhone(value?: string | null) {
   return formatPhone(raw);
 }
 
+function syncPickedStatus(
+  prev: Map<string, string>,
+  ids: Set<string>,
+  source: AdminApplicationRow[],
+) {
+  const known = new Map(prev);
+  for (const row of source) {
+    if (row.id) known.set(row.id, row.status);
+  }
+  const next = new Map<string, string>();
+  for (const id of ids) {
+    const status = known.get(id);
+    if (status) next.set(id, status);
+  }
+  if (next.size === prev.size && [...next].every(([id, status]) => prev.get(id) === status)) {
+    return prev;
+  }
+  return next;
+}
+
+function unpaidCancellationToasts(result: UnpaidCancellationResult) {
+  const listed = result.successes.length;
+  const already = result.successes.filter((item) => item.alreadyCanceled).length;
+  const allAlready =
+    result.failureCount === 0 &&
+    result.successCount > 0 &&
+    listed > 0 &&
+    listed === result.successCount &&
+    already === listed;
+  if (allAlready) {
+    adminToast.success("선택한 신청은 이미 취소되어 있습니다.");
+    return;
+  }
+  if (result.successCount > 0) {
+    adminToast.success(`미결제 신청 ${result.successCount}건이 취소되었습니다.`);
+  }
+  if (result.failureCount > 0) {
+    const first = result.failures[0];
+    const who = first?.name.trim() || "일부 신청";
+    const why = first ? unpaidCancellationFailureText(first) : "취소하지 못했습니다.";
+    adminToast.error(
+      result.failureCount === 1
+        ? `${who} 취소에 실패했습니다. ${why}`
+        : `${result.failureCount}건 취소에 실패했습니다. ${who}: ${why}`,
+    );
+    return;
+  }
+  if (result.successCount === 0) {
+    adminToast.error("취소된 신청이 없습니다.");
+  }
+}
+
 type Props = {
   slug?: AdminRaceEventId;
 };
 
 export function ApplicationsListPage({ slug }: Props) {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+  const { confirm, modal: confirmModal } = useAdminConfirm();
   const queryEventId = searchParams.get("eventId")?.trim() ?? "";
   const statusFromUrl = registrationStatusFromParam(searchParams.get("status"));
 
@@ -137,7 +196,9 @@ export function ApplicationsListPage({ slug }: Props) {
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [pickedStatus, setPickedStatus] = useState<Map<string, string>>(new Map());
   const [excelBusy, setExcelBusy] = useState(false);
+  const [cancelBusy, setCancelBusy] = useState(false);
 
   const eventsQuery = useQuery({
     queryKey: ["admin", "events"],
@@ -225,11 +286,16 @@ export function ApplicationsListPage({ slug }: Props) {
 
   useEffect(() => {
     setPicked(new Set());
+    setPickedStatus(new Map());
   }, [apiEventId, applied]);
 
   const rows = listQuery.data?.content ?? [];
   const totalCount = listQuery.data?.totalElements ?? 0;
   const pageCount = Math.max(1, listQuery.data?.totalPages ?? 1);
+
+  useEffect(() => {
+    setPickedStatus((prev) => syncPickedStatus(prev, picked, rows));
+  }, [picked, rows]);
 
   const selected = useMemo(() => {
     const row = rows.find((item) => item.id === selectedId) ?? null;
@@ -257,6 +323,10 @@ export function ApplicationsListPage({ slug }: Props) {
   };
 
   const pageIds = rows.map((row) => row.id).filter(Boolean);
+  const unpaidIds = [...picked].filter((id) => {
+    const onPage = rows.find((row) => row.id === id);
+    return canDeleteUnpaidRegistration(onPage?.status ?? pickedStatus.get(id));
+  });
 
   const togglePick = (id: string) => {
     setPicked((prev) => {
@@ -296,6 +366,53 @@ export function ApplicationsListPage({ slug }: Props) {
       );
     } finally {
       setExcelBusy(false);
+    }
+  };
+
+  const runUnpaidCancel = async () => {
+    if (!apiEventId || cancelBusy || picked.size === 0) return;
+    if (unpaidIds.length === 0) {
+      adminToast.error("결제 대기 신청만 취소할 수 있습니다.");
+      return;
+    }
+    const mixed = unpaidIds.length < picked.size;
+    const ok = await confirm({
+      title: "미결제 신청 취소",
+      message: mixed
+        ? `선택한 ${picked.size}건 중 결제 대기 ${unpaidIds.length}건만 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`
+        : `${unpaidIds.length}건의 미결제 신청을 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`,
+      confirmLabel: "취소 처리",
+    });
+    if (!ok) return;
+    setCancelBusy(true);
+    try {
+      const result = await cancelUnpaidRegistrations(apiEventId, unpaidIds);
+      const done = new Set(
+        result.successes.map((item) => item.registrationId).filter(Boolean),
+      );
+      if (done.size === 0 && result.failureCount === 0 && result.successCount > 0) {
+        unpaidIds.forEach((id) => done.add(id));
+      }
+      if (done.size > 0) {
+        setPicked((prev) => {
+          const next = new Set(prev);
+          done.forEach((id) => next.delete(id));
+          return next;
+        });
+      }
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "registration"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "registration-statistics"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "finance"] }),
+      ]);
+      unpaidCancellationToasts(result);
+    } catch (error) {
+      adminToast.error(
+        error instanceof Error ? error.message : "미결제 신청 취소에 실패했습니다.",
+      );
+    } finally {
+      setCancelBusy(false);
     }
   };
 
@@ -449,6 +566,16 @@ export function ApplicationsListPage({ slug }: Props) {
         actions={
           <div className="admin-table-shell__actions admin-apps-list__head-actions">
             <p className="admin-apps-list__hint">행을 클릭하면 상세를 볼 수 있습니다</p>
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost admin-btn--danger-text"
+              disabled={!hasAdminApi || !apiEventId || cancelBusy || picked.size === 0}
+              onClick={() => void runUnpaidCancel()}
+            >
+              {cancelBusy
+                ? "취소 처리 중…"
+                : `미결제 취소${unpaidIds.length ? ` (${unpaidIds.length})` : ""}`}
+            </button>
             <ExcelDownloadButtons
               busy={excelBusy}
               selectedCount={picked.size}
@@ -533,6 +660,7 @@ export function ApplicationsListPage({ slug }: Props) {
         }
         columns={columns}
       />
+      {confirmModal}
       <ApplicationDetailDrawer
         row={selected}
         source="applications"

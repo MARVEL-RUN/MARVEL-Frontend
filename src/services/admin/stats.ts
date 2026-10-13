@@ -1,31 +1,5 @@
 import { adminFetch, adminFetchBlob } from "@/lib/admin/fetch";
-import type { AdminRaceEventId } from "@/lib/admin/raceEvents";
-import { statusKey } from "@/lib/registration-status";
-import {
-  fetchAdminEvents,
-  listAllApplications,
-  raceEventSlug,
-  type AdminApplicationRow,
-} from "./applications";
 import { listAdminQuestions } from "./boards/inquiries";
-
-export type EventIntakeStats = {
-  eventId: string;
-  eventName: string;
-  slug: AdminRaceEventId | null;
-  individualCount: number;
-  groupCount: number;
-  confirmedCount: number;
-  participantCount: number;
-  roundCounts: [number, number, number];
-};
-
-export type AdminDashboardStats = {
-  unansweredCount: number;
-  cancellationPendingCount: number;
-  cancellationPendingEventId: string | null;
-  events: EventIntakeStats[];
-};
 
 export type RegistrationStatRow = {
   classification: string;
@@ -85,6 +59,43 @@ export function fetchDailyReportExcel(params: DailyReportExcelParams) {
   return adminFetchBlob(path, { method: "GET" }, dailyReportFallbackName());
 }
 
+export type DeliveryListExcelParams = {
+  eventId: string;
+  startAt: string;
+  endAt: string;
+};
+
+function deliveryListFallbackName() {
+  const now = new Date();
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `배송명단_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.xlsx`;
+}
+
+/** 스펙 예시 `2026-10-07T00:00:00`. 오프셋 없는 KST */
+function toDeliveryDateTime(value: string) {
+  const trimmed = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmed)) return `${trimmed}:00`;
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(trimmed)) return trimmed;
+  return "";
+}
+
+export function fetchDeliveryListExcel(params: DeliveryListExcelParams) {
+  const eventId = params.eventId.trim();
+  if (!eventId) throw new Error("대회 정보가 없습니다.");
+
+  const startAt = toDeliveryDateTime(params.startAt);
+  const endAt = toDeliveryDateTime(params.endAt);
+  if (!startAt || !endAt) throw new Error("시작·종료 시각을 시·분·초까지 입력하세요.");
+  if (startAt >= endAt) throw new Error("종료 시각은 시작보다 뒤여야 합니다.");
+
+  const query = new URLSearchParams({ startAt, endAt });
+  return adminFetchBlob(
+    `v1/admin/registrations/${encodeURIComponent(eventId)}/delivery-list/excel/download?${query}`,
+    { method: "GET" },
+    deliveryListFallbackName(),
+  );
+}
+
 export type PaymentDailyGraphDay = {
   date: string;
   dailyCount: number;
@@ -124,64 +135,17 @@ export function fetchPaymentDailyGraph(params: {
   );
 }
 
-function intakeFor(
-  rows: AdminApplicationRow[],
-): Omit<EventIntakeStats, "eventId" | "eventName" | "slug"> {
-  const individuals = rows.filter((row) => row.kind === "individual");
-  const groups = rows.filter((row) => row.kind === "group");
-  const roundCounts: [number, number, number] = [0, 0, 0];
-  for (const row of rows) {
-    if (row.round === "1") roundCounts[0] += 1;
-    else if (row.round === "2") roundCounts[1] += 1;
-    else if (row.round === "3") roundCounts[2] += 1;
-  }
-  return {
-    individualCount: individuals.length,
-    groupCount: groups.length,
-    confirmedCount: rows.filter((row) => statusKey(row.status) === "CONFIRMED").length,
-    participantCount:
-      individuals.length + groups.reduce((sum, row) => sum + (row.memberCount ?? 0), 0),
-    roundCounts,
-  };
-}
-
-export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const events = await fetchAdminEvents().catch(() => []);
-
-  const [applications, ...unansweredPages] = await Promise.all([
-    listAllApplications(),
-    ...events.map((event) =>
+export async function fetchUnansweredCount(eventIds: string[]) {
+  const pages = await Promise.all(
+    eventIds.map((eventId) =>
       listAdminQuestions({
-        eventId: event.eventId,
+        eventId,
         isAnswered: false,
         page: 0,
         size: 1,
         sort: "LATEST",
       }).catch(() => ({ totalElements: 0 })),
     ),
-  ]);
-
-  const cancellationPending = applications.filter(
-    (row) => statusKey(row.status) === "CANCELLATION_PENDING",
   );
-
-  const unansweredCount = unansweredPages.reduce(
-    (sum, page) => sum + (page.totalElements ?? 0),
-    0,
-  );
-
-  return {
-    unansweredCount,
-    cancellationPendingCount: cancellationPending.length,
-    cancellationPendingEventId: cancellationPending[0]?.eventId ?? null,
-    events: events.map((event) => {
-      const slug = raceEventSlug(event);
-      return {
-        eventId: event.eventId,
-        eventName: event.eventName,
-        slug,
-        ...intakeFor(applications.filter((row) => row.eventId === event.eventId)),
-      };
-    }),
-  };
+  return pages.reduce((sum, page) => sum + (page.totalElements ?? 0), 0);
 }

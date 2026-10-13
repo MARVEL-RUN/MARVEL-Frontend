@@ -52,7 +52,7 @@ async function readJsonBody(response: Response) {
 
 function applySession(result: LoginResult, account: string) {
   adminToken.setAccess(result.accessToken);
-  adminToken.setRefresh(result.refreshToken ?? null);
+  if (result.refreshToken) adminToken.setRefresh(result.refreshToken);
 
   const decoded = decodeToken(result.accessToken);
   const roles = extractRoles(decoded);
@@ -117,11 +117,7 @@ async function refreshWithApi(): Promise<LoginResult> {
     throw new Error("액세스 토큰을 받지 못했습니다.");
   }
 
-  return {
-    accessToken,
-    refreshToken: refreshToken ?? refresh,
-    adminName,
-  };
+  return { accessToken, refreshToken, adminName };
 }
 
 async function logoutWithApi() {

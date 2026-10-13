@@ -103,7 +103,7 @@ export const EVENT = {
       code: "FULL CIRCUIT",
       tone: "cyan",
       fee: "70,000원",
-      start: "13:30",
+      start: "13:00",
       desc: "한계를 넘어 서킷을 완주하는 히어로 레이스",
       map: MAIN_ASSETS.course10k,
       medalTurn: MAIN_ASSETS.medal10kTurn,
@@ -152,14 +152,14 @@ export const EVENT = {
       mark: "gate",
     },
     {
-      from: "13:00",
-      to: "13:30",
+      from: "12:30",
+      to: "13:00",
       rt: "30′",
       program: "준비운동 및 무대행사 : (10 Km)",
       note: "",
     },
     {
-      from: "13:30",
+      from: "13:00",
       to: "",
       rt: "–",
       program: "10 Km 러닝 시작",
@@ -228,6 +228,23 @@ export const EVENT = {
   sponsors: [
     { role: "주최", name: "ONEUNIVERSE STUDIO" },
     { role: "주관", name: "FLUX SONIC" },
+  ],
+  footerPartners: [
+    {
+      role: "주최",
+      items: [{ key: "host", name: "ONEUNIVERSE STUDIO" }],
+    },
+    {
+      role: "주관",
+      items: [
+        { key: "organizer", name: "FLUX SONIC" },
+        { key: "mfriends", name: "엠프렌즈" },
+      ],
+    },
+    {
+      role: "미디어파트너",
+      items: [{ key: "highcut", name: "하이컷" }],
+    },
   ],
   sponsorMoreNotice: "※ 위 기념품 이미지는 예시이며, 실제품과 상이할 수 있습니다.",
   sponsorMore: "+??",
