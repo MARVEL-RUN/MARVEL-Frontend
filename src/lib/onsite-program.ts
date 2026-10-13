@@ -127,7 +127,7 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     tone: "gold",
     en: "SAUNA ZONE",
     title: "사우나 존",
-    tagline: "좋은 삶에는 좋은 사우나가 필요하다",
+    tagline: "좋은 삶에는 좋은 사우나가 필요하다.",
     partner: "사사사(SASASA)",
     about: "사우나 문화를 만드는 브랜드, SAUNA CREATIVE GROUP",
     body: "사우나 텐트부터 짜릿한 콜드 플런지까지, 완주 후 몸과 컨디션을 가볍게 풀어보세요.",
