@@ -576,15 +576,11 @@
 
   .onsite-detail__photo {
     min-height: 0;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 3;
   }
 
   .onsite-detail__panel {
     padding: 1rem 1.05rem 1.15rem;
-  }
-
-  .onsite-detail__photo .onsite-booth__art {
-    object-position: center 28%;
   }
 
   .onsite-booth__logo--habitat {
