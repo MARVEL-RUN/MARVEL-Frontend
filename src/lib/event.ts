@@ -11,7 +11,7 @@ export const EVENT = {
   openAt: "2026-09-22T14:00:00+09:00",
   /* 홈 팝업 — 끄려면 enabled: false. image에 경로 넣으면 본문에 표시 */
   popup: {
-    enabled: true,
+    enabled: false,
     id: "shuttle-survey-2026-v3",
     title: "마블런 셔틀버스 추가 운행지역 수요조사",
     image: MAIN_ASSETS.popupShuttleSurvey,
