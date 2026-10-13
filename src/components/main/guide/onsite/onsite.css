@@ -378,6 +378,10 @@
   overflow: hidden;
 }
 
+.onsite-detail__photo .onsite-booth__art {
+  object-position: center 85%;
+}
+
 .onsite-detail__panel {
   display: grid;
   align-content: center;
@@ -526,6 +530,39 @@
   .onsite-booths,
   .onsite-picks {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .onsite-open {
+    gap: 0.65rem;
+  }
+
+  .onsite-pick {
+    gap: 0.28rem;
+    min-height: 0;
+    padding: 0.5rem 0.35rem 0.55rem;
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+
+  .onsite-pick__name,
+  .onsite-pick__title {
+    font-size: 0.66rem;
+    line-height: 1.25;
+  }
+
+  .onsite-pick .onsite-booth__logo {
+    max-width: 88%;
+    height: 1.05rem;
+  }
+
+  .onsite-pick .onsite-booth__logo--blend {
+    max-width: 92%;
+    height: 1.35rem;
+  }
+
+  .onsite-pick .onsite-booth__logo--habitat {
+    height: 1.55rem;
+    max-width: 96%;
   }
 
   .onsite-booth__frame {
@@ -540,5 +577,17 @@
   .onsite-detail__photo {
     min-height: 0;
     aspect-ratio: 16 / 10;
+  }
+
+  .onsite-detail__panel {
+    padding: 1rem 1.05rem 1.15rem;
+  }
+
+  .onsite-detail__photo .onsite-booth__art {
+    object-position: center 28%;
+  }
+
+  .onsite-booth__logo--habitat {
+    height: 2.15rem;
   }
 }
