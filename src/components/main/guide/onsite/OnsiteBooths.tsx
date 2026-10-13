@@ -21,29 +21,32 @@ function BoothPoster({
   return (
     <li className={`onsite-booth onsite-tone--${item.tone}`}>
       <button type="button" className="onsite-booth__frame" onClick={onOpen}>
-        <Image
-          src={item.photo}
-          alt=""
-          fill
-          className="onsite-booth__art"
-          sizes="(max-width: 720px) 46vw, 260px"
-        />
-        <span className="onsite-booth__shade" aria-hidden />
-        <span className="onsite-booth__copy">
-          {item.logo ? (
-            <Image
-              src={item.logo.src}
-              alt=""
-              width={item.logo.width}
-              height={item.logo.height}
-              className={logoClass(item.id)}
-            />
-          ) : null}
+        <span className="onsite-booth__media">
+          <Image
+            src={item.photo}
+            alt=""
+            fill
+            className="onsite-booth__art"
+            sizes="(max-width: 720px) 46vw, 260px"
+          />
           <span className="onsite-booth__en">{item.en}</span>
-          <span className="onsite-booth__title">{item.title}</span>
-          <span className="onsite-booth__hint" aria-hidden>
-            자세히
+          <span className="onsite-booth__brand">
+            {item.logo ? (
+              <Image
+                src={item.logo.src}
+                alt=""
+                width={item.logo.width}
+                height={item.logo.height}
+                className={logoClass(item.id)}
+              />
+            ) : (
+              <span className="onsite-booth__name">{item.partner}</span>
+            )}
           </span>
+        </span>
+        <span className="onsite-booth__title">{item.title}</span>
+        <span className="onsite-booth__hint" aria-hidden>
+          자세히 보기
         </span>
       </button>
     </li>
@@ -63,10 +66,10 @@ function BoothDetail({ item, onClose }: { item: OnsiteBoothItem; onClose: () => 
           className="onsite-booth__art"
           sizes="(max-width: 720px) 100vw, 420px"
         />
+        <span className="onsite-booth__en">{item.en}</span>
       </div>
       <div className="onsite-detail__panel">
         <div className="onsite-detail__head">
-          <p className="onsite-booth__en">{item.en}</p>
           <h3 id={titleId} className="onsite-detail__title">
             {item.title}
           </h3>
@@ -118,6 +121,7 @@ export function OnsiteBooths() {
                 type="button"
                 className={`onsite-pick onsite-tone--${item.tone}${on ? " is-on" : ""}`}
                 aria-pressed={on}
+                aria-label={item.title}
                 onClick={() => setOpenId(on ? null : item.id)}
               >
                 {item.logo ? (
