@@ -121,6 +121,7 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     partner: "한국해비타트",
     body: "한국해비타트만의 타투 스티커로 포인트를 더하고 즐거운 러닝에 따뜻한 의미까지 함께해 보세요!",
     photo: MAIN_ASSETS.onsiteTattooPhoto,
+    logo: { src: MAIN_ASSETS.onsiteHabitatLogo, width: 820, height: 333 },
   },
   {
     id: "sauna",

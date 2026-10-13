@@ -63,6 +63,7 @@ export const MAIN_ASSETS = {
   onsiteTapingPhoto: "/images/main/guide/onsite/booth-taping-photo.jpg",
   onsiteMovementLogo: "/images/main/guide/onsite/booth-movement-logo.png",
   onsiteTattooPhoto: "/images/main/guide/onsite/booth-tattoo-photo.jpg",
+  onsiteHabitatLogo: "/images/main/guide/onsite/booth-habitat-logo.png",
   onsiteSaunaPhoto: "/images/main/guide/onsite/booth-sauna-photo.jpg",
   onsiteSasasaLogo: "/images/main/guide/onsite/booth-sasasa-logo.png",
   venueThor: "/images/main/venue/2.3k-thor.png",

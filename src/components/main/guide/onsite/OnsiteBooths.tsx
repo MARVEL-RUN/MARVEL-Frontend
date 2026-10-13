@@ -5,7 +5,7 @@ import { useId, useState } from "react";
 import { ONSITE_BOOTHS, type OnsiteBoothItem } from "@/lib/onsite-program";
 
 function logoClass(id: string) {
-  return id === "taping"
+  return id === "taping" || id === "tattoo"
     ? "onsite-booth__logo onsite-booth__logo--blend"
     : "onsite-booth__logo";
 }
