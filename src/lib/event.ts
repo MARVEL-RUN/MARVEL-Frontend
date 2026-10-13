@@ -15,7 +15,7 @@ export const EVENT = {
   round2OpenNoticeDate: "2026. 10. 13. 화요일",
   round2OpenNoticeTime: "오후 2시",
   round2OpenNoticeAction: "추가 접수 OPEN",
-  /* 홈 팝업. nextAt(KST)부터 next. 끄려면 해당 구간의 enabled: false */
+  /* 홈 팝업. nextAt(KST)부터 next. 해당 팝업만 끄려면 next.enabled: false */
   popup: {
     enabled: false,
     id: "shuttle-survey-2026-v3",
@@ -24,8 +24,8 @@ export const EVENT = {
     href: "https://forms.gle/x9925cioc1HGnSEs8",
     nextAt: "2026-10-13T00:00:00+09:00",
     next: {
-      enabled: true,
-      id: "extra-registration-2026",
+      enabled: false,
+      id: "extra-registration-2026-v2",
       title: "2026 마블런 추가 접수 안내",
       image: MAIN_ASSETS.popupExtraRegistration,
       href: "",
