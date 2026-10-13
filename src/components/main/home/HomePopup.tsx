@@ -52,6 +52,14 @@ function clamp(left: number, top: number, el: HTMLElement, floorTop = EDGE) {
   };
 }
 
+function centerDesktop(el: HTMLElement) {
+  const z = siteZoom();
+  const vw = window.innerWidth / z;
+  const vh = window.innerHeight / z;
+  const floorTop = minTopDesktop();
+  return clamp((vw - el.offsetWidth) / 2, (vh - el.offsetHeight) / 2, el, floorTop);
+}
+
 export function HomePopup() {
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
@@ -140,15 +148,8 @@ export function HomePopup() {
     if (!open || mobile) return;
     const el = box.current;
     if (!el) return;
-    const z = siteZoom();
-    const rootFont = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
-    const minTop = minTopDesktop();
-    const left = 1.15 * rootFont;
-    setPos((prev) => ({
-      left: prev?.left ?? left,
-      top: Math.max(minTop, prev?.top ?? minTop),
-    }));
-  }, [open, mobile]);
+    setPos(centerDesktop(el));
+  }, [open, mobile, pop.id]);
 
   useEffect(() => {
     if (!open || mobile) return;
@@ -208,6 +209,7 @@ export function HomePopup() {
       }
     }
     setOpen(false);
+    setPos(null);
   }
 
   if (!open) return null;
@@ -215,7 +217,12 @@ export function HomePopup() {
   const sheet = (
     <aside
       ref={box}
-      className={["home-pop", mobile ? "home-pop--sheet" : "", dragging ? "is-drag" : ""]
+      className={[
+        "home-pop",
+        mobile ? "home-pop--sheet" : "",
+        !mobile && !pos ? "is-pending" : "",
+        dragging ? "is-drag" : "",
+      ]
         .filter(Boolean)
         .join(" ")}
       role="dialog"
@@ -237,7 +244,7 @@ export function HomePopup() {
                 src={pop.image}
                 alt=""
                 fill
-                sizes={mobile ? "100vw" : "36rem"}
+                sizes={mobile ? "100vw" : "30rem"}
                 draggable={false}
               />
             </a>
@@ -246,7 +253,7 @@ export function HomePopup() {
               src={pop.image}
               alt={pop.title}
               fill
-              sizes={mobile ? "100vw" : "36rem"}
+              sizes={mobile ? "100vw" : "30rem"}
               draggable={false}
             />
           )
