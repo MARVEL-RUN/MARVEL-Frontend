@@ -237,7 +237,7 @@ export function HomePopup() {
                 src={pop.image}
                 alt=""
                 fill
-                sizes={mobile ? "100vw" : "36rem"}
+                sizes={mobile ? "100vw" : "30rem"}
                 draggable={false}
               />
             </a>
@@ -246,7 +246,7 @@ export function HomePopup() {
               src={pop.image}
               alt={pop.title}
               fill
-              sizes={mobile ? "100vw" : "36rem"}
+              sizes={mobile ? "100vw" : "30rem"}
               draggable={false}
             />
           )
