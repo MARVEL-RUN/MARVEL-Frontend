@@ -230,6 +230,58 @@
   font-weight: 800;
 }
 
+/* PC 인원별 요금 — 화살표로 이어지는 단계, 인원 늘수록 진하게 */
+@media (min-width: 721px) {
+  .onsite-drive__tiers {
+    gap: 0;
+    margin-top: 1rem;
+  }
+
+  .onsite-drive__tiers li {
+    gap: 0.1rem;
+    margin-left: -10px;
+    padding: 0.6rem 0.4rem 0.55rem 1.1rem;
+    border-top: none;
+    background: rgba(224, 195, 106, 0.14);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%);
+  }
+
+  .onsite-drive__tiers li:first-child {
+    margin-left: 0;
+    padding-left: 0.5rem;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+  }
+
+  .onsite-drive__tiers li:nth-child(2) {
+    background: rgba(224, 195, 106, 0.3);
+  }
+
+  .onsite-drive__tiers li:last-child {
+    background: var(--gold);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 12px 50%);
+  }
+
+  .onsite-drive__tiers span {
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+  }
+
+  .onsite-drive__tiers strong {
+    font-size: 1.12rem;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    transform: skewX(-8deg);
+  }
+
+  .onsite-drive__tiers li:last-child span {
+    color: rgba(0, 3, 32, 0.72);
+  }
+
+  .onsite-drive__tiers li:last-child strong {
+    color: var(--navy);
+  }
+}
+
 /* 부스 · 프로그램 — 같은 크기 포스터, 열면 위 로고 카드 + 옆 설명 */
 .onsite-booths,
 .onsite-picks {
