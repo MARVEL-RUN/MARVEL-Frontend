@@ -3,54 +3,46 @@ const CAPS = "/admin/capacities";
 const MEMBERS = "/admin/members";
 const INQUIRY = "/admin/boards/inquiry";
 
-function isRaceSlug(id: string) {
-  return id === "marvel" || id === "virtual";
-}
+type AdminRaceSlug = "marvel" | "virtual";
+type EventRef = { eventId: string };
 
-function withQuery(path: string, slugPath: boolean, query?: string) {
-  if (!query) return path;
-  return slugPath ? `${path}?${query}` : `${path}&${query}`;
+export function isAdminRaceSlug(id: string): id is AdminRaceSlug {
+  return id === "marvel" || id === "virtual";
 }
 
 /** API eventId → list?eventId=, marvel·virtual slug → /{slug} (북마크용) */
 export function adminApplicationsHref(eventIdOrSlug: string, query?: string) {
-  const slug = isRaceSlug(eventIdOrSlug);
-  const path = slug
+  const path = isAdminRaceSlug(eventIdOrSlug)
     ? `${APPS}/${eventIdOrSlug}`
     : `${APPS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
-  return withQuery(path, slug, query);
+  if (!query) return path;
+  return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
 }
 
-export function adminApplicationsHrefFromEvent(
-  event: { eventId: string },
-  query?: string,
-) {
+export function adminApplicationsHrefFromEvent(event: EventRef, query?: string) {
   return adminApplicationsHref(event.eventId, query);
 }
 
 /** 대회 API eventId로 정원 상세 진입 */
-export function adminCapacitiesHrefFromEvent(event: { eventId: string }) {
+export function adminCapacitiesHrefFromEvent(event: EventRef) {
   return adminCapacitiesHref(event.eventId);
 }
 
 export function adminCapacitiesHref(eventIdOrSlug: string) {
-  if (isRaceSlug(eventIdOrSlug)) return `${CAPS}/${eventIdOrSlug}`;
+  if (isAdminRaceSlug(eventIdOrSlug)) return `${CAPS}/${eventIdOrSlug}`;
   return `${CAPS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
 }
 
 /** API eventId → list?eventId=, marvel·virtual slug → /{slug} (북마크용) */
 export function adminMembersHref(eventIdOrSlug: string, query?: string) {
-  const slug = isRaceSlug(eventIdOrSlug);
-  const path = slug
+  const path = isAdminRaceSlug(eventIdOrSlug)
     ? `${MEMBERS}/${eventIdOrSlug}`
     : `${MEMBERS}/list?eventId=${encodeURIComponent(eventIdOrSlug)}`;
-  return withQuery(path, slug, query);
+  if (!query) return path;
+  return isAdminRaceSlug(eventIdOrSlug) ? `${path}?${query}` : `${path}&${query}`;
 }
 
-export function adminMembersHrefFromEvent(
-  event: { eventId: string },
-  query?: string,
-) {
+export function adminMembersHrefFromEvent(event: EventRef, query?: string) {
   return adminMembersHref(event.eventId, query);
 }
 
@@ -60,13 +52,12 @@ export function adminMembersListBackHref(apiEventId: string) {
 
 export function adminOrganizationDetailHref(
   organizationId: string,
-  options: { apiEventId: string; adjust?: boolean },
+  options: { apiEventId: string },
 ) {
   const params = new URLSearchParams({
     organizationId,
     eventId: options.apiEventId,
   });
-  if (options.adjust) params.set("adjust", "1");
   return `${MEMBERS}/detail?${params}`;
 }
 
@@ -74,7 +65,7 @@ export function adminInquiriesHref(eventId: string) {
   return `${INQUIRY}/list?eventId=${encodeURIComponent(eventId)}`;
 }
 
-export function adminInquiriesHrefFromEvent(event: { eventId: string }) {
+export function adminInquiriesHrefFromEvent(event: EventRef) {
   return adminInquiriesHref(event.eventId);
 }
 
@@ -87,8 +78,4 @@ export function adminInquiryDetailHref(
     eventId: options.apiEventId,
   });
   return `${INQUIRY}/detail?${params}`;
-}
-
-export function isAdminRaceSlug(id: string) {
-  return isRaceSlug(id);
 }

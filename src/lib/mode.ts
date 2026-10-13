@@ -10,13 +10,18 @@ export const isComingSoon = APP_MODE === "coming-soon";
 export const isMain = APP_MODE === "main";
 
 /** 헤더 내비 (본페이지) */
+export const ONSITE_PROGRAM_HREF = "/guide/onsite-program";
+
 export const GUIDE_SECTIONS = [
   { href: "/guide#overview", label: "대회개요" },
   { href: "/guide#timeline", label: "타임라인" },
   { href: "/guide#course", label: "코스" },
+  { href: ONSITE_PROGRAM_HREF, label: "현장프로그램" },
 ] as const;
 
-export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href !== "/guide#overview");
+export const GUIDE_TABS = GUIDE_SECTIONS.filter(
+  (item) => item.href.includes("#") && item.href !== "/guide#overview",
+);
 
 export const KIT_HREF = "/kit";
 
