@@ -64,7 +64,8 @@ function BoothDetail({ item, onClose }: { item: OnsiteBoothItem; onClose: () => 
           alt=""
           fill
           className="onsite-booth__art"
-          sizes="(max-width: 720px) 100vw, 420px"
+          sizes="(max-width: 720px) 100vw, 1120px"
+          style={item.focus ? { objectPosition: item.focus } : undefined}
         />
         <span className="onsite-booth__en">{item.en}</span>
       </div>

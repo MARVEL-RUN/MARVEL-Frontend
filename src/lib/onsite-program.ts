@@ -30,6 +30,8 @@ export type OnsiteBoothItem = {
   about?: string;
   body: string;
   photo: string;
+  /* 열린 와이드 컷에서 사진 초점 (object-position) */
+  focus?: string;
   logo?: { src: string; width: number; height: number };
 };
 
@@ -133,6 +135,7 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     about: "사우나 문화를 만드는 브랜드, SAUNA CREATIVE GROUP",
     body: "사우나 텐트부터 짜릿한 콜드 플런지까지, 완주 후 몸과 컨디션을 가볍게 풀어보세요.",
     photo: MAIN_ASSETS.onsiteSaunaPhoto,
+    focus: "30% 90%",
     logo: { src: MAIN_ASSETS.onsiteSasasaLogo, width: 1235, height: 270 },
   },
 ] as const;
