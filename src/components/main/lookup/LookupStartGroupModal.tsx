@@ -14,7 +14,7 @@ import {
   type StartGroupDraft,
 } from "@/lib/start-group";
 import { applicationPasswordError } from "@/lib/register";
-import { findCategory } from "@/lib/registration-options";
+import { categoryLabel, findCategory } from "@/lib/registration-options";
 import {
   patchIndividualStartGroup,
   patchOrganizationStartGroups,
@@ -57,7 +57,9 @@ type Props = IndividualProps | GroupProps;
 
 type GroupMemberRow = {
   registrationId: string;
+  no: string;
   name: string;
+  courseName: string;
   eventCategoryId: string;
   stored: ReturnType<typeof startGroupInputFromStored>;
   draft: StartGroupDraft;
@@ -130,16 +132,19 @@ export function LookupStartGroupModal(props: Props) {
       return;
     }
     const rows = organizationLookupParticipants(props.receipt)
-      .filter((row) => !row.canceled && row.registrationId?.trim())
-      .map((row) => participantRow(row));
+      .filter((row) => !row.canceled)
+      .map((row, index) => participantRow(row, index))
+      .filter((row) => row.registrationId?.trim());
     setGroupRows(rows);
   }, [open, props]);
 
-  function participantRow(row: OrganizationLookupParticipant): GroupMemberRow {
+  function participantRow(row: OrganizationLookupParticipant, index: number): GroupMemberRow {
     const stored = startGroupInputFromStored(row.startGroupId, row.startGroupUnselected);
     return {
       registrationId: row.registrationId,
+      no: String(index + 1).padStart(2, "0"),
       name: row.name?.trim() || "참가자",
+      courseName: row.eventCategoryName?.trim() || "",
       eventCategoryId: row.eventCategoryId || "",
       stored,
       draft: startGroupDraftFromStored(row.startGroupId, row.startGroupUnselected),
@@ -181,7 +186,7 @@ export function LookupStartGroupModal(props: Props) {
         const category = findCategory(categories, row.eventCategoryId);
         const pickErr = startGroupDraftError(row.draft, category);
         if (pickErr) {
-          setLocalError(`${row.name}: ${pickErr}`);
+          setLocalError(`${row.no} ${row.name}: ${pickErr}`);
           return;
         }
       }
@@ -256,9 +261,15 @@ export function LookupStartGroupModal(props: Props) {
             <ul className="lookup-start-group__members">
               {groupRows.map((row) => {
                 const category = findCategory(categories, row.eventCategoryId);
+                const course = row.courseName || (category ? categoryLabel(category) : "");
                 return (
                   <li key={row.registrationId}>
-                    <p className="lookup-start-group__member-name">{row.name}</p>
+                    <p className="lookup-start-group__member-name">
+                      {row.no} {row.name}
+                      {course ? (
+                        <span className="lookup-start-group__member-course">{course}</span>
+                      ) : null}
+                    </p>
                     {storedStartGroupMissingFromOptions(
                       row.stored.startGroupId,
                       category,

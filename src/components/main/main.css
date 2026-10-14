@@ -1677,3 +1677,10 @@ button.course:disabled:hover {
   font-weight: 800;
   color: #fff;
 }
+
+.lookup-start-group__member-course {
+  margin-left: 0.5rem;
+  color: var(--silver);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
