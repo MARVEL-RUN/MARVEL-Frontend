@@ -853,6 +853,11 @@ export function GroupFlow({
                     const open = openMember === i;
                     return (
                       <Fragment key={i}>
+                        {i > 0 ? (
+                          <tr className="party__gap" aria-hidden="true">
+                            <td colSpan={7} />
+                          </tr>
+                        ) : null}
                         <tr className={open ? "party__info is-open" : "party__info"}>
                           <td className="party__no" rowSpan={3}>{i + 1}.</td>
                           <td className="party__peek">

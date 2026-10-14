@@ -1244,6 +1244,11 @@ export function GroupLookupEdit({
                         : [];
                     return (
                       <Fragment key={member.key}>
+                        {index > 0 ? (
+                          <tr className="party__gap" aria-hidden="true">
+                            <td colSpan={7} />
+                          </tr>
+                        ) : null}
                         <tr className={open ? "party__info is-open" : "party__info"}>
                           <td className="party__no" rowSpan={3}>
                             {index + 1}.

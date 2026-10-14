@@ -837,7 +837,6 @@
 
 .party-wrap {
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .party {
@@ -884,9 +883,37 @@
   font-size: 0.8rem;
 }
 
+/* 바깥 테두리를 참가자 블록마다 그려 블록 사이 간격에는 선이 없게 */
+.party thead tr:first-child th {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.party thead tr:first-child> :first-child,
+.party .party__no {
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
+
 .party thead tr:first-child> :last-child,
 .party .party__del {
-  border-right: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.party tr.party__gap + tr.party__info td {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.party tr.party__kit td,
+.party tr.party__info :is(.party__no, .party__fee, .party__del) {
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+
+.party tr.party__gap td {
+  height: 0.6rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0;
+  line-height: 0;
 }
 
 .party th {
@@ -1000,11 +1027,6 @@
   min-height: 2.15rem;
   padding: 0 0.5rem;
   font-size: 0.78rem;
-}
-
-.party tbody tr:last-child td,
-.party .party__info:has(+ .party__more + .party__kit:last-child) :is(.party__no, .party__fee, .party__del) {
-  border-bottom: 0;
 }
 
 .party .party__peek,
@@ -2327,6 +2349,18 @@
     text-align: left;
     border: 0;
     font-size: 0.75rem;
+  }
+
+  .party tr.party__gap {
+    display: none;
+  }
+
+  .party .party__no,
+  .party .party__del,
+  .party tr.party__gap + tr.party__info td {
+    border-top: 0;
+    border-right: 0;
+    border-left: 0;
   }
 
   .party .party__no {
