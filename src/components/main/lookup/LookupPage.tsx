@@ -11,7 +11,7 @@ import {
   lookupShowRefundOrCancelButton,
 } from "@/lib/main/registrationActionPolicy";
 import { startGroupDisplayFromLookup, type StartGroupDraft } from "@/lib/start-group";
-import { registrationStatusLabel } from "@/lib/registration-status";
+import { registrationStatusBadge, registrationStatusLabel } from "@/lib/registration-status";
 import {
   consumeLookupRefreshAfterPayment,
   paymentOrderFromRetry,
@@ -338,10 +338,18 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
           no={String(i + 1).padStart(2, "0")}
           member={member}
           status={registrationStatusLabel(member.status)}
+          tone={registrationStatusBadge(member.status)}
         />
       ))}
       {canceled.map((member) => (
-        <ReceiptMemberRow key={member.id} no="—" member={member} status="취소" canceled />
+        <ReceiptMemberRow
+          key={member.id}
+          no="—"
+          member={member}
+          status="취소"
+          tone="refunded"
+          canceled
+        />
       ))}
     </ul>
   );
@@ -351,11 +359,13 @@ function ReceiptMemberRow({
   no,
   member,
   status,
+  tone,
   canceled = false,
 }: {
   no: string;
   member: ReceiptMemberView;
   status: string;
+  tone: string;
   canceled?: boolean;
 }) {
   const size = member.souvenirs[0]?.size;
@@ -385,7 +395,9 @@ function ReceiptMemberRow({
           </dl>
         ) : null}
       </div>
-      {status ? <span className="lookup-members__status">{status}</span> : null}
+      {status ? (
+        <span className={`lookup-members__status lookup-members__status--${tone}`}>{status}</span>
+      ) : null}
     </li>
   );
 }
