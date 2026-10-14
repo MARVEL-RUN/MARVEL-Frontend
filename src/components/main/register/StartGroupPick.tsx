@@ -138,7 +138,9 @@ export function StartGroupPick({
           </div>
         );
       })}
-      <label className="start-group-pick__defer">
+      <label
+        className={`start-group-pick__defer${value.startGroupUnselected ? " is-on" : ""}`}
+      >
         <input
           type="checkbox"
           checked={value.startGroupUnselected}
@@ -150,9 +152,10 @@ export function StartGroupPick({
             })
           }
         />
-        <span>
-          A, B 그룹을 잘 모르겠어요
-          <small>후미 출발 그룹으로 배정됩니다</small>
+        <span className="start-group-pick__code">미정</span>
+        <span className="start-group-pick__desc">
+          <strong className="start-group-pick__finish">A, B 그룹을 잘 모르겠어요</strong>
+          <span className="start-group-pick__pace"> · 후미 출발 그룹으로 배정됩니다</span>
         </span>
       </label>
       {hintWhenInactive && preview ? (

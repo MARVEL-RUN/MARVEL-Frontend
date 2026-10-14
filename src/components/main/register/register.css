@@ -3386,7 +3386,8 @@
   list-style: none;
 }
 
-.start-group-pick__list label {
+.start-group-pick__list label,
+.start-group-pick__defer {
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: start;
@@ -3398,18 +3399,51 @@
   transition: border-color 0.15s, background 0.15s;
 }
 
-.start-group-pick__list label.is-on {
+/* 목록 간격(0.55rem)과 맞춤 */
+.start-group-pick__defer {
+  margin-top: -0.3rem;
+}
+
+.start-group-pick__list label.is-on,
+.start-group-pick__defer.is-on {
   border-color: rgba(237, 28, 36, 0.75);
   background: rgba(237, 28, 36, 0.08);
 }
 
-.start-group-pick__list label input {
-  margin-top: 0.15rem;
-  accent-color: var(--marvel);
+.start-group-pick__list label input,
+.start-group-pick__defer input {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
+.start-group-pick__list label input:checked,
+.start-group-pick__defer input:checked {
+  border-color: var(--marvel);
+  background-color: var(--marvel);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.4 6.3 4.9 8.8 9.6 3.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0.7rem;
+}
+
+.start-group-pick__list label input:focus-visible,
+.start-group-pick__defer input:focus-visible {
+  outline: 2px solid var(--marvel);
+  outline-offset: 2px;
+}
+
+/* 「미정」 폭에 맞춰 A·B 설명 시작점 통일 */
 .start-group-pick__code {
-  min-width: 1.6rem;
+  min-width: 2.2rem;
   font-weight: 800;
   color: #fff;
 }
@@ -3418,6 +3452,7 @@
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.88rem;
   line-height: 1.45;
+  word-break: keep-all;
 }
 
 .start-group-pick__finish {
@@ -3430,27 +3465,6 @@
 .start-group-pick__pace {
   color: rgba(255, 255, 255, 0.72);
   font-weight: 500;
-}
-
-.start-group-pick__defer {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.start-group-pick__defer input {
-  margin-top: 0.2rem;
-  accent-color: var(--marvel);
-}
-
-.start-group-pick__defer small {
-  display: block;
-  margin-top: 0.15rem;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 0.82rem;
 }
 
 .start-group-pick.is-disabled label,
