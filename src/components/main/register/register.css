@@ -2915,14 +2915,18 @@
   cursor: default;
 }
 
+.start-group-pick.is-preview label {
+  cursor: default;
+}
+
+.start-group-pick.is-preview input {
+  cursor: not-allowed;
+}
+
 .start-group-pick__section + .start-group-pick__section {
   margin-top: 0.9rem;
   padding-top: 0.85rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.start-group-pick__section.is-inactive {
-  opacity: 0.42;
 }
 
 .start-group-pick__section-title {

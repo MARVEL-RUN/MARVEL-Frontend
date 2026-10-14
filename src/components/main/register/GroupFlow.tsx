@@ -1025,8 +1025,8 @@ export function GroupFlow({
                                 startGroupId: p.startGroupId,
                                 startGroupUnselected: p.startGroupUnselected,
                               }}
-                              disabled={!optionsReady || !p.categoryId}
-                              hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹을 고를 수 있습니다."
+                              disabled={!optionsReady}
+                              hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
                               namePrefix={`member-${i}`}
                               onChange={(next) => patchMember(i, next)}
                             />

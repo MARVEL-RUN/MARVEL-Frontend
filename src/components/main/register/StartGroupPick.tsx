@@ -80,36 +80,44 @@ export function StartGroupPick({
     );
   }
 
-  const multiSection = sectionList.length > 1 || Boolean(sectionList[0]?.title);
-  const showInactiveHint = Boolean(hintWhenInactive && !activeSectionKey);
+  const preview = !activeSectionKey;
+  const visibleSections = preview
+    ? sectionList
+    : sectionList.filter((section) => section.key === activeSectionKey);
+
+  if (!visibleSections.length) {
+    return (
+      <p className="start-group-pick start-group-pick--empty">
+        선택한 종목의 출발 그룹을 불러오지 못했습니다.
+      </p>
+    );
+  }
+
+  const multiSection = visibleSections.length > 1 || Boolean(visibleSections[0]?.title);
+  const inputsDisabled = preview || Boolean(disabled);
+  const showSectionTitle = preview || visibleSections.length > 1;
 
   return (
-    <div className={`start-group-pick${disabled ? " is-disabled" : ""}`}>
-      {sectionList.map((section) => {
-        const sectionInactive =
-          Boolean(activeSectionKey) && section.key !== activeSectionKey;
-        const sectionDisabled = disabled || sectionInactive;
+    <div
+      className={`start-group-pick${preview ? " is-preview" : ""}${
+        disabled && !preview ? " is-disabled" : ""
+      }`}
+    >
+      {visibleSections.map((section) => {
         const radioName = multiSection
           ? `${namePrefix}-${section.key}`
           : `${namePrefix}-choice`;
 
         return (
-          <div
-            key={section.key}
-            className={
-              sectionInactive
-                ? "start-group-pick__section is-inactive"
-                : "start-group-pick__section"
-            }
-          >
-            {section.title ? (
+          <div key={section.key} className="start-group-pick__section">
+            {section.title && showSectionTitle ? (
               <p className="start-group-pick__section-title">{section.title}</p>
             ) : null}
             <GroupList
               groups={section.groups}
               value={value}
               onChange={onChange}
-              disabled={sectionDisabled}
+              disabled={inputsDisabled}
               radioName={radioName}
             />
           </div>
@@ -119,7 +127,7 @@ export function StartGroupPick({
         <input
           type="checkbox"
           checked={value.startGroupUnselected}
-          disabled={disabled || !activeSectionKey}
+          disabled={inputsDisabled}
           onChange={(e) =>
             onChange({
               startGroupId: "",
@@ -132,7 +140,7 @@ export function StartGroupPick({
           <small>후미 출발 그룹으로 배정됩니다</small>
         </span>
       </label>
-      {showInactiveHint ? (
+      {hintWhenInactive && preview ? (
         <p className="form-row__hint start-group-pick__hint">{hintWhenInactive}</p>
       ) : null}
     </div>
