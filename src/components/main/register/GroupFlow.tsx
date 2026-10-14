@@ -1013,7 +1013,7 @@ export function GroupFlow({
                           </td>
                         </tr>
                         <tr className={open ? "party__start-group is-open" : "party__start-group"}>
-                          <td colSpan={4}>
+                          <td colSpan={4} data-label="출발 그룹">
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={p.categoryId}
