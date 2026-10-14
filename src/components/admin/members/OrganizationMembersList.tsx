@@ -295,6 +295,7 @@ export function OrganizationMembersList({
       key: "name",
       header: "성명",
       className: "is-name",
+      width: "112px",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__name" title={row.name || undefined}>
           {row.name || "-"}
@@ -305,20 +306,21 @@ export function OrganizationMembersList({
       key: "birth",
       header: "생년월일",
       className: "is-muted",
-      width: "96px",
+      width: "92px",
       render: (row: AdminApplicationRow) => row.birth || "-",
     },
     {
       key: "gender",
       header: "성별",
       className: "is-muted",
-      width: "52px",
+      width: "48px",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
       className: "is-course",
+      width: "120px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
@@ -332,6 +334,7 @@ export function OrganizationMembersList({
       key: "souvenir",
       header: "기념품",
       className: "is-clip",
+      width: "92px",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
           {row.souvenir || "-"}
@@ -342,14 +345,14 @@ export function OrganizationMembersList({
       key: "phone",
       header: "연락처",
       className: "is-phone",
-      width: "120px",
+      width: "112px",
       render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
       key: "marketing",
       header: "마케팅",
       className: "is-marketing",
-      width: "56px",
+      width: "52px",
       render: (row: AdminApplicationRow) => (
         <MarketingBadge consent={Boolean(row.marketingConsent)} />
       ),
@@ -358,14 +361,14 @@ export function OrganizationMembersList({
       key: "status",
       header: "신청상태",
       className: "is-status",
-      width: "108px",
+      width: "102px",
       render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
     },
     {
       key: "appliedAt",
       header: "신청일시",
       className: "is-date",
-      width: "136px",
+      width: "124px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
