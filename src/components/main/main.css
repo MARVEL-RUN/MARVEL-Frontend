@@ -257,6 +257,121 @@ html.is-intro {
   font-size: 1.2rem;
 }
 
+/* 미디어 로딩 — 기념품·현장프로그램 */
+.media-load {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  background: var(--navy);
+}
+
+.media-load.is-out {
+  animation: media-load-out 1s ease forwards;
+}
+
+.media-load__mark {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: clamp(11rem, 36vw, 16rem);
+  overflow: hidden;
+  filter: drop-shadow(0 0 22px rgba(237, 29, 36, 0.35));
+  animation: media-load-pulse 1.3s ease-in-out infinite;
+}
+
+.media-load__mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 70%);
+  transform: translateX(-140%);
+  animation: media-load-shine 1.3s ease-in-out infinite;
+}
+
+/* 인트로 로고 비율: MARVEL 박스 ≈ RUN 폭의 절반 */
+.media-load__box {
+  display: block;
+  width: 52%;
+  height: auto;
+}
+
+.media-load__run {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.18em;
+}
+
+.media-load__bar {
+  display: block;
+  width: clamp(11rem, 36vw, 16rem);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.media-load__fill {
+  display: block;
+  height: 100%;
+  background: var(--marvel);
+  transition: width 0.25s ease;
+}
+
+.media-load__text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes media-load-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes media-load-shine {
+
+  0%,
+  35% {
+    transform: translateX(-140%);
+  }
+
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes media-load-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .media-load__mark,
+  .media-load__mark::after {
+    animation: none;
+  }
+}
+
 /* header */
 .site-header {
   position: fixed;
