@@ -836,7 +836,7 @@ export function GroupFlow({
                   <tr>
                     <th>참가종목</th>
                     <th>사이즈</th>
-                    <th colSpan={2}>패키지</th>
+                    <th colSpan={2}>출발 그룹</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1008,12 +1008,10 @@ export function GroupFlow({
                               }
                             />
                           </td>
-                          <td colSpan={2} data-label="패키지">
+                          <td className="party__kit-m" data-label="패키지">
                             <KitFixed courseId={courseId} />
                           </td>
-                        </tr>
-                        <tr className={open ? "party__start-group is-open" : "party__start-group"}>
-                          <td colSpan={4} data-label="출발 그룹">
+                          <td colSpan={2} data-label="출발 그룹">
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={p.categoryId}
@@ -1025,6 +1023,12 @@ export function GroupFlow({
                               namePrefix={`member-${i}`}
                               onChange={(next) => patchMember(i, next)}
                             />
+                          </td>
+                        </tr>
+                        <tr className="party__kit">
+                          <td colSpan={4}>
+                            <span className="party__kit-label">패키지</span>
+                            <KitFixed courseId={courseId} />
                           </td>
                         </tr>
                       </Fragment>

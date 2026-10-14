@@ -1003,7 +1003,7 @@
 }
 
 .party tbody tr:last-child td,
-.party .party__info:has(+ .party__more + .party__start-group:last-child) :is(.party__no, .party__fee, .party__del) {
+.party .party__info:has(+ .party__more + .party__kit:last-child) :is(.party__no, .party__fee, .party__del) {
   border-bottom: 0;
 }
 
@@ -2431,36 +2431,16 @@
     border-top: 0;
   }
 
-  .party tr.party__more.is-open:has(+ tr.party__start-group.is-open) {
-    margin-bottom: 0;
-  }
-
-  .party tr.party__start-group:not(.is-open) {
+  .party tr.party__kit {
     display: none;
   }
 
-  .party tr.party__start-group.is-open {
+  .party tr.party__more.is-open td.party__kit-m {
     display: grid;
-    grid-template-columns: 1fr;
-    margin-top: -1px;
-    margin-bottom: 0.65rem;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-top: 0;
   }
 
-  .party tr.party__start-group.is-open td {
-    display: grid;
-    gap: 0.28rem;
-    grid-column: 1 / -1;
-    min-width: 0;
-    padding: 0.5rem 0.6rem;
-  }
-
-  .party tr.party__start-group.is-open td[data-label="출발 그룹"] {
-    grid-column: 1 / -1;
-  }
-
-  .party tbody>tr:last-child {
+  .party tbody>tr:last-child,
+  .party tbody>tr.party__more:nth-last-child(2) {
     margin-bottom: 0;
   }
 
@@ -2497,26 +2477,6 @@
     color: #fff;
     font-size: 0.74rem;
     font-weight: 800;
-  }
-
-  .party .party-start-group {
-    display: block;
-  }
-
-  .party .party-start-group__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .party .party-start-group select {
-    width: 100%;
   }
 
   .party input,
@@ -3023,25 +2983,42 @@
   margin: 0.35rem 0 0;
 }
 
-/* 단체 참가자 행 — 종목 선택과 같은 드롭다운 */
-.party tr.party__start-group td {
-  padding: 0.5rem 0.55rem;
-}
-
-.party-start-group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.9rem;
-}
-
+/* 단체 참가자 표 — 출발 그룹은 헤더 열, 패키지는 PC에서 맨 아래 안내 줄 */
 .party-start-group__label {
-  flex: none;
-  color: #fff;
-  font-size: 0.8rem;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.party td.party__kit-m {
+  display: none;
+}
+
+.party tr.party__kit td {
+  padding: 0.45rem 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+  text-align: left;
+}
+
+.party__kit-label {
+  display: inline-block;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
-.party .party-start-group select {
-  flex: 0 1 34rem;
+.party tr.party__kit .kit-fixed {
+  display: inline-flex;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.76rem;
+  font-weight: 600;
 }
