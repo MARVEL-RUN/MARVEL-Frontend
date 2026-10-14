@@ -31,6 +31,8 @@ export type AdminOrganizationMember = {
   status: string;
   createdAt: string;
   amount: number;
+  startGroupCode: string;
+  startGroupUnselected?: boolean;
 };
 
 export type AdminOrganizationDetail = {
@@ -155,6 +157,8 @@ function toMember(row: unknown): AdminOrganizationMember | null {
     status: asText(item.status),
     createdAt: asText(item.createdAt),
     amount: asNumber(item.amount),
+    startGroupCode: asText(item.startGroupCode),
+    startGroupUnselected: asOptionalBool(item.startGroupUnselected),
   };
 }
 
@@ -190,6 +194,8 @@ export function mapOrganizationMemberToApplicationRow(
     status: statusKey(member.status),
     appliedAt: formatAdminBoardDate(member.createdAt || undefined),
     organizationId,
+    startGroupCode: member.startGroupCode,
+    startGroupUnselected: member.startGroupUnselected,
   };
 }
 

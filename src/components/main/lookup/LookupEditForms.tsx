@@ -521,13 +521,13 @@ export function IndividualLookupEdit({
                 disabled
               />
             </FormRow>
-            <FormRow label="이메일">
+            <FormRow label="이메일" locked={!canModify}>
               <EmailField value={email} onChange={setEmail} disabled={!canModify} />
             </FormRow>
           </FormSec>
 
           <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-            <FormRow label="주소" required>
+            <FormRow label="주소" required locked={!canModify}>
               <AddressField
                 zonecode={zonecode}
                 address={address}
@@ -610,7 +610,7 @@ export function IndividualLookupEdit({
             <ApplyHint>
               <p>{TIMING_CHIP_NOTE}</p>
             </ApplyHint>
-            <FormRow label="참가종목" required>
+            <FormRow label="참가종목" required locked={!canModify}>
               <CoursePick
                 value={courseId}
                 birth={birth}
@@ -625,7 +625,7 @@ export function IndividualLookupEdit({
             <FormRow label="패키지">
               <KitFixed courseId={courseId} />
             </FormRow>
-            <FormRow label="출발 그룹" required>
+            <FormRow label="출발 그룹" required locked={!canModify}>
               <StartGroupPick
                 sections={startGroupSections}
                 activeSectionKey={eventCategoryId || undefined}
@@ -636,7 +636,7 @@ export function IndividualLookupEdit({
                 namePrefix="lookup-edit-personal"
               />
             </FormRow>
-            <FormRow label="티셔츠 사이즈" required>
+            <FormRow label="티셔츠 사이즈" required locked={!canModify}>
               <ShirtPick
                 value={selectedSize}
                 sizes={souvenir ? sizes : undefined}
@@ -1150,7 +1150,7 @@ export function GroupLookupEdit({
                 disabled
               />
             </FormRow>
-            <FormRow label="이메일">
+            <FormRow label="이메일" locked={!canEditOrgCommon}>
               <EmailField
                 value={email}
                 onChange={setEmail}
@@ -1164,7 +1164,7 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-            <FormRow label="주소" required>
+            <FormRow label="주소" required locked={!canEditOrgCommon}>
               <AddressField
                 zonecode={zonecode}
                 address={address}
@@ -1240,17 +1240,13 @@ export function GroupLookupEdit({
                     const open = openMember === index;
                     const locked = Boolean(member.registrationId);
                     const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
+                    const memberFieldsLocked = !canEditMemberFields;
                     const memberPolicyNoteLines =
                       locked && member.memberPolicy
                         ? memberLookupPolicyNotes(member.memberPolicy)
                         : [];
                     return (
                       <Fragment key={member.key}>
-                        {index > 0 ? (
-                          <tr className="party__gap" aria-hidden="true">
-                            <td colSpan={7} />
-                          </tr>
-                        ) : null}
                         <tr className={open ? "party__info is-open" : "party__info"}>
                           <td className="party__no" rowSpan={3}>
                             {index + 1}.
@@ -1260,22 +1256,22 @@ export function GroupLookupEdit({
                               {groupMemberPeek(member, categories)}
                             </button>
                           </td>
-                          <td data-label="이름" className={locked ? "is-locked" : undefined}>
+                          <td data-label="이름" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <input
                               type="text"
                               placeholder="성명"
                               value={member.name}
                               onChange={(e) => patchMember(index, { name: e.target.value })}
                               required
-                              disabled={locked}
-                              readOnly={locked}
+                              disabled={memberFieldsLocked}
+                              readOnly={memberFieldsLocked}
                             />
                           </td>
-                          <td data-label="생년월일" className={locked ? "is-locked" : undefined}>
+                          <td data-label="생년월일" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <BirthText
                               value={member.birth}
                               onChange={(birth) => {
-                                if (locked) return;
+                                if (memberFieldsLocked) return;
                                 const current = findCategory(categories, member.eventCategoryId);
                                 const keep = current && categoryOpenForBirth(current, birth);
                                 patchMember(
@@ -1303,30 +1299,30 @@ export function GroupLookupEdit({
                                 );
                               }}
                               required
-                              disabled={locked}
+                              disabled={memberFieldsLocked}
                             />
                           </td>
-                          <td data-label="연락처" className={locked ? "is-locked" : undefined}>
+                          <td data-label="연락처" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <PhoneField
                               placeholder="연락처"
                               value={member.phNum}
                               onChange={(phNum) => {
-                                if (locked) return;
+                                if (memberFieldsLocked) return;
                                 patchMember(index, { phNum });
                               }}
                               required
-                              disabled={locked}
+                              disabled={memberFieldsLocked}
                             />
                           </td>
-                          <td data-label="성별" className={locked ? "is-locked" : undefined}>
+                          <td data-label="성별" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <select
                               value={toUiGender(member.gender)}
                               onChange={(e) => {
-                                if (locked) return;
+                                if (memberFieldsLocked) return;
                                 patchMember(index, { gender: toApiGender(e.target.value) });
                               }}
                               required
-                              disabled={locked}
+                              disabled={memberFieldsLocked}
                             >
                               <option value="">성별</option>
                               {GENDERS.map((g) => (
@@ -1371,7 +1367,10 @@ export function GroupLookupEdit({
                           </td>
                         </tr>
                         <tr className={open ? "party__more is-open" : "party__more"}>
-                          <td data-label="참가종목">
+                          <td
+                            data-label="참가종목"
+                            className={memberFieldsLocked ? "is-locked" : undefined}
+                          >
                             <select
                               value={member.eventCategoryId}
                               onChange={(e) => {
@@ -1414,13 +1413,11 @@ export function GroupLookupEdit({
                                 );
                               })}
                             </select>
-                            {memberPolicyNoteLines.map((line) => (
-                              <p key={line} className="form-row__hint" role="status">
-                                {line}
-                              </p>
-                            ))}
                           </td>
-                          <td data-label="출발 그룹">
+                          <td
+                            data-label="출발 그룹"
+                            className={memberFieldsLocked ? "is-locked" : undefined}
+                          >
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={member.eventCategoryId}
@@ -1441,7 +1438,11 @@ export function GroupLookupEdit({
                               }
                             />
                           </td>
-                          <td colSpan={2} data-label="사이즈">
+                          <td
+                            colSpan={2}
+                            data-label="사이즈"
+                            className={memberFieldsLocked ? "is-locked" : undefined}
+                          >
                             <ShirtPick
                               value={selectedSize}
                               sizes={souvenir ? sizes : undefined}
@@ -1466,6 +1467,29 @@ export function GroupLookupEdit({
                             <KitFixed courseId={courseId} />
                           </td>
                         </tr>
+                        {memberPolicyNoteLines.length ? (
+                          <tr className={open ? "party__callout is-open" : "party__callout"}>
+                            <td className="party__callout-pad party__callout-lead" aria-hidden="true">
+                              <span className="party-callout__arrow party-callout__arrow--lead" />
+                            </td>
+                            <td colSpan={4}>
+                              <div className="party-callout" role="status">
+                                <span
+                                  className="party-callout__arrow party-callout__arrow--inline"
+                                  aria-hidden="true"
+                                />
+                                <p className="party-callout__text">
+                                  {memberPolicyNoteLines.join(" ")}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="party__callout-pad" colSpan={2} aria-hidden="true" />
+                          </tr>
+                        ) : index < members.length - 1 ? (
+                          <tr className="party__gap" aria-hidden="true">
+                            <td colSpan={7} />
+                          </tr>
+                        ) : null}
                       </Fragment>
                     );
                   })}

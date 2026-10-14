@@ -130,16 +130,18 @@ function startGroupBlockedStatus(status?: string | null) {
   return key === "CANCELED" || key === "CANCELLATION_PENDING" || key === "EXPIRED";
 }
 
-/** 출발 그룹 전용 PATCH — 외부결제·modifyAllowed와 무관 */
+/** 출발 그룹 전용 PATCH — 수정 화면에서 못 바꿀 때(modifyAllowed false·외부결제)만 노출 */
 export function lookupPersonalStartGroupEditAllowed(receipt: RegistrationReceipt) {
   if (!receipt.registrationId?.trim()) return false;
   if (receipt.organizationId) return false;
+  if (lookupModifyAllowed(receipt)) return false;
   return !startGroupBlockedStatus(receipt.registrationStatus);
 }
 
 export function lookupOrganizationStartGroupEditAllowed(receipt: RegistrationReceipt) {
   if (!receipt.organizationId?.trim()) return false;
   if (closedRegistration(receipt.registrationStatus)) return false;
+  const editScreen = lookupOrganizationEditScreenAllowed(receipt);
   const rows =
     receipt.registrations?.length
       ? receipt.registrations
@@ -147,7 +149,9 @@ export function lookupOrganizationStartGroupEditAllowed(receipt: RegistrationRec
   return rows.some((row) => {
     if (row.canceled) return false;
     if (!row.registrationId?.trim()) return false;
-    return !startGroupBlockedStatus(row.registrationStatus);
+    if (startGroupBlockedStatus(row.registrationStatus)) return false;
+    const memberPolicy = "memberPolicy" in row ? row.memberPolicy : undefined;
+    return !editScreen || !memberModifyAllowed(memberPolicy, true);
   });
 }
 
@@ -264,3 +268,4 @@ export function memberLookupPolicyNotes(
   if (!memberPolicy.deleteMemberAllowed) push(memberPolicy.deleteMemberReason);
   return lines;
 }
+

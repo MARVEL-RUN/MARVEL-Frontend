@@ -69,7 +69,24 @@ function StatusBadge({ status }: { status: string }) {
 function CourseTag({ row }: { row: AdminApplicationRow }) {
   const label = applicationCourseLabel(row);
   if (!label || label === "-") return <>-</>;
-  return <span className="admin-apps-list__course-text">{label}</span>;
+  return (
+    <span className="admin-apps-list__course-text admin-apps-list__clip" title={label}>
+      {label}
+    </span>
+  );
+}
+
+function StartGroupTag({ row }: { row: AdminApplicationRow }) {
+  const code = row.startGroupCode?.trim();
+  if (!code) return <>-</>;
+  return (
+    <span className="admin-apps-list__group">
+      <span className="admin-apps-list__course-text">{code}</span>
+      {row.startGroupUnselected ? (
+        <span className="admin-apps-list__group-auto">미선택</span>
+      ) : null}
+    </span>
+  );
 }
 
 function MarketingBadge({ consent }: { consent: boolean }) {
@@ -271,14 +288,14 @@ export function OrganizationMembersList({
       key: "no",
       header: "번호",
       className: "is-num",
-      width: "48px",
+      width: "52px",
       render: (row: AdminApplicationRow) => row.no || "-",
     },
     {
       key: "name",
       header: "성명",
       className: "is-name",
-      width: "11%",
+      width: "140px",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__name" title={row.name || undefined}>
           {row.name || "-"}
@@ -289,28 +306,35 @@ export function OrganizationMembersList({
       key: "birth",
       header: "생년월일",
       className: "is-muted",
-      width: "96px",
+      width: "92px",
       render: (row: AdminApplicationRow) => row.birth || "-",
     },
     {
       key: "gender",
       header: "성별",
       className: "is-muted",
-      width: "56px",
+      width: "48px",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
       className: "is-course",
-      width: "56px",
+      width: "96px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
+    },
+    {
+      key: "startGroup",
+      header: "출발 그룹",
+      className: "is-course",
+      width: "84px",
+      render: (row: AdminApplicationRow) => <StartGroupTag row={row} />,
     },
     {
       key: "souvenir",
       header: "기념품",
       className: "is-clip",
-      width: "11%",
+      width: "92px",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
           {row.souvenir || "-"}
@@ -321,7 +345,7 @@ export function OrganizationMembersList({
       key: "phone",
       header: "연락처",
       className: "is-phone",
-      width: "118px",
+      width: "112px",
       render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
@@ -337,14 +361,14 @@ export function OrganizationMembersList({
       key: "status",
       header: "신청상태",
       className: "is-status",
-      width: "108px",
+      width: "102px",
       render: (row: AdminApplicationRow) => <StatusBadge status={row.status} />,
     },
     {
       key: "appliedAt",
       header: "신청일시",
       className: "is-date",
-      width: "132px",
+      width: "124px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];

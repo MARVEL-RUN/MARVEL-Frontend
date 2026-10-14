@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useFlowReset } from "@/lib/main/flowReset";
 import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
 import {
@@ -113,6 +114,12 @@ export function RegisterFlow() {
     setKind("");
     requestAnimationFrame(scrollPageTop);
   }
+
+  useFlowReset("register", () => {
+    setKind("");
+    setConsents(EMPTY_CONSENTS);
+    requestAnimationFrame(scrollPageTop);
+  });
 
   if (!kind) {
     return (

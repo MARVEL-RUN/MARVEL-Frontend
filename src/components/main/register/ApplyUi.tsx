@@ -735,7 +735,7 @@ export function AddressField({
   }
 
   return (
-    <div className="address-pick">
+    <div className={`address-pick${disabled ? " is-disabled" : ""}`}>
       <div className="address-pick__row">
         <input
           type="text"
@@ -745,6 +745,7 @@ export function AddressField({
           value={zonecode ?? ""}
           readOnly
           required={required}
+          disabled={disabled}
           onClick={search}
           aria-label="우편번호"
         />
@@ -765,9 +766,9 @@ export function AddressField({
         value={address ?? ""}
         readOnly
         required={required}
+        disabled={disabled}
         onClick={search}
         aria-label="기본주소"
-        tabIndex={disabled ? -1 : undefined}
       />
       <input
         type="text"

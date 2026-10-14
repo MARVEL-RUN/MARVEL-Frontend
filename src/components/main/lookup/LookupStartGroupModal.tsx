@@ -5,6 +5,7 @@ import { MainHttpError } from "@/lib/main/fetch";
 import {
   EMPTY_START_GROUP_DRAFT,
   sortedStartGroups,
+  startGroupDescriptionParts,
   startGroupDraftError,
   startGroupDraftFromStored,
   startGroupInputFromDraft,
@@ -14,7 +15,7 @@ import {
   type StartGroupDraft,
 } from "@/lib/start-group";
 import { applicationPasswordError } from "@/lib/register";
-import { findCategory } from "@/lib/registration-options";
+import { categoryLabel, findCategory } from "@/lib/registration-options";
 import {
   patchIndividualStartGroup,
   patchOrganizationStartGroups,
@@ -25,11 +26,12 @@ import type {
   OrganizationLookupParticipant,
   RegistrationCategory,
   RegistrationReceipt,
+  RegistrationStartGroup,
 } from "@/services/main/types";
 import { useEffect, useId, useState } from "react";
+import { X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { PasswordField } from "../register/ApplyUi";
-import { StartGroupPick } from "../register/StartGroupPick";
 
 type BaseProps = {
   open: boolean;
@@ -57,7 +59,9 @@ type Props = IndividualProps | GroupProps;
 
 type GroupMemberRow = {
   registrationId: string;
+  no: string;
   name: string;
+  courseName: string;
   eventCategoryId: string;
   stored: ReturnType<typeof startGroupInputFromStored>;
   draft: StartGroupDraft;
@@ -130,16 +134,19 @@ export function LookupStartGroupModal(props: Props) {
       return;
     }
     const rows = organizationLookupParticipants(props.receipt)
-      .filter((row) => !row.canceled && row.registrationId?.trim())
-      .map((row) => participantRow(row));
+      .filter((row) => !row.canceled)
+      .map((row, index) => participantRow(row, index))
+      .filter((row) => row.registrationId?.trim());
     setGroupRows(rows);
   }, [open, props]);
 
-  function participantRow(row: OrganizationLookupParticipant): GroupMemberRow {
+  function participantRow(row: OrganizationLookupParticipant, index: number): GroupMemberRow {
     const stored = startGroupInputFromStored(row.startGroupId, row.startGroupUnselected);
     return {
       registrationId: row.registrationId,
+      no: String(index + 1).padStart(2, "0"),
       name: row.name?.trim() || "참가자",
+      courseName: row.eventCategoryName?.trim() || "",
       eventCategoryId: row.eventCategoryId || "",
       stored,
       draft: startGroupDraftFromStored(row.startGroupId, row.startGroupUnselected),
@@ -181,7 +188,7 @@ export function LookupStartGroupModal(props: Props) {
         const category = findCategory(categories, row.eventCategoryId);
         const pickErr = startGroupDraftError(row.draft, category);
         if (pickErr) {
-          setLocalError(`${row.name}: ${pickErr}`);
+          setLocalError(`${row.no} ${row.name}: ${pickErr}`);
           return;
         }
       }
@@ -206,6 +213,14 @@ export function LookupStartGroupModal(props: Props) {
   if (!open || !mounted) return null;
 
   const showError = localError || error;
+  const changedCount =
+    props.kind === "group"
+      ? groupRows.filter((row) => startGroupSelectionChanged(row.stored, row.draft)).length
+      : 0;
+  const individualCategory =
+    props.kind === "individual"
+      ? findCategory(categories, props.receipt.eventCategoryId || "")
+      : undefined;
 
   return createPortal(
     <div className="inquiry-secret lookup-start-group" role="presentation">
@@ -222,43 +237,72 @@ export function LookupStartGroupModal(props: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-describedby={showError ? errorId : undefined}
       >
         <header className="inquiry-secret__head">
-          <h2 id={titleId}>출발 그룹 변경</h2>
-          <p className="inquiry-secret__desc">
-            {props.kind === "individual"
-              ? "신청 비밀번호로 출발 그룹만 변경합니다."
-              : "단체 비밀번호로 선택한 참가자의 출발 그룹만 변경합니다."}
-          </p>
+          <div className="lookup-start-group__title">
+            <span className="kicker">START GROUP</span>
+            <h2 id={titleId}>
+              출발 그룹 <em>설정</em>
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="inquiry-secret__x"
+            onClick={onClose}
+            disabled={busy}
+            aria-label="닫기"
+          >
+            <X size={20} strokeWidth={2.25} />
+          </button>
         </header>
+        <p className="inquiry-secret__desc">
+          {props.kind === "individual"
+            ? "예상 완주 기록에 맞는 출발 그룹을 선택하세요."
+            : "참가자별 출발 그룹을 선택하세요. 바꾼 참가자만 저장됩니다."}
+        </p>
         <div className="lookup-start-group__body">
+          {optionsError ? (
+            <p className="form-row__hint" role="status">
+              {optionsError}
+            </p>
+          ) : null}
           {props.kind === "individual" ? (
-            <>
+            <div className="lookup-start-group__solo">
               {storedStartGroupMissingFromOptions(
                 props.receipt.startGroupId,
-                findCategory(categories, props.receipt.eventCategoryId || ""),
+                individualCategory,
               ) ? (
-                <p className="form__note" role="status">
-                  현재 배정 그룹이 선택지에 없습니다. 다시 선택하거나 미선택으로 변경해 주세요.
+                <p className="form-row__hint" role="status">
+                  현재 배정 그룹이 선택지에 없습니다. 다시 선택해 주세요.
                 </p>
               ) : null}
-              <StartGroupPick
-                groups={sortedStartGroups(
-                  findCategory(categories, props.receipt.eventCategoryId || ""),
-                )}
+              <StartGroupChoice
+                groups={sortedStartGroups(individualCategory)}
                 value={individualDraft}
                 onChange={setIndividualDraft}
                 disabled={busy || Boolean(optionsError)}
-                namePrefix="lookup-personal"
+                name="lookup-personal-start-group"
               />
-            </>
+            </div>
           ) : (
             <ul className="lookup-start-group__members">
               {groupRows.map((row) => {
                 const category = findCategory(categories, row.eventCategoryId);
+                const course = row.courseName || (category ? categoryLabel(category) : "");
+                const changed = startGroupSelectionChanged(row.stored, row.draft);
                 return (
-                  <li key={row.registrationId}>
-                    <p className="lookup-start-group__member-name">{row.name}</p>
+                  <li key={row.registrationId} className={changed ? "is-changed" : undefined}>
+                    <div className="lookup-start-group__member-head">
+                      <span className="lookup-start-group__member-no">{row.no}</span>
+                      <strong className="lookup-start-group__member-name">{row.name}</strong>
+                      {course ? (
+                        <span className="lookup-start-group__member-course">{course}</span>
+                      ) : null}
+                      {changed ? (
+                        <span className="lookup-start-group__member-flag">변경</span>
+                      ) : null}
+                    </div>
                     {storedStartGroupMissingFromOptions(
                       row.stored.startGroupId,
                       category,
@@ -267,11 +311,12 @@ export function LookupStartGroupModal(props: Props) {
                         현재 배정 그룹이 선택지에 없습니다.
                       </p>
                     ) : null}
-                    <StartGroupPick
+                    <StartGroupChoice
                       groups={sortedStartGroups(category)}
                       value={row.draft}
                       disabled={busy || Boolean(optionsError) || !row.eventCategoryId}
-                      namePrefix={`lookup-org-${row.registrationId}`}
+                      name={`lookup-org-${row.registrationId}`}
+                      label={`${row.no} ${row.name} 출발 그룹`}
                       onChange={(next) =>
                         setGroupRows((rows) =>
                           rows.map((item) =>
@@ -287,6 +332,8 @@ export function LookupStartGroupModal(props: Props) {
               })}
             </ul>
           )}
+        </div>
+        <div className="lookup-start-group__foot">
           <div className="field">
             <span>{props.kind === "individual" ? "신청 비밀번호" : "단체 비밀번호"}</span>
             <PasswordField
@@ -297,28 +344,93 @@ export function LookupStartGroupModal(props: Props) {
               disabled={busy}
             />
           </div>
-        </div>
-        {showError ? (
-          <p id={errorId} className="inquiry-secret__error" role="alert">
-            {showError}
-          </p>
-        ) : null}
-        <div className="inquiry-secret__actions">
-          <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>
-            취소
-          </button>
-          <button
-            type="button"
-            className="btn btn--red"
-            onClick={() => void onSubmit()}
-            disabled={busy}
-          >
-            {busy ? "저장 중..." : "저장"}
-          </button>
+          {showError ? (
+            <p id={errorId} className="inquiry-secret__error" role="alert">
+              {showError}
+            </p>
+          ) : null}
+          <div className="inquiry-secret__actions">
+            <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>
+              취소
+            </button>
+            <button
+              type="button"
+              className="btn btn--red"
+              onClick={() => void onSubmit()}
+              disabled={busy}
+            >
+              {busy ? "저장 중..." : changedCount ? `${changedCount}명 저장` : "저장"}
+            </button>
+          </div>
         </div>
       </div>
     </div>,
     document.body,
+  );
+}
+
+const UNSELECTED_KEY = "__unselected";
+
+function StartGroupChoice({
+  groups,
+  value,
+  onChange,
+  disabled,
+  name,
+  label = "출발 그룹",
+}: {
+  groups: RegistrationStartGroup[];
+  value: StartGroupDraft;
+  onChange: (next: StartGroupDraft) => void;
+  disabled?: boolean;
+  name: string;
+  label?: string;
+}) {
+  if (!groups.length) {
+    return <p className="start-group-pick--empty">출발 그룹 선택지를 불러오지 못했습니다.</p>;
+  }
+  const current = value.startGroupUnselected ? UNSELECTED_KEY : value.startGroupId;
+  const options = [
+    ...groups.map((group) => {
+      const { finish, pace } = startGroupDescriptionParts(group.description);
+      return { key: group.id, code: group.code, title: finish, sub: pace };
+    }),
+    { key: UNSELECTED_KEY, code: "미정", title: "잘 모르겠어요", sub: "후미 출발 그룹으로 배정" },
+  ];
+
+  return (
+    <div className="lookup-start-group__choice" role="radiogroup" aria-label={label}>
+      {options.map((option) => {
+        const checked = current === option.key;
+        return (
+          <label
+            key={option.key}
+            className={`lookup-start-group__opt${checked ? " is-on" : ""}${
+              disabled ? " is-disabled" : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name={name}
+              checked={checked}
+              disabled={disabled}
+              onChange={() =>
+                onChange(
+                  option.key === UNSELECTED_KEY
+                    ? { startGroupId: "", startGroupUnselected: true }
+                    : { startGroupId: option.key, startGroupUnselected: false },
+                )
+              }
+            />
+            <span className="lookup-start-group__opt-code">{option.code}</span>
+            {option.title ? (
+              <span className="lookup-start-group__opt-title">{option.title}</span>
+            ) : null}
+            {option.sub ? <span className="lookup-start-group__opt-sub">{option.sub}</span> : null}
+          </label>
+        );
+      })}
+    </div>
   );
 }
 

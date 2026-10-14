@@ -898,7 +898,8 @@
   border-right: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-.party tr.party__gap + tr.party__info td {
+.party tr.party__gap + tr.party__info td,
+.party tr.party__callout + tr.party__info td {
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -1197,6 +1198,61 @@
   margin: 0 0.28rem;
 }
 
+/* 문구는 패키지 라벨과 같은 시작점, 화살표는 번호 칸에서 내려와 문구 앞까지 */
+.party tr.party__callout td {
+  padding: 0 0.75rem 1rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  vertical-align: top;
+}
+
+.party tr.party__callout td.party__callout-pad {
+  padding: 0;
+}
+
+.party tr.party__callout td.party__callout-lead {
+  position: relative;
+}
+
+.party-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.party-callout__arrow {
+  flex: none;
+  width: 0.85rem;
+  height: 0.95rem;
+  border-left: 1px solid var(--marvel);
+  border-bottom: 1px solid var(--marvel);
+}
+
+.party-callout__arrow--lead {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: -0.45rem;
+  width: auto;
+}
+
+.party-callout__arrow--inline {
+  display: none;
+}
+
+.party-callout__text {
+  margin: 0;
+  padding-top: 0.35rem;
+  flex: 1;
+  min-width: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
 /* 패키지는 입력이 아니라 안내라 PC에서는 맨 아래 흐린 줄 */
 .party tr.party__kit td {
   padding: 0.45rem 0.75rem;
@@ -1443,9 +1499,21 @@
 .form-row.is-locked input:disabled,
 .form-row.is-locked select:disabled,
 .form-row.is-locked .birth-pick select:disabled,
+.form-row.is-locked .address-pick input,
+.form-row.is-locked .address-pick__btn,
 .party td.is-locked input:disabled,
-.party td.is-locked select:disabled {
+.party td.is-locked select:disabled,
+.party td.is-locked .party-start-group select:disabled {
   opacity: 1;
+  cursor: not-allowed;
+}
+
+.address-pick.is-disabled {
+  pointer-events: none;
+}
+
+.address-pick.is-disabled input,
+.address-pick.is-disabled .address-pick__btn {
   cursor: not-allowed;
 }
 
@@ -2357,7 +2425,8 @@
 
   .party .party__no,
   .party .party__del,
-  .party tr.party__gap + tr.party__info td {
+  .party tr.party__gap + tr.party__info td,
+  .party tr.party__callout + tr.party__info td {
     border-top: 0;
     border-right: 0;
     border-left: 0;
@@ -2548,14 +2617,48 @@
   .party tr.party__kit.is-open {
     grid-template-columns: 1fr;
     margin-top: -1px;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0;
     border-top: 0;
+  }
+
+  .party tr.party__kit.is-open:has(+ tr.party__callout.is-open) td {
+    padding-bottom: 0.35rem;
+  }
+
+  .party tr.party__kit.is-open:not(:has(+ tr.party__callout.is-open)) {
+    margin-bottom: 0.8rem;
   }
 
   .party tr.party__kit.is-open td {
     grid-column: 1 / -1;
     padding: 0.4rem 0.6rem 0.7rem;
     background: transparent;
+  }
+
+  .party tr.party__callout:not(.is-open) {
+    display: none;
+  }
+
+  .party tr.party__callout.is-open {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: -1px;
+    margin-bottom: 0.8rem;
+    border: 0;
+    background: transparent;
+  }
+
+  .party tr.party__callout.is-open td {
+    grid-column: 1 / -1;
+    padding: 0 0.6rem 0.55rem;
+  }
+
+  .party tr.party__callout td.party__callout-pad {
+    display: none;
+  }
+
+  .party-callout__arrow--inline {
+    display: block;
   }
 
   .party .party__kit-label {
