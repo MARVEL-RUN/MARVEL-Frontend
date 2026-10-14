@@ -1483,9 +1483,7 @@ export function GroupLookupEdit({
                         </tr>
                         {memberPolicyNoteLines.length ? (
                           <tr className={open ? "party__callout is-open" : "party__callout"}>
-                            <td className="party__callout-pad party__callout-lead" aria-hidden="true">
-                              <span className="party-callout__arrow party-callout__arrow--lead" />
-                            </td>
+                            <td className="party__callout-pad" aria-hidden="true" />
                             <td colSpan={4}>
                               <div className="party-callout" role="status">
                                 <Info

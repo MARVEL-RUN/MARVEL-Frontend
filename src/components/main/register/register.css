@@ -1211,36 +1211,15 @@
   padding: 0;
 }
 
-.party tr.party__callout td.party__callout-lead {
+/* 아이콘은 왼쪽 바깥에 걸고 문구 시작점은 위 내용과 맞춤 */
+.party-callout {
   position: relative;
 }
 
-.party-callout {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.party-callout__arrow {
-  flex: none;
-  width: 0.85rem;
-  height: 0.95rem;
-  border-left: 1px solid var(--marvel);
-  border-bottom: 1px solid var(--marvel);
-}
-
-.party-callout__arrow--lead {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  right: -0.45rem;
-  width: auto;
-}
-
 .party-callout__icon {
-  display: none;
-  flex: none;
-  margin-top: 0.45rem;
+  position: absolute;
+  top: 0.45rem;
+  right: calc(100% + 0.35rem);
   color: var(--marvel);
 }
 
@@ -2880,10 +2859,6 @@
 
   .party tr.party__callout td.party__callout-pad {
     display: none;
-  }
-
-  .party-callout__icon {
-    display: block;
   }
 
   .party .party__kit-label {
