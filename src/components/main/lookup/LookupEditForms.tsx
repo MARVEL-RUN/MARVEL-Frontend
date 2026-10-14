@@ -1256,22 +1256,22 @@ export function GroupLookupEdit({
                               {groupMemberPeek(member, categories)}
                             </button>
                           </td>
-                          <td data-label="이름" className={locked ? "is-locked" : undefined}>
+                          <td data-label="이름" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <input
                               type="text"
                               placeholder="성명"
                               value={member.name}
                               onChange={(e) => patchMember(index, { name: e.target.value })}
                               required
-                              disabled={locked}
-                              readOnly={locked}
+                              disabled={memberFieldsLocked}
+                              readOnly={memberFieldsLocked}
                             />
                           </td>
-                          <td data-label="생년월일" className={locked ? "is-locked" : undefined}>
+                          <td data-label="생년월일" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <BirthText
                               value={member.birth}
                               onChange={(birth) => {
-                                if (locked) return;
+                                if (memberFieldsLocked) return;
                                 const current = findCategory(categories, member.eventCategoryId);
                                 const keep = current && categoryOpenForBirth(current, birth);
                                 patchMember(
@@ -1299,30 +1299,30 @@ export function GroupLookupEdit({
                                 );
                               }}
                               required
-                              disabled={locked}
+                              disabled={memberFieldsLocked}
                             />
                           </td>
-                          <td data-label="연락처" className={locked ? "is-locked" : undefined}>
+                          <td data-label="연락처" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <PhoneField
                               placeholder="연락처"
                               value={member.phNum}
                               onChange={(phNum) => {
-                                if (locked) return;
+                                if (memberFieldsLocked) return;
                                 patchMember(index, { phNum });
                               }}
                               required
-                              disabled={locked}
+                              disabled={memberFieldsLocked}
                             />
                           </td>
-                          <td data-label="성별" className={locked ? "is-locked" : undefined}>
+                          <td data-label="성별" className={memberFieldsLocked ? "is-locked" : undefined}>
                             <select
                               value={toUiGender(member.gender)}
                               onChange={(e) => {
-                                if (locked) return;
+                                if (memberFieldsLocked) return;
                                 patchMember(index, { gender: toApiGender(e.target.value) });
                               }}
                               required
-                              disabled={locked}
+                              disabled={memberFieldsLocked}
                             >
                               <option value="">성별</option>
                               {GENDERS.map((g) => (
