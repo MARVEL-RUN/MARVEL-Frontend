@@ -48,6 +48,7 @@ import type {
   RegistrationReceiptSouvenir,
   RegistrationSettlementResult,
 } from "@/services/main/types";
+import { useFlowReset } from "@/lib/main/flowReset";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -81,6 +82,11 @@ export function LookupPage() {
   useLayoutEffect(() => {
     scrollPageTop();
   }, [kind]);
+
+  useFlowReset("lookup", () => {
+    setKind("");
+    requestAnimationFrame(scrollPageTop);
+  });
 
   useLayoutEffect(() => {
     if (consumeLookupRefreshAfterPayment()) {
