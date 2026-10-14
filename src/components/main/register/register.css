@@ -1225,8 +1225,8 @@
   flex: none;
   width: 0.85rem;
   height: 0.95rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.32);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+  border-left: 1px solid var(--marvel);
+  border-bottom: 1px solid var(--marvel);
 }
 
 .party-callout__arrow--lead {
