@@ -103,6 +103,13 @@ export function lookupOrganizationCommonModifyAllowed(receipt: RegistrationRecei
   return Boolean(receipt.organizationId);
 }
 
+/** 배송 확정(REGISTRATION_PERIOD_PAYMENT) 시 단체장 성명·생년월일·연락처·주소는 함께 잠금 */
+export function lookupOrganizationShippingModifyAllowed(receipt: RegistrationReceipt) {
+  if (!lookupOrganizationCommonModifyAllowed(receipt)) return false;
+  const org = receipt.organizationPolicy;
+  return !(org && !org.paymentAllowed && org.paymentReason?.code === "REGISTRATION_PERIOD_PAYMENT");
+}
+
 /** 단체 수정 화면 진입 — 공통 false여도 구성원·추가 policy (인수인계 10.2) */
 export function lookupOrganizationEditScreenAllowed(receipt: RegistrationReceipt) {
   if (receipt.externalPayment) return false;

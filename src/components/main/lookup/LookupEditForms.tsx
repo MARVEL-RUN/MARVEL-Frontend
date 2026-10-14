@@ -48,6 +48,7 @@ import { StartGroupPick } from "../register/StartGroupPick";
 import {
   lookupModifyAllowed,
   lookupOrganizationCommonModifyAllowed,
+  lookupOrganizationShippingModifyAllowed,
   lookupShowPaymentButton,
   memberDeleteAllowed,
   memberLookupPolicyNotes,
@@ -918,9 +919,13 @@ export function GroupLookupEdit({
   const canEditOrgCommon = lookupOrganizationCommonModifyAllowed(receipt);
   const canAddMember = organizationAddMemberAllowed(receipt);
   const canPayAfterModify = lookupShowPaymentButton(receipt);
+  const canEditShipping = lookupOrganizationShippingModifyAllowed(receipt);
   const orgModifyPolicyNote = !canEditOrgCommon
     ? policyReasonMessage(receipt.organizationPolicy?.modifyReason)
     : "";
+  const shippingPolicyNote =
+    orgModifyPolicyNote ||
+    (!canEditShipping ? policyReasonMessage(receipt.organizationPolicy?.paymentReason) : "");
   const addMemberPolicyNote = !canAddMember
     ? policyReasonMessage(receipt.organizationPolicy?.addMemberReason)
     : "";
@@ -1133,34 +1138,39 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="02 / LEADER" title="대표자 정보">
-            <FormRow label="대표자 성명" required locked={!canEditOrgCommon}>
+            <FormRow label="대표자 성명" required locked={!canEditShipping}>
               <input
                 type="text"
                 placeholder="대표자 성명을 입력해주세요"
                 value={leaderName}
                 onChange={(e) => setLeaderName(filterNoSpaceName(e.target.value))}
                 required
-                disabled={!canEditOrgCommon}
-                readOnly={!canEditOrgCommon}
+                disabled={!canEditShipping}
+                readOnly={!canEditShipping}
               />
             </FormRow>
-            <FormRow label="대표자 생년월일" required locked={!canEditOrgCommon}>
+            <FormRow label="대표자 생년월일" required locked={!canEditShipping}>
               <BirthPick
                 value={leaderBirth}
                 onChange={setLeaderBirth}
-                disabled={!canEditOrgCommon}
+                disabled={!canEditShipping}
               />
+              {shippingPolicyNote ? (
+                <p className="form-row__hint" role="status">
+                  {shippingPolicyNote}
+                </p>
+              ) : null}
             </FormRow>
           </FormSec>
           <FormSec kicker="03 / CONTACT" title="연락처">
-            <FormRow label="휴대폰번호" required locked={!canEditOrgCommon}>
+            <FormRow label="휴대폰번호" required locked={!canEditShipping}>
               <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
                 value={leaderPhNum}
                 onChange={setLeaderPhNum}
                 autoComplete="tel"
                 required
-                disabled={!canEditOrgCommon}
+                disabled={!canEditShipping}
               />
             </FormRow>
             <FormRow label="이메일" locked={!canEditOrgCommon}>
@@ -1177,23 +1187,23 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-            <FormRow label="주소" required locked={!canEditOrgCommon}>
+            <FormRow label="주소" required locked={!canEditShipping}>
               <AddressField
                 zonecode={zonecode}
                 address={address}
                 addressDetail={addressDetail}
                 onChange={(next) => {
-                  if (!canEditOrgCommon) return;
+                  if (!canEditShipping) return;
                   if (next.zonecode != null) setZonecode(next.zonecode);
                   if (next.address != null) setAddress(next.address);
                   if (next.addressDetail != null) setAddressDetail(next.addressDetail);
                 }}
                 required
-                disabled={!canEditOrgCommon}
+                disabled={!canEditShipping}
               />
-              {orgModifyPolicyNote ? (
+              {shippingPolicyNote ? (
                 <p className="form-row__hint" role="status">
-                  {orgModifyPolicyNote}
+                  {shippingPolicyNote}
                 </p>
               ) : null}
             </FormRow>
