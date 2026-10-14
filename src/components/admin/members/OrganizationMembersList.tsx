@@ -72,6 +72,19 @@ function CourseTag({ row }: { row: AdminApplicationRow }) {
   return <span className="admin-apps-list__course-text">{label}</span>;
 }
 
+function StartGroupTag({ row }: { row: AdminApplicationRow }) {
+  const code = row.startGroupCode?.trim();
+  if (!code) return <>-</>;
+  return (
+    <span className="admin-apps-list__group">
+      <span className="admin-apps-list__course-text">{code}</span>
+      {row.startGroupUnselected ? (
+        <span className="admin-apps-list__group-auto">미선택</span>
+      ) : null}
+    </span>
+  );
+}
+
 function MarketingBadge({ consent }: { consent: boolean }) {
   return (
     <span
@@ -305,6 +318,13 @@ export function OrganizationMembersList({
       className: "is-course",
       width: "56px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
+    },
+    {
+      key: "startGroup",
+      header: "출발 그룹",
+      className: "is-course",
+      width: "84px",
+      render: (row: AdminApplicationRow) => <StartGroupTag row={row} />,
     },
     {
       key: "souvenir",
