@@ -11,8 +11,8 @@ export const EVENT = {
   openAt: "2026-09-22T14:00:00+09:00",
   /* 1차 마감 후 ~ 2차(추가) 접수 전 대기 (KST). 신청 CTA·/register 차단 */
   round2PauseFrom: "2026-10-13T00:00:00+09:00",
-  round2OpenAt: "2026-10-13T14:00:00+09:00",
-  round2OpenNoticeDate: "2026. 10. 13. 화요일",
+  round2OpenAt: "2026-10-14T14:00:00+09:00",
+  round2OpenNoticeDate: "2026. 10. 14. 수요일",
   round2OpenNoticeTime: "오후 2시",
   round2OpenNoticeAction: "추가 접수 OPEN",
   /* 홈 팝업. nextAt(KST)부터 next. 해당 팝업만 끄려면 next.enabled: false */
@@ -24,8 +24,8 @@ export const EVENT = {
     href: "https://forms.gle/x9925cioc1HGnSEs8",
     nextAt: "2026-10-13T00:00:00+09:00",
     next: {
-      enabled: false,
-      id: "extra-registration-2026-v2",
+      enabled: true,
+      id: "extra-registration-2026-v3",
       title: "2026 마블런 추가 접수 안내",
       image: MAIN_ASSETS.popupExtraRegistration,
       href: "",
