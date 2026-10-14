@@ -1469,14 +1469,21 @@ export function GroupLookupEdit({
                         </tr>
                         {memberPolicyNoteLines.length ? (
                           <tr className={open ? "party__callout is-open" : "party__callout"}>
-                            <td colSpan={7}>
+                            <td className="party__callout-pad party__callout-lead" aria-hidden="true">
+                              <span className="party-callout__arrow party-callout__arrow--lead" />
+                            </td>
+                            <td colSpan={4}>
                               <div className="party-callout" role="status">
-                                <span className="party-callout__arrow" aria-hidden="true" />
+                                <span
+                                  className="party-callout__arrow party-callout__arrow--inline"
+                                  aria-hidden="true"
+                                />
                                 <p className="party-callout__text">
                                   {memberPolicyNoteLines.join(" ")}
                                 </p>
                               </div>
                             </td>
+                            <td className="party__callout-pad" colSpan={2} aria-hidden="true" />
                           </tr>
                         ) : index < members.length - 1 ? (
                           <tr className="party__gap" aria-hidden="true">

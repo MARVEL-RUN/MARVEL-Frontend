@@ -1198,34 +1198,52 @@
   margin: 0 0.28rem;
 }
 
-/* 패키지는 입력이 아니라 안내라 PC에서는 맨 아래 흐린 줄 */
+/* 문구는 패키지 라벨과 같은 시작점, 화살표는 번호 칸에서 내려와 문구 앞까지 */
 .party tr.party__callout td {
-  padding: 0.15rem 0.75rem 0.55rem;
+  padding: 0 0.75rem 1rem;
   border: 0;
   background: transparent;
   text-align: left;
   vertical-align: top;
 }
 
+.party tr.party__callout td.party__callout-pad {
+  padding: 0;
+}
+
+.party tr.party__callout td.party__callout-lead {
+  position: relative;
+}
+
 .party-callout {
   display: flex;
   align-items: flex-start;
-  gap: 0.55rem;
-  max-width: 42rem;
+  gap: 0.5rem;
 }
 
 .party-callout__arrow {
   flex: none;
-  width: 1rem;
-  height: 1.5rem;
-  margin-top: 0.1rem;
-  border-left: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom-left-radius: 2px;
+  width: 0.85rem;
+  height: 0.95rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.32);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.party-callout__arrow--lead {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: -0.45rem;
+  width: auto;
+}
+
+.party-callout__arrow--inline {
+  display: none;
 }
 
 .party-callout__text {
   margin: 0;
+  padding-top: 0.35rem;
   flex: 1;
   min-width: 0;
   color: rgba(255, 255, 255, 0.58);
@@ -1235,6 +1253,7 @@
   word-break: keep-all;
 }
 
+/* 패키지는 입력이 아니라 안내라 PC에서는 맨 아래 흐린 줄 */
 .party tr.party__kit td {
   padding: 0.45rem 0.75rem;
   background: rgba(255, 255, 255, 0.025);
@@ -2406,7 +2425,8 @@
 
   .party .party__no,
   .party .party__del,
-  .party tr.party__gap + tr.party__info td {
+  .party tr.party__gap + tr.party__info td,
+  .party tr.party__callout + tr.party__info td {
     border-top: 0;
     border-right: 0;
     border-left: 0;
@@ -2630,11 +2650,15 @@
 
   .party tr.party__callout.is-open td {
     grid-column: 1 / -1;
-    padding: 0.2rem 0.6rem 0.55rem;
+    padding: 0 0.6rem 0.55rem;
   }
 
-  .party tr.party__callout.is-open .party-callout__arrow {
-    height: 1.35rem;
+  .party tr.party__callout td.party__callout-pad {
+    display: none;
+  }
+
+  .party-callout__arrow--inline {
+    display: block;
   }
 
   .party .party__kit-label {
