@@ -148,7 +148,6 @@ export function MembersListPage({ slug }: Props) {
       key: "no",
       header: "번호",
       className: "is-num",
-      width: "52px",
       render: (row: AdminOrganizationListItem) => row.listNumber || "-",
     },
     {
@@ -195,14 +194,12 @@ export function MembersListPage({ slug }: Props) {
       key: "createdAt",
       header: "등록일",
       className: "is-date",
-      width: "108px",
       render: (row: AdminOrganizationListItem) => formatAdminListDate(row.createdAt),
     },
     {
       key: "memberCount",
       header: "회원수",
       className: "is-num",
-      width: "64px",
       render: (row: AdminOrganizationListItem) =>
         row.memberCount > 0 ? String(row.memberCount) : "-",
     },
@@ -210,7 +207,6 @@ export function MembersListPage({ slug }: Props) {
       key: "members",
       header: "회원리스트",
       className: "is-link",
-      width: "108px",
       render: (row: AdminOrganizationListItem) =>
         row.organizationId ? (
           <Link
