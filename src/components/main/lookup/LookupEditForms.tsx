@@ -1224,8 +1224,8 @@ export function GroupLookupEdit({
                   </tr>
                   <tr>
                     <th>참가종목</th>
-                    <th>사이즈</th>
-                    <th colSpan={2}>출발 그룹</th>
+                    <th>출발 그룹</th>
+                    <th colSpan={2}>사이즈</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1413,28 +1413,7 @@ export function GroupLookupEdit({
                               </p>
                             ))}
                           </td>
-                          <td data-label="사이즈">
-                            <ShirtPick
-                              value={selectedSize}
-                              sizes={souvenir ? sizes : undefined}
-                              disabled={!souvenir || !canEditMemberFields}
-                              onChange={(size) => {
-                                if (!canEditMemberFields) return;
-                                patchMember(index, {
-                                  selectedSouvenirList: withShirtSize(
-                                    category,
-                                    member.selectedSouvenirList,
-                                    size,
-                                    member.birth,
-                                  ),
-                                });
-                              }}
-                            />
-                          </td>
-                          <td className="party__kit-m" data-label="패키지">
-                            <KitFixed courseId={courseId} />
-                          </td>
-                          <td colSpan={2} data-label="출발 그룹">
+                          <td data-label="출발 그룹">
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={member.eventCategoryId}
@@ -1454,8 +1433,26 @@ export function GroupLookupEdit({
                               }
                             />
                           </td>
+                          <td colSpan={2} data-label="사이즈">
+                            <ShirtPick
+                              value={selectedSize}
+                              sizes={souvenir ? sizes : undefined}
+                              disabled={!souvenir || !canEditMemberFields}
+                              onChange={(size) => {
+                                if (!canEditMemberFields) return;
+                                patchMember(index, {
+                                  selectedSouvenirList: withShirtSize(
+                                    category,
+                                    member.selectedSouvenirList,
+                                    size,
+                                    member.birth,
+                                  ),
+                                });
+                              }}
+                            />
+                          </td>
                         </tr>
-                        <tr className="party__kit">
+                        <tr className={open ? "party__kit is-open" : "party__kit"}>
                           <td colSpan={4}>
                             <span className="party__kit-label">패키지</span>
                             <KitFixed courseId={courseId} />

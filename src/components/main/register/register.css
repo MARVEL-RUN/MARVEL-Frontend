@@ -1175,6 +1175,30 @@
   margin: 0 0.28rem;
 }
 
+/* 패키지는 입력이 아니라 안내라 PC에서는 맨 아래 흐린 줄 */
+.party tr.party__kit td {
+  padding: 0.45rem 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+  text-align: left;
+}
+
+.party__kit-label {
+  display: inline-block;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.party tr.party__kit .kit-fixed {
+  display: inline-flex;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
 .apply-terms {
   width: min(860px, 100%);
   margin-inline: auto;
@@ -2431,16 +2455,42 @@
     border-top: 0;
   }
 
-  .party tr.party__kit {
+  .party tr.party__more.is-open:has(+ tr.party__kit.is-open) {
+    margin-bottom: 0;
+  }
+
+  .party tr.party__kit:not(.is-open) {
     display: none;
   }
 
-  .party tr.party__more.is-open td.party__kit-m {
-    display: grid;
+  .party tr.party__kit.is-open {
+    grid-template-columns: 1fr;
+    margin-top: -1px;
+    margin-bottom: 0.65rem;
+    border-top: 0;
   }
 
-  .party tbody>tr:last-child,
-  .party tbody>tr.party__more:nth-last-child(2) {
+  .party tr.party__kit.is-open td {
+    grid-column: 1 / -1;
+    padding: 0.5rem 0.6rem;
+    background: transparent;
+  }
+
+  .party .party__kit-label {
+    margin: 0;
+    color: #fff;
+    font-size: 0.74rem;
+    letter-spacing: -0.01em;
+  }
+
+  .party tr.party__kit .kit-fixed {
+    display: block;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  .party tbody>tr:last-child {
     margin-bottom: 0;
   }
 
@@ -2983,7 +3033,6 @@
   margin: 0.35rem 0 0;
 }
 
-/* 단체 참가자 표 — 출발 그룹은 헤더 열, 패키지는 PC에서 맨 아래 안내 줄 */
 .party-start-group__label {
   position: absolute;
   width: 1px;
@@ -2994,31 +3043,4 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-.party td.party__kit-m {
-  display: none;
-}
-
-.party tr.party__kit td {
-  padding: 0.45rem 0.75rem;
-  background: rgba(255, 255, 255, 0.025);
-  text-align: left;
-}
-
-.party__kit-label {
-  display: inline-block;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-.party tr.party__kit .kit-fixed {
-  display: inline-flex;
-  vertical-align: middle;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.76rem;
-  font-weight: 600;
 }

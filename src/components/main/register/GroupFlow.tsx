@@ -835,8 +835,8 @@ export function GroupFlow({
                   </tr>
                   <tr>
                     <th>참가종목</th>
-                    <th>사이즈</th>
-                    <th colSpan={2}>출발 그룹</th>
+                    <th>출발 그룹</th>
+                    <th colSpan={2}>사이즈</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -998,20 +998,7 @@ export function GroupFlow({
                               })}
                             </select>
                           </td>
-                          <td data-label="사이즈">
-                            <ShirtPick
-                              value={p.selectedSize}
-                              sizes={sizes}
-                              disabled={!souvenir}
-                              onChange={(selectedSize) =>
-                                patchMember(i, { selectedSize })
-                              }
-                            />
-                          </td>
-                          <td className="party__kit-m" data-label="패키지">
-                            <KitFixed courseId={courseId} />
-                          </td>
-                          <td colSpan={2} data-label="출발 그룹">
+                          <td data-label="출발 그룹">
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={p.categoryId}
@@ -1024,8 +1011,18 @@ export function GroupFlow({
                               onChange={(next) => patchMember(i, next)}
                             />
                           </td>
+                          <td colSpan={2} data-label="사이즈">
+                            <ShirtPick
+                              value={p.selectedSize}
+                              sizes={sizes}
+                              disabled={!souvenir}
+                              onChange={(selectedSize) =>
+                                patchMember(i, { selectedSize })
+                              }
+                            />
+                          </td>
                         </tr>
-                        <tr className="party__kit">
+                        <tr className={open ? "party__kit is-open" : "party__kit"}>
                           <td colSpan={4}>
                             <span className="party__kit-label">패키지</span>
                             <KitFixed courseId={courseId} />
