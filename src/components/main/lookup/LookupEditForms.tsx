@@ -70,7 +70,7 @@ import type {
   RegistrationReceipt,
   RegistrationSouvenirSelection,
 } from "@/services/main/types";
-import { CircleAlert, X } from "lucide-react";
+import { CircleAlert, Info, X } from "lucide-react";
 import { FormEvent, Fragment, useEffect, useId, useLayoutEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -1488,9 +1488,11 @@ export function GroupLookupEdit({
                             </td>
                             <td colSpan={4}>
                               <div className="party-callout" role="status">
-                                <span
-                                  className="party-callout__arrow party-callout__arrow--inline"
-                                  aria-hidden="true"
+                                <Info
+                                  className="party-callout__icon"
+                                  size={15}
+                                  strokeWidth={2.25}
+                                  aria-hidden
                                 />
                                 <p className="party-callout__text">
                                   {memberPolicyNoteLines.join(" ")}
