@@ -125,6 +125,9 @@ type RegistrationListItem = {
   createdAt?: string;
   organizationId?: string;
   orgId?: string;
+  startGroupId?: string;
+  startGroupCode?: string;
+  startGroupUnselected?: unknown;
 };
 
 type RegistrationDetail = {
@@ -183,9 +186,13 @@ export type RegistrationFilterParams = {
   eventCategoryId?: string;
 };
 
+export type StartGroupUnselectedFilter = "" | "true" | "false";
+
 export type RegistrationListParams = RegistrationFilterParams & {
   page: number;
   size: number;
+  startGroupCode?: string;
+  startGroupUnselected?: StartGroupUnselectedFilter;
 };
 
 export type RegistrationExcelParams = RegistrationFilterParams;
@@ -388,6 +395,9 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     status: statusKey(item.status),
     appliedAt: formatAdminBoardDate(asText(item.createdAt) || undefined),
     organizationId,
+    startGroupId: asText(item.startGroupId) || undefined,
+    startGroupCode: asText(item.startGroupCode) || undefined,
+    startGroupUnselected: asOptionalBool(item.startGroupUnselected),
   };
 }
 
@@ -511,8 +521,15 @@ function excelFallbackName() {
   return `신청자목록_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.xlsx`;
 }
 
+/** 그룹 조건은 엑셀 API 범위 밖이라 목록 조회에만 붙임. 전체는 파라미터 생략 */
 export function fetchAdminRegistrations(params: RegistrationListParams) {
   const query = registrationFilterQuery(params);
+  if (params.startGroupCode?.trim()) {
+    query.set("startGroupCode", params.startGroupCode.trim());
+  }
+  if (params.startGroupUnselected) {
+    query.set("startGroupUnselected", params.startGroupUnselected);
+  }
   query.set("page", String(params.page));
   query.set("size", String(params.size));
 

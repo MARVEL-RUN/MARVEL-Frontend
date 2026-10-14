@@ -782,6 +782,18 @@ body.admin-mode {
   color: var(--admin-ink);
 }
 
+.admin-apps-list__group {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.admin-apps-list__group-auto {
+  color: #8a94a3;
+  font-size: 11px;
+}
+
 .admin-apps-list__status {
   display: inline-flex;
   align-items: center;
