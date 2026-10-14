@@ -67,6 +67,14 @@ import {
   birthView,
 } from "./ApplyUi";
 import { GroupFlow } from "./GroupFlow";
+import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { StartGroupPick } from "./StartGroupPick";
+import {
+  EMPTY_START_GROUP_DRAFT,
+  startGroupDraftError,
+  startGroupPreviewSections,
+  startGroupSummary,
+} from "@/lib/start-group";
 
 const STEPS = ["정보", "확인"] as const;
 type Step = 0 | 1;
@@ -141,6 +149,8 @@ function IndividualFlow({
   const [payCheckOpen, setPayCheckOpen] = useState(false);
   const {
     categories,
+    registrationOpen,
+    registrationReason,
     loading: optionsLoading,
     errorMessage: optionsError,
     down: optionsDown,
@@ -206,6 +216,12 @@ function IndividualFlow({
 
   function onReview(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+          "현재 신규 접수를 받지 않습니다.",
+      );
+    }
     if (!draft.name.trim()) return fail("이름을 입력하세요.");
     if (/\s/.test(draft.name)) return fail("이름은 띄어쓰기 없이 입력하세요.");
     if (!/^\d{8}$/.test(draft.birth)) return fail("생년월일을 선택하세요.");
@@ -220,6 +236,8 @@ function IndividualFlow({
       return fail("이메일 형식을 확인하세요.");
     }
     if (!draft.courseId) return fail("참가종목을 선택하세요.");
+    const startGroupErr = startGroupDraftError(draft, selectedCategory);
+    if (startGroupErr) return fail(startGroupErr);
     if (optionsLoading) return fail("신청 옵션을 불러오는 중입니다.");
     if (optionsError || !categories.length) {
       return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
@@ -258,6 +276,12 @@ function IndividualFlow({
       goSubmitted();
       return;
     }
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+          "현재 신규 접수를 받지 않습니다.",
+      );
+    }
 
     setBusyAction("submit");
     setError("");
@@ -278,6 +302,12 @@ function IndividualFlow({
   }
 
   async function onPay() {
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+          "현재 신규 접수를 받지 않습니다.",
+      );
+    }
     if (!hasMainApi || !hasTossClientKey) {
       return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
@@ -322,6 +352,7 @@ function IndividualFlow({
   );
   const guardianRequired = guardianRequiredFor(draft);
   const guardianMinor = needsGuardian(draft.birth);
+  const startGroupSections = startGroupPreviewSections(categories);
 
   if (optionsDown) {
     return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
@@ -344,6 +375,9 @@ function IndividualFlow({
       {step === 0 ? (
         <form className="form" onSubmit={onReview} noValidate>
           <ApplyNotice lines={NOTICE} />
+          {!registrationOpen ? (
+            <RegistrationPolicyNotice reason={registrationReason} />
+          ) : null}
 
           <FormSec kicker="01 / PROFILE" title="개인정보">
             <FormRow label="이름" required>
@@ -369,6 +403,7 @@ function IndividualFlow({
                     birth,
                     ...next,
                     ...shirtAssignment(category, draft.selectedSize, birth),
+                    ...EMPTY_START_GROUP_DRAFT,
                   });
                 }}
               />
@@ -488,6 +523,7 @@ function IndividualFlow({
                       draft.selectedSize,
                       draft.birth,
                     ),
+                    ...EMPTY_START_GROUP_DRAFT,
                   })
                 }
               />
@@ -500,6 +536,23 @@ function IndividualFlow({
             ) : null}
             <FormRow label="패키지">
               <KitFixed courseId={draft.courseId} />
+            </FormRow>
+            <FormRow label="출발 그룹" required>
+              {optionsLoading ? (
+                <p className="form-row__hint">불러오는 중</p>
+              ) : (
+                <StartGroupPick
+                  sections={startGroupSections}
+                  activeSectionKey={selectedCategory?.categoryId}
+                  value={{
+                    startGroupId: draft.startGroupId,
+                    startGroupUnselected: draft.startGroupUnselected,
+                  }}
+                  disabled={!optionsReady}
+                  hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
+                  onChange={(next) => patch(next)}
+                />
+              )}
             </FormRow>
             <FormRow label="티셔츠 사이즈" required>
               <ShirtPick
@@ -562,7 +615,11 @@ function IndividualFlow({
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
-            <button type="submit" className="btn btn--red">
+            <button
+              type="submit"
+              className="btn btn--red"
+              disabled={!registrationOpen}
+            >
               확인하기
             </button>
           </div>
@@ -627,6 +684,10 @@ function IndividualFlow({
               <dd>{draft.selectedSize || "—"}</dd>
             </div>
             <div>
+              <dt>출발 그룹</dt>
+              <dd>{startGroupSummary(draft, selectedCategory)}</dd>
+            </div>
+            <div>
               <dt>패키지</dt>
               <dd>
                 <KitFixed courseId={draft.courseId} />
@@ -655,7 +716,9 @@ function IndividualFlow({
               type="button"
               className="btn btn--ghost"
               onClick={onSubmitApplication}
-              disabled={busyAction !== null || Boolean(registration)}
+              disabled={
+                !registrationOpen || busyAction !== null || Boolean(registration)
+              }
             >
               {busyAction === "submit"
                 ? "제출 중..."
@@ -667,7 +730,7 @@ function IndividualFlow({
               type="button"
               className="btn btn--red"
               onClick={onPay}
-              disabled={busyAction !== null}
+              disabled={!registrationOpen || busyAction !== null}
             >
               {busyAction === "pay" ? "결제 준비 중..." : "결제하기"}
             </button>

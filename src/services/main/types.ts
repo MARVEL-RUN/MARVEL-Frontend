@@ -5,6 +5,12 @@ export type RegistrationSouvenir = {
   sizes: string[];
 };
 
+export type RegistrationStartGroup = {
+  id: string;
+  code: string;
+  description: string;
+};
+
 export type RegistrationCategory = {
   order: number;
   categoryId: string;
@@ -13,10 +19,36 @@ export type RegistrationCategory = {
   isActive: boolean;
   amount: number;
   souvenirs: RegistrationSouvenir[];
+  startGroups?: RegistrationStartGroup[];
+};
+
+export type RegistrationPolicyReason = {
+  code: string;
+  message: string;
 };
 
 export type RegistrationOptionsResponse = {
   categories: RegistrationCategory[];
+  registrationAllowed?: boolean;
+  registrationReason?: RegistrationPolicyReason | null;
+};
+
+export type StartGroupInput = {
+  startGroupId: string | null;
+  startGroupUnselected: boolean;
+};
+
+export type PersonalStartGroupPatchRequest = {
+  password: string;
+} & StartGroupInput;
+
+export type OrganizationStartGroupPatchItem = {
+  registrationId: string;
+} & StartGroupInput;
+
+export type OrganizationStartGroupsPatchRequest = {
+  password: string;
+  registrations: OrganizationStartGroupPatchItem[];
 };
 
 export type SelectedSouvenir = {
@@ -42,7 +74,7 @@ export type RegistrationCreateRequest = {
   termsMarketingAgreed: boolean;
   termsMarketingChannelAgreed: boolean;
   email?: string;
-};
+} & StartGroupInput;
 
 export type RegistrationCreateResponse = {
   registrationId: string;
@@ -77,7 +109,7 @@ export type OrganizationParticipant = {
   phNum: string;
   birth: string;
   gender: "M" | "F";
-};
+} & StartGroupInput;
 
 export type OrganizationRegistrationRequest = {
   account: OrganizationAccount;
@@ -144,11 +176,6 @@ export type RegistrationReceiptSouvenir = {
   quantity: number;
 };
 
-export type RegistrationPolicyReason = {
-  code: string;
-  message: string;
-};
-
 export type UserRegistrationPolicy = {
   modifyAllowed: boolean;
   modifyReason: RegistrationPolicyReason | null;
@@ -188,6 +215,9 @@ export type OrganizationLookupParticipant = {
   canceled?: boolean;
   registrationStatus?: string;
   memberPolicy?: MemberRegistrationPolicy;
+  startGroupId?: string | null;
+  startGroupCode?: string | null;
+  startGroupUnselected?: boolean;
 };
 
 export type RegistrationReceipt = {
@@ -228,6 +258,9 @@ export type RegistrationReceipt = {
   externalPayment?: boolean;
   userPolicy?: UserRegistrationPolicy;
   organizationPolicy?: OrganizationRegistrationPolicy;
+  startGroupId?: string | null;
+  startGroupCode?: string | null;
+  startGroupUnselected?: boolean;
 };
 
 export type RegistrationSouvenirSelection = {
@@ -250,7 +283,7 @@ export type IndividualRegistrationModifyRequest = {
   guardianRelationship?: string;
   guardianConsent?: boolean;
   email?: string;
-};
+} & StartGroupInput;
 
 export type OrganizationParticipantModifyRequest = {
   registrationId?: string;
@@ -260,7 +293,7 @@ export type OrganizationParticipantModifyRequest = {
   phNum: string;
   birth: string;
   gender: "M" | "F";
-};
+} & StartGroupInput;
 
 export type OrganizationRegistrationModifyRequest = {
   access: OrganizationLookupRequest;

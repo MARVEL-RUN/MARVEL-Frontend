@@ -4,10 +4,13 @@ import { DEFAULT_EVENT_ID, hasMainApi, hasTossClientKey } from "@/lib/main/confi
 import { genderLabel } from "@/lib/registration-gender";
 import {
   lookupEditScreenAllowed,
+  lookupOrganizationStartGroupEditAllowed,
+  lookupPersonalStartGroupEditAllowed,
   lookupPolicyNotes,
   lookupShowPaymentButton,
   lookupShowRefundOrCancelButton,
 } from "@/lib/main/registrationActionPolicy";
+import { startGroupDisplayFromLookup, type StartGroupDraft } from "@/lib/start-group";
 import { registrationStatusLabel } from "@/lib/registration-status";
 import {
   consumeLookupRefreshAfterPayment,
@@ -61,6 +64,11 @@ import {
   type LookupModifyAction,
 } from "./LookupEditForms";
 import { LookupPasswordModal, type LookupPasswordSubmit } from "./LookupPasswordModal";
+import {
+  LookupStartGroupModal,
+  saveIndividualLookupStartGroup,
+  saveOrganizationLookupStartGroups,
+} from "./LookupStartGroupModal";
 
 type View = "form" | "hit" | "miss";
 
@@ -173,6 +181,7 @@ type ReceiptMemberView = {
   id: string;
   name: string;
   course: string;
+  startGroup: string;
   souvenirs: { id: string; name: string; size: string; quantity: number }[];
   canceled: boolean;
   status: string;
@@ -206,6 +215,10 @@ function toMemberView(
     id: row.registrationId || String(index),
     name: row.name ?? "",
     course: row.eventCategoryName ?? "",
+    startGroup: startGroupDisplayFromLookup(
+      "startGroupCode" in row ? row.startGroupCode : undefined,
+      "startGroupUnselected" in row ? row.startGroupUnselected : undefined,
+    ),
     souvenirs: memberSouvenirs(row).map((item) => ({
       id: item.souvenirId,
       name: item.name,
@@ -321,7 +334,12 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
                 {String(i + 1).padStart(2, "0")} {member.name || "참가자"}
               </strong>
               <span>
-                {[member.course, member.souvenirs[0]?.size, registrationStatusLabel(member.status)]
+                {[
+                  member.course,
+                  member.startGroup,
+                  member.souvenirs[0]?.size,
+                  registrationStatusLabel(member.status),
+                ]
                   .filter(Boolean)
                   .join(" · ") || "—"}
               </span>
@@ -379,6 +397,8 @@ function ReceiptActions({
   passwordBusy,
   onPay,
   onEdit,
+  onStartGroup,
+  startGroupEdit,
   onPassword,
   onRefund,
 }: {
@@ -387,17 +407,30 @@ function ReceiptActions({
   passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onStartGroup?: () => void;
+  startGroupEdit?: boolean;
   onPassword: () => void;
   onRefund?: () => void;
 }) {
   const pay = Boolean(onPay && lookupShowPaymentButton(receipt));
   const edit = Boolean(onEdit && lookupEditScreenAllowed(receipt));
+  const startGroup = Boolean(onStartGroup && startGroupEdit);
   const refund = Boolean(onRefund && lookupShowRefundOrCancelButton(receipt));
   return (
     <div className="flow__nav flow__nav--receipt">
       {edit ? (
         <button type="button" className="btn btn--ghost" onClick={onEdit} disabled={busy}>
           수정
+        </button>
+      ) : null}
+      {startGroup ? (
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={onStartGroup}
+          disabled={busy}
+        >
+          출발 그룹
         </button>
       ) : null}
       <button
@@ -437,9 +470,10 @@ function ReceiptNotes({
     <>
       {externalPayment ? (
         <p className="form__note form__note--external">
-          <strong>외부 결제 건은 결제/수정/환불을 진행할 수 없습니다.</strong>
+          <strong>외부 결제 건은 결제·일반 수정·환불을 진행할 수 없습니다.</strong>
           <span>
-            개인정보 수정이 필요하면 <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
+            출발 그룹은 「출발 그룹」에서 변경할 수 있습니다. 그 외 개인정보 수정은{" "}
+            <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
           </span>
         </p>
       ) : null}
@@ -460,6 +494,8 @@ function IndividualReceiptCard({
   passwordBusy,
   onPay,
   onEdit,
+  onStartGroup,
+  startGroupEdit,
   onPassword,
   onRefund,
 }: {
@@ -469,6 +505,8 @@ function IndividualReceiptCard({
   passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onStartGroup?: () => void;
+  startGroupEdit?: boolean;
   onPassword: () => void;
   onRefund?: () => void;
 }) {
@@ -546,6 +584,15 @@ function IndividualReceiptCard({
             <dd>{course}</dd>
           </div>
         ) : null}
+        <div>
+          <dt>출발 그룹</dt>
+          <dd>
+            {startGroupDisplayFromLookup(
+              receipt.startGroupCode,
+              receipt.startGroupUnselected,
+            )}
+          </dd>
+        </div>
         <ReceiptSouvenirSpec souvenirs={receiptSouvenirs(receipt)} />
         {receipt.orderId ? (
           <div>
@@ -570,6 +617,8 @@ function IndividualReceiptCard({
         passwordBusy={passwordBusy}
         onPay={externalPayment ? undefined : onPay}
         onEdit={externalPayment ? undefined : onEdit}
+        onStartGroup={onStartGroup}
+        startGroupEdit={startGroupEdit}
         onPassword={onPassword}
         onRefund={externalPayment ? undefined : onRefund}
       />
@@ -583,6 +632,8 @@ function GroupReceiptCard({
   passwordBusy,
   onPay,
   onEdit,
+  onStartGroup,
+  startGroupEdit,
   onPassword,
   onRefund,
 }: {
@@ -591,6 +642,8 @@ function GroupReceiptCard({
   passwordBusy?: boolean;
   onPay?: () => void;
   onEdit?: () => void;
+  onStartGroup?: () => void;
+  startGroupEdit?: boolean;
   onPassword: () => void;
   onRefund?: () => void;
 }) {
@@ -643,6 +696,8 @@ function GroupReceiptCard({
         passwordBusy={passwordBusy}
         onPay={onPay}
         onEdit={onEdit}
+        onStartGroup={onStartGroup}
+        startGroupEdit={startGroupEdit}
         onPassword={onPassword}
         onRefund={onRefund}
       />
@@ -703,6 +758,9 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [passwordBusy, setPasswordBusy] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [startGroupOpen, setStartGroupOpen] = useState(false);
+  const [startGroupBusy, setStartGroupBusy] = useState(false);
+  const [startGroupError, setStartGroupError] = useState("");
 
   useLayoutEffect(() => {
     if (view !== "hit" || panel !== "list") return;
@@ -714,6 +772,13 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     setError("");
     setPasswordError("");
     setPasswordOpen(true);
+  }
+
+  function openStartGroup(receipt: RegistrationReceipt) {
+    setError("");
+    setStartGroupError("");
+    setActive(receipt);
+    setStartGroupOpen(true);
   }
 
   async function onChangePassword(input: LookupPasswordSubmit) {
@@ -979,6 +1044,28 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
     }
   }
 
+  async function onSaveStartGroup(password: string, draft: StartGroupDraft) {
+    if (!active || !access) {
+      setStartGroupError("조회 정보를 확인하지 못했습니다.");
+      return;
+    }
+    setStartGroupBusy(true);
+    setStartGroupError("");
+    try {
+      await saveIndividualLookupStartGroup(active, password, draft);
+      await refreshIndividual(access);
+      setStartGroupOpen(false);
+      setActive(null);
+      mainToast.success("출발 그룹이 변경되었습니다.");
+    } catch (err) {
+      setStartGroupError(
+        lookupErrorMessage(err, "출발 그룹을 저장하지 못했습니다."),
+      );
+    } finally {
+      setStartGroupBusy(false);
+    }
+  }
+
   if (view === "miss") {
     return (
       <section className="block wait">
@@ -1030,6 +1117,8 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
               setActive(receipt);
               setPanel("edit");
             }}
+            onStartGroup={() => openStartGroup(receipt)}
+            startGroupEdit={lookupPersonalStartGroupEditAllowed(receipt)}
             onRefund={() => {
               setError("");
               setActive(receipt);
@@ -1065,6 +1154,22 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           }}
           onSubmit={(input) => void onChangePassword(input)}
         />
+        {active ? (
+          <LookupStartGroupModal
+            kind="individual"
+            open={startGroupOpen}
+            busy={startGroupBusy}
+            error={startGroupError}
+            receipt={active}
+            onClose={() => {
+              if (startGroupBusy) return;
+              setStartGroupError("");
+              setStartGroupOpen(false);
+              setActive(null);
+            }}
+            onConfirm={(password, draft) => onSaveStartGroup(password, draft)}
+          />
+        ) : null}
       </>
     );
   }
@@ -1142,6 +1247,9 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [passwordBusy, setPasswordBusy] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [startGroupOpen, setStartGroupOpen] = useState(false);
+  const [startGroupBusy, setStartGroupBusy] = useState(false);
+  const [startGroupError, setStartGroupError] = useState("");
 
   useLayoutEffect(() => {
     if (view !== "hit" || panel !== "list") return;
@@ -1153,6 +1261,13 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     setError("");
     setPasswordError("");
     setPasswordOpen(true);
+  }
+
+  function openStartGroup(receipt: RegistrationReceipt) {
+    setError("");
+    setStartGroupError("");
+    setActive(receipt);
+    setStartGroupOpen(true);
   }
 
   async function onChangePassword(input: LookupPasswordSubmit) {
@@ -1404,6 +1519,31 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
     }
   }
 
+  async function onSaveStartGroup(
+    password: string,
+    items: { registrationId: string; draft: StartGroupDraft }[],
+  ) {
+    if (!active?.organizationId || !access) {
+      setStartGroupError("조회 정보를 확인하지 못했습니다.");
+      return;
+    }
+    setStartGroupBusy(true);
+    setStartGroupError("");
+    try {
+      await saveOrganizationLookupStartGroups(active.organizationId, password, items);
+      await refreshOrganization(access);
+      setStartGroupOpen(false);
+      setActive(null);
+      mainToast.success("출발 그룹이 변경되었습니다.");
+    } catch (err) {
+      setStartGroupError(
+        lookupErrorMessage(err, "출발 그룹을 저장하지 못했습니다."),
+      );
+    } finally {
+      setStartGroupBusy(false);
+    }
+  }
+
   if (view === "miss") {
     return (
       <section className="block wait">
@@ -1454,6 +1594,8 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
               setActive(receipt);
               setPanel("edit");
             }}
+            onStartGroup={() => openStartGroup(receipt)}
+            startGroupEdit={lookupOrganizationStartGroupEditAllowed(receipt)}
             onRefund={() => {
               setError("");
               setActive(receipt);
@@ -1489,6 +1631,22 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           }}
           onSubmit={(input) => void onChangePassword(input)}
         />
+        {active ? (
+          <LookupStartGroupModal
+            kind="group"
+            open={startGroupOpen}
+            busy={startGroupBusy}
+            error={startGroupError}
+            receipt={active}
+            onClose={() => {
+              if (startGroupBusy) return;
+              setStartGroupError("");
+              setStartGroupOpen(false);
+              setActive(null);
+            }}
+            onConfirm={(password, items) => onSaveStartGroup(password, items)}
+          />
+        ) : null}
       </>
     );
   }

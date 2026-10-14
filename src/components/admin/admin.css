@@ -751,7 +751,8 @@ body.admin-mode {
 }
 
 .admin-apps-list__name,
-.admin-apps-list__souvenir {
+.admin-apps-list__souvenir,
+.admin-apps-list__clip {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -780,6 +781,19 @@ body.admin-mode {
 .admin-apps-list__course-text {
   font-weight: 500;
   color: var(--admin-ink);
+}
+
+/* 행 높이가 고정이라 코드·미선택을 한 줄로 */
+.admin-apps-list__group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.admin-apps-list__group-auto {
+  color: #8a94a3;
+  font-size: 11px;
 }
 
 .admin-apps-list__status {

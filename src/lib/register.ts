@@ -60,6 +60,8 @@ export type EntryDraft = {
   zonecode: string;
   address: string;
   addressDetail: string;
+  startGroupId: string;
+  startGroupUnselected: boolean;
 } & Consents;
 
 export type EntryRecord = {
@@ -84,6 +86,8 @@ export type ParticipantDraft = {
   birth: string;
   gender: Gender | "";
   phone: string;
+  startGroupId: string;
+  startGroupUnselected: boolean;
 };
 
 export type GroupDraft = {
@@ -180,6 +184,8 @@ export const EMPTY_DRAFT: EntryDraft = {
   zonecode: "",
   address: "",
   addressDetail: "",
+  startGroupId: "",
+  startGroupUnselected: false,
   ...EMPTY_CONSENTS,
 };
 
@@ -191,6 +197,8 @@ export const EMPTY_PARTICIPANT: ParticipantDraft = {
   birth: "",
   gender: "",
   phone: "",
+  startGroupId: "",
+  startGroupUnselected: false,
 };
 
 export const EMPTY_GROUP: GroupDraft = {

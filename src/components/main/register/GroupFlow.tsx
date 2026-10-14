@@ -61,7 +61,14 @@ import {
   createOrganizationRegistration,
 } from "@/services/main/registrations";
 import type { RegistrationCategory } from "@/services/main/types";
+import {
+  EMPTY_START_GROUP_DRAFT,
+  startGroupDraftError,
+  startGroupSummary,
+} from "@/lib/start-group";
 import { RegisterUnavailable } from "./RegisterUnavailable";
+import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { GroupMemberStartGroup } from "./GroupMemberStartGroup";
 import { useRegistrationOptions } from "./useRegistrationOptions";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "../SheetModal";
@@ -173,6 +180,8 @@ export function GroupFlow({
   const [payCheckOpen, setPayCheckOpen] = useState(false);
   const {
     categories,
+    registrationOpen,
+    registrationReason,
     loading: optionsLoading,
     errorMessage: optionsError,
     down: optionsDown,
@@ -392,6 +401,12 @@ export function GroupFlow({
 
   function onForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+        "현재 신규 접수를 받지 않습니다.",
+      );
+    }
     if (!optionsReady) {
       return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
     }
@@ -480,6 +495,14 @@ export function GroupFlow({
         if (!souvenirSizes(souvenir, ticketForBirth(p.birth)).includes(p.selectedSize)) {
           throw new Error(`참가자 ${n}: 티셔츠 사이즈를 선택하세요.`);
         }
+        const groupErr = startGroupDraftError(
+          {
+            startGroupId: p.startGroupId,
+            startGroupUnselected: p.startGroupUnselected,
+          },
+          category,
+        );
+        if (groupErr) throw new Error(`참가자 ${n}: ${groupErr}`);
       });
     } catch (err) {
       return fail(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
@@ -507,6 +530,12 @@ export function GroupFlow({
       goSubmitted();
       return;
     }
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+        "현재 신규 접수를 받지 않습니다.",
+      );
+    }
 
     setBusyAction("submit");
     setError("");
@@ -527,6 +556,12 @@ export function GroupFlow({
   }
 
   async function onPay() {
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+        "현재 신규 접수를 받지 않습니다.",
+      );
+    }
     if (!hasMainApi || !hasTossClientKey) {
       return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
@@ -571,7 +606,6 @@ export function GroupFlow({
     draft.organizationPassword,
     draft.passwordConfirm,
   );
-
   if (optionsDown) {
     return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
   }
@@ -593,6 +627,9 @@ export function GroupFlow({
       {step === 0 ? (
         <form className="form" onSubmit={onForm} noValidate>
           <ApplyNotice lines={NOTICE} />
+          {!registrationOpen ? (
+            <RegistrationPolicyNotice reason={registrationReason} />
+          ) : null}
 
           <FormSec kicker="01 / GROUP" title="단체 정보">
             <FormRow label="단체명" required>
@@ -798,8 +835,8 @@ export function GroupFlow({
                   </tr>
                   <tr>
                     <th>참가종목</th>
-                    <th>사이즈</th>
-                    <th colSpan={2}>패키지</th>
+                    <th>출발 그룹</th>
+                    <th colSpan={2}>사이즈</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -816,36 +853,41 @@ export function GroupFlow({
                     const open = openMember === i;
                     return (
                       <Fragment key={i}>
-                      <tr className={open ? "party__info is-open" : "party__info"}>
-                        <td className="party__no" rowSpan={2}>{i + 1}.</td>
-                        <td className="party__peek">
-                          <button
-                            type="button"
-                            onClick={() => setOpenMember(i)}
-                          >
-                            {memberPeek(p, categories)}
-                          </button>
-                        </td>
-                        <td data-label="이름">
-                          <input
-                            type="text"
-                            placeholder="성명"
-                            value={p.name}
-                            onChange={(e) => patchMember(i, { name: e.target.value })}
-                            required
-                          />
-                        </td>
-                        <td data-label="생년월일">
-                          <BirthText
-                            value={p.birth}
-                            onChange={(birth) => {
-                              const current = findCategory(categories, p.categoryId);
-                              const keep =
-                                current && categoryOpenForBirth(current, birth);
-                              patchMember(
-                                i,
-                                keep
-                                  ? {
+                        {i > 0 ? (
+                          <tr className="party__gap" aria-hidden="true">
+                            <td colSpan={7} />
+                          </tr>
+                        ) : null}
+                        <tr className={open ? "party__info is-open" : "party__info"}>
+                          <td className="party__no" rowSpan={3}>{i + 1}.</td>
+                          <td className="party__peek">
+                            <button
+                              type="button"
+                              onClick={() => setOpenMember(i)}
+                            >
+                              {memberPeek(p, categories)}
+                            </button>
+                          </td>
+                          <td data-label="이름">
+                            <input
+                              type="text"
+                              placeholder="성명"
+                              value={p.name}
+                              onChange={(e) => patchMember(i, { name: e.target.value })}
+                              required
+                            />
+                          </td>
+                          <td data-label="생년월일">
+                            <BirthText
+                              value={p.birth}
+                              onChange={(birth) => {
+                                const current = findCategory(categories, p.categoryId);
+                                const keep =
+                                  current && categoryOpenForBirth(current, birth);
+                                patchMember(
+                                  i,
+                                  keep
+                                    ? {
                                       birth,
                                       ...shirtAssignment(
                                         current,
@@ -853,125 +895,144 @@ export function GroupFlow({
                                         birth,
                                       ),
                                     }
-                                  : {
+                                    : {
                                       birth,
                                       categoryId: "",
                                       ...shirtAssignment(undefined, "", birth),
+                                      ...EMPTY_START_GROUP_DRAFT,
                                     },
-                              );
-                            }}
-                          />
-                        </td>
-                        <td data-label="연락처">
-                          <PhoneField
-                            placeholder="연락처"
-                            value={p.phone}
-                            onChange={(phone) => patchMember(i, { phone })}
-                            required
-                          />
-                        </td>
-                        <td data-label="성별">
-                          <select
-                            value={p.gender}
-                            onChange={(e) =>
-                              patchMember(i, { gender: e.target.value as Gender })
-                            }
-                            required
-                          >
-                            <option value="">성별</option>
-                            {GENDERS.map((g) => (
-                              <option key={g.id} value={g.id}>
-                                {g.label}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="party__fee" data-label="참가비" rowSpan={2}>
-                          {category
-                            ? formatFee(categoryFeeAmount(category, p.birth))
-                            : "—"}
-                        </td>
-                        <td className="party__del" rowSpan={2}>
-                          <button
-                            type="button"
-                            className="party__expand"
-                            onClick={() => setOpenMember(i)}
-                          >
-                            펼치기
-                          </button>
-                          <button
-                            type="button"
-                            className="party__fold"
-                            onClick={() => setOpenMember(-1)}
-                          >
-                            접기
-                          </button>
-                          <button
-                            type="button"
-                            className="party__remove"
-                            onClick={() => removeMember(i)}
-                            disabled={draft.participants.length <= 1}
-                          >
-                            삭제
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className={open ? "party__more is-open" : "party__more"}>
-                        <td data-label="참가종목">
-                          <select
-                            value={p.categoryId}
-                            onChange={(e) => {
-                              const categoryId = e.target.value;
-                              patchMember(i, {
-                                categoryId,
-                                ...shirtAssignment(
-                                  findCategory(categories, categoryId),
-                                  p.selectedSize,
-                                  p.birth,
-                                ),
-                              });
-                            }}
-                            disabled={!optionsReady}
-                            required
-                          >
-                            <option value="">
-                              {optionsLoading ? "불러오는 중" : "참가종목"}
-                            </option>
-                            {categories.map((item) => {
-                              const ageOff = !categoryOpenForBirth(item, p.birth);
-                              const closed = item.isActive === false;
-                              const reason = closed
-                                ? "마감"
-                                : ageOff
-                                  ? categoryClosedReason(item, p.birth)
-                                  : "";
-                              return (
-                                <option
-                                  key={item.categoryId}
-                                  value={item.categoryId}
-                                  disabled={closed || ageOff}
-                                >
-                                  {categoryLabel(item)}
-                                  {reason ? ` (${reason})` : ""}
+                                );
+                              }}
+                            />
+                          </td>
+                          <td data-label="연락처">
+                            <PhoneField
+                              placeholder="연락처"
+                              value={p.phone}
+                              onChange={(phone) => patchMember(i, { phone })}
+                              required
+                            />
+                          </td>
+                          <td data-label="성별">
+                            <select
+                              value={p.gender}
+                              onChange={(e) =>
+                                patchMember(i, { gender: e.target.value as Gender })
+                              }
+                              required
+                            >
+                              <option value="">성별</option>
+                              {GENDERS.map((g) => (
+                                <option key={g.id} value={g.id}>
+                                  {g.label}
                                 </option>
-                              );
-                            })}
-                          </select>
-                        </td>
-                        <td data-label="사이즈">
-                          <ShirtPick
-                            value={p.selectedSize}
-                            sizes={sizes}
-                            disabled={!souvenir}
-                            onChange={(selectedSize) =>
-                              patchMember(i, { selectedSize })
-                            }
-                          />
-                        </td>
-                        <td colSpan={2} data-label="패키지">
-                          <KitFixed courseId={courseId} />
-                        </td>
-                      </tr>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="party__fee" data-label="참가비" rowSpan={3}>
+                            {category
+                              ? formatFee(categoryFeeAmount(category, p.birth))
+                              : "—"}
+                          </td>
+                          <td className="party__del" rowSpan={3}>
+                            <button
+                              type="button"
+                              className="party__expand"
+                              onClick={() => setOpenMember(i)}
+                            >
+                              펼치기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__fold"
+                              onClick={() => setOpenMember(-1)}
+                            >
+                              접기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__remove"
+                              onClick={() => removeMember(i)}
+                              disabled={draft.participants.length <= 1}
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__more is-open" : "party__more"}>
+                          <td data-label="참가종목">
+                            <select
+                              value={p.categoryId}
+                              onChange={(e) => {
+                                const categoryId = e.target.value;
+                                patchMember(i, {
+                                  categoryId,
+                                  ...shirtAssignment(
+                                    findCategory(categories, categoryId),
+                                    p.selectedSize,
+                                    p.birth,
+                                  ),
+                                  ...EMPTY_START_GROUP_DRAFT,
+                                });
+                                if (categoryId) setOpenMember(i);
+                              }}
+                              disabled={!optionsReady}
+                              required
+                            >
+                              <option value="">
+                                {optionsLoading ? "불러오는 중" : "참가종목"}
+                              </option>
+                              {categories.map((item) => {
+                                const ageOff = !categoryOpenForBirth(item, p.birth);
+                                const closed = item.isActive === false;
+                                const reason = closed
+                                  ? "마감"
+                                  : ageOff
+                                    ? categoryClosedReason(item, p.birth)
+                                    : "";
+                                return (
+                                  <option
+                                    key={item.categoryId}
+                                    value={item.categoryId}
+                                    disabled={closed || ageOff}
+                                  >
+                                    {categoryLabel(item)}
+                                    {reason ? ` (${reason})` : ""}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </td>
+                          <td data-label="출발 그룹">
+                            <GroupMemberStartGroup
+                              category={category}
+                              categoryId={p.categoryId}
+                              value={{
+                                startGroupId: p.startGroupId,
+                                startGroupUnselected: p.startGroupUnselected,
+                              }}
+                              disabled={!optionsReady}
+                              namePrefix={`member-${i}`}
+                              onChange={(next) => patchMember(i, next)}
+                            />
+                          </td>
+                          <td colSpan={2} data-label="사이즈">
+                            <ShirtPick
+                              value={p.selectedSize}
+                              sizes={sizes}
+                              disabled={!souvenir}
+                              onChange={(selectedSize) =>
+                                patchMember(i, { selectedSize })
+                              }
+                            />
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__kit is-open" : "party__kit"}>
+                          <td colSpan={4}>
+                            <span className="party__kit-label">패키지</span>
+                            <KitFixed courseId={courseId} />
+                          </td>
+                        </tr>
                       </Fragment>
                     );
                   })}
@@ -1007,7 +1068,11 @@ export function GroupFlow({
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
-            <button type="submit" className="btn btn--red">
+            <button
+              type="submit"
+              className="btn btn--red"
+              disabled={!registrationOpen}
+            >
               확인하기
             </button>
           </div>
@@ -1076,7 +1141,14 @@ export function GroupFlow({
                   </strong>
                   <span>
                     {category ? categoryLabel(category) : "—"} ·{" "}
-                    {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
+                    {startGroupSummary(
+                      {
+                        startGroupId: p.startGroupId,
+                        startGroupUnselected: p.startGroupUnselected,
+                      },
+                      category,
+                    )}{" "}
+                    · {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
                     {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
                   </span>
                   <KitFixed courseId={courseId} />
@@ -1106,7 +1178,9 @@ export function GroupFlow({
               type="button"
               className="btn btn--ghost"
               onClick={onSubmitApplication}
-              disabled={busyAction !== null || Boolean(payment)}
+              disabled={
+                !registrationOpen || busyAction !== null || Boolean(payment)
+              }
             >
               {busyAction === "submit"
                 ? "제출 중..."
@@ -1118,7 +1192,7 @@ export function GroupFlow({
               type="button"
               className="btn btn--red"
               onClick={onPay}
-              disabled={busyAction !== null}
+              disabled={!registrationOpen || busyAction !== null}
             >
               {busyAction === "pay" ? "결제 준비 중..." : "결제하기"}
             </button>

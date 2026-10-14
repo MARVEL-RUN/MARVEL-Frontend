@@ -125,6 +125,32 @@ export function lookupEditScreenAllowed(receipt: RegistrationReceipt) {
   return lookupModifyAllowed(receipt);
 }
 
+function startGroupBlockedStatus(status?: string | null) {
+  const key = statusKey(status);
+  return key === "CANCELED" || key === "CANCELLATION_PENDING" || key === "EXPIRED";
+}
+
+/** 출발 그룹 전용 PATCH — 외부결제·modifyAllowed와 무관 */
+export function lookupPersonalStartGroupEditAllowed(receipt: RegistrationReceipt) {
+  if (!receipt.registrationId?.trim()) return false;
+  if (receipt.organizationId) return false;
+  return !startGroupBlockedStatus(receipt.registrationStatus);
+}
+
+export function lookupOrganizationStartGroupEditAllowed(receipt: RegistrationReceipt) {
+  if (!receipt.organizationId?.trim()) return false;
+  if (closedRegistration(receipt.registrationStatus)) return false;
+  const rows =
+    receipt.registrations?.length
+      ? receipt.registrations
+      : receipt.members ?? [];
+  return rows.some((row) => {
+    if (row.canceled) return false;
+    if (!row.registrationId?.trim()) return false;
+    return !startGroupBlockedStatus(row.registrationStatus);
+  });
+}
+
 export function lookupRefundOrCancelAllowed(receipt: RegistrationReceipt) {
   if (receipt.externalPayment) return false;
   if (closedRegistration(receipt.registrationStatus)) return false;

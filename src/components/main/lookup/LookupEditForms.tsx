@@ -34,6 +34,17 @@ import {
   souvenirSizes,
 } from "@/lib/registration-options";
 import {
+  EMPTY_START_GROUP_DRAFT,
+  startGroupDraftError,
+  startGroupDraftFromStored,
+  startGroupPreviewSections,
+  startGroupInputFromDraft,
+  startGroupInputFromStored,
+  startGroupSummary,
+} from "@/lib/start-group";
+import { GroupMemberStartGroup } from "../register/GroupMemberStartGroup";
+import { StartGroupPick } from "../register/StartGroupPick";
+import {
   lookupModifyAllowed,
   lookupOrganizationCommonModifyAllowed,
   lookupShowPaymentButton,
@@ -311,6 +322,9 @@ export function IndividualLookupEdit({
   const [souvenirs, setSouvenirs] = useState(
     souvenirSelections(receipt.selectedSouvenirList),
   );
+  const [startGroupDraft, setStartGroupDraft] = useState(() =>
+    startGroupDraftFromStored(receipt.startGroupId, receipt.startGroupUnselected),
+  );
   const [hint, setHint] = useState("");
 
   useLayoutEffect(() => {
@@ -365,6 +379,7 @@ export function IndividualLookupEdit({
   const modifyPolicyNote = !canModify
     ? policyReasonMessage(receipt.userPolicy?.modifyReason)
     : "";
+  const startGroupSections = startGroupPreviewSections(categories);
 
   function applyCategory(
     next: RegistrationCategory | undefined,
@@ -378,6 +393,7 @@ export function IndividualLookupEdit({
   function onCourseChange(nextCourseId: CourseId) {
     const next = categoryForCourse(categories, nextCourseId, birth);
     applyCategory(next);
+    setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
   }
 
   function validateForm() {
@@ -396,6 +412,8 @@ export function IndividualLookupEdit({
       (souvenir && !selectedSize ? "티셔츠 사이즈를 선택하세요." : "");
     if (invalid) return invalid;
     if (gender !== "M" && gender !== "F") return "성별을 선택하세요.";
+    const groupErr = startGroupDraftError(startGroupDraft, category);
+    if (groupErr) return groupErr;
     return "";
   }
 
@@ -416,6 +434,7 @@ export function IndividualLookupEdit({
       guardianRelationship: guardianRelation.trim() || undefined,
       guardianConsent: guardianRequired ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
+      ...startGroupInputFromDraft(startGroupDraft),
     };
   }
 
@@ -449,319 +468,334 @@ export function IndividualLookupEdit({
 
   return (
     <>
-    {step === 0 ? (
-    <form className="form lookup-edit" onSubmit={goReview} noValidate>
-      <div className="form__head">
-        <h2>개인 접수 수정</h2>
-        <p className="form__note">조회한 접수 정보를 수정합니다.</p>
-        <p className="lookup-edit__lock-note">
-          개인정보(이름·생년월일·성별)와 휴대폰 번호는 수정할 수 없습니다.
-        </p>
-        {modifyPolicyNote ? (
-          <p className="form__note" role="status">
-            {modifyPolicyNote}
-          </p>
-        ) : null}
-      </div>
-
-      <FormSec kicker="01 / PROFILE" title="개인정보">
-        <FormRow label="이름" required locked>
-          <input
-            type="text"
-            name="name"
-            placeholder="띄어쓰기 없이 입력해주세요."
-            value={name}
-            autoComplete="name"
-            required
-            disabled
-            readOnly
-          />
-        </FormRow>
-        <FormRow label="생년월일" required locked>
-          <BirthPick value={birth} onChange={() => { }} disabled />
-        </FormRow>
-        <FormRow label="성별" required locked>
-          <GenderPick
-            name="gender"
-            value={toUiGender(gender)}
-            onChange={() => { }}
-            disabled
-          />
-        </FormRow>
-      </FormSec>
-
-      <FormSec kicker="02 / CONTACT" title="연락처 정보">
-        <FormRow label="휴대폰번호" required locked>
-          <PhoneField
-            name="phone"
-            placeholder="휴대폰번호를 입력해주세요."
-            value={phone}
-            onChange={() => { }}
-            autoComplete="tel"
-            required
-            disabled
-          />
-        </FormRow>
-        <FormRow label="이메일">
-          <EmailField value={email} onChange={setEmail} disabled={!canModify} />
-        </FormRow>
-      </FormSec>
-
-      <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-        <FormRow label="주소" required>
-          <AddressField
-            zonecode={zonecode}
-            address={address}
-            addressDetail={addressDetail}
-            onChange={(next) => {
-              if (!canModify) return;
-              if (next.zonecode != null) setZonecode(next.zonecode);
-              if (next.address != null) setAddress(next.address);
-              if (next.addressDetail != null) setAddressDetail(next.addressDetail);
-            }}
-            required
-            disabled={!canModify}
-          />
-        </FormRow>
-      </FormSec>
-
-      <FormSec
-        kicker="04 / GUARDIAN"
-        title={guardianMinor ? "보호자 정보" : "보호자 정보 (선택)"}
-        note={
-          guardianMinor
-            ? `${GUARDIAN_AGE_NOTE} 보호자 이름·관계·연락처·동의를 입력해 주세요.`
-            : "선택사항입니다. 입력하면 이름·관계·연락처·동의를 모두 작성해 주세요."
-        }
-      >
-        <FormRow label="보호자 이름" required={guardianRequired}>
-          <input
-            type="text"
-            name="guardianName"
-            placeholder="띄어쓰기 없이 입력해주세요."
-            value={guardianName}
-            onChange={(e) => setGuardianName(e.target.value)}
-            autoComplete="name"
-            required={guardianRequired}
-            disabled={!canModify}
-          />
-        </FormRow>
-        <FormRow label="보호자 관계" required={guardianRequired}>
-          <input
-            type="text"
-            name="guardianRelation"
-            placeholder="부, 모, 조부모 등"
-            value={guardianRelation}
-            onChange={(e) => setGuardianRelation(e.target.value)}
-            required={guardianRequired}
-            disabled={!canModify}
-          />
-        </FormRow>
-        <FormRow label="보호자 연락처" required={guardianRequired}>
-          <PhoneField
-            name="guardianPhone"
-            placeholder="보호자(학부모) 연락처"
-            value={guardianPhone}
-            onChange={setGuardianPhone}
-            required={guardianRequired}
-            disabled={!canModify}
-          />
-        </FormRow>
-        <FormRow label="보호자 동의" required={guardianRequired}>
-          <GuardianConsentField
-            variant="button"
-            agreed={guardianConsent}
-            onChange={setGuardianConsent}
-            disabled={!canModify}
-          />
-          {guardianRequired && !guardianMinor ? (
-            <p className="form-row__hint">
-              보호자 정보를 입력한 경우 동의까지 완료해 주세요.
+      {step === 0 ? (
+        <form className="form lookup-edit" onSubmit={goReview} noValidate>
+          <div className="form__head">
+            <h2>개인 접수 수정</h2>
+            <p className="form__note">조회한 접수 정보를 수정합니다.</p>
+            <p className="lookup-edit__lock-note">
+              개인정보(이름·생년월일·성별)와 휴대폰 번호는 수정할 수 없습니다.
             </p>
-          ) : null}
-          {guardianMinor ? (
-            <p className="form-row__hint">
-              만 14세 미만은 보호자 동의까지 완료해야 신청할 수 있습니다.
-            </p>
-          ) : null}
-        </FormRow>
-      </FormSec>
+            {modifyPolicyNote ? (
+              <p className="form__note" role="status">
+                {modifyPolicyNote}
+              </p>
+            ) : null}
+          </div>
 
-      <FormSec kicker="05 / ENTRY" title="신청 정보">
-        <ApplyHint>
-          <p>{TIMING_CHIP_NOTE}</p>
-        </ApplyHint>
-        <FormRow label="참가종목" required>
-          <CoursePick
-            value={courseId}
-            birth={birth}
-            onChange={onCourseChange}
-            disabled={!canModify}
-          />
-          {ageBand(birth) === "child" ? (
-            <p className="form-row__hint">{CHILD_ACCOMPANY_NOTE}</p>
-          ) : null}
-        </FormRow>
-        {optionsError ? <p className="form__err">{optionsError}</p> : null}
-        <FormRow label="패키지">
-          <KitFixed courseId={courseId} />
-        </FormRow>
-        <FormRow label="티셔츠 사이즈" required>
-          <ShirtPick
-            value={selectedSize}
-            sizes={souvenir ? sizes : undefined}
-            disabled={!canModify || !souvenir || !optionsReady}
-            onChange={(size) => applyCategory(category, size)}
-          />
-          {!eventCategoryId ? (
-            <p className="form-row__hint">종목을 먼저 선택하세요</p>
-          ) : !souvenir && !optionsError ? (
-            <p className="form-row__hint">티셔츠 옵션을 불러오지 못했습니다</p>
-          ) : null}
-        </FormRow>
-        <FormRow label="참가비">
-          {courseId ? (
-            <FeeText courseId={courseId} ticket={ticket} />
-          ) : (
-            <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
-          )}
-        </FormRow>
-      </FormSec>
+          <FormSec kicker="01 / PROFILE" title="개인정보">
+            <FormRow label="이름" required locked>
+              <input
+                type="text"
+                name="name"
+                placeholder="띄어쓰기 없이 입력해주세요."
+                value={name}
+                autoComplete="name"
+                required
+                disabled
+                readOnly
+              />
+            </FormRow>
+            <FormRow label="생년월일" required locked>
+              <BirthPick value={birth} onChange={() => { }} disabled />
+            </FormRow>
+            <FormRow label="성별" required locked>
+              <GenderPick
+                name="gender"
+                value={toUiGender(gender)}
+                onChange={() => { }}
+                disabled
+              />
+            </FormRow>
+          </FormSec>
 
-      {hint || error ? (
-        <p className="form__err flow__err" role="alert">
-          {hint || error}
-        </p>
-      ) : null}
-      <div className="flow__nav">
-        <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
-          돌아가기
-        </button>
-        <button type="submit" className="btn btn--red" disabled={busy || !canModify}>
-          확인하기
-        </button>
-      </div>
-    </form>
-    ) : null}
+          <FormSec kicker="02 / CONTACT" title="연락처 정보">
+            <FormRow label="휴대폰번호" required locked>
+              <PhoneField
+                name="phone"
+                placeholder="휴대폰번호를 입력해주세요."
+                value={phone}
+                onChange={() => { }}
+                autoComplete="tel"
+                required
+                disabled
+              />
+            </FormRow>
+            <FormRow label="이메일">
+              <EmailField value={email} onChange={setEmail} disabled={!canModify} />
+            </FormRow>
+          </FormSec>
 
-    {step === 1 ? (
-      <section className="block block--lookup-confirm">
-        <h2>수정 내용을 확인하세요</h2>
-        {modifyPolicyNote ? (
-          <p className="form__note" role="status">
-            {modifyPolicyNote}
-          </p>
-        ) : null}
-        <dl className="spec">
-          <div>
-            <dt>참가종목</dt>
-            <dd>
-              {category ? (
-                <>
-                  {categoryLabel(category)}
-                  <small>{formatFee(categoryFeeAmount(category, birth))}</small>
-                </>
-              ) : (
-                "—"
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt>이름</dt>
-            <dd>{name.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>생년월일</dt>
-            <dd>{birthView(birth) || "—"}</dd>
-          </div>
-          <div>
-            <dt>성별</dt>
-            <dd>{genderLabel(toUiGender(gender))}</dd>
-          </div>
-          <div>
-            <dt>휴대폰번호</dt>
-            <dd>{formatPhone(phone) || "—"}</dd>
-          </div>
-          <div>
-            <dt>이메일</dt>
-            <dd>{email.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>주소</dt>
-            <dd>{addressView || "—"}</dd>
-          </div>
-          <div>
-            <dt>보호자 이름</dt>
-            <dd>{guardianName.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>보호자 관계</dt>
-            <dd>{guardianRelation.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>보호자 연락처</dt>
-            <dd>{formatPhone(guardianPhone) || guardianPhone.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>보호자 동의</dt>
-            <dd>{guardianConsent ? "동의함" : "—"}</dd>
-          </div>
-          <div>
-            <dt>티셔츠 사이즈</dt>
-            <dd>{selectedSize || "—"}</dd>
-          </div>
-          <div>
-            <dt>패키지</dt>
-            <dd>
+          <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+            <FormRow label="주소" required>
+              <AddressField
+                zonecode={zonecode}
+                address={address}
+                addressDetail={addressDetail}
+                onChange={(next) => {
+                  if (!canModify) return;
+                  if (next.zonecode != null) setZonecode(next.zonecode);
+                  if (next.address != null) setAddress(next.address);
+                  if (next.addressDetail != null) setAddressDetail(next.addressDetail);
+                }}
+                required
+                disabled={!canModify}
+              />
+            </FormRow>
+          </FormSec>
+
+          <FormSec
+            kicker="04 / GUARDIAN"
+            title={guardianMinor ? "보호자 정보" : "보호자 정보 (선택)"}
+            note={
+              guardianMinor
+                ? `${GUARDIAN_AGE_NOTE} 보호자 이름·관계·연락처·동의를 입력해 주세요.`
+                : "선택사항입니다. 입력하면 이름·관계·연락처·동의를 모두 작성해 주세요."
+            }
+          >
+            <FormRow label="보호자 이름" required={guardianRequired}>
+              <input
+                type="text"
+                name="guardianName"
+                placeholder="띄어쓰기 없이 입력해주세요."
+                value={guardianName}
+                onChange={(e) => setGuardianName(e.target.value)}
+                autoComplete="name"
+                required={guardianRequired}
+                disabled={!canModify}
+              />
+            </FormRow>
+            <FormRow label="보호자 관계" required={guardianRequired}>
+              <input
+                type="text"
+                name="guardianRelation"
+                placeholder="부, 모, 조부모 등"
+                value={guardianRelation}
+                onChange={(e) => setGuardianRelation(e.target.value)}
+                required={guardianRequired}
+                disabled={!canModify}
+              />
+            </FormRow>
+            <FormRow label="보호자 연락처" required={guardianRequired}>
+              <PhoneField
+                name="guardianPhone"
+                placeholder="보호자(학부모) 연락처"
+                value={guardianPhone}
+                onChange={setGuardianPhone}
+                required={guardianRequired}
+                disabled={!canModify}
+              />
+            </FormRow>
+            <FormRow label="보호자 동의" required={guardianRequired}>
+              <GuardianConsentField
+                variant="button"
+                agreed={guardianConsent}
+                onChange={setGuardianConsent}
+                disabled={!canModify}
+              />
+              {guardianRequired && !guardianMinor ? (
+                <p className="form-row__hint">
+                  보호자 정보를 입력한 경우 동의까지 완료해 주세요.
+                </p>
+              ) : null}
+              {guardianMinor ? (
+                <p className="form-row__hint">
+                  만 14세 미만은 보호자 동의까지 완료해야 신청할 수 있습니다.
+                </p>
+              ) : null}
+            </FormRow>
+          </FormSec>
+
+          <FormSec kicker="05 / ENTRY" title="신청 정보">
+            <ApplyHint>
+              <p>{TIMING_CHIP_NOTE}</p>
+            </ApplyHint>
+            <FormRow label="참가종목" required>
+              <CoursePick
+                value={courseId}
+                birth={birth}
+                onChange={onCourseChange}
+                disabled={!canModify}
+              />
+              {ageBand(birth) === "child" ? (
+                <p className="form-row__hint">{CHILD_ACCOMPANY_NOTE}</p>
+              ) : null}
+            </FormRow>
+            {optionsError ? <p className="form__err">{optionsError}</p> : null}
+            <FormRow label="패키지">
               <KitFixed courseId={courseId} />
-            </dd>
-          </div>
-        </dl>
-        <DockNav>
+            </FormRow>
+            <FormRow label="출발 그룹" required>
+              <StartGroupPick
+                sections={startGroupSections}
+                activeSectionKey={eventCategoryId || undefined}
+                value={startGroupDraft}
+                onChange={setStartGroupDraft}
+                disabled={!canModify || !optionsReady}
+                hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
+                namePrefix="lookup-edit-personal"
+              />
+            </FormRow>
+            <FormRow label="티셔츠 사이즈" required>
+              <ShirtPick
+                value={selectedSize}
+                sizes={souvenir ? sizes : undefined}
+                disabled={!canModify || !souvenir || !optionsReady}
+                onChange={(size) => applyCategory(category, size)}
+              />
+              {!eventCategoryId ? (
+                <p className="form-row__hint">종목을 먼저 선택하세요</p>
+              ) : !souvenir && !optionsError ? (
+                <p className="form-row__hint">티셔츠 옵션을 불러오지 못했습니다</p>
+              ) : null}
+            </FormRow>
+            <FormRow label="참가비">
+              {courseId ? (
+                <FeeText courseId={courseId} ticket={ticket} />
+              ) : (
+                <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
+              )}
+            </FormRow>
+          </FormSec>
+
           {hint || error ? (
             <p className="form__err flow__err" role="alert">
               {hint || error}
             </p>
           ) : null}
-          <button
-            type="button"
-            className="btn btn--ghost"
-            disabled={busy}
-            onClick={() => {
-              setPayCheckOpen(false);
-              setStep(0);
-              scrollPageTop();
-            }}
-          >
-            수정
-          </button>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            disabled={busy || !canModify}
-            onClick={() => runModify("submit")}
-          >
-            {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
-          </button>
-          {canPayAfterModify ? (
+          <div className="flow__nav">
+            <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
+              돌아가기
+            </button>
+            <button type="submit" className="btn btn--red" disabled={busy || !canModify}>
+              확인하기
+            </button>
+          </div>
+        </form>
+      ) : null}
+
+      {step === 1 ? (
+        <section className="block block--lookup-confirm">
+          <h2>수정 내용을 확인하세요</h2>
+          {modifyPolicyNote ? (
+            <p className="form__note" role="status">
+              {modifyPolicyNote}
+            </p>
+          ) : null}
+          <dl className="spec">
+            <div>
+              <dt>참가종목</dt>
+              <dd>
+                {category ? (
+                  <>
+                    {categoryLabel(category)}
+                    <small>{formatFee(categoryFeeAmount(category, birth))}</small>
+                  </>
+                ) : (
+                  "—"
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>이름</dt>
+              <dd>{name.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>생년월일</dt>
+              <dd>{birthView(birth) || "—"}</dd>
+            </div>
+            <div>
+              <dt>성별</dt>
+              <dd>{genderLabel(toUiGender(gender))}</dd>
+            </div>
+            <div>
+              <dt>휴대폰번호</dt>
+              <dd>{formatPhone(phone) || "—"}</dd>
+            </div>
+            <div>
+              <dt>이메일</dt>
+              <dd>{email.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>주소</dt>
+              <dd>{addressView || "—"}</dd>
+            </div>
+            <div>
+              <dt>보호자 이름</dt>
+              <dd>{guardianName.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>보호자 관계</dt>
+              <dd>{guardianRelation.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>보호자 연락처</dt>
+              <dd>{formatPhone(guardianPhone) || guardianPhone.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>보호자 동의</dt>
+              <dd>{guardianConsent ? "동의함" : "—"}</dd>
+            </div>
+            <div>
+              <dt>티셔츠 사이즈</dt>
+              <dd>{selectedSize || "—"}</dd>
+            </div>
+            <div>
+              <dt>출발 그룹</dt>
+              <dd>{startGroupSummary(startGroupDraft, category)}</dd>
+            </div>
+            <div>
+              <dt>패키지</dt>
+              <dd>
+                <KitFixed courseId={courseId} />
+              </dd>
+            </div>
+          </dl>
+          <DockNav>
+            {hint || error ? (
+              <p className="form__err flow__err" role="alert">
+                {hint || error}
+              </p>
+            ) : null}
             <button
               type="button"
-              className="btn btn--red"
+              className="btn btn--ghost"
               disabled={busy}
-              onClick={() => runModify("pay")}
+              onClick={() => {
+                setPayCheckOpen(false);
+                setStep(0);
+                scrollPageTop();
+              }}
             >
-              {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+              수정
             </button>
-          ) : null}
-        </DockNav>
-      </section>
-    ) : null}
+            <button
+              type="button"
+              className="btn btn--ghost"
+              disabled={busy || !canModify}
+              onClick={() => runModify("submit")}
+            >
+              {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
+            </button>
+            {canPayAfterModify ? (
+              <button
+                type="button"
+                className="btn btn--red"
+                disabled={busy}
+                onClick={() => runModify("pay")}
+              >
+                {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+              </button>
+            ) : null}
+          </DockNav>
+        </section>
+      ) : null}
 
-    <RegisterPayCheckModal
-      mode="lookup-modify"
-      open={payCheckOpen}
-      onClose={() => setPayCheckOpen(false)}
-    />
+      <RegisterPayCheckModal
+        mode="lookup-modify"
+        open={payCheckOpen}
+        onClose={() => setPayCheckOpen(false)}
+      />
     </>
   );
 }
@@ -772,6 +806,7 @@ type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
   eventCategoryName?: string;
   shirtSize?: string;
   memberPolicy?: MemberRegistrationPolicy;
+  storedStartGroupCode?: string | null;
 };
 
 function memberKey() {
@@ -797,6 +832,8 @@ function emptyMember(): GroupMemberDraft {
     phNum: "",
     birth: "",
     gender: "",
+    startGroupId: null,
+    startGroupUnselected: false,
   };
 }
 
@@ -824,6 +861,8 @@ function participantDraft(
     birth: (row.birth || "").replace(/\D/g, ""),
     gender: toApiGender(row.gender) || "M",
     memberPolicy: row.memberPolicy,
+    ...startGroupInputFromStored(row.startGroupId, row.startGroupUnselected),
+    storedStartGroupCode: row.startGroupCode,
   };
 }
 
@@ -886,7 +925,6 @@ export function GroupLookupEdit({
       }, 0),
     [categories, members],
   );
-
   useLayoutEffect(() => {
     scrollPageTop();
   }, []);
@@ -989,6 +1027,14 @@ export function GroupLookupEdit({
           ? "티셔츠 사이즈를 선택하세요."
           : "");
       if (invalid) return `${prefix}${invalid}`;
+      const groupErr = startGroupDraftError(
+        {
+          startGroupId: member.startGroupId ?? "",
+          startGroupUnselected: member.startGroupUnselected,
+        },
+        category,
+      );
+      if (groupErr) return `${prefix}${groupErr}`;
     }
     if (!leaderName.trim()) return "대표자 정보를 확인하지 못했습니다.";
     if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 정보를 확인하지 못했습니다.";
@@ -1024,6 +1070,8 @@ export function GroupLookupEdit({
           phNum: toApiPhone(row.phNum),
           birth: toApiBirth(row.birth),
           gender: row.gender === "F" ? "F" : "M",
+          startGroupId: row.startGroupId,
+          startGroupUnselected: row.startGroupUnselected,
         };
         if (row.registrationId) next.registrationId = row.registrationId;
         return next;
@@ -1050,496 +1098,534 @@ export function GroupLookupEdit({
 
   return (
     <>
-    {step === 0 ? (
-    <form className="form lookup-edit" onSubmit={goReview} noValidate>
-      <div className="form__head">
-        <h2>단체 접수 수정</h2>
-        <p className="form__note">
-          참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
-        </p>
-        <p className="lookup-edit__lock-note">
-          단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호, 이미 등록된
-          참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
-        </p>
-      </div>
-      <FormSec kicker="01 / GROUP" title="단체">
-        <FormRow label="단체명" locked>
-          <input type="text" value={organizationName} disabled readOnly />
-        </FormRow>
-        <FormRow label="단체 계정" locked>
-          <input
-            type="text"
-            value={organizationLoginId}
-            disabled
-            readOnly
-            autoComplete="username"
-          />
-        </FormRow>
-      </FormSec>
-      <FormSec kicker="02 / LEADER" title="대표자 정보">
-        <FormRow label="대표자 성명" required locked>
-          <input
-            type="text"
-            placeholder="대표자 성명을 입력해주세요"
-            value={leaderName}
-            required
-            disabled
-            readOnly
-          />
-        </FormRow>
-        <FormRow label="대표자 생년월일" required locked>
-          <BirthPick value={leaderBirth} onChange={() => {}} disabled />
-        </FormRow>
-      </FormSec>
-      <FormSec kicker="03 / CONTACT" title="연락처">
-        <FormRow label="휴대폰번호" required locked>
-          <PhoneField
-            placeholder="휴대폰번호를 입력해주세요."
-            value={leaderPhNum}
-            onChange={() => {}}
-            autoComplete="tel"
-            required
-            disabled
-          />
-        </FormRow>
-        <FormRow label="이메일">
-          <EmailField
-            value={email}
-            onChange={setEmail}
-            disabled={!canEditOrgCommon}
-          />
-          {orgModifyPolicyNote ? (
-            <p className="form-row__hint" role="status">
-              {orgModifyPolicyNote}
+      {step === 0 ? (
+        <form className="form lookup-edit" onSubmit={goReview} noValidate>
+          <div className="form__head">
+            <h2>단체 접수 수정</h2>
+            <p className="form__note">
+              참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
             </p>
-          ) : null}
-        </FormRow>
-      </FormSec>
-      <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-        <FormRow label="주소" required>
-          <AddressField
-            zonecode={zonecode}
-            address={address}
-            addressDetail={addressDetail}
-            onChange={(next) => {
-              if (!canEditOrgCommon) return;
-              if (next.zonecode != null) setZonecode(next.zonecode);
-              if (next.address != null) setAddress(next.address);
-              if (next.addressDetail != null) setAddressDetail(next.addressDetail);
-            }}
-            required
-            disabled={!canEditOrgCommon}
-          />
-          {orgModifyPolicyNote ? (
-            <p className="form-row__hint" role="status">
-              {orgModifyPolicyNote}
+            <p className="lookup-edit__lock-note">
+              단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호, 이미 등록된
+              참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
             </p>
-          ) : null}
-        </FormRow>
-      </FormSec>
-      <FormSec kicker="05" title="참가자">
-        <div className="party-bar">
-          <p>{members.length}명 등록</p>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            onClick={addMember}
-            disabled={busy || members.length >= MAX_GROUP_SIZE || !canAddMember}
-          >
-            참가자 추가
-          </button>
-        </div>
-        {addMemberPolicyNote ? (
-          <p className="form__note" role="status">
-            {addMemberPolicyNote}
-          </p>
-        ) : null}
-        {optionsError ? <p className="form__err">{optionsError}</p> : null}
-        <div className="party-wrap">
-          <table className="party">
-            <colgroup>
-              <col className="party__c-no" />
-              <col className="party__c-name" />
-              <col className="party__c-birth" />
-              <col className="party__c-phone" />
-              <col className="party__c-gender" />
-              <col className="party__c-fee" />
-              <col className="party__c-del" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th rowSpan={2}>번호</th>
-                <th>이름</th>
-                <th>생년월일</th>
-                <th>연락처</th>
-                <th>성별</th>
-                <th rowSpan={2}>참가비</th>
-                <th rowSpan={2}>삭제</th>
-              </tr>
-              <tr>
-                <th>참가종목</th>
-                <th>사이즈</th>
-                <th colSpan={2}>패키지</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((member, index) => {
-                const category = findCategory(categories, member.eventCategoryId);
-                const souvenir = shirtSouvenir(category);
-                const sizes = souvenirSizes(souvenir, ticketForBirth(member.birth));
-                const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
-                const selectedSize = memberShirtSize(member.selectedSouvenirList, category);
-                const open = openMember === index;
-                const locked = Boolean(member.registrationId);
-                const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
-                const memberPolicyNoteLines =
-                  locked && member.memberPolicy
-                    ? memberLookupPolicyNotes(member.memberPolicy)
-                    : [];
-                return (
-                  <Fragment key={member.key}>
-                    <tr className={open ? "party__info is-open" : "party__info"}>
-                      <td className="party__no" rowSpan={2}>
-                        {index + 1}.
-                      </td>
-                      <td className="party__peek">
-                        <button type="button" onClick={() => setOpenMember(index)}>
-                          {groupMemberPeek(member, categories)}
-                        </button>
-                      </td>
-                      <td data-label="이름" className={locked ? "is-locked" : undefined}>
-                        <input
-                          type="text"
-                          placeholder="성명"
-                          value={member.name}
-                          onChange={(e) => patchMember(index, { name: e.target.value })}
-                          required
-                          disabled={locked}
-                          readOnly={locked}
-                        />
-                      </td>
-                      <td data-label="생년월일" className={locked ? "is-locked" : undefined}>
-                        <BirthText
-                          value={member.birth}
-                          onChange={(birth) => {
-                            if (locked) return;
-                            const current = findCategory(categories, member.eventCategoryId);
-                            const keep = current && categoryOpenForBirth(current, birth);
-                            patchMember(
-                              index,
-                              keep
-                                ? {
-                                  birth,
-                                  selectedSouvenirList: withShirtSize(
-                                    current,
-                                    member.selectedSouvenirList,
-                                    memberShirtSize(member.selectedSouvenirList, current),
-                                    birth,
-                                  ),
-                                }
-                                : {
-                                  birth,
-                                  eventCategoryId: "",
-                                  selectedSouvenirList: withShirtSize(
-                                    undefined,
-                                    member.selectedSouvenirList,
-                                    "",
-                                    birth,
-                                  ),
-                                },
-                            );
-                          }}
-                          required
-                          disabled={locked}
-                        />
-                      </td>
-                      <td data-label="연락처" className={locked ? "is-locked" : undefined}>
-                        <PhoneField
-                          placeholder="연락처"
-                          value={member.phNum}
-                          onChange={(phNum) => {
-                            if (locked) return;
-                            patchMember(index, { phNum });
-                          }}
-                          required
-                          disabled={locked}
-                        />
-                      </td>
-                      <td data-label="성별" className={locked ? "is-locked" : undefined}>
-                        <select
-                          value={toUiGender(member.gender)}
-                          onChange={(e) => {
-                            if (locked) return;
-                            patchMember(index, { gender: toApiGender(e.target.value) });
-                          }}
-                          required
-                          disabled={locked}
-                        >
-                          <option value="">성별</option>
-                          {GENDERS.map((g) => (
-                            <option key={g.id} value={g.id}>
-                              {g.label}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="party__fee" data-label="참가비" rowSpan={2}>
-                        {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
-                      </td>
-                      <td className="party__del" rowSpan={2}>
-                        <button
-                          type="button"
-                          className="party__expand"
-                          onClick={() => setOpenMember(index)}
-                        >
-                          펼치기
-                        </button>
-                        <button
-                          type="button"
-                          className="party__fold"
-                          onClick={() => setOpenMember(-1)}
-                        >
-                          접기
-                        </button>
-                        <button
-                          type="button"
-                          className="party__remove"
-                          onClick={() => removeMember(index)}
-                          disabled={
-                            busy ||
-                            members.length <= 1 ||
-                            (member.registrationId
-                              ? !memberDeleteAllowed(member.memberPolicy, false)
-                              : false)
-                          }
-                        >
-                          삭제
-                        </button>
-                      </td>
-                    </tr>
-                    <tr className={open ? "party__more is-open" : "party__more"}>
-                      <td data-label="참가종목">
-                        <select
-                          value={member.eventCategoryId}
-                          onChange={(e) => {
-                            if (!canEditMemberFields) return;
-                            const eventCategoryId = e.target.value;
-                            const next = findCategory(categories, eventCategoryId);
-                            patchMember(index, {
-                              eventCategoryId,
-                              selectedSouvenirList: withShirtSize(
-                                next,
-                                member.selectedSouvenirList,
-                                memberShirtSize(member.selectedSouvenirList, next),
-                                member.birth,
-                              ),
-                            });
-                          }}
-                          disabled={!optionsReady || !canEditMemberFields}
-                          required
-                        >
-                          <option value="">{optionsReady ? "참가종목" : "불러오는 중"}</option>
-                          {categories.map((item) => {
-                            const ageOff = !categoryOpenForBirth(item, member.birth);
-                            const closed = item.isActive === false;
-                            const reason = closed
-                              ? "마감"
-                              : ageOff
-                                ? categoryClosedReason(item, member.birth)
-                                : "";
-                            return (
-                              <option
-                                key={item.categoryId}
-                                value={item.categoryId}
-                                disabled={closed || ageOff}
-                              >
-                                {categoryLabel(item)}
-                                {reason ? ` (${reason})` : ""}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        {memberPolicyNoteLines.map((line) => (
-                          <p key={line} className="form-row__hint" role="status">
-                            {line}
-                          </p>
-                        ))}
-                      </td>
-                      <td data-label="사이즈">
-                        <ShirtPick
-                          value={selectedSize}
-                          sizes={souvenir ? sizes : undefined}
-                          disabled={!souvenir || !canEditMemberFields}
-                          onChange={(size) => {
-                            if (!canEditMemberFields) return;
-                            patchMember(index, {
-                              selectedSouvenirList: withShirtSize(
-                                category,
-                                member.selectedSouvenirList,
-                                size,
-                                member.birth,
-                              ),
-                            });
-                          }}
-                        />
-                      </td>
-                      <td colSpan={2} data-label="패키지">
-                        <KitFixed courseId={courseId} />
-                      </td>
-                    </tr>
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <p className="party-sum">합계 {formatFee(total)}</p>
-      </FormSec>
-      {needsGroupGuardian ? (
-        <FormSec kicker="06 / CONSENT" title="단체장 동의">
-          <ApplyHint>
-            <p>{GUARDIAN_AGE_NOTE}</p>
-            <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>
-          </ApplyHint>
-          <FormRow label="법정대리인 동의" required>
-            <GuardianConsentField
-              label={GROUP_GUARDIAN_CONSENT_LABEL}
-              variant="button"
-              agreed={guardianConsent}
-              onChange={setGuardianConsent}
-            />
-          </FormRow>
-        </FormSec>
-      ) : null}
-      {hint || error ? (
-        <p className="form__err flow__err" role="alert">
-          {hint || error}
-        </p>
-      ) : null}
-      <div className="flow__nav">
-        <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
-          돌아가기
-        </button>
-        <button type="submit" className="btn btn--red" disabled={busy || members.length === 0}>
-          확인하기
-        </button>
-      </div>
-    </form>
-    ) : null}
-
-    {step === 1 ? (
-      <section className="block block--lookup-confirm">
-        <h2>수정 내용을 확인하세요</h2>
-        <dl className="spec">
-          <div>
-            <dt>단체명</dt>
-            <dd>{organizationName || "—"}</dd>
           </div>
-          <div>
-            <dt>단체 계정</dt>
-            <dd>{organizationLoginId || "—"}</dd>
-          </div>
-          <div>
-            <dt>대표자</dt>
-            <dd>{leaderName.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>대표자 생년월일</dt>
-            <dd>{birthView(leaderBirth) || "—"}</dd>
-          </div>
-          <div>
-            <dt>대표자 연락처</dt>
-            <dd>{formatPhone(leaderPhNum) || "—"}</dd>
-          </div>
-          <div>
-            <dt>이메일</dt>
-            <dd>{email.trim() || "—"}</dd>
-          </div>
-          <div>
-            <dt>주소</dt>
-            <dd>{addressView || "—"}</dd>
-          </div>
-          <div>
-            <dt>인원</dt>
-            <dd>{members.length}명</dd>
-          </div>
-          <div>
-            <dt>합계</dt>
-            <dd>{formatFee(total)}</dd>
-          </div>
-          {needsGroupGuardian ? (
-            <div>
-              <dt>단체장 동의</dt>
-              <dd>{guardianConsent ? "동의함" : "—"}</dd>
+          <FormSec kicker="01 / GROUP" title="단체">
+            <FormRow label="단체명" locked>
+              <input type="text" value={organizationName} disabled readOnly />
+            </FormRow>
+            <FormRow label="단체 계정" locked>
+              <input
+                type="text"
+                value={organizationLoginId}
+                disabled
+                readOnly
+                autoComplete="username"
+              />
+            </FormRow>
+          </FormSec>
+          <FormSec kicker="02 / LEADER" title="대표자 정보">
+            <FormRow label="대표자 성명" required locked>
+              <input
+                type="text"
+                placeholder="대표자 성명을 입력해주세요"
+                value={leaderName}
+                required
+                disabled
+                readOnly
+              />
+            </FormRow>
+            <FormRow label="대표자 생년월일" required locked>
+              <BirthPick value={leaderBirth} onChange={() => { }} disabled />
+            </FormRow>
+          </FormSec>
+          <FormSec kicker="03 / CONTACT" title="연락처">
+            <FormRow label="휴대폰번호" required locked>
+              <PhoneField
+                placeholder="휴대폰번호를 입력해주세요."
+                value={leaderPhNum}
+                onChange={() => { }}
+                autoComplete="tel"
+                required
+                disabled
+              />
+            </FormRow>
+            <FormRow label="이메일">
+              <EmailField
+                value={email}
+                onChange={setEmail}
+                disabled={!canEditOrgCommon}
+              />
+              {orgModifyPolicyNote ? (
+                <p className="form-row__hint" role="status">
+                  {orgModifyPolicyNote}
+                </p>
+              ) : null}
+            </FormRow>
+          </FormSec>
+          <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
+            <FormRow label="주소" required>
+              <AddressField
+                zonecode={zonecode}
+                address={address}
+                addressDetail={addressDetail}
+                onChange={(next) => {
+                  if (!canEditOrgCommon) return;
+                  if (next.zonecode != null) setZonecode(next.zonecode);
+                  if (next.address != null) setAddress(next.address);
+                  if (next.addressDetail != null) setAddressDetail(next.addressDetail);
+                }}
+                required
+                disabled={!canEditOrgCommon}
+              />
+              {orgModifyPolicyNote ? (
+                <p className="form-row__hint" role="status">
+                  {orgModifyPolicyNote}
+                </p>
+              ) : null}
+            </FormRow>
+          </FormSec>
+          <FormSec kicker="05" title="참가자">
+            <div className="party-bar">
+              <p>{members.length}명 등록</p>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={addMember}
+                disabled={busy || members.length >= MAX_GROUP_SIZE || !canAddMember}
+              >
+                참가자 추가
+              </button>
             </div>
+            {addMemberPolicyNote ? (
+              <p className="form__note" role="status">
+                {addMemberPolicyNote}
+              </p>
+            ) : null}
+            {optionsError ? <p className="form__err">{optionsError}</p> : null}
+            <div className="party-wrap">
+              <table className="party">
+                <colgroup>
+                  <col className="party__c-no" />
+                  <col className="party__c-name" />
+                  <col className="party__c-birth" />
+                  <col className="party__c-phone" />
+                  <col className="party__c-gender" />
+                  <col className="party__c-fee" />
+                  <col className="party__c-del" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th rowSpan={2}>번호</th>
+                    <th>이름</th>
+                    <th>생년월일</th>
+                    <th>연락처</th>
+                    <th>성별</th>
+                    <th rowSpan={2}>참가비</th>
+                    <th rowSpan={2}>삭제</th>
+                  </tr>
+                  <tr>
+                    <th>참가종목</th>
+                    <th>출발 그룹</th>
+                    <th colSpan={2}>사이즈</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map((member, index) => {
+                    const category = findCategory(categories, member.eventCategoryId);
+                    const souvenir = shirtSouvenir(category);
+                    const sizes = souvenirSizes(souvenir, ticketForBirth(member.birth));
+                    const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
+                    const selectedSize = memberShirtSize(member.selectedSouvenirList, category);
+                    const open = openMember === index;
+                    const locked = Boolean(member.registrationId);
+                    const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
+                    const memberPolicyNoteLines =
+                      locked && member.memberPolicy
+                        ? memberLookupPolicyNotes(member.memberPolicy)
+                        : [];
+                    return (
+                      <Fragment key={member.key}>
+                        {index > 0 ? (
+                          <tr className="party__gap" aria-hidden="true">
+                            <td colSpan={7} />
+                          </tr>
+                        ) : null}
+                        <tr className={open ? "party__info is-open" : "party__info"}>
+                          <td className="party__no" rowSpan={3}>
+                            {index + 1}.
+                          </td>
+                          <td className="party__peek">
+                            <button type="button" onClick={() => setOpenMember(index)}>
+                              {groupMemberPeek(member, categories)}
+                            </button>
+                          </td>
+                          <td data-label="이름" className={locked ? "is-locked" : undefined}>
+                            <input
+                              type="text"
+                              placeholder="성명"
+                              value={member.name}
+                              onChange={(e) => patchMember(index, { name: e.target.value })}
+                              required
+                              disabled={locked}
+                              readOnly={locked}
+                            />
+                          </td>
+                          <td data-label="생년월일" className={locked ? "is-locked" : undefined}>
+                            <BirthText
+                              value={member.birth}
+                              onChange={(birth) => {
+                                if (locked) return;
+                                const current = findCategory(categories, member.eventCategoryId);
+                                const keep = current && categoryOpenForBirth(current, birth);
+                                patchMember(
+                                  index,
+                                  keep
+                                    ? {
+                                      birth,
+                                      selectedSouvenirList: withShirtSize(
+                                        current,
+                                        member.selectedSouvenirList,
+                                        memberShirtSize(member.selectedSouvenirList, current),
+                                        birth,
+                                      ),
+                                    }
+                                    : {
+                                      birth,
+                                      eventCategoryId: "",
+                                      selectedSouvenirList: withShirtSize(
+                                        undefined,
+                                        member.selectedSouvenirList,
+                                        "",
+                                        birth,
+                                      ),
+                                    },
+                                );
+                              }}
+                              required
+                              disabled={locked}
+                            />
+                          </td>
+                          <td data-label="연락처" className={locked ? "is-locked" : undefined}>
+                            <PhoneField
+                              placeholder="연락처"
+                              value={member.phNum}
+                              onChange={(phNum) => {
+                                if (locked) return;
+                                patchMember(index, { phNum });
+                              }}
+                              required
+                              disabled={locked}
+                            />
+                          </td>
+                          <td data-label="성별" className={locked ? "is-locked" : undefined}>
+                            <select
+                              value={toUiGender(member.gender)}
+                              onChange={(e) => {
+                                if (locked) return;
+                                patchMember(index, { gender: toApiGender(e.target.value) });
+                              }}
+                              required
+                              disabled={locked}
+                            >
+                              <option value="">성별</option>
+                              {GENDERS.map((g) => (
+                                <option key={g.id} value={g.id}>
+                                  {g.label}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="party__fee" data-label="참가비" rowSpan={3}>
+                            {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
+                          </td>
+                          <td className="party__del" rowSpan={3}>
+                            <button
+                              type="button"
+                              className="party__expand"
+                              onClick={() => setOpenMember(index)}
+                            >
+                              펼치기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__fold"
+                              onClick={() => setOpenMember(-1)}
+                            >
+                              접기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__remove"
+                              onClick={() => removeMember(index)}
+                              disabled={
+                                busy ||
+                                members.length <= 1 ||
+                                (member.registrationId
+                                  ? !memberDeleteAllowed(member.memberPolicy, false)
+                                  : false)
+                              }
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__more is-open" : "party__more"}>
+                          <td data-label="참가종목">
+                            <select
+                              value={member.eventCategoryId}
+                              onChange={(e) => {
+                                if (!canEditMemberFields) return;
+                                const eventCategoryId = e.target.value;
+                                const next = findCategory(categories, eventCategoryId);
+                                patchMember(index, {
+                                  eventCategoryId,
+                                  selectedSouvenirList: withShirtSize(
+                                    next,
+                                    member.selectedSouvenirList,
+                                    memberShirtSize(member.selectedSouvenirList, next),
+                                    member.birth,
+                                  ),
+                                  ...EMPTY_START_GROUP_DRAFT,
+                                });
+                                if (eventCategoryId) setOpenMember(index);
+                              }}
+                              disabled={!optionsReady || !canEditMemberFields}
+                              required
+                            >
+                              <option value="">{optionsReady ? "참가종목" : "불러오는 중"}</option>
+                              {categories.map((item) => {
+                                const ageOff = !categoryOpenForBirth(item, member.birth);
+                                const closed = item.isActive === false;
+                                const reason = closed
+                                  ? "마감"
+                                  : ageOff
+                                    ? categoryClosedReason(item, member.birth)
+                                    : "";
+                                return (
+                                  <option
+                                    key={item.categoryId}
+                                    value={item.categoryId}
+                                    disabled={closed || ageOff}
+                                  >
+                                    {categoryLabel(item)}
+                                    {reason ? ` (${reason})` : ""}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            {memberPolicyNoteLines.map((line) => (
+                              <p key={line} className="form-row__hint" role="status">
+                                {line}
+                              </p>
+                            ))}
+                          </td>
+                          <td data-label="출발 그룹">
+                            <GroupMemberStartGroup
+                              category={category}
+                              categoryId={member.eventCategoryId}
+                              value={{
+                                startGroupId: member.startGroupId ?? "",
+                                startGroupUnselected: member.startGroupUnselected,
+                              }}
+                              disabled={!optionsReady || !canEditMemberFields}
+                              namePrefix={`lookup-edit-member-${index}`}
+                              storedCode={member.storedStartGroupCode}
+                              onChange={(next) =>
+                                patchMember(index, {
+                                  startGroupId: next.startGroupUnselected
+                                    ? null
+                                    : next.startGroupId || null,
+                                  startGroupUnselected: next.startGroupUnselected,
+                                })
+                              }
+                            />
+                          </td>
+                          <td colSpan={2} data-label="사이즈">
+                            <ShirtPick
+                              value={selectedSize}
+                              sizes={souvenir ? sizes : undefined}
+                              disabled={!souvenir || !canEditMemberFields}
+                              onChange={(size) => {
+                                if (!canEditMemberFields) return;
+                                patchMember(index, {
+                                  selectedSouvenirList: withShirtSize(
+                                    category,
+                                    member.selectedSouvenirList,
+                                    size,
+                                    member.birth,
+                                  ),
+                                });
+                              }}
+                            />
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__kit is-open" : "party__kit"}>
+                          <td colSpan={4}>
+                            <span className="party__kit-label">패키지</span>
+                            <KitFixed courseId={courseId} />
+                          </td>
+                        </tr>
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="party-sum">합계 {formatFee(total)}</p>
+          </FormSec>
+          {needsGroupGuardian ? (
+            <FormSec kicker="06 / CONSENT" title="단체장 동의">
+              <ApplyHint>
+                <p>{GUARDIAN_AGE_NOTE}</p>
+                <p>참가자 개개인 동의 대신 단체장 동의로 진행합니다.</p>
+              </ApplyHint>
+              <FormRow label="법정대리인 동의" required>
+                <GuardianConsentField
+                  label={GROUP_GUARDIAN_CONSENT_LABEL}
+                  variant="button"
+                  agreed={guardianConsent}
+                  onChange={setGuardianConsent}
+                />
+              </FormRow>
+            </FormSec>
           ) : null}
-        </dl>
-        <ul className="member-list">
-          {members.map((member, i) => {
-            const category = findCategory(categories, member.eventCategoryId);
-            const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
-            const size = memberShirtSize(member.selectedSouvenirList, category);
-            return (
-              <li key={member.key}>
-                <strong>
-                  {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
-                </strong>
-                <span>
-                  {category ? categoryLabel(category) : "—"} · {size || "—"} ·{" "}
-                  {birthView(member.birth) || "—"} ·{" "}
-                  {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
-                  {formatPhone(member.phNum) || "—"}
-                </span>
-                <KitFixed courseId={courseId} />
-              </li>
-            );
-          })}
-        </ul>
-        <DockNav>
           {hint || error ? (
             <p className="form__err flow__err" role="alert">
               {hint || error}
             </p>
           ) : null}
-          <button
-            type="button"
-            className="btn btn--ghost"
-            disabled={busy}
-            onClick={() => {
-              setPayCheckOpen(false);
-              setStep(0);
-              scrollPageTop();
-            }}
-          >
-            수정
-          </button>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            disabled={busy}
-            onClick={() => runModify("submit")}
-          >
-            {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
-          </button>
-          {canPayAfterModify ? (
+          <div className="flow__nav">
+            <button type="button" className="btn btn--ghost" onClick={onBack} disabled={busy}>
+              돌아가기
+            </button>
+            <button type="submit" className="btn btn--red" disabled={busy || members.length === 0}>
+              확인하기
+            </button>
+          </div>
+        </form>
+      ) : null}
+
+      {step === 1 ? (
+        <section className="block block--lookup-confirm">
+          <h2>수정 내용을 확인하세요</h2>
+          <dl className="spec">
+            <div>
+              <dt>단체명</dt>
+              <dd>{organizationName || "—"}</dd>
+            </div>
+            <div>
+              <dt>단체 계정</dt>
+              <dd>{organizationLoginId || "—"}</dd>
+            </div>
+            <div>
+              <dt>대표자</dt>
+              <dd>{leaderName.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>대표자 생년월일</dt>
+              <dd>{birthView(leaderBirth) || "—"}</dd>
+            </div>
+            <div>
+              <dt>대표자 연락처</dt>
+              <dd>{formatPhone(leaderPhNum) || "—"}</dd>
+            </div>
+            <div>
+              <dt>이메일</dt>
+              <dd>{email.trim() || "—"}</dd>
+            </div>
+            <div>
+              <dt>주소</dt>
+              <dd>{addressView || "—"}</dd>
+            </div>
+            <div>
+              <dt>인원</dt>
+              <dd>{members.length}명</dd>
+            </div>
+            <div>
+              <dt>합계</dt>
+              <dd>{formatFee(total)}</dd>
+            </div>
+            {needsGroupGuardian ? (
+              <div>
+                <dt>단체장 동의</dt>
+                <dd>{guardianConsent ? "동의함" : "—"}</dd>
+              </div>
+            ) : null}
+          </dl>
+          <ul className="member-list">
+            {members.map((member, i) => {
+              const category = findCategory(categories, member.eventCategoryId);
+              const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
+              const size = memberShirtSize(member.selectedSouvenirList, category);
+              return (
+                <li key={member.key}>
+                  <strong>
+                    {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
+                  </strong>
+                  <span>
+                    {category ? categoryLabel(category) : "—"} ·{" "}
+                    {startGroupSummary(
+                      {
+                        startGroupId: member.startGroupId ?? "",
+                        startGroupUnselected: member.startGroupUnselected,
+                      },
+                      category,
+                    )}{" "}
+                    · {size || "—"} · {birthView(member.birth) || "—"} ·{" "}
+                    {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
+                    {formatPhone(member.phNum) || "—"}
+                  </span>
+                  <KitFixed courseId={courseId} />
+                </li>
+              );
+            })}
+          </ul>
+          <DockNav>
+            {hint || error ? (
+              <p className="form__err flow__err" role="alert">
+                {hint || error}
+              </p>
+            ) : null}
             <button
               type="button"
-              className="btn btn--red"
+              className="btn btn--ghost"
               disabled={busy}
-              onClick={() => runModify("pay")}
+              onClick={() => {
+                setPayCheckOpen(false);
+                setStep(0);
+                scrollPageTop();
+              }}
             >
-              {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+              수정
             </button>
-          ) : null}
-        </DockNav>
-      </section>
-    ) : null}
+            <button
+              type="button"
+              className="btn btn--ghost"
+              disabled={busy}
+              onClick={() => runModify("submit")}
+            >
+              {busy && pendingAction === "submit" ? "제출 중..." : "수정된 신청서 제출"}
+            </button>
+            {canPayAfterModify ? (
+              <button
+                type="button"
+                className="btn btn--red"
+                disabled={busy}
+                onClick={() => runModify("pay")}
+              >
+                {busy && pendingAction === "pay" ? "결제 준비 중..." : "결제하기"}
+              </button>
+            ) : null}
+          </DockNav>
+        </section>
+      ) : null}
 
-    <RegisterPayCheckModal
-      mode="lookup-modify"
-      open={payCheckOpen}
-      onClose={() => setPayCheckOpen(false)}
-    />
+      <RegisterPayCheckModal
+        mode="lookup-modify"
+        open={payCheckOpen}
+        onClose={() => setPayCheckOpen(false)}
+      />
     </>
   );
 }

@@ -36,8 +36,10 @@ import {
   unpaidCancellationFailureText,
   type AdminApplicationRow,
   type ApplicationKind,
+  type StartGroupUnselectedFilter,
   type UnpaidCancellationResult,
 } from "@/services/admin/applications";
+import { fetchAdminRegistrationOptions } from "@/services/admin/registration-options";
 import {
   ExcelDownloadButtons,
   ExcelPageCheck,
@@ -67,11 +69,28 @@ const STATUS_OPTIONS: { value: RegistrationStatus | ""; label: string }[] = [
   })),
 ];
 
+const UNSELECTED_OPTIONS: { value: StartGroupUnselectedFilter; label: string }[] = [
+  { value: "", label: "선택 방식" },
+  { value: "false", label: "직접 선택" },
+  { value: "true", label: "미선택(후미)" },
+];
+
 type Applied = {
   q: string;
   kind: ApplicationKind | "";
   status: RegistrationStatus | "";
   eventCategoryId: string;
+  startGroupCode: string;
+  startGroupUnselected: StartGroupUnselectedFilter;
+};
+
+const EMPTY_APPLIED: Applied = {
+  q: "",
+  kind: "",
+  status: "",
+  eventCategoryId: "",
+  startGroupCode: "",
+  startGroupUnselected: "",
 };
 
 function errorHint(error: unknown) {
@@ -111,7 +130,24 @@ function MarketingBadge({ consent }: { consent: boolean }) {
 function CourseTag({ row }: { row: AdminApplicationRow }) {
   const label = applicationCourseLabel(row);
   if (!label || label === "-") return <>-</>;
-  return <span className="admin-apps-list__course-text">{label}</span>;
+  return (
+    <span className="admin-apps-list__course-text admin-apps-list__clip" title={label}>
+      {label}
+    </span>
+  );
+}
+
+function StartGroupTag({ row }: { row: AdminApplicationRow }) {
+  const code = row.startGroupCode?.trim();
+  if (!code) return <>-</>;
+  return (
+    <span className="admin-apps-list__group">
+      <span className="admin-apps-list__course-text">{code}</span>
+      {row.startGroupUnselected ? (
+        <span className="admin-apps-list__group-auto">미선택</span>
+      ) : null}
+    </span>
+  );
 }
 
 function displayPhone(value?: string | null) {
@@ -187,11 +223,11 @@ export function ApplicationsListPage({ slug }: Props) {
   const [kind, setKind] = useState<ApplicationKind | "">("");
   const [status, setStatus] = useState<RegistrationStatus | "">(statusFromUrl);
   const [course, setCourse] = useState("");
+  const [groupCode, setGroupCode] = useState("");
+  const [groupUnselected, setGroupUnselected] = useState<StartGroupUnselectedFilter>("");
   const [applied, setApplied] = useState<Applied>({
-    q: "",
-    kind: "",
+    ...EMPTY_APPLIED,
     status: statusFromUrl,
-    eventCategoryId: "",
   });
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -243,6 +279,27 @@ export function ApplicationsListPage({ slug }: Props) {
     [categoriesQuery.data],
   );
 
+  const optionsQuery = useQuery({
+    queryKey: ["admin", "registration-options", apiEventId],
+    queryFn: () => fetchAdminRegistrationOptions(apiEventId),
+    enabled: hasAdminApi && Boolean(apiEventId),
+  });
+
+  // code는 종목마다 따로 정의돼 있어 대회 전체에서 중복 제거
+  const groupCodeOptions = useMemo(() => {
+    const codes = new Set<string>();
+    for (const category of optionsQuery.data?.categories ?? []) {
+      for (const group of category.startGroups ?? []) {
+        const code = group.code.trim();
+        if (code) codes.add(code);
+      }
+    }
+    return [
+      { value: "", label: "전체 출발 그룹" },
+      ...[...codes].map((code) => ({ value: code, label: `${code} 그룹` })),
+    ];
+  }, [optionsQuery.data]);
+
   const listQuery = useQuery({
     queryKey: ["admin", "registrations", apiEventId, applied, page],
     queryFn: async () => {
@@ -252,6 +309,8 @@ export function ApplicationsListPage({ slug }: Props) {
         status: applied.status,
         keyword: applied.q,
         eventCategoryId: applied.eventCategoryId,
+        startGroupCode: applied.startGroupCode,
+        startGroupUnselected: applied.startGroupUnselected,
         page: page - 1,
         size: PAGE_SIZE,
       });
@@ -276,7 +335,8 @@ export function ApplicationsListPage({ slug }: Props) {
 
   useEffect(() => {
     setCourse("");
-    setApplied((prev) => ({ ...prev, eventCategoryId: "" }));
+    setGroupCode("");
+    setApplied((prev) => ({ ...prev, eventCategoryId: "", startGroupCode: "" }));
     setPage(1);
   }, [apiEventId]);
 
@@ -309,7 +369,14 @@ export function ApplicationsListPage({ slug }: Props) {
   }, [detailQuery.data, rows, selectedId]);
 
   const runSearch = () => {
-    setApplied({ q, kind, status, eventCategoryId: course });
+    setApplied({
+      q,
+      kind,
+      status,
+      eventCategoryId: course,
+      startGroupCode: groupCode,
+      startGroupUnselected: groupUnselected,
+    });
     setPage(1);
   };
 
@@ -318,7 +385,9 @@ export function ApplicationsListPage({ slug }: Props) {
     setKind("");
     setStatus("");
     setCourse("");
-    setApplied({ q: "", kind: "", status: "", eventCategoryId: "" });
+    setGroupCode("");
+    setGroupUnselected("");
+    setApplied(EMPTY_APPLIED);
     setPage(1);
   };
 
@@ -458,21 +527,20 @@ export function ApplicationsListPage({ slug }: Props) {
       key: "no",
       header: "번호",
       className: "is-num",
-      width: "48px",
+      width: "52px",
       render: (row: AdminApplicationRow) => row.no || "-",
     },
     {
       key: "kind",
       header: "유형",
       className: "is-kind",
-      width: "48px",
+      width: "52px",
       render: (row: AdminApplicationRow) => <KindBadge kind={row.kind} />,
     },
     {
       key: "name",
       header: "이름/단체명",
       className: "is-name",
-      width: "11%",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__name" title={row.name || undefined}>
           {row.name || "-"}
@@ -490,21 +558,26 @@ export function ApplicationsListPage({ slug }: Props) {
       key: "gender",
       header: "성별",
       className: "is-muted",
-      width: "56px",
+      width: "52px",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
       className: "is-course",
-      width: "56px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
+    },
+    {
+      key: "startGroup",
+      header: "출발 그룹",
+      className: "is-course",
+      width: "84px",
+      render: (row: AdminApplicationRow) => <StartGroupTag row={row} />,
     },
     {
       key: "souvenir",
       header: "기념품",
       className: "is-clip",
-      width: "11%",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
           {row.souvenir || "-"}
@@ -515,14 +588,14 @@ export function ApplicationsListPage({ slug }: Props) {
       key: "phone",
       header: "연락처",
       className: "is-phone",
-      width: "118px",
+      width: "120px",
       render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
       key: "marketing",
       header: "마케팅",
       className: "is-marketing",
-      width: "52px",
+      width: "56px",
       render: (row: AdminApplicationRow) => (
         <MarketingBadge consent={Boolean(row.marketingConsent)} />
       ),
@@ -538,7 +611,7 @@ export function ApplicationsListPage({ slug }: Props) {
       key: "appliedAt",
       header: "신청일시",
       className: "is-date",
-      width: "132px",
+      width: "136px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
@@ -627,6 +700,28 @@ export function ApplicationsListPage({ slug }: Props) {
                 }}
                 ariaLabel="코스"
                 width={128}
+              />
+              <AdminSelect
+                value={groupCode}
+                options={groupCodeOptions}
+                onChange={(value) => {
+                  setGroupCode(value);
+                  setApplied((prev) => ({ ...prev, startGroupCode: value }));
+                  setPage(1);
+                }}
+                ariaLabel="출발 그룹"
+                width={128}
+              />
+              <AdminSelect
+                value={groupUnselected}
+                options={UNSELECTED_OPTIONS}
+                onChange={(value) => {
+                  setGroupUnselected(value);
+                  setApplied((prev) => ({ ...prev, startGroupUnselected: value }));
+                  setPage(1);
+                }}
+                ariaLabel="그룹 선택 방식"
+                width={112}
               />
             </div>
             <input
