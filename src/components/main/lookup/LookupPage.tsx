@@ -473,12 +473,12 @@ function ReceiptNotes({
   const policyNotes = lookupPolicyNotes(receipt);
   if (!externalPayment && !warning && policyNotes.length === 0) return null;
   return (
-    <>
+    <div className="ticket__notes">
       {externalPayment ? (
         <p className="form__note form__note--external">
           <strong>외부 결제 건은 결제·일반 수정·환불을 진행할 수 없습니다.</strong>
           <span>
-            출발 그룹은 「출발 그룹」에서 변경할 수 있습니다. 그 외 개인정보 수정은{" "}
+            출발 그룹은 「출발 그룹 설정」에서 변경할 수 있습니다. 그 외 개인정보 수정은{" "}
             <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
           </span>
         </p>
@@ -489,7 +489,7 @@ function ReceiptNotes({
           {line}
         </p>
       ))}
-    </>
+    </div>
   );
 }
 

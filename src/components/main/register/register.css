@@ -1711,6 +1711,18 @@
   margin-top: 0.85rem;
 }
 
+.ticket__notes {
+  margin-top: 2.25rem;
+}
+
+.ticket .ticket__notes .form__note {
+  margin-top: 0.55rem;
+}
+
+.ticket .ticket__notes .form__note:first-child {
+  margin-top: 0;
+}
+
 .ticket .form__note--external {
   display: flex;
   flex-direction: column;
