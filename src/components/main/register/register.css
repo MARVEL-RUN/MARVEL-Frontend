@@ -2274,12 +2274,45 @@
   }
 
   .party tr.party__info {
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .party tr.party__info.is-open {
     margin-bottom: 0;
+    padding-bottom: 0.35rem;
     border-bottom: 0;
+    background: transparent;
+  }
+
+  .party tr.party__info.is-open,
+  .party tr.party__more.is-open,
+  .party tr.party__kit.is-open {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: #08091d;
+  }
+
+  /* 펼친 카드: 기본 정보 / 신청 정보 묶음 제목 */
+  .party tr.party__info.is-open::after,
+  .party tr.party__more.is-open::before {
+    grid-column: 1 / -1;
+    margin: 0.7rem 0.6rem 0.15rem;
+    padding-left: 0.45rem;
+    border-left: 2px solid var(--marvel);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.06em;
+  }
+
+  .party tr.party__info.is-open::after {
+    content: "기본 정보";
+    grid-row: 2;
+  }
+
+  .party tr.party__more.is-open::before {
+    content: "신청 정보";
   }
 
   .party th,
@@ -2366,18 +2399,42 @@
     align-items: stretch;
   }
 
+  .party tr.party__info.is-open {
+    grid-template-columns: 1fr 1fr auto;
+  }
+
   .party tr.is-open .party__peek {
     display: none;
   }
 
+  /* 펼친 카드 헤더 띠: 참가자 번호 · 참가비 · 접기/삭제 */
+  .party tr.is-open .party__no,
+  .party tr.party__info.is-open td[data-label="참가비"],
+  .party tr.is-open .party__del {
+    grid-row: 1;
+    background: rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
   .party tr.is-open .party__no {
     grid-column: 1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.9rem;
+  }
+
+  .party tr.party__info.is-open td[data-label="참가비"] {
+    grid-column: 2;
+    align-content: center;
+    justify-items: end;
+    padding-right: 0.2rem;
+    font-size: 0.9rem;
+  }
+
+  .party tr.party__info.is-open td[data-label="참가비"]::before {
+    content: none;
   }
 
   .party tr.is-open .party__del {
-    grid-column: 2;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    grid-column: 3;
   }
 
   .party .party__expand,
@@ -2405,7 +2462,8 @@
   }
 
   .party tr.is-open td[data-label] {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
   }
 
   .party tr.is-open td[data-label="이름"],
@@ -2415,13 +2473,12 @@
 
   .party tr.is-open td[data-label="생년월일"],
   .party tr.is-open td[data-label="성별"] {
-    grid-column: 2;
+    grid-column: 2 / -1;
   }
 
   .party tr.is-open td[data-label="참가종목"],
   .party tr.is-open td[data-label="사이즈"],
-  .party tr.is-open td[data-label="패키지"],
-  .party tr.is-open td[data-label="참가비"] {
+  .party tr.is-open td[data-label="패키지"] {
     grid-column: 1 / -1;
   }
 
@@ -2439,10 +2496,6 @@
     white-space: normal;
   }
 
-  .party tr.party__info.is-open td[data-label="참가비"] {
-    border-bottom: 0;
-  }
-
   .party tr.party__more:not(.is-open) {
     display: none;
   }
@@ -2451,8 +2504,8 @@
     display: grid;
     grid-template-columns: 1fr;
     margin-top: -1px;
-    margin-bottom: 0.65rem;
-    border-top: 0;
+    margin-bottom: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .party tr.party__more.is-open:has(+ tr.party__kit.is-open) {
@@ -2466,13 +2519,13 @@
   .party tr.party__kit.is-open {
     grid-template-columns: 1fr;
     margin-top: -1px;
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.8rem;
     border-top: 0;
   }
 
   .party tr.party__kit.is-open td {
     grid-column: 1 / -1;
-    padding: 0.5rem 0.6rem;
+    padding: 0.4rem 0.6rem 0.7rem;
     background: transparent;
   }
 
