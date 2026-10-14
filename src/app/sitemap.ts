@@ -6,6 +6,7 @@ export const dynamic = "force-static";
 const PUBLIC_PATHS = [
   "/",
   "/guide",
+  "/guide/onsite-program",
   "/kit",
   "/directions",
   "/precautions",
