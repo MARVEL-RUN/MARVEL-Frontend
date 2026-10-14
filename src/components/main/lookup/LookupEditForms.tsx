@@ -35,9 +35,10 @@ import {
 } from "@/lib/registration-options";
 import {
   EMPTY_START_GROUP_DRAFT,
+  sortedStartGroups,
   startGroupDraftError,
-  startGroupPreviewSections,
   startGroupDraftFromStored,
+  startGroupPreviewSections,
   startGroupInputFromDraft,
   startGroupInputFromStored,
   startGroupSummary,
@@ -922,8 +923,6 @@ export function GroupLookupEdit({
       }, 0),
     [categories, members],
   );
-  const startGroupSections = startGroupPreviewSections(categories);
-
   useLayoutEffect(() => {
     scrollPageTop();
   }, []);
@@ -1439,25 +1438,29 @@ export function GroupLookupEdit({
                       <tr className="party__start-group is-open">
                         <td colSpan={7} data-label="출발 그룹">
                           <p className="party__start-group-label">출발 그룹</p>
-                          <StartGroupPick
-                            sections={startGroupSections}
-                            activeSectionKey={member.eventCategoryId || undefined}
-                            value={{
-                              startGroupId: member.startGroupId ?? "",
-                              startGroupUnselected: member.startGroupUnselected,
-                            }}
-                            disabled={!optionsReady || !canEditMemberFields}
-                            hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
-                            namePrefix={`lookup-edit-member-${index}`}
-                            onChange={(next) =>
-                              patchMember(index, {
-                                startGroupId: next.startGroupUnselected
-                                  ? null
-                                  : next.startGroupId || null,
-                                startGroupUnselected: next.startGroupUnselected,
-                              })
-                            }
-                          />
+                          {!member.eventCategoryId ? (
+                            <p className="form-row__hint">
+                              참가종목을 선택하면 출발 그룹을 고를 수 있습니다.
+                            </p>
+                          ) : (
+                            <StartGroupPick
+                              groups={sortedStartGroups(category)}
+                              value={{
+                                startGroupId: member.startGroupId ?? "",
+                                startGroupUnselected: member.startGroupUnselected,
+                              }}
+                              disabled={!optionsReady || !canEditMemberFields}
+                              namePrefix={`lookup-edit-member-${index}`}
+                              onChange={(next) =>
+                                patchMember(index, {
+                                  startGroupId: next.startGroupUnselected
+                                    ? null
+                                    : next.startGroupId || null,
+                                  startGroupUnselected: next.startGroupUnselected,
+                                })
+                              }
+                            />
+                          )}
                         </td>
                       </tr>
                     ) : null}
