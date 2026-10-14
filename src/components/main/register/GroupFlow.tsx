@@ -854,7 +854,7 @@ export function GroupFlow({
                     return (
                       <Fragment key={i}>
                         <tr className={open ? "party__info is-open" : "party__info"}>
-                          <td className="party__no" rowSpan={2}>{i + 1}.</td>
+                          <td className="party__no" rowSpan={3}>{i + 1}.</td>
                           <td className="party__peek">
                             <button
                               type="button"
@@ -924,12 +924,12 @@ export function GroupFlow({
                               ))}
                             </select>
                           </td>
-                          <td className="party__fee" data-label="참가비" rowSpan={2}>
+                          <td className="party__fee" data-label="참가비" rowSpan={3}>
                             {category
                               ? formatFee(categoryFeeAmount(category, p.birth))
                               : "—"}
                           </td>
-                          <td className="party__del" rowSpan={2}>
+                          <td className="party__del" rowSpan={3}>
                             <button
                               type="button"
                               className="party__expand"
@@ -1013,7 +1013,7 @@ export function GroupFlow({
                           </td>
                         </tr>
                         <tr className={open ? "party__start-group is-open" : "party__start-group"}>
-                          <td colSpan={7}>
+                          <td colSpan={4}>
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={p.categoryId}

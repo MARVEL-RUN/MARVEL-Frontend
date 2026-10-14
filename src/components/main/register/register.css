@@ -1003,7 +1003,7 @@
 }
 
 .party tbody tr:last-child td,
-.party .party__info:has(+ .party__more:last-child) :is(.party__no, .party__fee, .party__del) {
+.party .party__info:has(+ .party__more + .party__start-group:last-child) :is(.party__no, .party__fee, .party__del) {
   border-bottom: 0;
 }
 
@@ -2975,10 +2975,7 @@
 
 /* 단체 참가자 행 — 종목 선택과 같은 드롭다운 */
 .party tr.party__start-group td {
-  padding: 0.65rem 0.55rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: 0;
-  border-bottom: 0;
+  padding: 0.5rem 0.55rem;
 }
 
 .party-start-group {

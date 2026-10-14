@@ -1245,7 +1245,7 @@ export function GroupLookupEdit({
                     return (
                       <Fragment key={member.key}>
                         <tr className={open ? "party__info is-open" : "party__info"}>
-                          <td className="party__no" rowSpan={2}>
+                          <td className="party__no" rowSpan={3}>
                             {index + 1}.
                           </td>
                           <td className="party__peek">
@@ -1329,10 +1329,10 @@ export function GroupLookupEdit({
                               ))}
                             </select>
                           </td>
-                          <td className="party__fee" data-label="참가비" rowSpan={2}>
+                          <td className="party__fee" data-label="참가비" rowSpan={3}>
                             {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
                           </td>
-                          <td className="party__del" rowSpan={2}>
+                          <td className="party__del" rowSpan={3}>
                             <button
                               type="button"
                               className="party__expand"
@@ -1436,7 +1436,7 @@ export function GroupLookupEdit({
                           </td>
                         </tr>
                         <tr className={open ? "party__start-group is-open" : "party__start-group"}>
-                          <td colSpan={7}>
+                          <td colSpan={4}>
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={member.eventCategoryId}
