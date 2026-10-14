@@ -905,9 +905,11 @@ export function GroupLookupEdit({
     () => receipt.guardianConsent === true,
   );
   const [email, setEmail] = useState(receipt.email?.trim() || "");
-  const [leaderName] = useState(receipt.leaderName?.trim() || "");
-  const [leaderBirth] = useState((receipt.leaderBirth || "").replace(/\D/g, "").slice(0, 8));
-  const [leaderPhNum] = useState(receipt.leaderPhNum || "");
+  const [leaderName, setLeaderName] = useState(receipt.leaderName?.trim() || "");
+  const [leaderBirth, setLeaderBirth] = useState(
+    (receipt.leaderBirth || "").replace(/\D/g, "").slice(0, 8),
+  );
+  const [leaderPhNum, setLeaderPhNum] = useState(receipt.leaderPhNum || "");
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
@@ -1043,9 +1045,9 @@ export function GroupLookupEdit({
       );
       if (groupErr) return `${prefix}${groupErr}`;
     }
-    if (!leaderName.trim()) return "대표자 정보를 확인하지 못했습니다.";
-    if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 정보를 확인하지 못했습니다.";
-    if (leaderPhNum.replace(/\D/g, "").length < 10) return "대표자 정보를 확인하지 못했습니다.";
+    if (!leaderName.trim()) return "대표자 성명을 입력하세요.";
+    if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 생년월일을 입력하세요.";
+    if (leaderPhNum.replace(/\D/g, "").length < 10) return "대표자 휴대폰번호를 입력하세요.";
     if (!zonecode.trim() || !address.trim()) return "우편번호 찾기로 주소를 선택하세요.";
     if (!addressDetail.trim()) return "상세주소를 입력하세요.";
     if (needsGroupGuardian && !guardianConsent) {
@@ -1113,7 +1115,7 @@ export function GroupLookupEdit({
               참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
             </p>
             <p className="lookup-edit__lock-note">
-              단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호는 수정할 수 없습니다.
+              단체명·단체 계정은 수정할 수 없습니다.
             </p>
           </div>
           <FormSec kicker="01 / GROUP" title="단체">
@@ -1131,29 +1133,34 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="02 / LEADER" title="대표자 정보">
-            <FormRow label="대표자 성명" required locked>
+            <FormRow label="대표자 성명" required locked={!canEditOrgCommon}>
               <input
                 type="text"
                 placeholder="대표자 성명을 입력해주세요"
                 value={leaderName}
+                onChange={(e) => setLeaderName(filterNoSpaceName(e.target.value))}
                 required
-                disabled
-                readOnly
+                disabled={!canEditOrgCommon}
+                readOnly={!canEditOrgCommon}
               />
             </FormRow>
-            <FormRow label="대표자 생년월일" required locked>
-              <BirthPick value={leaderBirth} onChange={() => { }} disabled />
+            <FormRow label="대표자 생년월일" required locked={!canEditOrgCommon}>
+              <BirthPick
+                value={leaderBirth}
+                onChange={setLeaderBirth}
+                disabled={!canEditOrgCommon}
+              />
             </FormRow>
           </FormSec>
           <FormSec kicker="03 / CONTACT" title="연락처">
-            <FormRow label="휴대폰번호" required locked>
+            <FormRow label="휴대폰번호" required locked={!canEditOrgCommon}>
               <PhoneField
                 placeholder="휴대폰번호를 입력해주세요."
                 value={leaderPhNum}
-                onChange={() => { }}
+                onChange={setLeaderPhNum}
                 autoComplete="tel"
                 required
-                disabled
+                disabled={!canEditOrgCommon}
               />
             </FormRow>
             <FormRow label="이메일" locked={!canEditOrgCommon}>
