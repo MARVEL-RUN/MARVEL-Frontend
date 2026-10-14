@@ -1055,6 +1055,11 @@
   letter-spacing: 0.14em;
 }
 
+.form .field>span {
+  color: var(--gold);
+  font-weight: 700;
+}
+
 .field input {
   width: 100%;
   padding: 0.85rem 0;
