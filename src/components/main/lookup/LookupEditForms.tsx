@@ -529,8 +529,8 @@ export function IndividualLookupEdit({
                 disabled={!canModify}
               />
             </FormRow>
-            <FormRow label="이메일" locked={!canModify}>
-              <EmailField value={email} onChange={setEmail} disabled={!canModify} />
+            <FormRow label="이메일">
+              <EmailField value={email} onChange={setEmail} />
             </FormRow>
           </FormSec>
 
@@ -1173,17 +1173,8 @@ export function GroupLookupEdit({
                 disabled={!canEditShipping}
               />
             </FormRow>
-            <FormRow label="이메일" locked={!canEditOrgCommon}>
-              <EmailField
-                value={email}
-                onChange={setEmail}
-                disabled={!canEditOrgCommon}
-              />
-              {orgModifyPolicyNote ? (
-                <p className="form-row__hint" role="status">
-                  {orgModifyPolicyNote}
-                </p>
-              ) : null}
+            <FormRow label="이메일">
+              <EmailField value={email} onChange={setEmail} />
             </FormRow>
           </FormSec>
           <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
