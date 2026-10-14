@@ -33,6 +33,7 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
+import { startGroupInputFromStored } from "@/lib/start-group";
 import {
   lookupModifyAllowed,
   lookupOrganizationCommonModifyAllowed,
@@ -416,6 +417,7 @@ export function IndividualLookupEdit({
       guardianRelationship: guardianRelation.trim() || undefined,
       guardianConsent: guardianRequired ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
+      ...startGroupInputFromStored(receipt.startGroupId, receipt.startGroupUnselected),
     };
   }
 
@@ -797,6 +799,8 @@ function emptyMember(): GroupMemberDraft {
     phNum: "",
     birth: "",
     gender: "",
+    startGroupId: null,
+    startGroupUnselected: false,
   };
 }
 
@@ -824,6 +828,7 @@ function participantDraft(
     birth: (row.birth || "").replace(/\D/g, ""),
     gender: toApiGender(row.gender) || "M",
     memberPolicy: row.memberPolicy,
+    ...startGroupInputFromStored(row.startGroupId, row.startGroupUnselected),
   };
 }
 
@@ -1024,6 +1029,8 @@ export function GroupLookupEdit({
           phNum: toApiPhone(row.phNum),
           birth: toApiBirth(row.birth),
           gender: row.gender === "F" ? "F" : "M",
+          startGroupId: row.startGroupId,
+          startGroupUnselected: row.startGroupUnselected,
         };
         if (row.registrationId) next.registrationId = row.registrationId;
         return next;
