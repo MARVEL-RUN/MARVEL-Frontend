@@ -13,15 +13,13 @@ export const isMain = APP_MODE === "main";
 export const ONSITE_PROGRAM_HREF = "/guide/onsite-program";
 
 export const GUIDE_SECTIONS = [
-  { href: "/guide#overview", label: "대회개요" },
+  { href: "/guide", label: "대회개요" },
   { href: "/guide#timeline", label: "타임라인" },
   { href: "/guide#course", label: "코스" },
   { href: ONSITE_PROGRAM_HREF, label: "현장프로그램" },
 ] as const;
 
-export const GUIDE_TABS = GUIDE_SECTIONS.filter(
-  (item) => item.href.includes("#") && item.href !== "/guide#overview",
-);
+export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href.includes("#"));
 
 export const KIT_HREF = "/kit";
 
@@ -35,7 +33,12 @@ export const BOARD_HREF = "/notices";
 
 export const NAV_ITEMS = [
   { href: "/", label: "마블런2026" },
-  { href: "/guide", label: "대회안내", children: GUIDE_SECTIONS },
+  {
+    href: "/guide",
+    label: "대회안내",
+    pickChild: true,
+    children: GUIDE_SECTIONS,
+  },
   { href: KIT_HREF, label: "기념품" },
   { href: "/directions", label: "오시는길" },
   { href: BOARD_HREF, label: "커뮤니티", pickChild: true, children: BOARD_SECTIONS },
