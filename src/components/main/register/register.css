@@ -2299,8 +2299,8 @@
     margin: 0.7rem 0.6rem 0.15rem;
     padding-left: 0.45rem;
     border-left: 2px solid var(--marvel);
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.7rem;
+    color: #fff;
+    font-size: 0.74rem;
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: 0.06em;
@@ -2461,11 +2461,6 @@
     font-size: 0.72rem;
   }
 
-  .party tr.is-open td[data-label] {
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
-  }
-
   .party tr.is-open td[data-label="이름"],
   .party tr.is-open td[data-label="연락처"] {
     grid-column: 1;
@@ -2531,9 +2526,10 @@
 
   .party .party__kit-label {
     margin: 0;
-    color: #fff;
-    font-size: 0.74rem;
-    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   .party tr.party__kit .kit-fixed {
@@ -2556,17 +2552,19 @@
     min-width: 0;
   }
 
-  .party td[data-label="사이즈"] .seg {
-    flex-wrap: wrap;
-    justify-content: flex-start;
+  /* 라벨은 작고 흐리게, 값은 크고 밝게. 라벨-필드 간격 < 필드-필드 간격 */
+  .party tr.is-open td[data-label] {
+    gap: 0.32rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .party td[data-label]::before {
     content: attr(data-label);
-    color: #fff;
-    font-size: 0.74rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     word-break: keep-all;
   }
 
@@ -2576,36 +2574,77 @@
     font-weight: 800;
   }
 
-  .party td[data-label="참가비"]::before {
-    color: #fff;
-    font-size: 0.74rem;
-    font-weight: 800;
-  }
-
   .party input,
   .party select {
-    min-height: 2.35rem;
+    min-height: 2.6rem;
     box-sizing: border-box;
-    padding: 0.4rem 0.5rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
     font-size: 1rem;
     line-height: 1.3;
     text-align: left;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
 
   .party select {
-    padding-right: 1.45rem;
+    padding-right: 1.8rem;
+    background-position: right 0.65rem center;
+  }
+
+  .party input::placeholder {
+    color: rgba(255, 255, 255, 0.36);
+  }
+
+  .party select:has(option[value=""]:checked) {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .party select option {
+    background: #08091d;
+    color: #fff;
+  }
+
+  .party input:focus,
+  .party select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+  }
+
+  .party input:disabled,
+  .party select:disabled {
+    border-style: dashed;
+    background-color: transparent;
+  }
+
+  .party td[data-label="사이즈"] .seg {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.3rem;
+  }
+
+  .party td[data-label="사이즈"] .seg button {
+    min-width: 0;
+    min-height: 2.4rem;
+    padding: 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 0.84rem;
+    clip-path: none;
+  }
+
+  .party td[data-label="사이즈"] .seg button.is-on {
+    background: var(--marvel);
+    border-color: var(--marvel);
   }
 
   .party-sum {
     margin-top: 0.7rem;
     font-size: 0.95rem;
     text-align: left;
-  }
-
-  .party td[data-label="사이즈"] .seg button {
-    min-height: 2.25rem;
-    padding: 0 0.55rem;
-    font-size: 0.88rem;
   }
 
   .form-row__label {
