@@ -3402,7 +3402,7 @@
 
 /* 목록 간격(0.55rem)과 맞춤 */
 .start-group-pick__defer {
-  margin-top: -0.3rem;
+  margin-top: 0.55rem;
 }
 
 .start-group-pick__list label.is-on,
