@@ -220,16 +220,6 @@ export function lookupPolicyNotes(receipt: RegistrationReceipt) {
   }
   if (org && !org.addMemberAllowed) push(org.addMemberReason);
 
-  if (receipt.organizationId) {
-    for (const row of receipt.registrations ?? []) {
-      if (row.canceled) continue;
-      const mp = row.memberPolicy;
-      if (!mp) continue;
-      if (!mp.modifyAllowed) push(mp.modifyReason);
-      if (!mp.deleteMemberAllowed) push(mp.deleteMemberReason);
-    }
-  }
-
   return lines;
 }
 
