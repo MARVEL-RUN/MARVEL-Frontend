@@ -69,7 +69,11 @@ function StatusBadge({ status }: { status: string }) {
 function CourseTag({ row }: { row: AdminApplicationRow }) {
   const label = applicationCourseLabel(row);
   if (!label || label === "-") return <>-</>;
-  return <span className="admin-apps-list__course-text">{label}</span>;
+  return (
+    <span className="admin-apps-list__course-text admin-apps-list__clip" title={label}>
+      {label}
+    </span>
+  );
 }
 
 function StartGroupTag({ row }: { row: AdminApplicationRow }) {
@@ -284,14 +288,13 @@ export function OrganizationMembersList({
       key: "no",
       header: "번호",
       className: "is-num",
-      width: "48px",
+      width: "52px",
       render: (row: AdminApplicationRow) => row.no || "-",
     },
     {
       key: "name",
       header: "성명",
       className: "is-name",
-      width: "11%",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__name" title={row.name || undefined}>
           {row.name || "-"}
@@ -309,14 +312,13 @@ export function OrganizationMembersList({
       key: "gender",
       header: "성별",
       className: "is-muted",
-      width: "56px",
+      width: "52px",
       render: (row: AdminApplicationRow) => applicationGenderLabel(row.gender),
     },
     {
       key: "course",
       header: "코스",
       className: "is-course",
-      width: "56px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
@@ -330,7 +332,6 @@ export function OrganizationMembersList({
       key: "souvenir",
       header: "기념품",
       className: "is-clip",
-      width: "11%",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
           {row.souvenir || "-"}
@@ -341,14 +342,14 @@ export function OrganizationMembersList({
       key: "phone",
       header: "연락처",
       className: "is-phone",
-      width: "118px",
+      width: "120px",
       render: (row: AdminApplicationRow) => displayPhone(row.phone),
     },
     {
       key: "marketing",
       header: "마케팅",
       className: "is-marketing",
-      width: "52px",
+      width: "56px",
       render: (row: AdminApplicationRow) => (
         <MarketingBadge consent={Boolean(row.marketingConsent)} />
       ),
@@ -364,7 +365,7 @@ export function OrganizationMembersList({
       key: "appliedAt",
       header: "신청일시",
       className: "is-date",
-      width: "132px",
+      width: "136px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
   ];
