@@ -10,6 +10,7 @@ import {
   TIMING_CHIP_NOTE,
   ageBand,
   emailOk,
+  filterNoSpaceName,
   formatFee,
   formatPhone,
   needsGuardian,
@@ -47,6 +48,7 @@ import { StartGroupPick } from "../register/StartGroupPick";
 import {
   lookupModifyAllowed,
   lookupOrganizationCommonModifyAllowed,
+  lookupOrganizationShippingModifyAllowed,
   lookupShowPaymentButton,
   memberDeleteAllowed,
   memberLookupPolicyNotes,
@@ -302,11 +304,11 @@ export function IndividualLookupEdit({
   const [pendingAction, setPendingAction] = useState<LookupModifyAction | null>(null);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsError, setOptionsError] = useState("");
-  const [name] = useState(receipt.name?.trim() || access.name);
-  const [birth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
-  const [phone] = useState(receipt.phNum || access.phNum);
+  const [name, setName] = useState(receipt.name?.trim() || access.name);
+  const [birth, setBirth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
+  const [phone, setPhone] = useState(receipt.phNum || access.phNum);
   const [email, setEmail] = useState(receipt.email?.trim() || "");
-  const [gender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
+  const [gender, setGender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
@@ -388,6 +390,14 @@ export function IndividualLookupEdit({
   ) {
     setEventCategoryId(next?.categoryId ?? "");
     setSouvenirs(withShirtSize(next, souvenirs, size, nextBirth));
+  }
+
+  function onBirthChange(nextBirth: string) {
+    setBirth(nextBirth);
+    if (!courseId) return;
+    const next = categoryForCourse(categories, courseId, nextBirth);
+    applyCategory(next, selectedSize, nextBirth);
+    if (next?.categoryId !== eventCategoryId) setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
   }
 
   function onCourseChange(nextCourseId: CourseId) {
@@ -473,9 +483,6 @@ export function IndividualLookupEdit({
           <div className="form__head">
             <h2>개인 접수 수정</h2>
             <p className="form__note">조회한 접수 정보를 수정합니다.</p>
-            <p className="lookup-edit__lock-note">
-              개인정보(이름·생년월일·성별)와 휴대폰 번호는 수정할 수 없습니다.
-            </p>
             {modifyPolicyNote ? (
               <p className="form__note" role="status">
                 {modifyPolicyNote}
@@ -484,45 +491,46 @@ export function IndividualLookupEdit({
           </div>
 
           <FormSec kicker="01 / PROFILE" title="개인정보">
-            <FormRow label="이름" required locked>
+            <FormRow label="이름" required locked={!canModify}>
               <input
                 type="text"
                 name="name"
                 placeholder="띄어쓰기 없이 입력해주세요."
                 value={name}
+                onChange={(e) => setName(filterNoSpaceName(e.target.value))}
                 autoComplete="name"
                 required
-                disabled
-                readOnly
+                disabled={!canModify}
+                readOnly={!canModify}
               />
             </FormRow>
-            <FormRow label="생년월일" required locked>
-              <BirthPick value={birth} onChange={() => { }} disabled />
+            <FormRow label="생년월일" required locked={!canModify}>
+              <BirthPick value={birth} onChange={onBirthChange} disabled={!canModify} />
             </FormRow>
-            <FormRow label="성별" required locked>
+            <FormRow label="성별" required locked={!canModify}>
               <GenderPick
                 name="gender"
                 value={toUiGender(gender)}
-                onChange={() => { }}
-                disabled
+                onChange={(next) => setGender(toApiGender(next))}
+                disabled={!canModify}
               />
             </FormRow>
           </FormSec>
 
           <FormSec kicker="02 / CONTACT" title="연락처 정보">
-            <FormRow label="휴대폰번호" required locked>
+            <FormRow label="휴대폰번호" required locked={!canModify}>
               <PhoneField
                 name="phone"
                 placeholder="휴대폰번호를 입력해주세요."
                 value={phone}
-                onChange={() => { }}
+                onChange={setPhone}
                 autoComplete="tel"
                 required
-                disabled
+                disabled={!canModify}
               />
             </FormRow>
-            <FormRow label="이메일" locked={!canModify}>
-              <EmailField value={email} onChange={setEmail} disabled={!canModify} />
+            <FormRow label="이메일">
+              <EmailField value={email} onChange={setEmail} />
             </FormRow>
           </FormSec>
 
@@ -898,9 +906,11 @@ export function GroupLookupEdit({
     () => receipt.guardianConsent === true,
   );
   const [email, setEmail] = useState(receipt.email?.trim() || "");
-  const [leaderName] = useState(receipt.leaderName?.trim() || "");
-  const [leaderBirth] = useState((receipt.leaderBirth || "").replace(/\D/g, "").slice(0, 8));
-  const [leaderPhNum] = useState(receipt.leaderPhNum || "");
+  const [leaderName, setLeaderName] = useState(receipt.leaderName?.trim() || "");
+  const [leaderBirth, setLeaderBirth] = useState(
+    (receipt.leaderBirth || "").replace(/\D/g, "").slice(0, 8),
+  );
+  const [leaderPhNum, setLeaderPhNum] = useState(receipt.leaderPhNum || "");
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
@@ -909,9 +919,13 @@ export function GroupLookupEdit({
   const canEditOrgCommon = lookupOrganizationCommonModifyAllowed(receipt);
   const canAddMember = organizationAddMemberAllowed(receipt);
   const canPayAfterModify = lookupShowPaymentButton(receipt);
+  const canEditShipping = lookupOrganizationShippingModifyAllowed(receipt);
   const orgModifyPolicyNote = !canEditOrgCommon
     ? policyReasonMessage(receipt.organizationPolicy?.modifyReason)
     : "";
+  const shippingPolicyNote =
+    orgModifyPolicyNote ||
+    (!canEditShipping ? policyReasonMessage(receipt.organizationPolicy?.paymentReason) : "");
   const addMemberPolicyNote = !canAddMember
     ? policyReasonMessage(receipt.organizationPolicy?.addMemberReason)
     : "";
@@ -1036,9 +1050,9 @@ export function GroupLookupEdit({
       );
       if (groupErr) return `${prefix}${groupErr}`;
     }
-    if (!leaderName.trim()) return "대표자 정보를 확인하지 못했습니다.";
-    if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 정보를 확인하지 못했습니다.";
-    if (leaderPhNum.replace(/\D/g, "").length < 10) return "대표자 정보를 확인하지 못했습니다.";
+    if (!leaderName.trim()) return "대표자 성명을 입력하세요.";
+    if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 생년월일을 입력하세요.";
+    if (leaderPhNum.replace(/\D/g, "").length < 10) return "대표자 휴대폰번호를 입력하세요.";
     if (!zonecode.trim() || !address.trim()) return "우편번호 찾기로 주소를 선택하세요.";
     if (!addressDetail.trim()) return "상세주소를 입력하세요.";
     if (needsGroupGuardian && !guardianConsent) {
@@ -1106,8 +1120,7 @@ export function GroupLookupEdit({
               참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
             </p>
             <p className="lookup-edit__lock-note">
-              단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호, 이미 등록된
-              참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
+              단체명·단체 계정은 수정할 수 없습니다.
             </p>
           </div>
           <FormSec kicker="01 / GROUP" title="단체">
@@ -1125,62 +1138,63 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="02 / LEADER" title="대표자 정보">
-            <FormRow label="대표자 성명" required locked>
+            <FormRow label="대표자 성명" required locked={!canEditShipping}>
               <input
                 type="text"
                 placeholder="대표자 성명을 입력해주세요"
                 value={leaderName}
+                onChange={(e) => setLeaderName(filterNoSpaceName(e.target.value))}
                 required
-                disabled
-                readOnly
+                disabled={!canEditShipping}
+                readOnly={!canEditShipping}
               />
             </FormRow>
-            <FormRow label="대표자 생년월일" required locked>
-              <BirthPick value={leaderBirth} onChange={() => { }} disabled />
-            </FormRow>
-          </FormSec>
-          <FormSec kicker="03 / CONTACT" title="연락처">
-            <FormRow label="휴대폰번호" required locked>
-              <PhoneField
-                placeholder="휴대폰번호를 입력해주세요."
-                value={leaderPhNum}
-                onChange={() => { }}
-                autoComplete="tel"
-                required
-                disabled
+            <FormRow label="대표자 생년월일" required locked={!canEditShipping}>
+              <BirthPick
+                value={leaderBirth}
+                onChange={setLeaderBirth}
+                disabled={!canEditShipping}
               />
-            </FormRow>
-            <FormRow label="이메일" locked={!canEditOrgCommon}>
-              <EmailField
-                value={email}
-                onChange={setEmail}
-                disabled={!canEditOrgCommon}
-              />
-              {orgModifyPolicyNote ? (
+              {shippingPolicyNote ? (
                 <p className="form-row__hint" role="status">
-                  {orgModifyPolicyNote}
+                  {shippingPolicyNote}
                 </p>
               ) : null}
             </FormRow>
           </FormSec>
+          <FormSec kicker="03 / CONTACT" title="연락처">
+            <FormRow label="휴대폰번호" required locked={!canEditShipping}>
+              <PhoneField
+                placeholder="휴대폰번호를 입력해주세요."
+                value={leaderPhNum}
+                onChange={setLeaderPhNum}
+                autoComplete="tel"
+                required
+                disabled={!canEditShipping}
+              />
+            </FormRow>
+            <FormRow label="이메일">
+              <EmailField value={email} onChange={setEmail} />
+            </FormRow>
+          </FormSec>
           <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-            <FormRow label="주소" required locked={!canEditOrgCommon}>
+            <FormRow label="주소" required locked={!canEditShipping}>
               <AddressField
                 zonecode={zonecode}
                 address={address}
                 addressDetail={addressDetail}
                 onChange={(next) => {
-                  if (!canEditOrgCommon) return;
+                  if (!canEditShipping) return;
                   if (next.zonecode != null) setZonecode(next.zonecode);
                   if (next.address != null) setAddress(next.address);
                   if (next.addressDetail != null) setAddressDetail(next.addressDetail);
                 }}
                 required
-                disabled={!canEditOrgCommon}
+                disabled={!canEditShipping}
               />
-              {orgModifyPolicyNote ? (
+              {shippingPolicyNote ? (
                 <p className="form-row__hint" role="status">
-                  {orgModifyPolicyNote}
+                  {shippingPolicyNote}
                 </p>
               ) : null}
             </FormRow>

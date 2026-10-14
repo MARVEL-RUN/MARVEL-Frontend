@@ -11,7 +11,7 @@ import {
   lookupShowRefundOrCancelButton,
 } from "@/lib/main/registrationActionPolicy";
 import { startGroupDisplayFromLookup, type StartGroupDraft } from "@/lib/start-group";
-import { registrationStatusLabel } from "@/lib/registration-status";
+import { registrationStatusBadge, registrationStatusLabel } from "@/lib/registration-status";
 import {
   consumeLookupRefreshAfterPayment,
   paymentOrderFromRetry,
@@ -331,39 +331,74 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
   const active = members.filter((member) => !member.canceled);
   const canceled = members.filter((member) => member.canceled);
   return (
-    <>
-      {active.length > 0 ? (
-        <ul className="member-list">
-          {active.map((member, i) => (
-            <li key={member.id}>
-              <strong>
-                {String(i + 1).padStart(2, "0")} {member.name || "참가자"}
-              </strong>
-              <span>
-                {[
-                  member.course,
-                  member.startGroup,
-                  member.souvenirs[0]?.size,
-                  registrationStatusLabel(member.status),
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || "—"}
-              </span>
-            </li>
-          ))}
-        </ul>
+    <ul className="lookup-members">
+      {active.map((member, i) => (
+        <ReceiptMemberRow
+          key={member.id}
+          no={String(i + 1).padStart(2, "0")}
+          member={member}
+          status={registrationStatusLabel(member.status)}
+          tone={registrationStatusBadge(member.status)}
+        />
+      ))}
+      {canceled.map((member) => (
+        <ReceiptMemberRow
+          key={member.id}
+          no="—"
+          member={member}
+          status="취소"
+          tone="refunded"
+          canceled
+        />
+      ))}
+    </ul>
+  );
+}
+
+function ReceiptMemberRow({
+  no,
+  member,
+  status,
+  tone,
+  canceled = false,
+}: {
+  no: string;
+  member: ReceiptMemberView;
+  status: string;
+  tone: string;
+  canceled?: boolean;
+}) {
+  const size = member.souvenirs[0]?.size;
+  const startGroup = member.startGroup && member.startGroup !== "—" ? member.startGroup : "";
+  return (
+    <li className={canceled ? "is-canceled" : undefined}>
+      <span className="lookup-members__no">{no}</span>
+      <div className="lookup-members__main">
+        <p className="lookup-members__head">
+          <strong>{member.name || "참가자"}</strong>
+          {member.course ? <span className="lookup-members__course">{member.course}</span> : null}
+        </p>
+        {!canceled && (startGroup || size) ? (
+          <dl className="lookup-members__meta">
+            {startGroup ? (
+              <div>
+                <dt>출발 그룹</dt>
+                <dd>{startGroup}</dd>
+              </div>
+            ) : null}
+            {size ? (
+              <div>
+                <dt>사이즈</dt>
+                <dd>{size}</dd>
+              </div>
+            ) : null}
+          </dl>
+        ) : null}
+      </div>
+      {status ? (
+        <span className={`lookup-members__status lookup-members__status--${tone}`}>{status}</span>
       ) : null}
-      {canceled.length > 0 ? (
-        <ul className="member-list">
-          {canceled.map((member) => (
-            <li key={member.id} className="is-canceled">
-              <strong>{member.name || "참가자"}</strong>
-              <span>취소</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </>
+    </li>
   );
 }
 
@@ -473,23 +508,55 @@ function ReceiptNotes({
   const policyNotes = lookupPolicyNotes(receipt);
   if (!externalPayment && !warning && policyNotes.length === 0) return null;
   return (
-    <>
+    <div className="ticket__notes">
       {externalPayment ? (
         <p className="form__note form__note--external">
           <strong>외부 결제 건은 결제·일반 수정·환불을 진행할 수 없습니다.</strong>
           <span>
-            출발 그룹은 「출발 그룹」에서 변경할 수 있습니다. 그 외 개인정보 수정은{" "}
+            출발 그룹은 「출발 그룹 설정」에서 변경할 수 있습니다. 그 외 개인정보 수정은{" "}
             <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
           </span>
         </p>
       ) : null}
       {warning ? <p className="form__note">{warning}</p> : null}
-      {policyNotes.map((line) => (
-        <p key={line} className="form__note">
-          {line}
+      {policyNotes.length ? <PolicyNoticeBox lines={policyNotes} inquiryHref={inquiryHref} /> : null}
+    </div>
+  );
+}
+
+function splitSentences(text: string) {
+  return text.split(/(?<=[.!?])\s+/).map((part) => part.trim()).filter(Boolean);
+}
+
+/** 모든 문구 끝 문장이 같으면 한 번만 */
+function commonTailSentence(lines: string[]) {
+  if (lines.length < 2) return "";
+  const tails = lines.map((line) => {
+    const parts = splitSentences(line);
+    return parts.length > 1 ? parts[parts.length - 1] : "";
+  });
+  return tails[0] && tails.every((tail) => tail === tails[0]) ? tails[0] : "";
+}
+
+function PolicyNoticeBox({ lines, inquiryHref }: { lines: string[]; inquiryHref: string }) {
+  const tail = commonTailSentence(lines);
+  const items = tail
+    ? lines.map((line) => splitSentences(line).slice(0, -1).join(" "))
+    : lines;
+  return (
+    <section className="ticket-notice" aria-label="신청 안내">
+      <p className="ticket-notice__title">안내</p>
+      <ul className="ticket-notice__list">
+        {items.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+      {tail ? (
+        <p className="ticket-notice__tail">
+          {tail} <Link href={inquiryHref}>문의사항 남기기</Link>
         </p>
-      ))}
-    </>
+      ) : null}
+    </section>
   );
 }
 
@@ -538,7 +605,9 @@ function IndividualReceiptCard({
   return (
     <section className="ticket">
       <p className="kicker">FOUND</p>
-      <h2>개인 접수 확인</h2>
+      <h2>
+        개인 접수 <em>확인</em>
+      </h2>
       <dl className="spec">
         <div>
           <dt>이름</dt>
@@ -661,7 +730,9 @@ function GroupReceiptCard({
   return (
     <section className="ticket">
       <p className="kicker">FOUND</p>
-      <h2>단체 접수 확인</h2>
+      <h2>
+        단체 접수 <em>확인</em>
+      </h2>
       <dl className="spec">
         <div>
           <dt>단체명</dt>

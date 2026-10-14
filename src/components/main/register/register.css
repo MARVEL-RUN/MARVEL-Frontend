@@ -1606,6 +1606,20 @@
 .ticket h2 {
   margin-bottom: 0.8rem;
   font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.ticket .spec dt {
+  letter-spacing: 0.02em;
+}
+
+.ticket h2 em {
+  display: inline-block;
+  color: var(--marvel);
+  font-style: normal;
+  transform: skewX(-10deg);
 }
 
 .ticket--done h2 {
@@ -1709,6 +1723,214 @@
 
 .ticket .form__note {
   margin-top: 0.85rem;
+}
+
+.lookup-members {
+  display: grid;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  list-style: none;
+  text-align: left;
+}
+
+.lookup-members>li {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 0.75rem;
+  padding: 0.95rem 0.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lookup-members>li.is-canceled {
+  opacity: 0.5;
+}
+
+.lookup-members__no {
+  display: inline-block;
+  color: var(--marvel);
+  font-size: 1.3rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  transform: skewX(-10deg);
+}
+
+.lookup-members__main {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.lookup-members__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  margin: 0;
+}
+
+.lookup-members__head strong {
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.lookup-members__course {
+  padding: 0.22rem 0.65rem 0.18rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--silver);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+}
+
+.lookup-members__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+  margin: 0;
+}
+
+.lookup-members__meta div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.lookup-members__meta dt {
+  color: var(--note);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.lookup-members__meta dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.lookup-members__status {
+  --tone: var(--note);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: center;
+  color: var(--tone);
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lookup-members__status::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--tone);
+}
+
+.lookup-members__status--paid {
+  --tone: #3ecf8e;
+}
+
+.lookup-members__status--pending {
+  --tone: var(--gold);
+}
+
+.lookup-members__status--refund_requested {
+  --tone: var(--marvel);
+}
+
+@media (max-width: 720px) {
+  .lookup-members>li {
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    column-gap: 0.55rem;
+    padding: 0.85rem 0;
+  }
+
+  .lookup-members__no {
+    font-size: 1.1rem;
+  }
+
+  .lookup-members__status {
+    align-self: start;
+    margin-top: 0.2rem;
+    font-size: 0.7rem;
+  }
+}
+
+.ticket__notes {
+  margin-top: 3.25rem;
+}
+
+.ticket-notice {
+  margin-top: 1rem;
+  padding: 1.05rem 1.2rem 1.1rem;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: left;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+.ticket__notes>.ticket-notice:first-child {
+  margin-top: 0;
+}
+
+.ticket-notice__title {
+  margin: 0 0 0.6rem;
+  color: var(--marvel);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.ticket-notice__list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ticket-notice__list li {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.ticket-notice__tail {
+  margin: 0.8rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--note);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.ticket-notice__tail a {
+  margin-left: 0.35rem;
+  color: var(--gold);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.ticket .ticket__notes .form__note {
+  margin-top: 0.55rem;
+}
+
+.ticket .ticket__notes .form__note:first-child {
+  margin-top: 0;
 }
 
 .ticket .form__note--external {
@@ -2785,6 +3007,7 @@
   }
 
   .form-row__label {
+    color: rgba(255, 255, 255, 0.6);
     white-space: normal;
     word-break: keep-all;
   }
@@ -3164,7 +3387,8 @@
   list-style: none;
 }
 
-.start-group-pick__list label {
+.start-group-pick__list label,
+.start-group-pick__defer {
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: start;
@@ -3176,59 +3400,84 @@
   transition: border-color 0.15s, background 0.15s;
 }
 
-.start-group-pick__list label.is-on {
+/* 목록 간격(0.55rem)과 맞춤 */
+.start-group-pick__defer {
+  margin-top: 0.55rem;
+}
+
+.start-group-pick__list label.is-on,
+.start-group-pick__defer.is-on {
   border-color: rgba(237, 28, 36, 0.75);
   background: rgba(237, 28, 36, 0.08);
 }
 
-.start-group-pick__list label input {
-  margin-top: 0.15rem;
-  accent-color: var(--marvel);
+.start-group-pick__list label input,
+.start-group-pick__defer input {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
+.start-group-pick__list label input:checked,
+.start-group-pick__defer input:checked {
+  border-color: var(--marvel);
+  background-color: var(--marvel);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.4 6.3 4.9 8.8 9.6 3.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0.7rem;
+}
+
+.start-group-pick__list label input:focus-visible,
+.start-group-pick__defer input:focus-visible {
+  outline: 2px solid var(--marvel);
+  outline-offset: 2px;
+}
+
+/* 「미정」 폭에 맞춰 A·B 설명 시작점 통일 */
 .start-group-pick__code {
-  min-width: 1.6rem;
-  font-weight: 800;
+  min-width: 2.2rem;
   color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .start-group-pick__desc {
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   line-height: 1.45;
+  word-break: keep-all;
 }
 
 .start-group-pick__finish {
   color: #fff;
   font-weight: 800;
-  font-size: 0.95rem;
   letter-spacing: -0.01em;
 }
 
 .start-group-pick__pace {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.84rem;
   font-weight: 500;
 }
 
-.start-group-pick__defer {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
+@media (max-width: 720px) {
+  .start-group-pick__pace {
+    display: block;
+    margin-top: 0.1rem;
+  }
 
-.start-group-pick__defer input {
-  margin-top: 0.2rem;
-  accent-color: var(--marvel);
-}
-
-.start-group-pick__defer small {
-  display: block;
-  margin-top: 0.15rem;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 0.82rem;
+  .start-group-pick__pace-sep {
+    display: none;
+  }
 }
 
 .start-group-pick.is-disabled label,

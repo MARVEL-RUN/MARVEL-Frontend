@@ -24,7 +24,12 @@ function StartGroupDescription({ text }: { text: string }) {
   return (
     <span className="start-group-pick__desc">
       <strong className="start-group-pick__finish">{finish}</strong>
-      {pace ? <span className="start-group-pick__pace"> · {pace}</span> : null}
+      {pace ? (
+        <span className="start-group-pick__pace">
+          <span className="start-group-pick__pace-sep"> · </span>
+          {pace}
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -68,6 +73,40 @@ function GroupList({
         );
       })}
     </ul>
+  );
+}
+
+function DeferOption({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: StartGroupDraft;
+  onChange: (next: StartGroupDraft) => void;
+  disabled: boolean;
+}) {
+  return (
+    <label className={`start-group-pick__defer${value.startGroupUnselected ? " is-on" : ""}`}>
+      <input
+        type="checkbox"
+        checked={value.startGroupUnselected}
+        disabled={disabled}
+        onChange={(e) =>
+          onChange({
+            startGroupId: "",
+            startGroupUnselected: e.target.checked,
+          })
+        }
+      />
+      <span className="start-group-pick__code">미정</span>
+      <span className="start-group-pick__desc">
+        <strong className="start-group-pick__finish">A, B 그룹을 잘 모르겠어요</strong>
+        <span className="start-group-pick__pace">
+          <span className="start-group-pick__pace-sep"> · </span>
+          후미 출발 그룹으로 배정됩니다
+        </span>
+      </span>
+    </label>
   );
 }
 
@@ -135,26 +174,10 @@ export function StartGroupPick({
               disabled={inputsDisabled}
               radioName={radioName}
             />
+            <DeferOption value={value} onChange={onChange} disabled={inputsDisabled} />
           </div>
         );
       })}
-      <label className="start-group-pick__defer">
-        <input
-          type="checkbox"
-          checked={value.startGroupUnselected}
-          disabled={inputsDisabled}
-          onChange={(e) =>
-            onChange({
-              startGroupId: "",
-              startGroupUnselected: e.target.checked,
-            })
-          }
-        />
-        <span>
-          A, B 그룹을 잘 모르겠어요
-          <small>후미 출발 그룹으로 배정됩니다</small>
-        </span>
-      </label>
       {hintWhenInactive && preview ? (
         <p className="form-row__hint start-group-pick__hint">{hintWhenInactive}</p>
       ) : null}
