@@ -265,16 +265,3 @@ export function memberLookupPolicyNotes(
   return lines;
 }
 
-/** 등록된 구성원 정책 안내 — 동일 문구는 한 번만 */
-export function organizationMemberLookupPolicyNotes(
-  members: { registrationId?: string | null; memberPolicy?: MemberRegistrationPolicy }[],
-) {
-  const lines: string[] = [];
-  for (const member of members) {
-    if (!member.registrationId?.trim()) continue;
-    for (const line of memberLookupPolicyNotes(member.memberPolicy)) {
-      if (!lines.includes(line)) lines.push(line);
-    }
-  }
-  return lines;
-}
