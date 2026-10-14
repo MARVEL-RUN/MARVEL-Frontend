@@ -24,7 +24,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ChevronRight, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 15;
 
@@ -148,14 +148,13 @@ export function MembersListPage({ slug }: Props) {
       key: "no",
       header: "번호",
       className: "is-num",
-      width: "48px",
+      width: "52px",
       render: (row: AdminOrganizationListItem) => row.listNumber || "-",
     },
     {
       key: "groupName",
       header: "단체명",
       className: "is-name",
-      width: "14%",
       render: (row: AdminOrganizationListItem) => (
         <span className="admin-apps-list__name" title={row.groupName || undefined}>
           {row.groupName || "-"}
@@ -166,30 +165,37 @@ export function MembersListPage({ slug }: Props) {
       key: "eventName",
       header: "대회명",
       className: "is-clip",
-      width: "18%",
       render: (row: AdminOrganizationListItem) => (
-        <span title={row.eventName || undefined}>{row.eventName || "-"}</span>
+        <span className="admin-apps-list__clip" title={row.eventName || undefined}>
+          {row.eventName || "-"}
+        </span>
       ),
     },
     {
       key: "leaderName",
       header: "대표자명",
       className: "is-muted",
-      width: "88px",
-      render: (row: AdminOrganizationListItem) => row.leaderName || "-",
+      render: (row: AdminOrganizationListItem) => (
+        <span className="admin-apps-list__clip" title={row.leaderName || undefined}>
+          {row.leaderName || "-"}
+        </span>
+      ),
     },
     {
       key: "loginId",
       header: "대표자 아이디",
       className: "is-clip",
-      width: "12%",
-      render: (row: AdminOrganizationListItem) => row.loginId || "-",
+      render: (row: AdminOrganizationListItem) => (
+        <span className="admin-apps-list__clip" title={row.loginId || undefined}>
+          {row.loginId || "-"}
+        </span>
+      ),
     },
     {
       key: "createdAt",
       header: "등록일",
       className: "is-date",
-      width: "96px",
+      width: "108px",
       render: (row: AdminOrganizationListItem) => formatAdminListDate(row.createdAt),
     },
     {
@@ -204,7 +210,7 @@ export function MembersListPage({ slug }: Props) {
       key: "members",
       header: "회원리스트",
       className: "is-link",
-      width: "96px",
+      width: "108px",
       render: (row: AdminOrganizationListItem) =>
         row.organizationId ? (
           <Link
@@ -223,20 +229,9 @@ export function MembersListPage({ slug }: Props) {
     },
   ];
 
-  const tableRowCount = rows.length;
-  const fixedTableHeight =
-    hasAdminApi &&
-    Boolean(apiEventId) &&
-    listQuery.data !== undefined &&
-    tableRowCount > 0;
-  const listPageStyle = fixedTableHeight
-    ? ({ "--admin-apps-list-rows": tableRowCount } as CSSProperties)
-    : undefined;
-
   return (
     <div
-      className={`admin-page admin-apps-list admin-members-list${fixedTableHeight ? " is-fixed-table" : ""}${listQuery.isFetching ? " is-fetching" : ""}`}
-      style={listPageStyle}
+      className={`admin-page admin-apps-list admin-members-list${listQuery.isFetching ? " is-fetching" : ""}`}
     >
       <AdminTableShell<AdminOrganizationListItem>
         title="단체회원 관리"
