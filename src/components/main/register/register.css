@@ -1729,7 +1729,7 @@
 
 .ticket-notice__title {
   margin: 0 0 0.6rem;
-  color: #fff;
+  color: var(--marvel);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.12em;
