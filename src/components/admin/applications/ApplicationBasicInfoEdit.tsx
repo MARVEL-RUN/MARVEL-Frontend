@@ -2,13 +2,27 @@
 
 import { emailOk, formatPhone } from "@/lib/register";
 import { toApiGender } from "@/lib/registration-gender";
+import { findCategory } from "@/lib/registration-options";
+import {
+  findStartGroup,
+  sortedStartGroups,
+  startGroupDraftError,
+  startGroupDraftFromStored,
+  startGroupInputFromDraft,
+  startGroupSelectionChanged,
+  type StartGroupDraft,
+} from "@/lib/start-group";
 import {
   updateRegistrationBasicInfo,
   type AdminApplicationRow,
   type RegistrationBasicInfoUpdate,
 } from "@/services/admin/applications";
-import { useMutation } from "@tanstack/react-query";
+import { fetchAdminRegistrationOptions } from "@/services/admin/registration-options";
+import type { RegistrationCategory } from "@/services/main/types";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+
+const DEFER_VALUE = "__defer";
 
 export type ApplicationBasicInfoEditMode = "full" | "organization-member";
 
@@ -32,6 +46,7 @@ type FormState = {
   guardianName: string;
   guardianPhNum: string;
   guardianRelationship: string;
+  startGroup: StartGroupDraft;
 };
 
 function editableText(value?: string | null) {
@@ -54,6 +69,7 @@ function formFromRow(row: AdminApplicationRow): FormState {
     guardianName: row.guardianName?.trim() ?? "",
     guardianPhNum: (row.guardianPhone ?? "").replace(/\D/g, ""),
     guardianRelationship: row.guardianRelation?.trim() ?? "",
+    startGroup: startGroupDraftFromStored(row.startGroupId, row.startGroupUnselected),
   };
 }
 
@@ -71,7 +87,11 @@ function birthHint(raw: string) {
   return `${digits.slice(0, 4)}.${digits.slice(4, 6)}.${digits.slice(6, 8)}`;
 }
 
-function validate(form: FormState) {
+function validate(
+  form: FormState,
+  initial: FormState,
+  category: RegistrationCategory | undefined,
+) {
   if (!form.name.trim()) return "이름을 입력하세요.";
   if (!form.phNum.trim()) return "연락처를 입력하세요.";
   if (form.birth.replace(/\D/g, "").length !== 8) return "생년월일 8자리를 입력하세요.";
@@ -80,6 +100,13 @@ function validate(form: FormState) {
   if (!form.addressDetail.trim()) return "상세주소를 입력하세요.";
   const email = editableText(form.email);
   if (email && !emailOk(email)) return "이메일 형식을 확인하세요.";
+  const stored = startGroupInputFromDraft(initial.startGroup);
+  const storedEmpty = !stored.startGroupUnselected && !stored.startGroupId;
+  // 그대로 둔 저장값은 선택지 조회 실패·비활성 그룹이어도 서버 판단에 맡김
+  if (storedEmpty || startGroupSelectionChanged(stored, form.startGroup)) {
+    const groupErr = startGroupDraftError(form.startGroup, category);
+    if (groupErr) return groupErr;
+  }
   return "";
 }
 
@@ -96,6 +123,7 @@ function toPayload(form: FormState): RegistrationBasicInfoUpdate {
     guardianName: form.guardianName.trim(),
     guardianPhNum: form.guardianPhNum.replace(/\D/g, ""),
     guardianRelationship: form.guardianRelationship.trim(),
+    ...startGroupInputFromDraft(form.startGroup),
   };
 }
 
@@ -140,6 +168,36 @@ export function ApplicationBasicInfoEdit({
   const [form, setForm] = useState(initial);
   const lockSharedFields = mode === "organization-member";
 
+  const options = useQuery({
+    queryKey: ["admin", "registration-options", row.eventId],
+    queryFn: () => fetchAdminRegistrationOptions(row.eventId),
+    enabled: Boolean(row.eventId),
+  });
+  const category = findCategory(options.data?.categories ?? [], row.eventCategoryId ?? "");
+  const groups = sortedStartGroups(category);
+  const storedGroupMissing =
+    options.isSuccess &&
+    !form.startGroup.startGroupUnselected &&
+    Boolean(form.startGroup.startGroupId) &&
+    !findStartGroup(category, form.startGroup.startGroupId);
+  const startGroupValue = form.startGroup.startGroupUnselected
+    ? DEFER_VALUE
+    : storedGroupMissing
+      ? ""
+      : form.startGroup.startGroupId;
+  const startGroupPlaceholder = options.isLoading
+    ? "불러오는 중…"
+    : options.isError
+      ? "선택지를 불러오지 못했습니다"
+      : groups.length
+        ? "선택"
+        : "선택 가능한 출발 그룹이 없습니다";
+  const startGroupHint = storedGroupMissing
+    ? `저장된 그룹${row.startGroupCode ? `(${row.startGroupCode})` : ""}이 선택지에 없습니다. 다시 선택하세요.`
+    : options.isError
+      ? "현재 저장값으로 유지됩니다"
+      : row.courseName?.trim() || undefined;
+
   const save = useMutation({
     mutationFn: () => updateRegistrationBasicInfo(row.id, toPayload(form)),
     onSuccess: () => onSaved(),
@@ -153,7 +211,9 @@ export function ApplicationBasicInfoEdit({
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const invalid = validate(form);
+    const invalid = storedGroupMissing
+      ? "출발 그룹을 다시 선택하세요."
+      : validate(form, initial, category);
     if (invalid) {
       onError(invalid);
       return;
@@ -170,7 +230,7 @@ export function ApplicationBasicInfoEdit({
       {lockSharedFields ? (
         <div className="admin-drawer__guide" role="note">
           <p>
-            이름·연락처·생년월일·성별·보호자만 수정할 수 있습니다.
+            이름·연락처·생년월일·성별·보호자·출발 그룹만 수정할 수 있습니다.
             <br />
             이메일·주소는 단체 상세의 「기본정보 수정」에서 변경해 주세요.
           </p>
@@ -188,10 +248,39 @@ export function ApplicationBasicInfoEdit({
         </div>
       ) : (
         <p className="admin-drawer__edit-note">
-          신청자·주소·보호자 정보만 수정됩니다. 코스·기념품·결제 정보는 변경되지
+          신청자·주소·보호자·출발 그룹만 수정됩니다. 코스·기념품·결제 정보는 변경되지
           않습니다.
         </p>
       )}
+
+      <EditSection title="신청 정보">
+        <EditRow label="출발 그룹" hint={startGroupHint}>
+          <select
+            className="admin-drawer__edit-input admin-drawer__edit-select"
+            value={startGroupValue}
+            disabled={!groups.length}
+            onChange={(e) => {
+              const next = e.target.value;
+              patch({
+                startGroup:
+                  next === DEFER_VALUE
+                    ? { startGroupId: "", startGroupUnselected: true }
+                    : { startGroupId: next, startGroupUnselected: false },
+              });
+            }}
+          >
+            <option value="">{startGroupPlaceholder}</option>
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.code} · {group.description}
+              </option>
+            ))}
+            {groups.length ? (
+              <option value={DEFER_VALUE}>미선택 (후미 그룹 배정)</option>
+            ) : null}
+          </select>
+        </EditRow>
+      </EditSection>
 
       <EditSection title={lockSharedFields || row.kind === "group" ? "참가자" : "신청자"}>
         <EditRow label="이름">

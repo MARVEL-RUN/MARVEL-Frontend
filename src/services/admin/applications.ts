@@ -94,6 +94,9 @@ export type AdminApplicationRow = {
   eventCategoryId?: string;
   selectedSouvenirList?: AdminSelectedSouvenir[];
   externalPayment?: boolean;
+  startGroupId?: string;
+  startGroupCode?: string;
+  startGroupUnselected?: boolean;
 };
 
 export type AdminSelectedSouvenir = {
@@ -166,6 +169,9 @@ type RegistrationDetail = {
   eventCategoryId?: unknown;
   selectedSouvenirList?: unknown;
   externalPayment?: unknown;
+  startGroupId?: unknown;
+  startGroupCode?: unknown;
+  startGroupUnselected?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -445,6 +451,10 @@ export function applyRegistrationDetail(
       asOptionalBool(data.termsMarketingAgreed) ?? row.marketingConsent,
     eventCategoryId: firstText(data.eventCategoryId) || row.eventCategoryId,
     externalPayment: asOptionalBool(data.externalPayment) ?? row.externalPayment,
+    startGroupId: firstText(data.startGroupId) || row.startGroupId,
+    startGroupCode: firstText(data.startGroupCode) || row.startGroupCode,
+    startGroupUnselected:
+      asOptionalBool(data.startGroupUnselected) ?? row.startGroupUnselected,
     selectedSouvenirList: (() => {
       const list = asSelectedSouvenirList(data.selectedSouvenirList);
       return list.length ? list : row.selectedSouvenirList;
@@ -667,6 +677,8 @@ export type RegistrationBasicInfoUpdate = {
   guardianName: string;
   guardianPhNum: string;
   guardianRelationship: string;
+  startGroupId: string | null;
+  startGroupUnselected: boolean;
 };
 
 export function updateRegistrationBasicInfo(
@@ -734,6 +746,15 @@ export function applicationCourseLabel(row: AdminApplicationRow) {
   if (row.round) return applicationRoundLabel(row);
   if (!row.courseId) return "-";
   return courseById(row.courseId)?.distance ?? row.courseId;
+}
+
+/** 미선택(true)도 실제 후미 code가 저장돼 있어 함께 보여 줌 */
+export function applicationStartGroupLabel(row: AdminApplicationRow) {
+  const code = row.startGroupCode?.trim() ?? "";
+  if (row.startGroupUnselected === true) {
+    return code ? `${code} (미선택 · 후미 배정)` : "미선택 (후미 배정)";
+  }
+  return code || "-";
 }
 
 export function applicationRoundLabel(row: AdminApplicationRow) {
