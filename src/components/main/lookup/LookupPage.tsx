@@ -430,7 +430,7 @@ function ReceiptActions({
           onClick={onStartGroup}
           disabled={busy}
         >
-          출발 그룹
+          출발 그룹 설정
         </button>
       ) : null}
       <button
