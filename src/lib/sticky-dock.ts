@@ -3,7 +3,9 @@
 import { useEffect, useState, type RefObject } from "react";
 import { isMobileView, keyboardCover } from "./viewport";
 
-const FIELD = "input, textarea, select";
+/* 키보드가 뜨는 칸만 — 체크박스 포커스가 남으면 하단 고정이 풀리지 않음 */
+const FIELD =
+  "input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=reset]):not([type=file]):not([type=range]):not([type=color]), textarea, select";
 
 function typing() {
   const el = document.activeElement;
