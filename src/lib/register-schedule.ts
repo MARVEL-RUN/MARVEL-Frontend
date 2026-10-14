@@ -27,7 +27,7 @@ export function countdownSlotsTo(targetMs: number, now = Date.now()): CountdownS
 const round2PauseFrom = () => Date.parse(EVENT.round2PauseFrom);
 const round2OpenAt = () => Date.parse(EVENT.round2OpenAt);
 
-/** 1차 마감 ~ 2차 오픈 전 (예: 10/13 00:00 ~ 10/13 14:00 KST) */
+/** 1차 마감 ~ 2차 오픈 전 (예: 10/13 00:00 ~ 10/14 14:00 KST) */
 export function isRegistrationRound2Pause(now = Date.now()) {
   const flag = process.env.NEXT_PUBLIC_REGISTRATION_ROUND2_PAUSE;
   if (flag === "0") return false;
