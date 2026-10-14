@@ -95,10 +95,10 @@ export function StartGroupPick({
     );
   }
 
-  const preview = !activeSectionKey;
-  const visibleSections = preview
-    ? sectionList
-    : sectionList.filter((section) => section.key === activeSectionKey);
+  const preview = Boolean(sections?.length) && !activeSectionKey;
+  const visibleSections = activeSectionKey
+    ? sectionList.filter((section) => section.key === activeSectionKey)
+    : sectionList;
 
   if (!visibleSections.length) {
     return (
