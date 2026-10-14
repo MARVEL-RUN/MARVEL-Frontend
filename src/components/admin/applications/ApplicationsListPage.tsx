@@ -295,7 +295,7 @@ export function ApplicationsListPage({ slug }: Props) {
       }
     }
     return [
-      { value: "", label: "전체 그룹" },
+      { value: "", label: "전체 출발 그룹" },
       ...[...codes].map((code) => ({ value: code, label: `${code} 그룹` })),
     ];
   }, [optionsQuery.data]);
@@ -569,7 +569,7 @@ export function ApplicationsListPage({ slug }: Props) {
     },
     {
       key: "startGroup",
-      header: "그룹",
+      header: "출발 그룹",
       className: "is-course",
       width: "84px",
       render: (row: AdminApplicationRow) => <StartGroupTag row={row} />,
@@ -710,7 +710,7 @@ export function ApplicationsListPage({ slug }: Props) {
                   setPage(1);
                 }}
                 ariaLabel="출발 그룹"
-                width={104}
+                width={128}
               />
               <AdminSelect
                 value={groupUnselected}
