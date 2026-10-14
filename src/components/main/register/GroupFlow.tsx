@@ -63,8 +63,8 @@ import {
 import type { RegistrationCategory } from "@/services/main/types";
 import {
   EMPTY_START_GROUP_DRAFT,
-  sortedStartGroups,
   startGroupDraftError,
+  startGroupPreviewSections,
   startGroupSummary,
 } from "@/lib/start-group";
 import { RegisterUnavailable } from "./RegisterUnavailable";
@@ -607,6 +607,7 @@ export function GroupFlow({
     draft.organizationPassword,
     draft.passwordConfirm,
   );
+  const startGroupSections = startGroupPreviewSections(categories);
 
   if (optionsDown) {
     return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
@@ -1018,12 +1019,14 @@ export function GroupFlow({
                           <td colSpan={7} data-label="출발 그룹">
                             <p className="party__start-group-label">출발 그룹</p>
                             <StartGroupPick
-                              groups={sortedStartGroups(category)}
+                              sections={startGroupSections}
+                              activeSectionKey={p.categoryId || undefined}
                               value={{
                                 startGroupId: p.startGroupId,
                                 startGroupUnselected: p.startGroupUnselected,
                               }}
-                              disabled={!optionsReady || !category}
+                              disabled={!optionsReady || !p.categoryId}
+                              hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹을 고를 수 있습니다."
                               namePrefix={`member-${i}`}
                               onChange={(next) => patchMember(i, next)}
                             />

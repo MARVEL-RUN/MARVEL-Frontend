@@ -3,6 +3,24 @@ import type {
   RegistrationStartGroup,
   StartGroupInput,
 } from "@/services/main/types";
+import { categoryLabel, sortedCategories } from "./registration-options";
+
+export type StartGroupPreviewSection = {
+  key: string;
+  title: string;
+  groups: RegistrationStartGroup[];
+};
+
+/** 종목별 출발 그룹 — 미선택 시 미리보기용 */
+export function startGroupPreviewSections(categories: RegistrationCategory[]) {
+  return sortedCategories(categories)
+    .map((category) => ({
+      key: category.categoryId,
+      title: categoryLabel(category),
+      groups: sortedStartGroups(category),
+    }))
+    .filter((section) => section.groups.length > 0);
+}
 
 export type StartGroupDraft = {
   startGroupId: string;

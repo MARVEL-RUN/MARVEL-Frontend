@@ -1,22 +1,78 @@
 import type { RegistrationStartGroup } from "@/services/main/types";
-import type { StartGroupDraft } from "@/lib/start-group";
+import type { StartGroupDraft, StartGroupPreviewSection } from "@/lib/start-group";
 
 type Props = {
-  groups: RegistrationStartGroup[];
+  /** 단일 종목(조회·수정 등) */
+  groups?: RegistrationStartGroup[];
+  /** 신청 화면 — 종목별 미리보기 */
+  sections?: StartGroupPreviewSection[];
+  activeSectionKey?: string;
   value: StartGroupDraft;
   onChange: (next: StartGroupDraft) => void;
   disabled?: boolean;
   namePrefix?: string;
+  hintWhenInactive?: string;
 };
 
-export function StartGroupPick({
+function GroupList({
   groups,
   value,
   onChange,
   disabled,
+  radioName,
+}: {
+  groups: RegistrationStartGroup[];
+  value: StartGroupDraft;
+  onChange: (next: StartGroupDraft) => void;
+  disabled?: boolean;
+  radioName: string;
+}) {
+  return (
+    <ul className="start-group-pick__list" role="radiogroup" aria-label="출발 그룹">
+      {groups.map((group) => {
+        const checked = !value.startGroupUnselected && value.startGroupId === group.id;
+        return (
+          <li key={group.id}>
+            <label className={checked ? "is-on" : undefined}>
+              <input
+                type="radio"
+                name={radioName}
+                checked={checked}
+                disabled={disabled}
+                onChange={() =>
+                  onChange({
+                    startGroupId: group.id,
+                    startGroupUnselected: false,
+                  })
+                }
+              />
+              <span className="start-group-pick__code">{group.code}</span>
+              <span className="start-group-pick__desc">{group.description}</span>
+            </label>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+export function StartGroupPick({
+  groups,
+  sections,
+  activeSectionKey,
+  value,
+  onChange,
+  disabled,
   namePrefix = "start-group",
+  hintWhenInactive,
 }: Props) {
-  if (!groups.length) {
+  const sectionList = sections?.length
+    ? sections
+    : groups?.length
+      ? [{ key: "single", title: "", groups }]
+      : [];
+
+  if (!sectionList.length) {
     return (
       <p className="start-group-pick start-group-pick--empty">
         출발 그룹 선택지를 불러오지 못했습니다.
@@ -24,41 +80,46 @@ export function StartGroupPick({
     );
   }
 
-  const radioName = `${namePrefix}-choice`;
+  const multiSection = sectionList.length > 1 || Boolean(sectionList[0]?.title);
+  const showInactiveHint = Boolean(hintWhenInactive && !activeSectionKey);
 
   return (
     <div className={`start-group-pick${disabled ? " is-disabled" : ""}`}>
-      <ul className="start-group-pick__list" role="radiogroup" aria-label="출발 그룹">
-        {groups.map((group) => {
-          const checked =
-            !value.startGroupUnselected && value.startGroupId === group.id;
-          return (
-            <li key={group.id}>
-              <label className={checked ? "is-on" : undefined}>
-                <input
-                  type="radio"
-                  name={radioName}
-                  checked={checked}
-                  disabled={disabled}
-                  onChange={() =>
-                    onChange({
-                      startGroupId: group.id,
-                      startGroupUnselected: false,
-                    })
-                  }
-                />
-                <span className="start-group-pick__code">{group.code}</span>
-                <span className="start-group-pick__desc">{group.description}</span>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      {sectionList.map((section) => {
+        const sectionInactive =
+          Boolean(activeSectionKey) && section.key !== activeSectionKey;
+        const sectionDisabled = disabled || sectionInactive;
+        const radioName = multiSection
+          ? `${namePrefix}-${section.key}`
+          : `${namePrefix}-choice`;
+
+        return (
+          <div
+            key={section.key}
+            className={
+              sectionInactive
+                ? "start-group-pick__section is-inactive"
+                : "start-group-pick__section"
+            }
+          >
+            {section.title ? (
+              <p className="start-group-pick__section-title">{section.title}</p>
+            ) : null}
+            <GroupList
+              groups={section.groups}
+              value={value}
+              onChange={onChange}
+              disabled={sectionDisabled}
+              radioName={radioName}
+            />
+          </div>
+        );
+      })}
       <label className="start-group-pick__defer">
         <input
           type="checkbox"
           checked={value.startGroupUnselected}
-          disabled={disabled}
+          disabled={disabled || !activeSectionKey}
           onChange={(e) =>
             onChange({
               startGroupId: "",
@@ -71,6 +132,9 @@ export function StartGroupPick({
           <small>후미 출발 그룹으로 배정됩니다</small>
         </span>
       </label>
+      {showInactiveHint ? (
+        <p className="form-row__hint start-group-pick__hint">{hintWhenInactive}</p>
+      ) : null}
     </div>
   );
 }

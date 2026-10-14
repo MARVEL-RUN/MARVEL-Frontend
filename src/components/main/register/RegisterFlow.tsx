@@ -71,8 +71,8 @@ import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
 import { StartGroupPick } from "./StartGroupPick";
 import {
   EMPTY_START_GROUP_DRAFT,
-  sortedStartGroups,
   startGroupDraftError,
+  startGroupPreviewSections,
   startGroupSummary,
 } from "@/lib/start-group";
 
@@ -352,7 +352,7 @@ function IndividualFlow({
   );
   const guardianRequired = guardianRequiredFor(draft);
   const guardianMinor = needsGuardian(draft.birth);
-  const startGroups = sortedStartGroups(selectedCategory);
+  const startGroupSections = startGroupPreviewSections(categories);
 
   if (optionsDown) {
     return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
@@ -538,18 +538,18 @@ function IndividualFlow({
               <KitFixed courseId={draft.courseId} />
             </FormRow>
             <FormRow label="출발 그룹" required>
-              {!draft.courseId ? (
-                <p className="form-row__hint">종목을 먼저 선택하세요</p>
-              ) : optionsLoading ? (
+              {optionsLoading ? (
                 <p className="form-row__hint">불러오는 중</p>
               ) : (
                 <StartGroupPick
-                  groups={startGroups}
+                  sections={startGroupSections}
+                  activeSectionKey={selectedCategory?.categoryId}
                   value={{
                     startGroupId: draft.startGroupId,
                     startGroupUnselected: draft.startGroupUnselected,
                   }}
-                  disabled={!optionsReady}
+                  disabled={!optionsReady || !draft.courseId}
+                  hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹을 고를 수 있습니다."
                   onChange={(next) => patch(next)}
                 />
               )}

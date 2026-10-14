@@ -2915,6 +2915,27 @@
   cursor: default;
 }
 
+.start-group-pick__section + .start-group-pick__section {
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.start-group-pick__section.is-inactive {
+  opacity: 0.42;
+}
+
+.start-group-pick__section-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.start-group-pick__hint {
+  margin: 0.35rem 0 0;
+}
+
 .party__start-group td {
   padding: 0.65rem 0.5rem 1rem;
   border-top: 1px dashed rgba(255, 255, 255, 0.12);

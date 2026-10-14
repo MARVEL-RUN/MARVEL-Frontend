@@ -35,8 +35,8 @@ import {
 } from "@/lib/registration-options";
 import {
   EMPTY_START_GROUP_DRAFT,
-  sortedStartGroups,
   startGroupDraftError,
+  startGroupPreviewSections,
   startGroupDraftFromStored,
   startGroupInputFromDraft,
   startGroupInputFromStored,
@@ -378,6 +378,7 @@ export function IndividualLookupEdit({
   const modifyPolicyNote = !canModify
     ? policyReasonMessage(receipt.userPolicy?.modifyReason)
     : "";
+  const startGroupSections = startGroupPreviewSections(categories);
 
   function applyCategory(
     next: RegistrationCategory | undefined,
@@ -624,17 +625,15 @@ export function IndividualLookupEdit({
           <KitFixed courseId={courseId} />
         </FormRow>
         <FormRow label="출발 그룹" required>
-          {!eventCategoryId ? (
-            <p className="form-row__hint">종목을 먼저 선택하세요</p>
-          ) : (
-            <StartGroupPick
-              groups={sortedStartGroups(category)}
-              value={startGroupDraft}
-              onChange={setStartGroupDraft}
-              disabled={!canModify || !optionsReady}
-              namePrefix="lookup-edit-personal"
-            />
-          )}
+          <StartGroupPick
+            sections={startGroupSections}
+            activeSectionKey={eventCategoryId || undefined}
+            value={startGroupDraft}
+            onChange={setStartGroupDraft}
+            disabled={!canModify || !optionsReady || !eventCategoryId}
+            hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹을 고를 수 있습니다."
+            namePrefix="lookup-edit-personal"
+          />
         </FormRow>
         <FormRow label="티셔츠 사이즈" required>
           <ShirtPick
@@ -923,6 +922,7 @@ export function GroupLookupEdit({
       }, 0),
     [categories, members],
   );
+  const startGroupSections = startGroupPreviewSections(categories);
 
   useLayoutEffect(() => {
     scrollPageTop();
@@ -1440,12 +1440,18 @@ export function GroupLookupEdit({
                         <td colSpan={7} data-label="출발 그룹">
                           <p className="party__start-group-label">출발 그룹</p>
                           <StartGroupPick
-                            groups={sortedStartGroups(category)}
+                            sections={startGroupSections}
+                            activeSectionKey={member.eventCategoryId || undefined}
                             value={{
                               startGroupId: member.startGroupId ?? "",
                               startGroupUnselected: member.startGroupUnselected,
                             }}
-                            disabled={!optionsReady || !canEditMemberFields || !category}
+                            disabled={
+                              !optionsReady ||
+                              !canEditMemberFields ||
+                              !member.eventCategoryId
+                            }
+                            hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹을 고를 수 있습니다."
                             namePrefix={`lookup-edit-member-${index}`}
                             onChange={(next) =>
                               patchMember(index, {
