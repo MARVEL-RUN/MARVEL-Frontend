@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import { OG_DESCRIPTION, OG_TITLE, SEO_TITLE, SITE_URL } from "@/lib/event";
 import { APP_MODE, isMain } from "@/lib/mode";
@@ -11,12 +10,9 @@ import "./globals.css";
 import { GoogleAnalytics } from "./GoogleAnalytics";
 import { NaverAnalytics } from "./NaverAnalytics";
 
-const notoSansKr = Noto_Sans_KR({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-  variable: "--font-noto",
-});
+/* 빌드 때 구글 폰트를 받지 않도록 런타임 link로. 공지 본문(.notice-body)에서만 씀 */
+const NOTO_SANS_KR_CSS =
+  "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap";
 
 const googleVerification = process.env.GOOGLE_SITE_VERIFICATION;
 const naverVerification = process.env.NAVER_SITE_VERIFICATION;
@@ -76,7 +72,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" className={notoSansKr.variable} suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={NOTO_SANS_KR_CSS} />
+      </head>
       <body>
         <Script id="site-zoom-guard" strategy="beforeInteractive">
           {`(function(){var p=location.pathname;if(p.indexOf("/admin")===0)return;var preview=${JSON.stringify(PREVIEW_BASE_PATH)};var onPreview=p===preview||p.indexOf(preview+"/")===0;if(${JSON.stringify(APP_MODE)}!=="main"&&!onPreview)return;document.documentElement.classList.add("is-main");if(p!=="/"&&p!==""){document.documentElement.classList.add("is-live");}})();`}

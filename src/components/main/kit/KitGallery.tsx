@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import { type CourseId } from "@/lib/register";
+import { KitMedalReel } from "./KitMedalReel";
 import { ScarfPreview, type ScarfFace } from "./ScarfPreview";
 
 const SHIRT_SPEC_KIDS = ["130", "150"] as const;
@@ -33,6 +34,7 @@ export function KitGallery() {
   return (
     <div className="kit-gallery">
       <KitMedalPane />
+      <KitMedalReel />
       <KitShirtPane />
       <KitBibPane />
       <KitScarfPane />
