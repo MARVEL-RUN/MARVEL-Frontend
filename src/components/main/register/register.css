@@ -3445,13 +3445,14 @@
 /* 「미정」 폭에 맞춰 A·B 설명 시작점 통일 */
 .start-group-pick__code {
   min-width: 2.2rem;
-  font-weight: 800;
   color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .start-group-pick__desc {
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   line-height: 1.45;
   word-break: keep-all;
 }
@@ -3459,13 +3460,24 @@
 .start-group-pick__finish {
   color: #fff;
   font-weight: 800;
-  font-size: 0.95rem;
   letter-spacing: -0.01em;
 }
 
 .start-group-pick__pace {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.84rem;
   font-weight: 500;
+}
+
+@media (max-width: 720px) {
+  .start-group-pick__pace {
+    display: block;
+    margin-top: 0.1rem;
+  }
+
+  .start-group-pick__pace-sep {
+    display: none;
+  }
 }
 
 .start-group-pick.is-disabled label,

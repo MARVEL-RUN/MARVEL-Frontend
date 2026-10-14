@@ -24,7 +24,12 @@ function StartGroupDescription({ text }: { text: string }) {
   return (
     <span className="start-group-pick__desc">
       <strong className="start-group-pick__finish">{finish}</strong>
-      {pace ? <span className="start-group-pick__pace"> · {pace}</span> : null}
+      {pace ? (
+        <span className="start-group-pick__pace">
+          <span className="start-group-pick__pace-sep"> · </span>
+          {pace}
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -96,7 +101,10 @@ function DeferOption({
       <span className="start-group-pick__code">미정</span>
       <span className="start-group-pick__desc">
         <strong className="start-group-pick__finish">A, B 그룹을 잘 모르겠어요</strong>
-        <span className="start-group-pick__pace"> · 후미 출발 그룹으로 배정됩니다</span>
+        <span className="start-group-pick__pace">
+          <span className="start-group-pick__pace-sep"> · </span>
+          후미 출발 그룹으로 배정됩니다
+        </span>
       </span>
     </label>
   );
