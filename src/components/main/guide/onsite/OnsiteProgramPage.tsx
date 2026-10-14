@@ -60,7 +60,7 @@ export function OnsiteProgramPage() {
               서킷 <em>체험 · 주행</em>
             </h2>
             <p className="onsite-sec__lead">
-              레이스 전후로 인제스피디움에서 즐길 수 있는 주행 체험입니다.
+              인제스피디움에서 경험하는 짜릿하고 역동적인 모터스포츠 액티비티
             </p>
           </header>
           <ol className="onsite-drives">
@@ -77,7 +77,7 @@ export function OnsiteProgramPage() {
               함께하는 <em>부스 · 프로그램</em>
             </h2>
             <p className="onsite-sec__lead">
-              러닝 전후 컨디션과 즐거움을 채워 줄 파트너 부스입니다.
+              행사 당일, 러닝의 즐거움을 더하는 다채로운 이벤트 및 체험 프로그램
             </p>
           </header>
           <OnsiteBooths />
