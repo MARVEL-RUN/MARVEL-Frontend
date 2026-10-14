@@ -7,7 +7,7 @@ import { MAIN_ASSETS } from "@/lib/assets";
 /* 캐시돼 있어도 한 번은 보여 줌. 네트워크가 막히면 GIVE_UP 뒤 그냥 연다 */
 const MIN_SHOW_MS = 450;
 const GIVE_UP_MS = 10000;
-const FADE_MS = 400;
+const FADE_MS = 1000;
 
 function waitImage(img: HTMLImageElement) {
   /* lazy 이미지는 스크롤 전엔 안 받으므로 eager로 바꿔 당긴다 */

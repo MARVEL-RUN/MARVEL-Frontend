@@ -271,7 +271,7 @@ html.is-intro {
 }
 
 .media-load.is-out {
-  animation: media-load-out 0.4s ease forwards;
+  animation: media-load-out 1s ease forwards;
 }
 
 .media-load__mark {
@@ -289,12 +289,10 @@ html.is-intro {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.45) 50%,
-    transparent 70%
-  );
+  background: linear-gradient(110deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 70%);
   transform: translateX(-140%);
   animation: media-load-shine 1.3s ease-in-out infinite;
 }
@@ -336,20 +334,24 @@ html.is-intro {
 }
 
 @keyframes media-load-pulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.04);
   }
 }
 
 @keyframes media-load-shine {
+
   0%,
   35% {
     transform: translateX(-140%);
   }
+
   100% {
     transform: translateX(140%);
   }
@@ -363,6 +365,7 @@ html.is-intro {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .media-load__mark,
   .media-load__mark::after {
     animation: none;
