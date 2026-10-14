@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ONSITE_DRIVE } from "@/lib/onsite-program";
 import { SideBanner } from "../../layout/SideBanner";
+import { MediaLoader } from "../../MediaLoader";
 import { OnsiteBooths } from "./OnsiteBooths";
 
 function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: number }) {
@@ -50,39 +51,41 @@ function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: numbe
 
 export function OnsiteProgramPage() {
   return (
-    <main className="page onsite-page">
-      <SideBanner kicker="PROGRAM" title="현장프로그램" en="ON-SITE PROGRAM" />
-      <div className="page__body wrap onsite-page__body">
-        <section className="onsite-sec" aria-labelledby="onsite-drive-heading">
-          <header className="onsite-sec__head">
-            <p className="kicker">01 / DRIVE</p>
-            <h2 id="onsite-drive-heading">
-              서킷 <em>체험 · 주행</em>
-            </h2>
-            <p className="onsite-sec__lead">
-              인제스피디움에서 경험하는 짜릿하고 역동적인 모터스포츠 액티비티
-            </p>
-          </header>
-          <ol className="onsite-drives">
-            {ONSITE_DRIVE.map((item, index) => (
-              <DriveRow key={item.id} item={item} no={index + 1} />
-            ))}
-          </ol>
-        </section>
+    <MediaLoader>
+      <main className="page onsite-page">
+        <SideBanner kicker="PROGRAM" title="현장프로그램" en="ON-SITE PROGRAM" />
+        <div className="page__body wrap onsite-page__body">
+          <section className="onsite-sec" aria-labelledby="onsite-drive-heading">
+            <header className="onsite-sec__head">
+              <p className="kicker">01 / DRIVE</p>
+              <h2 id="onsite-drive-heading">
+                서킷 <em>체험 · 주행</em>
+              </h2>
+              <p className="onsite-sec__lead">
+                인제스피디움에서 경험하는 짜릿하고 역동적인 모터스포츠 액티비티
+              </p>
+            </header>
+            <ol className="onsite-drives">
+              {ONSITE_DRIVE.map((item, index) => (
+                <DriveRow key={item.id} item={item} no={index + 1} />
+              ))}
+            </ol>
+          </section>
 
-        <section className="onsite-sec" aria-labelledby="onsite-booth-heading">
-          <header className="onsite-sec__head">
-            <p className="kicker">02 / BOOTH</p>
-            <h2 id="onsite-booth-heading">
-              함께하는 <em>부스 · 프로그램</em>
-            </h2>
-            <p className="onsite-sec__lead">
-              행사 당일, 러닝의 즐거움을 더하는 다채로운 이벤트 및 체험 프로그램
-            </p>
-          </header>
-          <OnsiteBooths />
-        </section>
-      </div>
-    </main>
+          <section className="onsite-sec" aria-labelledby="onsite-booth-heading">
+            <header className="onsite-sec__head">
+              <p className="kicker">02 / BOOTH</p>
+              <h2 id="onsite-booth-heading">
+                함께하는 <em>부스 · 프로그램</em>
+              </h2>
+              <p className="onsite-sec__lead">
+                행사 당일, 러닝의 즐거움을 더하는 다채로운 이벤트 및 체험 프로그램
+              </p>
+            </header>
+            <OnsiteBooths />
+          </section>
+        </div>
+      </main>
+    </MediaLoader>
   );
 }
