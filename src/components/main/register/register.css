@@ -2812,3 +2812,117 @@
     padding: max(0.45rem, env(safe-area-inset-top, 0px)) 0.65rem max(0.45rem, env(safe-area-inset-bottom, 0px));
   }
 }
+
+.register-policy-notice {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 196, 0, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 196, 0, 0.08);
+}
+
+.register-policy-notice__title {
+  margin: 0 0 0.35rem;
+  font-weight: 800;
+  color: #ffc400;
+}
+
+.register-policy-notice__body {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.start-group-pick {
+  display: grid;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.start-group-pick--empty {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+}
+
+.start-group-pick__list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.start-group-pick__list label {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: start;
+  gap: 0.55rem 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.start-group-pick__list label.is-on {
+  border-color: rgba(237, 28, 36, 0.75);
+  background: rgba(237, 28, 36, 0.08);
+}
+
+.start-group-pick__list label input {
+  margin-top: 0.15rem;
+  accent-color: var(--marvel);
+}
+
+.start-group-pick__code {
+  min-width: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.start-group-pick__desc {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.start-group-pick__defer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.start-group-pick__defer input {
+  margin-top: 0.2rem;
+  accent-color: var(--marvel);
+}
+
+.start-group-pick__defer small {
+  display: block;
+  margin-top: 0.15rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
+}
+
+.start-group-pick.is-disabled label,
+.start-group-pick.is-disabled .start-group-pick__defer {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.party__start-group td {
+  padding: 0.65rem 0.5rem 1rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.party__start-group-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+}

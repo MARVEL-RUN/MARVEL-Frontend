@@ -61,7 +61,15 @@ import {
   createOrganizationRegistration,
 } from "@/services/main/registrations";
 import type { RegistrationCategory } from "@/services/main/types";
+import {
+  EMPTY_START_GROUP_DRAFT,
+  sortedStartGroups,
+  startGroupDraftError,
+  startGroupSummary,
+} from "@/lib/start-group";
 import { RegisterUnavailable } from "./RegisterUnavailable";
+import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { StartGroupPick } from "./StartGroupPick";
 import { useRegistrationOptions } from "./useRegistrationOptions";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { SheetModal } from "../SheetModal";
@@ -173,6 +181,8 @@ export function GroupFlow({
   const [payCheckOpen, setPayCheckOpen] = useState(false);
   const {
     categories,
+    registrationOpen,
+    registrationReason,
     loading: optionsLoading,
     errorMessage: optionsError,
     down: optionsDown,
@@ -392,6 +402,12 @@ export function GroupFlow({
 
   function onForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+          "현재 신규 접수를 받지 않습니다.",
+      );
+    }
     if (!optionsReady) {
       return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
     }
@@ -480,6 +496,14 @@ export function GroupFlow({
         if (!souvenirSizes(souvenir, ticketForBirth(p.birth)).includes(p.selectedSize)) {
           throw new Error(`참가자 ${n}: 티셔츠 사이즈를 선택하세요.`);
         }
+        const groupErr = startGroupDraftError(
+          {
+            startGroupId: p.startGroupId,
+            startGroupUnselected: p.startGroupUnselected,
+          },
+          category,
+        );
+        if (groupErr) throw new Error(`참가자 ${n}: ${groupErr}`);
       });
     } catch (err) {
       return fail(err instanceof Error ? err.message : "참가자 정보를 확인하세요.");
@@ -507,6 +531,12 @@ export function GroupFlow({
       goSubmitted();
       return;
     }
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+          "현재 신규 접수를 받지 않습니다.",
+      );
+    }
 
     setBusyAction("submit");
     setError("");
@@ -527,6 +557,12 @@ export function GroupFlow({
   }
 
   async function onPay() {
+    if (!registrationOpen) {
+      return fail(
+        registrationReason?.message?.trim() ||
+          "현재 신규 접수를 받지 않습니다.",
+      );
+    }
     if (!hasMainApi || !hasTossClientKey) {
       return fail(
         "결제 연동 설정(NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
@@ -593,6 +629,9 @@ export function GroupFlow({
       {step === 0 ? (
         <form className="form" onSubmit={onForm} noValidate>
           <ApplyNotice lines={NOTICE} />
+          {!registrationOpen ? (
+            <RegistrationPolicyNotice reason={registrationReason} />
+          ) : null}
 
           <FormSec kicker="01 / GROUP" title="단체 정보">
             <FormRow label="단체명" required>
@@ -857,6 +896,7 @@ export function GroupFlow({
                                       birth,
                                       categoryId: "",
                                       ...shirtAssignment(undefined, "", birth),
+                                      ...EMPTY_START_GROUP_DRAFT,
                                     },
                               );
                             }}
@@ -929,6 +969,7 @@ export function GroupFlow({
                                   p.selectedSize,
                                   p.birth,
                                 ),
+                                ...EMPTY_START_GROUP_DRAFT,
                               });
                             }}
                             disabled={!optionsReady}
@@ -972,6 +1013,23 @@ export function GroupFlow({
                           <KitFixed courseId={courseId} />
                         </td>
                       </tr>
+                      {open ? (
+                        <tr className="party__start-group is-open">
+                          <td colSpan={7} data-label="출발 그룹">
+                            <p className="party__start-group-label">출발 그룹</p>
+                            <StartGroupPick
+                              groups={sortedStartGroups(category)}
+                              value={{
+                                startGroupId: p.startGroupId,
+                                startGroupUnselected: p.startGroupUnselected,
+                              }}
+                              disabled={!optionsReady || !category}
+                              namePrefix={`member-${i}`}
+                              onChange={(next) => patchMember(i, next)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
                       </Fragment>
                     );
                   })}
@@ -1007,7 +1065,11 @@ export function GroupFlow({
             <button type="button" className="btn btn--ghost" onClick={onBack}>
               유형 변경
             </button>
-            <button type="submit" className="btn btn--red">
+            <button
+              type="submit"
+              className="btn btn--red"
+              disabled={!registrationOpen}
+            >
               확인하기
             </button>
           </div>
@@ -1076,7 +1138,14 @@ export function GroupFlow({
                   </strong>
                   <span>
                     {category ? categoryLabel(category) : "—"} ·{" "}
-                    {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
+                    {startGroupSummary(
+                      {
+                        startGroupId: p.startGroupId,
+                        startGroupUnselected: p.startGroupUnselected,
+                      },
+                      category,
+                    )}{" "}
+                    · {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
                     {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
                   </span>
                   <KitFixed courseId={courseId} />
@@ -1106,7 +1175,9 @@ export function GroupFlow({
               type="button"
               className="btn btn--ghost"
               onClick={onSubmitApplication}
-              disabled={busyAction !== null || Boolean(payment)}
+              disabled={
+                !registrationOpen || busyAction !== null || Boolean(payment)
+              }
             >
               {busyAction === "submit"
                 ? "제출 중..."
@@ -1118,7 +1189,7 @@ export function GroupFlow({
               type="button"
               className="btn btn--red"
               onClick={onPay}
-              disabled={busyAction !== null}
+              disabled={!registrationOpen || busyAction !== null}
             >
               {busyAction === "pay" ? "결제 준비 중..." : "결제하기"}
             </button>

@@ -97,3 +97,16 @@ export function storedStartGroupMissingFromOptions(
   if (!id) return false;
   return !findStartGroup(category, id);
 }
+
+export function startGroupSummary(
+  draft: StartGroupDraft,
+  category: RegistrationCategory | undefined,
+) {
+  if (draft.startGroupUnselected) {
+    return startGroupLabel(null, true);
+  }
+  const group = findStartGroup(category, draft.startGroupId);
+  if (group) return group.code;
+  const id = draft.startGroupId.trim();
+  return id || "—";
+}
