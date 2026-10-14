@@ -898,8 +898,8 @@
   border-right: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-.party tr.party__gap + tr.party__info td,
-.party tr.party__callout + tr.party__info td {
+.party tr.party__gap+tr.party__info td,
+.party tr.party__callout+tr.party__info td {
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -2629,8 +2629,8 @@
 
   .party .party__no,
   .party .party__del,
-  .party tr.party__gap + tr.party__info td,
-  .party tr.party__callout + tr.party__info td {
+  .party tr.party__gap+tr.party__info td,
+  .party tr.party__callout+tr.party__info td {
     border-top: 0;
     border-right: 0;
     border-left: 0;
