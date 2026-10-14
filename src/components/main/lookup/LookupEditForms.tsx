@@ -10,6 +10,7 @@ import {
   TIMING_CHIP_NOTE,
   ageBand,
   emailOk,
+  filterNoSpaceName,
   formatFee,
   formatPhone,
   needsGuardian,
@@ -302,11 +303,11 @@ export function IndividualLookupEdit({
   const [pendingAction, setPendingAction] = useState<LookupModifyAction | null>(null);
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [optionsError, setOptionsError] = useState("");
-  const [name] = useState(receipt.name?.trim() || access.name);
-  const [birth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
-  const [phone] = useState(receipt.phNum || access.phNum);
+  const [name, setName] = useState(receipt.name?.trim() || access.name);
+  const [birth, setBirth] = useState((receipt.birth || access.birth).replace(/\D/g, ""));
+  const [phone, setPhone] = useState(receipt.phNum || access.phNum);
   const [email, setEmail] = useState(receipt.email?.trim() || "");
-  const [gender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
+  const [gender, setGender] = useState<"M" | "F" | "">(toApiGender(receipt.gender));
   const [zonecode, setZonecode] = useState(parsedAddress.zonecode);
   const [address, setAddress] = useState(parsedAddress.address);
   const [addressDetail, setAddressDetail] = useState(receipt.addressDetail?.trim() || "");
@@ -388,6 +389,14 @@ export function IndividualLookupEdit({
   ) {
     setEventCategoryId(next?.categoryId ?? "");
     setSouvenirs(withShirtSize(next, souvenirs, size, nextBirth));
+  }
+
+  function onBirthChange(nextBirth: string) {
+    setBirth(nextBirth);
+    if (!courseId) return;
+    const next = categoryForCourse(categories, courseId, nextBirth);
+    applyCategory(next, selectedSize, nextBirth);
+    if (next?.categoryId !== eventCategoryId) setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
   }
 
   function onCourseChange(nextCourseId: CourseId) {
@@ -473,9 +482,6 @@ export function IndividualLookupEdit({
           <div className="form__head">
             <h2>개인 접수 수정</h2>
             <p className="form__note">조회한 접수 정보를 수정합니다.</p>
-            <p className="lookup-edit__lock-note">
-              개인정보(이름·생년월일·성별)와 휴대폰 번호는 수정할 수 없습니다.
-            </p>
             {modifyPolicyNote ? (
               <p className="form__note" role="status">
                 {modifyPolicyNote}
@@ -484,41 +490,42 @@ export function IndividualLookupEdit({
           </div>
 
           <FormSec kicker="01 / PROFILE" title="개인정보">
-            <FormRow label="이름" required locked>
+            <FormRow label="이름" required locked={!canModify}>
               <input
                 type="text"
                 name="name"
                 placeholder="띄어쓰기 없이 입력해주세요."
                 value={name}
+                onChange={(e) => setName(filterNoSpaceName(e.target.value))}
                 autoComplete="name"
                 required
-                disabled
-                readOnly
+                disabled={!canModify}
+                readOnly={!canModify}
               />
             </FormRow>
-            <FormRow label="생년월일" required locked>
-              <BirthPick value={birth} onChange={() => { }} disabled />
+            <FormRow label="생년월일" required locked={!canModify}>
+              <BirthPick value={birth} onChange={onBirthChange} disabled={!canModify} />
             </FormRow>
-            <FormRow label="성별" required locked>
+            <FormRow label="성별" required locked={!canModify}>
               <GenderPick
                 name="gender"
                 value={toUiGender(gender)}
-                onChange={() => { }}
-                disabled
+                onChange={(next) => setGender(toApiGender(next))}
+                disabled={!canModify}
               />
             </FormRow>
           </FormSec>
 
           <FormSec kicker="02 / CONTACT" title="연락처 정보">
-            <FormRow label="휴대폰번호" required locked>
+            <FormRow label="휴대폰번호" required locked={!canModify}>
               <PhoneField
                 name="phone"
                 placeholder="휴대폰번호를 입력해주세요."
                 value={phone}
-                onChange={() => { }}
+                onChange={setPhone}
                 autoComplete="tel"
                 required
-                disabled
+                disabled={!canModify}
               />
             </FormRow>
             <FormRow label="이메일" locked={!canModify}>
@@ -1106,8 +1113,7 @@ export function GroupLookupEdit({
               참가자 정보를 수정합니다. 인원을 추가하면 차액 결제가 필요할 수 있습니다.
             </p>
             <p className="lookup-edit__lock-note">
-              단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호, 이미 등록된
-              참가자의 개인정보(이름·생년월일·성별)와 연락처는 수정할 수 없습니다.
+              단체명·단체 계정, 대표자 정보(성명·생년월일)와 휴대폰 번호는 수정할 수 없습니다.
             </p>
           </div>
           <FormSec kicker="01 / GROUP" title="단체">
