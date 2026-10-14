@@ -562,8 +562,8 @@ body.admin-mode {
 }
 
 .admin-apps-list {
-  --admin-apps-row-h: 26px;
-  --admin-apps-head-h: 28px;
+  --admin-apps-row-h: 40px;
+  --admin-apps-head-h: 44px;
   --admin-apps-list-rows: 15;
 }
 
@@ -713,7 +713,8 @@ body.admin-mode {
   min-height: 14px;
 }
 
-.admin-apps-list__check input {
+/* .admin-table-shell input 의 height: 32px 보다 우선 */
+.admin-apps-list .admin-apps-list__check input {
   width: 14px;
   height: 14px;
   margin: 0;
