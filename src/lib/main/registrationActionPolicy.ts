@@ -103,6 +103,13 @@ export function lookupOrganizationCommonModifyAllowed(receipt: RegistrationRecei
   return Boolean(receipt.organizationId);
 }
 
+/** 배송 확정(REGISTRATION_PERIOD_PAYMENT) 시 단체장 성명·생년월일·연락처·주소는 함께 잠금 */
+export function lookupOrganizationShippingModifyAllowed(receipt: RegistrationReceipt) {
+  if (!lookupOrganizationCommonModifyAllowed(receipt)) return false;
+  const org = receipt.organizationPolicy;
+  return !(org && !org.paymentAllowed && org.paymentReason?.code === "REGISTRATION_PERIOD_PAYMENT");
+}
+
 /** 단체 수정 화면 진입 — 공통 false여도 구성원·추가 policy (인수인계 10.2) */
 export function lookupOrganizationEditScreenAllowed(receipt: RegistrationReceipt) {
   if (receipt.externalPayment) return false;
@@ -123,6 +130,36 @@ export function lookupOrganizationEditScreenAllowed(receipt: RegistrationReceipt
 export function lookupEditScreenAllowed(receipt: RegistrationReceipt) {
   if (receipt.organizationId) return lookupOrganizationEditScreenAllowed(receipt);
   return lookupModifyAllowed(receipt);
+}
+
+function startGroupBlockedStatus(status?: string | null) {
+  const key = statusKey(status);
+  return key === "CANCELED" || key === "CANCELLATION_PENDING" || key === "EXPIRED";
+}
+
+/** 출발 그룹 전용 PATCH — 수정 화면에서 못 바꿀 때(modifyAllowed false·외부결제)만 노출 */
+export function lookupPersonalStartGroupEditAllowed(receipt: RegistrationReceipt) {
+  if (!receipt.registrationId?.trim()) return false;
+  if (receipt.organizationId) return false;
+  if (lookupModifyAllowed(receipt)) return false;
+  return !startGroupBlockedStatus(receipt.registrationStatus);
+}
+
+export function lookupOrganizationStartGroupEditAllowed(receipt: RegistrationReceipt) {
+  if (!receipt.organizationId?.trim()) return false;
+  if (closedRegistration(receipt.registrationStatus)) return false;
+  const editScreen = lookupOrganizationEditScreenAllowed(receipt);
+  const rows =
+    receipt.registrations?.length
+      ? receipt.registrations
+      : receipt.members ?? [];
+  return rows.some((row) => {
+    if (row.canceled) return false;
+    if (!row.registrationId?.trim()) return false;
+    if (startGroupBlockedStatus(row.registrationStatus)) return false;
+    const memberPolicy = "memberPolicy" in row ? row.memberPolicy : undefined;
+    return !editScreen || !memberModifyAllowed(memberPolicy, true);
+  });
 }
 
 export function lookupRefundOrCancelAllowed(receipt: RegistrationReceipt) {
@@ -183,16 +220,6 @@ export function lookupPolicyNotes(receipt: RegistrationReceipt) {
   }
   if (org && !org.addMemberAllowed) push(org.addMemberReason);
 
-  if (receipt.organizationId) {
-    for (const row of receipt.registrations ?? []) {
-      if (row.canceled) continue;
-      const mp = row.memberPolicy;
-      if (!mp) continue;
-      if (!mp.modifyAllowed) push(mp.modifyReason);
-      if (!mp.deleteMemberAllowed) push(mp.deleteMemberReason);
-    }
-  }
-
   return lines;
 }
 
@@ -238,3 +265,4 @@ export function memberLookupPolicyNotes(
   if (!memberPolicy.deleteMemberAllowed) push(memberPolicy.deleteMemberReason);
   return lines;
 }
+

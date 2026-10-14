@@ -12,7 +12,9 @@ import type {
   OrganizationRegistrationModifyRequest,
   OrganizationRegistrationRequest,
   OrganizationRegistrationResponse,
+  OrganizationStartGroupsPatchRequest,
   PaymentRetryResponse,
+  PersonalStartGroupPatchRequest,
   RegistrationCreateRequest,
   RegistrationCreateResponse,
   RegistrationReceipt,
@@ -37,6 +39,24 @@ function firstText(...values: unknown[]) {
     if (text) return text;
   }
   return "";
+}
+
+function parseStartGroupFields(row: Record<string, unknown>) {
+  const startGroupIdRaw = row.startGroupId;
+  const startGroupId =
+    startGroupIdRaw === null || startGroupIdRaw === undefined
+      ? null
+      : asText(startGroupIdRaw) || null;
+  const startGroupCodeRaw = row.startGroupCode;
+  const startGroupCode =
+    startGroupCodeRaw === null || startGroupCodeRaw === undefined
+      ? null
+      : asText(startGroupCodeRaw) || null;
+  const startGroupUnselected =
+    typeof row.startGroupUnselected === "boolean"
+      ? row.startGroupUnselected
+      : undefined;
+  return { startGroupId, startGroupCode, startGroupUnselected };
 }
 
 function souvenirListFromParticipant(row: Record<string, unknown>) {
@@ -85,6 +105,7 @@ function asLookupParticipant(raw: unknown): OrganizationLookupParticipant | null
     canceled: row.canceled === true || status === "CANCELED",
     registrationStatus: status,
     memberPolicy: parseMemberPolicy(row.memberPolicy),
+    ...parseStartGroupFields(row),
   };
 }
 
@@ -137,6 +158,7 @@ function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
     userPolicy: parseUserPolicy(row.userPolicy),
     organizationPolicy: parseOrganizationPolicy(row.organizationPolicy),
     registrations: mergedRegistrations,
+    ...parseStartGroupFields(row),
   };
 }
 
@@ -299,6 +321,34 @@ export async function modifyIndividualRegistration(
 ) {
   return mainFetch<RegistrationSettlementResult>(
     `v1/public/events/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function patchIndividualStartGroup(
+  eventId: string,
+  registrationId: string,
+  body: PersonalStartGroupPatchRequest,
+) {
+  return mainFetch<void>(
+    `v1/public/events/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}/start-group`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function patchOrganizationStartGroups(
+  eventId: string,
+  organizationId: string,
+  body: OrganizationStartGroupsPatchRequest,
+) {
+  return mainFetch<void>(
+    `v1/public/events/${encodeURIComponent(eventId)}/organizations/${encodeURIComponent(organizationId)}/registrations/start-groups`,
     {
       method: "PATCH",
       body: JSON.stringify(body),

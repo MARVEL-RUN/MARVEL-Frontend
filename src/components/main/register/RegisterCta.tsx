@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Lock } from "lucide-react";
 import { useRef, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
+import { resetFlowIfCurrent } from "@/lib/main/flowReset";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import { registrationRound2HintUi } from "@/lib/register-schedule";
 import { RegisterClosedModal } from "./RegisterClosedModal";
@@ -17,9 +18,10 @@ type Props = {
   className?: string;
   compact?: boolean;
   plain?: boolean;
+  onNavigate?: () => void;
 };
 
-export function RegisterCta({ className, compact, plain }: Props) {
+export function RegisterCta({ className, compact, plain, onNavigate }: Props) {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [closedOpen, setClosedOpen] = useState(false);
   const [round2Open, setRound2Open] = useState(false);
@@ -29,7 +31,14 @@ export function RegisterCta({ className, compact, plain }: Props) {
 
   if (registrationOpen && !round2Pause) {
     return (
-      <Link href={registerHref} className={className}>
+      <Link
+        href={registerHref}
+        className={className}
+        onClick={() => {
+          resetFlowIfCurrent(registerHref, "register");
+          onNavigate?.();
+        }}
+      >
         참가신청
       </Link>
     );

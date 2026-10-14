@@ -562,8 +562,8 @@ body.admin-mode {
 }
 
 .admin-apps-list {
-  --admin-apps-row-h: 26px;
-  --admin-apps-head-h: 28px;
+  --admin-apps-row-h: 40px;
+  --admin-apps-head-h: 44px;
   --admin-apps-list-rows: 15;
 }
 
@@ -713,7 +713,8 @@ body.admin-mode {
   min-height: 14px;
 }
 
-.admin-apps-list__check input {
+/* .admin-table-shell input 의 height: 32px 보다 우선 */
+.admin-apps-list .admin-apps-list__check input {
   width: 14px;
   height: 14px;
   margin: 0;
@@ -751,7 +752,8 @@ body.admin-mode {
 }
 
 .admin-apps-list__name,
-.admin-apps-list__souvenir {
+.admin-apps-list__souvenir,
+.admin-apps-list__clip {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -780,6 +782,19 @@ body.admin-mode {
 .admin-apps-list__course-text {
   font-weight: 500;
   color: var(--admin-ink);
+}
+
+/* 행 높이가 고정이라 코드·미선택을 한 줄로 */
+.admin-apps-list__group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.admin-apps-list__group-auto {
+  color: #8a94a3;
+  font-size: 11px;
 }
 
 .admin-apps-list__status {
