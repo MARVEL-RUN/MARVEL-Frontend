@@ -1711,6 +1711,135 @@
   margin-top: 0.85rem;
 }
 
+.lookup-members {
+  display: grid;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  list-style: none;
+  text-align: left;
+}
+
+.lookup-members>li {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 0.75rem;
+  padding: 0.95rem 0.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lookup-members>li.is-canceled {
+  opacity: 0.5;
+}
+
+.lookup-members__no {
+  display: inline-block;
+  color: var(--marvel);
+  font-size: 1.3rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  transform: skewX(-10deg);
+}
+
+.lookup-members__main {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.lookup-members__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  margin: 0;
+}
+
+.lookup-members__head strong {
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.lookup-members__course {
+  padding: 0.22rem 0.65rem 0.18rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--silver);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+}
+
+.lookup-members__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+  margin: 0;
+}
+
+.lookup-members__meta div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.lookup-members__meta dt {
+  color: var(--note);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.lookup-members__meta dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.lookup-members__status {
+  align-self: center;
+  padding: 0.3rem 0.75rem 0.26rem;
+  border-top: 1.5px solid #fff;
+  border-bottom: 1.5px solid #fff;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+.lookup-members>li.is-canceled .lookup-members__status {
+  border-color: var(--note);
+  color: var(--note);
+}
+
+@media (max-width: 720px) {
+  .lookup-members>li {
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    column-gap: 0.55rem;
+    padding: 0.85rem 0;
+  }
+
+  .lookup-members__no {
+    font-size: 1.1rem;
+  }
+
+  .lookup-members__status {
+    align-self: start;
+    padding: 0.24rem 0.6rem 0.2rem;
+    font-size: 0.68rem;
+  }
+}
+
 .ticket__notes {
   margin-top: 3.25rem;
 }

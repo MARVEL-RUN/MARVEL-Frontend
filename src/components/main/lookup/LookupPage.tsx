@@ -331,39 +331,62 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
   const active = members.filter((member) => !member.canceled);
   const canceled = members.filter((member) => member.canceled);
   return (
-    <>
-      {active.length > 0 ? (
-        <ul className="member-list">
-          {active.map((member, i) => (
-            <li key={member.id}>
-              <strong>
-                {String(i + 1).padStart(2, "0")} {member.name || "참가자"}
-              </strong>
-              <span>
-                {[
-                  member.course,
-                  member.startGroup,
-                  member.souvenirs[0]?.size,
-                  registrationStatusLabel(member.status),
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || "—"}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {canceled.length > 0 ? (
-        <ul className="member-list">
-          {canceled.map((member) => (
-            <li key={member.id} className="is-canceled">
-              <strong>{member.name || "참가자"}</strong>
-              <span>취소</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </>
+    <ul className="lookup-members">
+      {active.map((member, i) => (
+        <ReceiptMemberRow
+          key={member.id}
+          no={String(i + 1).padStart(2, "0")}
+          member={member}
+          status={registrationStatusLabel(member.status)}
+        />
+      ))}
+      {canceled.map((member) => (
+        <ReceiptMemberRow key={member.id} no="—" member={member} status="취소" canceled />
+      ))}
+    </ul>
+  );
+}
+
+function ReceiptMemberRow({
+  no,
+  member,
+  status,
+  canceled = false,
+}: {
+  no: string;
+  member: ReceiptMemberView;
+  status: string;
+  canceled?: boolean;
+}) {
+  const size = member.souvenirs[0]?.size;
+  const startGroup = member.startGroup && member.startGroup !== "—" ? member.startGroup : "";
+  return (
+    <li className={canceled ? "is-canceled" : undefined}>
+      <span className="lookup-members__no">{no}</span>
+      <div className="lookup-members__main">
+        <p className="lookup-members__head">
+          <strong>{member.name || "참가자"}</strong>
+          {member.course ? <span className="lookup-members__course">{member.course}</span> : null}
+        </p>
+        {!canceled && (startGroup || size) ? (
+          <dl className="lookup-members__meta">
+            {startGroup ? (
+              <div>
+                <dt>출발 그룹</dt>
+                <dd>{startGroup}</dd>
+              </div>
+            ) : null}
+            {size ? (
+              <div>
+                <dt>사이즈</dt>
+                <dd>{size}</dd>
+              </div>
+            ) : null}
+          </dl>
+        ) : null}
+      </div>
+      {status ? <span className="lookup-members__status">{status}</span> : null}
+    </li>
   );
 }
 
