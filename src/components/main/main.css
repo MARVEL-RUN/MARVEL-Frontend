@@ -1719,7 +1719,44 @@ button.course:disabled:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.6rem;
+  width: 100%;
   min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lookup-start-group__member-head:focus-visible {
+  outline: 2px solid var(--marvel);
+  outline-offset: 3px;
+}
+
+.lookup-start-group__member-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.lookup-start-group__member-picked {
+  color: var(--silver);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lookup-start-group__member-caret {
+  flex: none;
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 0.2s;
+}
+
+.lookup-start-group__members>li.is-open .lookup-start-group__member-caret {
+  transform: rotate(180deg);
 }
 
 .lookup-start-group__member-no {
@@ -1753,7 +1790,6 @@ button.course:disabled:hover {
 }
 
 .lookup-start-group__member-flag {
-  margin-left: auto;
   padding: 0.22rem 0.65rem 0.18rem;
   background: var(--gold);
   color: var(--navy);

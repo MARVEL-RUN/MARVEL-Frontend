@@ -4,6 +4,7 @@ import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { MainHttpError } from "@/lib/main/fetch";
 import {
   EMPTY_START_GROUP_DRAFT,
+  findStartGroup,
   sortedStartGroups,
   startGroupDescriptionParts,
   startGroupDraftError,
@@ -29,7 +30,7 @@ import type {
   RegistrationStartGroup,
 } from "@/services/main/types";
 import { useEffect, useId, useState } from "react";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { PasswordField } from "../register/ApplyUi";
 
@@ -80,6 +81,16 @@ export function LookupStartGroupModal(props: Props) {
     EMPTY_START_GROUP_DRAFT,
   );
   const [groupRows, setGroupRows] = useState<GroupMemberRow[]>([]);
+  const [openRows, setOpenRows] = useState<Set<string>>(() => new Set());
+
+  function toggleRow(id: string) {
+    setOpenRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -138,6 +149,7 @@ export function LookupStartGroupModal(props: Props) {
       .map((row, index) => participantRow(row, index))
       .filter((row) => row.registrationId?.trim());
     setGroupRows(rows);
+    setOpenRows(new Set(rows[0] ? [rows[0].registrationId] : []));
   }, [open, props]);
 
   function participantRow(row: OrganizationLookupParticipant, index: number): GroupMemberRow {
@@ -188,6 +200,7 @@ export function LookupStartGroupModal(props: Props) {
         const category = findCategory(categories, row.eventCategoryId);
         const pickErr = startGroupDraftError(row.draft, category);
         if (pickErr) {
+          setOpenRows((prev) => new Set(prev).add(row.registrationId));
           setLocalError(`${row.no} ${row.name}: ${pickErr}`);
           return;
         }
@@ -291,18 +304,46 @@ export function LookupStartGroupModal(props: Props) {
                 const category = findCategory(categories, row.eventCategoryId);
                 const course = row.courseName || (category ? categoryLabel(category) : "");
                 const changed = startGroupSelectionChanged(row.stored, row.draft);
+                const expanded = openRows.has(row.registrationId);
+                const choiceId = `lookup-sg-${row.registrationId}`;
+                const pickedCode = findStartGroup(category, row.draft.startGroupId)?.code;
+                const picked = row.draft.startGroupUnselected
+                  ? "미정"
+                  : pickedCode
+                    ? `${pickedCode}그룹`
+                    : "미선택";
                 return (
-                  <li key={row.registrationId} className={changed ? "is-changed" : undefined}>
-                    <div className="lookup-start-group__member-head">
+                  <li
+                    key={row.registrationId}
+                    className={[changed ? "is-changed" : "", expanded ? "is-open" : ""]
+                      .filter(Boolean)
+                      .join(" ") || undefined}
+                  >
+                    <button
+                      type="button"
+                      className="lookup-start-group__member-head"
+                      aria-expanded={expanded}
+                      aria-controls={choiceId}
+                      onClick={() => toggleRow(row.registrationId)}
+                    >
                       <span className="lookup-start-group__member-no">{row.no}</span>
                       <strong className="lookup-start-group__member-name">{row.name}</strong>
                       {course ? (
                         <span className="lookup-start-group__member-course">{course}</span>
                       ) : null}
-                      {changed ? (
-                        <span className="lookup-start-group__member-flag">변경</span>
-                      ) : null}
-                    </div>
+                      <span className="lookup-start-group__member-side">
+                        {changed ? (
+                          <span className="lookup-start-group__member-flag">변경</span>
+                        ) : null}
+                        <span className="lookup-start-group__member-picked">{picked}</span>
+                        <ChevronDown
+                          className="lookup-start-group__member-caret"
+                          size={18}
+                          strokeWidth={2.25}
+                          aria-hidden
+                        />
+                      </span>
+                    </button>
                     {storedStartGroupMissingFromOptions(
                       row.stored.startGroupId,
                       category,
@@ -311,22 +352,24 @@ export function LookupStartGroupModal(props: Props) {
                         현재 배정 그룹이 선택지에 없습니다.
                       </p>
                     ) : null}
-                    <StartGroupChoice
-                      groups={sortedStartGroups(category)}
-                      value={row.draft}
-                      disabled={busy || Boolean(optionsError) || !row.eventCategoryId}
-                      name={`lookup-org-${row.registrationId}`}
-                      label={`${row.no} ${row.name} 출발 그룹`}
-                      onChange={(next) =>
-                        setGroupRows((rows) =>
-                          rows.map((item) =>
-                            item.registrationId === row.registrationId
-                              ? { ...item, draft: next }
-                              : item,
-                          ),
-                        )
-                      }
-                    />
+                    <div id={choiceId} hidden={!expanded}>
+                      <StartGroupChoice
+                        groups={sortedStartGroups(category)}
+                        value={row.draft}
+                        disabled={busy || Boolean(optionsError) || !row.eventCategoryId}
+                        name={`lookup-org-${row.registrationId}`}
+                        label={`${row.no} ${row.name} 출발 그룹`}
+                        onChange={(next) =>
+                          setGroupRows((rows) =>
+                            rows.map((item) =>
+                              item.registrationId === row.registrationId
+                                ? { ...item, draft: next }
+                                : item,
+                            ),
+                          )
+                        }
+                      />
+                    </div>
                   </li>
                 );
               })}
