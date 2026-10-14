@@ -605,7 +605,9 @@ function IndividualReceiptCard({
   return (
     <section className="ticket">
       <p className="kicker">FOUND</p>
-      <h2>개인 접수 확인</h2>
+      <h2>
+        개인 접수 <em>확인</em>
+      </h2>
       <dl className="spec">
         <div>
           <dt>이름</dt>
@@ -728,7 +730,9 @@ function GroupReceiptCard({
   return (
     <section className="ticket">
       <p className="kicker">FOUND</p>
-      <h2>단체 접수 확인</h2>
+      <h2>
+        단체 접수 <em>확인</em>
+      </h2>
       <dl className="spec">
         <div>
           <dt>단체명</dt>
