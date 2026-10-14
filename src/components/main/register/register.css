@@ -1461,6 +1461,128 @@
   margin-inline: auto;
 }
 
+.kind-pick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kind-pick__item {
+  --tone: var(--marvel);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 7.5rem;
+  padding: 1.3rem 1.2rem 1.3rem 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a0c22;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.kind-pick__item--cyan {
+  --tone: var(--cyan);
+}
+
+.kind-pick__item:hover,
+.kind-pick__item:focus-visible {
+  border-color: var(--tone);
+  background: #10132b;
+  outline: none;
+}
+
+.kind-pick__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kind-pick__no {
+  display: inline-block;
+  color: var(--tone);
+  font-size: 2.1rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  transform: skewX(-10deg);
+}
+
+.kind-pick__body {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.kind-pick__code {
+  color: var(--tone);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.kind-pick__title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.kind-pick__desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.kind-pick__go {
+  color: rgba(255, 255, 255, 0.45);
+  transition: transform 0.15s, color 0.15s;
+}
+
+.kind-pick__item:hover .kind-pick__go,
+.kind-pick__item:focus-visible .kind-pick__go {
+  color: var(--tone);
+  transform: translateX(3px);
+}
+
+@media (max-width: 720px) {
+  .kind-pick {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .kind-pick__item {
+    gap: 0.85rem;
+    min-height: 0;
+    padding: 1.05rem 0.95rem 1.05rem 1.05rem;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+  }
+
+  .kind-pick__no {
+    font-size: 1.7rem;
+  }
+
+  .kind-pick__title {
+    font-size: 1.05rem;
+  }
+
+  .kind-pick__desc {
+    font-size: 0.78rem;
+  }
+}
+
 /* 조회 컬럼(720)에서 수정 폼만 신청과 같은 920 */
 .lookup-edit {
   width: auto;
