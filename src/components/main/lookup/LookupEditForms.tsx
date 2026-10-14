@@ -49,8 +49,8 @@ import {
   lookupOrganizationCommonModifyAllowed,
   lookupShowPaymentButton,
   memberDeleteAllowed,
+  memberLookupPolicyNotes,
   memberModifyAllowed,
-  organizationMemberLookupPolicyNotes,
   organizationAddMemberAllowed,
   policyReasonMessage,
 } from "@/lib/main/registrationActionPolicy";
@@ -925,10 +925,6 @@ export function GroupLookupEdit({
       }, 0),
     [categories, members],
   );
-  const memberPolicyNotes = useMemo(
-    () => organizationMemberLookupPolicyNotes(members),
-    [members],
-  );
   useLayoutEffect(() => {
     scrollPageTop();
   }, []);
@@ -1245,13 +1241,12 @@ export function GroupLookupEdit({
                     const locked = Boolean(member.registrationId);
                     const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
                     const memberFieldsLocked = !canEditMemberFields;
+                    const memberPolicyNoteLines =
+                      locked && member.memberPolicy
+                        ? memberLookupPolicyNotes(member.memberPolicy)
+                        : [];
                     return (
                       <Fragment key={member.key}>
-                        {index > 0 ? (
-                          <tr className="party__gap" aria-hidden="true">
-                            <td colSpan={7} />
-                          </tr>
-                        ) : null}
                         <tr className={open ? "party__info is-open" : "party__info"}>
                           <td className="party__no" rowSpan={3}>
                             {index + 1}.
@@ -1472,21 +1467,28 @@ export function GroupLookupEdit({
                             <KitFixed courseId={courseId} />
                           </td>
                         </tr>
+                        {memberPolicyNoteLines.length ? (
+                          <tr className={open ? "party__callout is-open" : "party__callout"}>
+                            <td colSpan={7}>
+                              <div className="party-callout" role="status">
+                                <span className="party-callout__arrow" aria-hidden="true" />
+                                <p className="party-callout__text">
+                                  {memberPolicyNoteLines.join(" ")}
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : index < members.length - 1 ? (
+                          <tr className="party__gap" aria-hidden="true">
+                            <td colSpan={7} />
+                          </tr>
+                        ) : null}
                       </Fragment>
                     );
                   })}
                 </tbody>
               </table>
             </div>
-            {memberPolicyNotes.length ? (
-              <div className="party-policy-foot" role="status">
-                <ul className="party__policy-notes">
-                  {memberPolicyNotes.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
             <p className="party-sum">합계 {formatFee(total)}</p>
           </FormSec>
           {needsGroupGuardian ? (

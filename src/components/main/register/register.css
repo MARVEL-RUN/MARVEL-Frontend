@@ -898,7 +898,8 @@
   border-right: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-.party tr.party__gap + tr.party__info td {
+.party tr.party__gap + tr.party__info td,
+.party tr.party__callout + tr.party__info td {
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -1198,26 +1199,39 @@
 }
 
 /* 패키지는 입력이 아니라 안내라 PC에서는 맨 아래 흐린 줄 */
-.party-policy-foot {
-  margin: 0.5rem 0 0;
-  padding: 0.45rem 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
+.party tr.party__callout td {
+  padding: 0.15rem 0.75rem 0.55rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  vertical-align: top;
 }
 
-.party__policy-notes {
+.party-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: 42rem;
+}
+
+.party-callout__arrow {
+  flex: none;
+  width: 1rem;
+  height: 1.5rem;
+  margin-top: 0.1rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom-left-radius: 2px;
+}
+
+.party-callout__text {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.28rem;
-}
-
-.party__policy-notes li {
+  flex: 1;
+  min-width: 0;
   color: rgba(255, 255, 255, 0.58);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.6;
   word-break: keep-all;
 }
 
@@ -2583,14 +2597,44 @@
   .party tr.party__kit.is-open {
     grid-template-columns: 1fr;
     margin-top: -1px;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0;
     border-top: 0;
+  }
+
+  .party tr.party__kit.is-open:has(+ tr.party__callout.is-open) td {
+    padding-bottom: 0.35rem;
+  }
+
+  .party tr.party__kit.is-open:not(:has(+ tr.party__callout.is-open)) {
+    margin-bottom: 0.8rem;
   }
 
   .party tr.party__kit.is-open td {
     grid-column: 1 / -1;
     padding: 0.4rem 0.6rem 0.7rem;
     background: transparent;
+  }
+
+  .party tr.party__callout:not(.is-open) {
+    display: none;
+  }
+
+  .party tr.party__callout.is-open {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: -1px;
+    margin-bottom: 0.8rem;
+    border: 0;
+    background: transparent;
+  }
+
+  .party tr.party__callout.is-open td {
+    grid-column: 1 / -1;
+    padding: 0.2rem 0.6rem 0.55rem;
+  }
+
+  .party tr.party__callout.is-open .party-callout__arrow {
+    height: 1.35rem;
   }
 
   .party .party__kit-label {
