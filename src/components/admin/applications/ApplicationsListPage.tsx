@@ -541,7 +541,7 @@ export function ApplicationsListPage({ slug }: Props) {
       key: "name",
       header: "이름/단체명",
       className: "is-name",
-      width: "112px",
+      width: "140px",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__name" title={row.name || undefined}>
           {row.name || "-"}
@@ -566,7 +566,7 @@ export function ApplicationsListPage({ slug }: Props) {
       key: "course",
       header: "코스",
       className: "is-course",
-      width: "120px",
+      width: "96px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
