@@ -1,5 +1,9 @@
 import type { RegistrationStartGroup } from "@/services/main/types";
-import type { StartGroupDraft, StartGroupPreviewSection } from "@/lib/start-group";
+import {
+  startGroupDescriptionParts,
+  type StartGroupDraft,
+  type StartGroupPreviewSection,
+} from "@/lib/start-group";
 
 type Props = {
   /** 단일 종목(조회·수정 등) */
@@ -13,6 +17,17 @@ type Props = {
   namePrefix?: string;
   hintWhenInactive?: string;
 };
+
+function StartGroupDescription({ text }: { text: string }) {
+  const { finish, pace } = startGroupDescriptionParts(text);
+  if (!finish) return null;
+  return (
+    <span className="start-group-pick__desc">
+      <strong className="start-group-pick__finish">{finish}</strong>
+      {pace ? <span className="start-group-pick__pace"> · {pace}</span> : null}
+    </span>
+  );
+}
 
 function GroupList({
   groups,
@@ -47,7 +62,7 @@ function GroupList({
                 }
               />
               <span className="start-group-pick__code">{group.code}</span>
-              <span className="start-group-pick__desc">{group.description}</span>
+              <StartGroupDescription text={group.description} />
             </label>
           </li>
         );

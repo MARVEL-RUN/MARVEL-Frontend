@@ -2888,6 +2888,18 @@
   line-height: 1.45;
 }
 
+.start-group-pick__finish {
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+
+.start-group-pick__pace {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 500;
+}
+
 .start-group-pick__defer {
   display: flex;
   align-items: flex-start;

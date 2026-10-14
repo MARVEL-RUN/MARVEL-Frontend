@@ -148,3 +148,16 @@ export function startGroupSelectionChanged(
     (stored.startGroupId ?? "") !== (next.startGroupId ?? "")
   );
 }
+
+/** API description — 「예상 완주 …」 구간과 나머지(페이스) 분리 */
+export function startGroupDescriptionParts(description: string) {
+  const text = description.trim();
+  if (!text) return { finish: "", pace: "" };
+  const parts = text.split(/\s*·\s*/);
+  const finish = parts[0]?.trim() ?? "";
+  const pace = parts.slice(1).join(" · ").trim();
+  if (/^예상\s+완주/i.test(finish)) {
+    return { finish, pace };
+  }
+  return { finish: text, pace: "" };
+}
