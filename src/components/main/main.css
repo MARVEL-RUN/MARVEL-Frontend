@@ -1652,3 +1652,28 @@ button.course:disabled:hover {
     --header-h: calc(2.85rem + env(safe-area-inset-top, 0px));
   }
 }
+
+.lookup-start-group__panel {
+  max-width: 34rem;
+  max-height: min(88vh, 42rem);
+  overflow: auto;
+}
+
+.lookup-start-group__body {
+  display: grid;
+  gap: 1rem;
+}
+
+.lookup-start-group__members {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lookup-start-group__member-name {
+  margin: 0 0 0.45rem;
+  font-weight: 800;
+  color: #fff;
+}

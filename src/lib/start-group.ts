@@ -110,3 +110,23 @@ export function startGroupSummary(
   const id = draft.startGroupId.trim();
   return id || "—";
 }
+
+export function startGroupDisplayFromLookup(
+  startGroupCode?: string | null,
+  startGroupUnselected?: boolean,
+) {
+  if (startGroupUnselected === true) return startGroupLabel(null, true);
+  const code = (startGroupCode ?? "").trim();
+  return code || "—";
+}
+
+export function startGroupSelectionChanged(
+  stored: StartGroupInput,
+  draft: StartGroupDraft,
+) {
+  const next = startGroupInputFromDraft(draft);
+  return (
+    stored.startGroupUnselected !== next.startGroupUnselected ||
+    (stored.startGroupId ?? "") !== (next.startGroupId ?? "")
+  );
+}

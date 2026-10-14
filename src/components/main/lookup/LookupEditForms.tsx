@@ -33,7 +33,16 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
-import { startGroupInputFromStored } from "@/lib/start-group";
+import {
+  EMPTY_START_GROUP_DRAFT,
+  sortedStartGroups,
+  startGroupDraftError,
+  startGroupDraftFromStored,
+  startGroupInputFromDraft,
+  startGroupInputFromStored,
+  startGroupSummary,
+} from "@/lib/start-group";
+import { StartGroupPick } from "../register/StartGroupPick";
 import {
   lookupModifyAllowed,
   lookupOrganizationCommonModifyAllowed,
@@ -312,6 +321,9 @@ export function IndividualLookupEdit({
   const [souvenirs, setSouvenirs] = useState(
     souvenirSelections(receipt.selectedSouvenirList),
   );
+  const [startGroupDraft, setStartGroupDraft] = useState(() =>
+    startGroupDraftFromStored(receipt.startGroupId, receipt.startGroupUnselected),
+  );
   const [hint, setHint] = useState("");
 
   useLayoutEffect(() => {
@@ -379,6 +391,7 @@ export function IndividualLookupEdit({
   function onCourseChange(nextCourseId: CourseId) {
     const next = categoryForCourse(categories, nextCourseId, birth);
     applyCategory(next);
+    setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
   }
 
   function validateForm() {
@@ -397,6 +410,8 @@ export function IndividualLookupEdit({
       (souvenir && !selectedSize ? "티셔츠 사이즈를 선택하세요." : "");
     if (invalid) return invalid;
     if (gender !== "M" && gender !== "F") return "성별을 선택하세요.";
+    const groupErr = startGroupDraftError(startGroupDraft, category);
+    if (groupErr) return groupErr;
     return "";
   }
 
@@ -417,7 +432,7 @@ export function IndividualLookupEdit({
       guardianRelationship: guardianRelation.trim() || undefined,
       guardianConsent: guardianRequired ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
-      ...startGroupInputFromStored(receipt.startGroupId, receipt.startGroupUnselected),
+      ...startGroupInputFromDraft(startGroupDraft),
     };
   }
 
@@ -608,6 +623,19 @@ export function IndividualLookupEdit({
         <FormRow label="패키지">
           <KitFixed courseId={courseId} />
         </FormRow>
+        <FormRow label="출발 그룹" required>
+          {!eventCategoryId ? (
+            <p className="form-row__hint">종목을 먼저 선택하세요</p>
+          ) : (
+            <StartGroupPick
+              groups={sortedStartGroups(category)}
+              value={startGroupDraft}
+              onChange={setStartGroupDraft}
+              disabled={!canModify || !optionsReady}
+              namePrefix="lookup-edit-personal"
+            />
+          )}
+        </FormRow>
         <FormRow label="티셔츠 사이즈" required>
           <ShirtPick
             value={selectedSize}
@@ -711,6 +739,10 @@ export function IndividualLookupEdit({
           <div>
             <dt>티셔츠 사이즈</dt>
             <dd>{selectedSize || "—"}</dd>
+          </div>
+          <div>
+            <dt>출발 그룹</dt>
+            <dd>{startGroupSummary(startGroupDraft, category)}</dd>
           </div>
           <div>
             <dt>패키지</dt>
@@ -994,6 +1026,14 @@ export function GroupLookupEdit({
           ? "티셔츠 사이즈를 선택하세요."
           : "");
       if (invalid) return `${prefix}${invalid}`;
+      const groupErr = startGroupDraftError(
+        {
+          startGroupId: member.startGroupId ?? "",
+          startGroupUnselected: member.startGroupUnselected,
+        },
+        category,
+      );
+      if (groupErr) return `${prefix}${groupErr}`;
     }
     if (!leaderName.trim()) return "대표자 정보를 확인하지 못했습니다.";
     if (leaderBirth.replace(/\D/g, "").length !== 8) return "대표자 정보를 확인하지 못했습니다.";
@@ -1340,6 +1380,7 @@ export function GroupLookupEdit({
                                 memberShirtSize(member.selectedSouvenirList, next),
                                 member.birth,
                               ),
+                              ...EMPTY_START_GROUP_DRAFT,
                             });
                           }}
                           disabled={!optionsReady || !canEditMemberFields}
@@ -1394,6 +1435,30 @@ export function GroupLookupEdit({
                         <KitFixed courseId={courseId} />
                       </td>
                     </tr>
+                    {open ? (
+                      <tr className="party__start-group is-open">
+                        <td colSpan={7} data-label="출발 그룹">
+                          <p className="party__start-group-label">출발 그룹</p>
+                          <StartGroupPick
+                            groups={sortedStartGroups(category)}
+                            value={{
+                              startGroupId: member.startGroupId ?? "",
+                              startGroupUnselected: member.startGroupUnselected,
+                            }}
+                            disabled={!optionsReady || !canEditMemberFields || !category}
+                            namePrefix={`lookup-edit-member-${index}`}
+                            onChange={(next) =>
+                              patchMember(index, {
+                                startGroupId: next.startGroupUnselected
+                                  ? null
+                                  : next.startGroupId || null,
+                                startGroupUnselected: next.startGroupUnselected,
+                              })
+                            }
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
                   </Fragment>
                 );
               })}
@@ -1492,8 +1557,15 @@ export function GroupLookupEdit({
                   {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
                 </strong>
                 <span>
-                  {category ? categoryLabel(category) : "—"} · {size || "—"} ·{" "}
-                  {birthView(member.birth) || "—"} ·{" "}
+                  {category ? categoryLabel(category) : "—"} ·{" "}
+                  {startGroupSummary(
+                    {
+                      startGroupId: member.startGroupId ?? "",
+                      startGroupUnselected: member.startGroupUnselected,
+                    },
+                    category,
+                  )}{" "}
+                  · {size || "—"} · {birthView(member.birth) || "—"} ·{" "}
                   {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
                   {formatPhone(member.phNum) || "—"}
                 </span>
