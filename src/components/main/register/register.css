@@ -3170,3 +3170,13 @@
   white-space: nowrap;
   border: 0;
 }
+
+.party-start-group__hint {
+  margin: 0.35rem 0 0;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  word-break: keep-all;
+}

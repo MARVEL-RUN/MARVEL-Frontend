@@ -806,6 +806,7 @@ type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
   eventCategoryName?: string;
   shirtSize?: string;
   memberPolicy?: MemberRegistrationPolicy;
+  storedStartGroupCode?: string | null;
 };
 
 function memberKey() {
@@ -861,6 +862,7 @@ function participantDraft(
     gender: toApiGender(row.gender) || "M",
     memberPolicy: row.memberPolicy,
     ...startGroupInputFromStored(row.startGroupId, row.startGroupUnselected),
+    storedStartGroupCode: row.startGroupCode,
   };
 }
 
@@ -1428,6 +1430,7 @@ export function GroupLookupEdit({
                               }}
                               disabled={!optionsReady || !canEditMemberFields}
                               namePrefix={`lookup-edit-member-${index}`}
+                              storedCode={member.storedStartGroupCode}
                               onChange={(next) =>
                                 patchMember(index, {
                                   startGroupId: next.startGroupUnselected
