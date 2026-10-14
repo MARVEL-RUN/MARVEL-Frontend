@@ -1712,7 +1712,60 @@
 }
 
 .ticket__notes {
-  margin-top: 2.25rem;
+  margin-top: 3.25rem;
+}
+
+.ticket-notice {
+  margin-top: 1rem;
+  padding: 1.05rem 1.2rem 1.1rem;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: left;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+.ticket__notes>.ticket-notice:first-child {
+  margin-top: 0;
+}
+
+.ticket-notice__title {
+  margin: 0 0 0.6rem;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.ticket-notice__list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ticket-notice__list li {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.ticket-notice__tail {
+  margin: 0.8rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--note);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.ticket-notice__tail a {
+  margin-left: 0.35rem;
+  color: var(--gold);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
 }
 
 .ticket .ticket__notes .form__note {

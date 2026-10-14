@@ -484,12 +484,44 @@ function ReceiptNotes({
         </p>
       ) : null}
       {warning ? <p className="form__note">{warning}</p> : null}
-      {policyNotes.map((line) => (
-        <p key={line} className="form__note">
-          {line}
-        </p>
-      ))}
+      {policyNotes.length ? <PolicyNoticeBox lines={policyNotes} inquiryHref={inquiryHref} /> : null}
     </div>
+  );
+}
+
+function splitSentences(text: string) {
+  return text.split(/(?<=[.!?])\s+/).map((part) => part.trim()).filter(Boolean);
+}
+
+/** 모든 문구 끝 문장이 같으면 한 번만 */
+function commonTailSentence(lines: string[]) {
+  if (lines.length < 2) return "";
+  const tails = lines.map((line) => {
+    const parts = splitSentences(line);
+    return parts.length > 1 ? parts[parts.length - 1] : "";
+  });
+  return tails[0] && tails.every((tail) => tail === tails[0]) ? tails[0] : "";
+}
+
+function PolicyNoticeBox({ lines, inquiryHref }: { lines: string[]; inquiryHref: string }) {
+  const tail = commonTailSentence(lines);
+  const items = tail
+    ? lines.map((line) => splitSentences(line).slice(0, -1).join(" "))
+    : lines;
+  return (
+    <section className="ticket-notice" aria-label="신청 안내">
+      <p className="ticket-notice__title">안내</p>
+      <ul className="ticket-notice__list">
+        {items.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+      {tail ? (
+        <p className="ticket-notice__tail">
+          {tail} <Link href={inquiryHref}>문의사항 남기기</Link>
+        </p>
+      ) : null}
+    </section>
   );
 }
 
