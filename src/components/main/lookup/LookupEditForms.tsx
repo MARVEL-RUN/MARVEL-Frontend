@@ -49,8 +49,8 @@ import {
   lookupOrganizationCommonModifyAllowed,
   lookupShowPaymentButton,
   memberDeleteAllowed,
-  memberLookupPolicyNotes,
   memberModifyAllowed,
+  organizationMemberLookupPolicyNotes,
   organizationAddMemberAllowed,
   policyReasonMessage,
 } from "@/lib/main/registrationActionPolicy";
@@ -521,13 +521,13 @@ export function IndividualLookupEdit({
                 disabled
               />
             </FormRow>
-            <FormRow label="이메일">
+            <FormRow label="이메일" locked={!canModify}>
               <EmailField value={email} onChange={setEmail} disabled={!canModify} />
             </FormRow>
           </FormSec>
 
           <FormSec kicker="03 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-            <FormRow label="주소" required>
+            <FormRow label="주소" required locked={!canModify}>
               <AddressField
                 zonecode={zonecode}
                 address={address}
@@ -610,7 +610,7 @@ export function IndividualLookupEdit({
             <ApplyHint>
               <p>{TIMING_CHIP_NOTE}</p>
             </ApplyHint>
-            <FormRow label="참가종목" required>
+            <FormRow label="참가종목" required locked={!canModify}>
               <CoursePick
                 value={courseId}
                 birth={birth}
@@ -625,7 +625,7 @@ export function IndividualLookupEdit({
             <FormRow label="패키지">
               <KitFixed courseId={courseId} />
             </FormRow>
-            <FormRow label="출발 그룹" required>
+            <FormRow label="출발 그룹" required locked={!canModify}>
               <StartGroupPick
                 sections={startGroupSections}
                 activeSectionKey={eventCategoryId || undefined}
@@ -636,7 +636,7 @@ export function IndividualLookupEdit({
                 namePrefix="lookup-edit-personal"
               />
             </FormRow>
-            <FormRow label="티셔츠 사이즈" required>
+            <FormRow label="티셔츠 사이즈" required locked={!canModify}>
               <ShirtPick
                 value={selectedSize}
                 sizes={souvenir ? sizes : undefined}
@@ -925,6 +925,10 @@ export function GroupLookupEdit({
       }, 0),
     [categories, members],
   );
+  const memberPolicyNotes = useMemo(
+    () => organizationMemberLookupPolicyNotes(members),
+    [members],
+  );
   useLayoutEffect(() => {
     scrollPageTop();
   }, []);
@@ -1150,7 +1154,7 @@ export function GroupLookupEdit({
                 disabled
               />
             </FormRow>
-            <FormRow label="이메일">
+            <FormRow label="이메일" locked={!canEditOrgCommon}>
               <EmailField
                 value={email}
                 onChange={setEmail}
@@ -1164,7 +1168,7 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="04 / ADDRESS" title="주소" note="기념품 배송 및 참가 안내에 사용됩니다.">
-            <FormRow label="주소" required>
+            <FormRow label="주소" required locked={!canEditOrgCommon}>
               <AddressField
                 zonecode={zonecode}
                 address={address}
@@ -1240,10 +1244,7 @@ export function GroupLookupEdit({
                     const open = openMember === index;
                     const locked = Boolean(member.registrationId);
                     const canEditMemberFields = memberModifyAllowed(member.memberPolicy, true);
-                    const memberPolicyNoteLines =
-                      locked && member.memberPolicy
-                        ? memberLookupPolicyNotes(member.memberPolicy)
-                        : [];
+                    const memberFieldsLocked = !canEditMemberFields;
                     return (
                       <Fragment key={member.key}>
                         {index > 0 ? (
@@ -1371,7 +1372,10 @@ export function GroupLookupEdit({
                           </td>
                         </tr>
                         <tr className={open ? "party__more is-open" : "party__more"}>
-                          <td data-label="참가종목">
+                          <td
+                            data-label="참가종목"
+                            className={memberFieldsLocked ? "is-locked" : undefined}
+                          >
                             <select
                               value={member.eventCategoryId}
                               onChange={(e) => {
@@ -1414,13 +1418,11 @@ export function GroupLookupEdit({
                                 );
                               })}
                             </select>
-                            {memberPolicyNoteLines.map((line) => (
-                              <p key={line} className="form-row__hint" role="status">
-                                {line}
-                              </p>
-                            ))}
                           </td>
-                          <td data-label="출발 그룹">
+                          <td
+                            data-label="출발 그룹"
+                            className={memberFieldsLocked ? "is-locked" : undefined}
+                          >
                             <GroupMemberStartGroup
                               category={category}
                               categoryId={member.eventCategoryId}
@@ -1441,7 +1443,11 @@ export function GroupLookupEdit({
                               }
                             />
                           </td>
-                          <td colSpan={2} data-label="사이즈">
+                          <td
+                            colSpan={2}
+                            data-label="사이즈"
+                            className={memberFieldsLocked ? "is-locked" : undefined}
+                          >
                             <ShirtPick
                               value={selectedSize}
                               sizes={souvenir ? sizes : undefined}
@@ -1472,6 +1478,15 @@ export function GroupLookupEdit({
                 </tbody>
               </table>
             </div>
+            {memberPolicyNotes.length ? (
+              <div className="party-policy-foot" role="status">
+                <ul className="party__policy-notes">
+                  {memberPolicyNotes.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <p className="party-sum">합계 {formatFee(total)}</p>
           </FormSec>
           {needsGroupGuardian ? (

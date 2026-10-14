@@ -1198,6 +1198,29 @@
 }
 
 /* 패키지는 입력이 아니라 안내라 PC에서는 맨 아래 흐린 줄 */
+.party-policy-foot {
+  margin: 0.5rem 0 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.party__policy-notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.party__policy-notes li {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
 .party tr.party__kit td {
   padding: 0.45rem 0.75rem;
   background: rgba(255, 255, 255, 0.025);
@@ -1443,9 +1466,21 @@
 .form-row.is-locked input:disabled,
 .form-row.is-locked select:disabled,
 .form-row.is-locked .birth-pick select:disabled,
+.form-row.is-locked .address-pick input,
+.form-row.is-locked .address-pick__btn,
 .party td.is-locked input:disabled,
-.party td.is-locked select:disabled {
+.party td.is-locked select:disabled,
+.party td.is-locked .party-start-group select:disabled {
   opacity: 1;
+  cursor: not-allowed;
+}
+
+.address-pick.is-disabled {
+  pointer-events: none;
+}
+
+.address-pick.is-disabled input,
+.address-pick.is-disabled .address-pick__btn {
   cursor: not-allowed;
 }
 
