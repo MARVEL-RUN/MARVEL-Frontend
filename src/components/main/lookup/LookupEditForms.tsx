@@ -1435,31 +1435,28 @@ export function GroupLookupEdit({
                             <KitFixed courseId={courseId} />
                           </td>
                         </tr>
-                        {open ? (
-                          <tr className="party__start-group is-open">
-                            <td colSpan={7}>
-                              <p className="party__start-group-head">출발 그룹</p>
-                              <GroupMemberStartGroup
-                                category={category}
-                                categoryId={member.eventCategoryId}
-                                value={{
-                                  startGroupId: member.startGroupId ?? "",
-                                  startGroupUnselected: member.startGroupUnselected,
-                                }}
-                                disabled={!optionsReady || !canEditMemberFields}
-                                namePrefix={`lookup-edit-member-${index}`}
-                                onChange={(next) =>
-                                  patchMember(index, {
-                                    startGroupId: next.startGroupUnselected
-                                      ? null
-                                      : next.startGroupId || null,
-                                    startGroupUnselected: next.startGroupUnselected,
-                                  })
-                                }
-                              />
-                            </td>
-                          </tr>
-                        ) : null}
+                        <tr className={open ? "party__start-group is-open" : "party__start-group"}>
+                          <td colSpan={7}>
+                            <GroupMemberStartGroup
+                              category={category}
+                              categoryId={member.eventCategoryId}
+                              value={{
+                                startGroupId: member.startGroupId ?? "",
+                                startGroupUnselected: member.startGroupUnselected,
+                              }}
+                              disabled={!optionsReady || !canEditMemberFields}
+                              namePrefix={`lookup-edit-member-${index}`}
+                              onChange={(next) =>
+                                patchMember(index, {
+                                  startGroupId: next.startGroupUnselected
+                                    ? null
+                                    : next.startGroupId || null,
+                                  startGroupUnselected: next.startGroupUnselected,
+                                })
+                              }
+                            />
+                          </td>
+                        </tr>
                       </Fragment>
                     );
                   })}

@@ -1012,24 +1012,21 @@ export function GroupFlow({
                             <KitFixed courseId={courseId} />
                           </td>
                         </tr>
-                        {open ? (
-                          <tr className="party__start-group is-open">
-                            <td colSpan={7}>
-                              <p className="party__start-group-head">출발 그룹</p>
-                              <GroupMemberStartGroup
-                                category={category}
-                                categoryId={p.categoryId}
-                                value={{
-                                  startGroupId: p.startGroupId,
-                                  startGroupUnselected: p.startGroupUnselected,
-                                }}
-                                disabled={!optionsReady}
-                                namePrefix={`member-${i}`}
-                                onChange={(next) => patchMember(i, next)}
-                              />
-                            </td>
-                          </tr>
-                        ) : null}
+                        <tr className={open ? "party__start-group is-open" : "party__start-group"}>
+                          <td colSpan={7}>
+                            <GroupMemberStartGroup
+                              category={category}
+                              categoryId={p.categoryId}
+                              value={{
+                                startGroupId: p.startGroupId,
+                                startGroupUnselected: p.startGroupUnselected,
+                              }}
+                              disabled={!optionsReady}
+                              namePrefix={`member-${i}`}
+                              onChange={(next) => patchMember(i, next)}
+                            />
+                          </td>
+                        </tr>
                       </Fragment>
                     );
                   })}

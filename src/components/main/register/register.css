@@ -2432,6 +2432,10 @@
     margin-bottom: 0;
   }
 
+  .party tr.party__start-group:not(.is-open) {
+    display: none;
+  }
+
   .party tr.party__start-group.is-open {
     display: block;
     margin-top: -1px;
@@ -2969,84 +2973,44 @@
   margin: 0.35rem 0 0;
 }
 
-.party tr.party__more.is-open:has(+ tr.party__start-group.is-open) {
-  margin-bottom: 0;
+/* 단체 참가자 행 — 종목 선택과 같은 드롭다운 */
+.party tr.party__start-group td {
+  padding: 0.65rem 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 0;
   border-bottom: 0;
 }
 
-.party__start-group td {
-  padding: 0.75rem 0.65rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.party__start-group-head {
-  margin: 0 0 0.7rem;
-  text-align: center;
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-
-.party-start-group--wait {
-  margin: 0;
-  padding: 0.85rem 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-radius: 6px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-.party-start-group .start-group-pick {
-  gap: 0.55rem;
-}
-
-.party-start-group .start-group-pick__list {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
-.party-start-group .start-group-pick__list label {
-  grid-template-columns: auto 1.35rem minmax(0, 1fr);
+.party-start-group {
+  display: flex;
   align-items: center;
-  padding: 0.65rem 0.75rem;
-  min-height: 3.1rem;
+  justify-content: center;
+  gap: 0.9rem;
 }
 
-.party-start-group .start-group-pick__list label input {
-  margin-top: 0;
+.party-start-group__label {
+  flex: none;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
-.party-start-group .start-group-pick__code {
-  font-size: 0.95rem;
-}
-
-.party-start-group .start-group-pick__desc {
-  font-size: 0.76rem;
-  line-height: 1.35;
-}
-
-.party-start-group .start-group-pick__finish {
-  font-size: 0.82rem;
-}
-
-.party-start-group .start-group-pick__defer {
-  justify-content: flex-end;
-  margin-top: 0.2rem;
-  padding-top: 0.4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.78rem;
-}
-
-.party-start-group .start-group-pick__defer small {
-  font-size: 0.72rem;
+.party .party-start-group select {
+  flex: 0 1 34rem;
 }
 
 @media (max-width: 720px) {
-  .party-start-group .start-group-pick__list {
-    grid-template-columns: 1fr;
+  .party-start-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .party-start-group__label {
+    text-align: left;
+  }
+
+  .party .party-start-group select {
+    flex: none;
   }
 }
