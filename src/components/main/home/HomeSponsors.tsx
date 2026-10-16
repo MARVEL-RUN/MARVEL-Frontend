@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
 import {
@@ -30,20 +31,43 @@ const PARTNER_ROWS = [
 const MELON = HOME_SPONSORS.find((s) => s.key === "melon")!;
 
 /* 푸터 로고는 흰색이라 카드 위에선 검정으로, 멜론만 컬러 */
-const GROUPS: { label: string; items: Logo[] }[] = [
-  { label: "SPONSORS", items: HOME_SPONSORS },
+function partnerLogo(item: PartnerGroup["items"][number]): Logo {
+  return item.key === "melon"
+    ? { ...MELON, key: "partner-melon" }
+    : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) };
+}
+
+const GROUPS: { label: string; parts: Logo[][] }[] = [
+  { label: "SPONSORS", parts: [HOME_SPONSORS] },
   ...PARTNER_ROWS.map((roles) => ({
     label: roles.join(" & "),
-    items: PARTNERS
-      .filter((group) => roles.includes(group.role))
-      .flatMap((group) => group.items)
-      .map((item): Logo =>
-        item.key === "melon"
-          ? { ...MELON, key: "partner-melon" }
-          : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) },
-      ),
+    parts: PARTNERS.filter((group) => roles.includes(group.role)).map((group) =>
+      group.items.map(partnerLogo),
+    ),
   })),
 ];
+
+function LogoCard({ logo }: { logo: Logo }) {
+  return (
+    <li
+      className={[
+        "sponsors__item",
+        `sponsors__item--${logo.key}`,
+        logo.ink ? "sponsors__item--ink" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <Image
+        src={logo.src}
+        alt={logo.name}
+        width={logo.width}
+        height={logo.height}
+        draggable={false}
+      />
+    </li>
+  );
+}
 
 export function HomeSponsors() {
   return (
@@ -64,26 +88,24 @@ export function HomeSponsors() {
               ) : null}
               <p className="sponsors__label">{group.label}</p>
             </div>
-            <ul className="sponsors__grid">
-              {group.items.map((s) => (
-                <li
-                  key={s.key}
-                  className={[
-                    "sponsors__item",
-                    `sponsors__item--${s.key}`,
-                    s.ink ? "sponsors__item--ink" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  <Image
-                    src={s.src}
-                    alt={s.name}
-                    width={s.width}
-                    height={s.height}
-                    draggable={false}
-                  />
-                </li>
+            <ul
+              className={
+                group.parts.length > 1
+                  ? "sponsors__grid sponsors__grid--split"
+                  : "sponsors__grid"
+              }
+            >
+              {group.parts.map((part, j) => (
+                <Fragment key={j}>
+                  {j > 0 ? (
+                    <li className="sponsors__amp" aria-hidden>
+                      &amp;
+                    </li>
+                  ) : null}
+                  {part.map((logo) => (
+                    <LogoCard key={logo.key} logo={logo} />
+                  ))}
+                </Fragment>
               ))}
             </ul>
           </div>
