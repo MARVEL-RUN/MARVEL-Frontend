@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
 import {
+  HOME_MELON_LOGO,
   HOME_SPONSORS,
   footerPartnerLogo,
   type FooterPartnerLogoKey,
@@ -28,12 +29,10 @@ const PARTNER_ROWS = [
   ["미디어파트너", "공식 러닝 뮤직 파트너"],
 ];
 
-const MELON = HOME_SPONSORS.find((s) => s.key === "melon")!;
-
 /* 푸터 로고는 흰색이라 카드 위에선 검정으로, 멜론만 컬러 */
 function partnerLogo(item: PartnerGroup["items"][number]): Logo {
   return item.key === "melon"
-    ? { ...MELON, key: "partner-melon" }
+    ? { key: item.key, name: item.name, ...HOME_MELON_LOGO }
     : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) };
 }
 

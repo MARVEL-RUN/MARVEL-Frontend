@@ -31,7 +31,6 @@ const HOME_SPONSOR_LIST = [
   { key: "nature-valley", file: "nature-valley.svg", name: "네이처밸리 프로틴바", width: 406, height: 116 },
   { key: "ourhome", file: "ourhome.svg", name: "아워홈", width: 797, height: 154 },
   { key: "top", file: "top.svg", name: "TOP 커피", width: 396, height: 274 },
-  { key: "melon", file: "melon.png", name: "멜론", width: 480, height: 127 },
   { key: "lego", file: "lego.png", name: "LEGO", width: 160, height: 160 },
   { key: "fcmm", file: "fcmm.svg", name: "FCMM", width: 124, height: 42 },
   { key: "helinox", file: "helinox.svg", name: "헬리녹스", width: 618, height: 127 },
@@ -42,6 +41,12 @@ export const HOME_SPONSORS = HOME_SPONSOR_LIST.map(({ file, ...s }) => ({
   ...s,
   src: `/images/main/sponsors/${file}`,
 }));
+
+export const HOME_MELON_LOGO = {
+  src: "/images/main/sponsors/melon.png",
+  width: 480,
+  height: 127,
+};
 
 export function footerPartnerLogo(key: FooterPartnerLogoKey) {
   return FOOTER_LOGO[key];

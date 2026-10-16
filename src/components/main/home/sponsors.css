@@ -92,7 +92,7 @@
 
 .sponsors__amp {
   flex: none;
-  color: rgba(211, 212, 220, 0.6);
+  color: var(--marvel);
   font-size: 0.95rem;
   font-weight: 300;
   line-height: 1;
