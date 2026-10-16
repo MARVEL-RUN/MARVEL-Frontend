@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
 import {
@@ -24,6 +23,13 @@ type PartnerGroup = {
 
 const PARTNERS: readonly PartnerGroup[] = EVENT.footerPartners;
 
+const ROLE_EN: Record<string, string> = {
+  주최: "HOSTED BY",
+  주관: "ORGANIZED BY",
+  미디어파트너: "MEDIA PARTNER",
+  "공식 러닝 뮤직 파트너": "OFFICIAL MUSIC PARTNER",
+};
+
 /* 푸터 로고는 흰색이라 카드 위에선 검정으로, 멜론만 컬러 */
 function partnerLogo(item: PartnerGroup["items"][number]): Logo {
   return item.key === "melon"
@@ -31,10 +37,14 @@ function partnerLogo(item: PartnerGroup["items"][number]): Logo {
     : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) };
 }
 
-const PARTNER_ROWS = PARTNERS.map((group) => ({
-  label: group.role,
-  logos: group.items.map(partnerLogo),
-}));
+const ROWS: { role: string; en: string; logos: Logo[] }[] = [
+  ...PARTNERS.map((group) => ({
+    role: group.role,
+    en: ROLE_EN[group.role] ?? "",
+    logos: group.items.map(partnerLogo),
+  })),
+  { role: "후원사", en: "SPONSORS", logos: HOME_SPONSORS },
+];
 
 function LogoCard({ logo }: { logo: Logo }) {
   return (
@@ -62,22 +72,17 @@ export function HomeSponsors() {
   return (
     <section className="sponsors" aria-labelledby="sponsors-title">
       <div className="sponsors__inner reveal">
-        <div className="sponsors__head">
-          <p className="kicker">BRANDS</p>
-          <h2 className="sponsors__title" id="sponsors-title">
-            마블런과{" "}
-            <br />
-            <em>함께하는 브랜드</em>
-          </h2>
-        </div>
-        <div className="sponsors__partners">
-          {PARTNER_ROWS.map((row) => (
-            <div
-              key={row.label}
-              className="sponsors__partner"
-              style={{ "--span": row.logos.length } as CSSProperties}
-            >
-              <p className="sponsors__label">{row.label}</p>
+        <p className="kicker">BRANDS</p>
+        <h2 className="sponsors__title" id="sponsors-title">
+          마블런과 <em>함께하는 브랜드</em>
+        </h2>
+        <div className="sponsors__rows">
+          {ROWS.map((row) => (
+            <div key={row.role} className="sponsors__row">
+              <h3 className="sponsors__role">
+                <span className="sponsors__role-ko">{row.role}</span>
+                {row.en ? <span className="sponsors__role-en">{row.en}</span> : null}
+              </h3>
               <ul className="sponsors__grid">
                 {row.logos.map((logo) => (
                   <LogoCard key={logo.key} logo={logo} />
@@ -86,12 +91,6 @@ export function HomeSponsors() {
             </div>
           ))}
         </div>
-        <p className="sponsors__label sponsors__label--sponsors">SPONSORS</p>
-        <ul className="sponsors__grid sponsors__grid--sponsors">
-          {HOME_SPONSORS.map((logo) => (
-            <LogoCard key={logo.key} logo={logo} />
-          ))}
-        </ul>
       </div>
     </section>
   );
