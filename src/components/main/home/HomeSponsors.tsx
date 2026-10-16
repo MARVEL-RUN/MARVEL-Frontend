@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
 import {
@@ -46,24 +45,31 @@ const GROUPS: { label: string; parts: Logo[][] }[] = [
   })),
 ];
 
-function LogoCard({ logo }: { logo: Logo }) {
+function LogoCard({ logo, amp }: { logo: Logo; amp: boolean }) {
   return (
-    <li
-      className={[
-        "sponsors__item",
-        `sponsors__item--${logo.key}`,
-        logo.ink ? "sponsors__item--ink" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <Image
-        src={logo.src}
-        alt={logo.name}
-        width={logo.width}
-        height={logo.height}
-        draggable={false}
-      />
+    <li className="sponsors__cell">
+      {amp ? (
+        <span className="sponsors__amp" aria-hidden>
+          &amp;
+        </span>
+      ) : null}
+      <div
+        className={[
+          "sponsors__item",
+          `sponsors__item--${logo.key}`,
+          logo.ink ? "sponsors__item--ink" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <Image
+          src={logo.src}
+          alt={logo.name}
+          width={logo.width}
+          height={logo.height}
+          draggable={false}
+        />
+      </div>
     </li>
   );
 }
@@ -87,25 +93,12 @@ export function HomeSponsors() {
               ) : null}
               <p className="sponsors__label">{group.label}</p>
             </div>
-            <ul
-              className={
-                group.parts.length > 1
-                  ? "sponsors__grid sponsors__grid--split"
-                  : "sponsors__grid"
-              }
-            >
-              {group.parts.map((part, j) => (
-                <Fragment key={j}>
-                  {j > 0 ? (
-                    <li className="sponsors__amp" aria-hidden>
-                      &amp;
-                    </li>
-                  ) : null}
-                  {part.map((logo) => (
-                    <LogoCard key={logo.key} logo={logo} />
-                  ))}
-                </Fragment>
-              ))}
+            <ul className="sponsors__grid">
+              {group.parts.flatMap((part, j) =>
+                part.map((logo, k) => (
+                  <LogoCard key={logo.key} logo={logo} amp={j > 0 && k === 0} />
+                )),
+              )}
             </ul>
           </div>
         ))}
