@@ -72,6 +72,7 @@ import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
 import { StartGroupPick } from "./StartGroupPick";
 import {
   EMPTY_START_GROUP_DRAFT,
+  hasStartGroupFeature,
   startGroupDraftError,
   startGroupPreviewSections,
   startGroupSummary,
@@ -544,23 +545,25 @@ function IndividualFlow({
             <FormRow label="패키지">
               <KitFixed courseId={draft.courseId} />
             </FormRow>
-            <FormRow label="출발 그룹" required>
-              {optionsLoading ? (
-                <p className="form-row__hint">불러오는 중</p>
-              ) : (
-                <StartGroupPick
-                  sections={startGroupSections}
-                  activeSectionKey={selectedCategory?.categoryId}
-                  value={{
-                    startGroupId: draft.startGroupId,
-                    startGroupUnselected: draft.startGroupUnselected,
-                  }}
-                  disabled={!optionsReady}
-                  hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
-                  onChange={(next) => patch(next)}
-                />
-              )}
-            </FormRow>
+            {hasStartGroupFeature ? (
+              <FormRow label="출발 그룹" required>
+                {optionsLoading ? (
+                  <p className="form-row__hint">불러오는 중</p>
+                ) : (
+                  <StartGroupPick
+                    sections={startGroupSections}
+                    activeSectionKey={selectedCategory?.categoryId}
+                    value={{
+                      startGroupId: draft.startGroupId,
+                      startGroupUnselected: draft.startGroupUnselected,
+                    }}
+                    disabled={!optionsReady}
+                    hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
+                    onChange={(next) => patch(next)}
+                  />
+                )}
+              </FormRow>
+            ) : null}
             <FormRow label="티셔츠 사이즈" required>
               <ShirtPick
                 value={draft.selectedSize}
@@ -690,10 +693,12 @@ function IndividualFlow({
               <dt>티셔츠 사이즈</dt>
               <dd>{draft.selectedSize || "—"}</dd>
             </div>
-            <div>
-              <dt>출발 그룹</dt>
-              <dd>{startGroupSummary(draft, selectedCategory)}</dd>
-            </div>
+            {hasStartGroupFeature ? (
+              <div>
+                <dt>출발 그룹</dt>
+                <dd>{startGroupSummary(draft, selectedCategory)}</dd>
+              </div>
+            ) : null}
             <div>
               <dt>패키지</dt>
               <dd>

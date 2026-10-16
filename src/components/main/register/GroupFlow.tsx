@@ -63,6 +63,7 @@ import {
 import type { RegistrationCategory } from "@/services/main/types";
 import {
   EMPTY_START_GROUP_DRAFT,
+  hasStartGroupFeature,
   startGroupDraftError,
   startGroupSummary,
 } from "@/lib/start-group";
@@ -835,8 +836,8 @@ export function GroupFlow({
                   </tr>
                   <tr>
                     <th>참가종목</th>
-                    <th>출발 그룹</th>
-                    <th colSpan={2}>사이즈</th>
+                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
+                    <th colSpan={hasStartGroupFeature ? 2 : 3}>사이즈</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1003,19 +1004,21 @@ export function GroupFlow({
                               })}
                             </select>
                           </td>
-                          <td data-label="출발 그룹">
-                            <GroupMemberStartGroup
-                              category={category}
-                              categoryId={p.categoryId}
-                              value={{
-                                startGroupId: p.startGroupId,
-                                startGroupUnselected: p.startGroupUnselected,
-                              }}
-                              disabled={!optionsReady}
-                              namePrefix={`member-${i}`}
-                              onChange={(next) => patchMember(i, next)}
-                            />
-                          </td>
+                          {hasStartGroupFeature ? (
+                            <td data-label="출발 그룹">
+                              <GroupMemberStartGroup
+                                category={category}
+                                categoryId={p.categoryId}
+                                value={{
+                                  startGroupId: p.startGroupId,
+                                  startGroupUnselected: p.startGroupUnselected,
+                                }}
+                                disabled={!optionsReady}
+                                namePrefix={`member-${i}`}
+                                onChange={(next) => patchMember(i, next)}
+                              />
+                            </td>
+                          ) : null}
                           <td colSpan={2} data-label="사이즈">
                             <ShirtPick
                               value={p.selectedSize}
@@ -1140,14 +1143,16 @@ export function GroupFlow({
                     {String(i + 1).padStart(2, "0")} {p.name}
                   </strong>
                   <span>
-                    {category ? categoryLabel(category) : "—"} ·{" "}
-                    {startGroupSummary(
-                      {
-                        startGroupId: p.startGroupId,
-                        startGroupUnselected: p.startGroupUnselected,
-                      },
-                      category,
-                    )}{" "}
+                    {category ? categoryLabel(category) : "—"}
+                    {hasStartGroupFeature
+                      ? ` · ${startGroupSummary(
+                          {
+                            startGroupId: p.startGroupId,
+                            startGroupUnselected: p.startGroupUnselected,
+                          },
+                          category,
+                        )}`
+                      : ""}{" "}
                     · {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
                     {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
                   </span>

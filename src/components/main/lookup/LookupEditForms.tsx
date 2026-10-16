@@ -36,10 +36,11 @@ import {
 } from "@/lib/registration-options";
 import {
   EMPTY_START_GROUP_DRAFT,
+  hasStartGroupFeature,
   startGroupDraftError,
   startGroupDraftFromStored,
   startGroupPreviewSections,
-  startGroupInputFromDraft,
+  startGroupInputForModify,
   startGroupInputFromStored,
   startGroupSummary,
 } from "@/lib/start-group";
@@ -444,7 +445,11 @@ export function IndividualLookupEdit({
       guardianRelationship: guardianRelation.trim() || undefined,
       guardianConsent: guardianRequired ? guardianConsent : false,
       ...(email.trim() ? { email: email.trim() } : {}),
-      ...startGroupInputFromDraft(startGroupDraft),
+      ...startGroupInputForModify(
+        startGroupDraft,
+        receipt.startGroupId,
+        receipt.startGroupUnselected,
+      ),
     };
   }
 
@@ -633,17 +638,19 @@ export function IndividualLookupEdit({
             <FormRow label="패키지">
               <KitFixed courseId={courseId} />
             </FormRow>
-            <FormRow label="출발 그룹" required locked={!canModify}>
-              <StartGroupPick
-                sections={startGroupSections}
-                activeSectionKey={eventCategoryId || undefined}
-                value={startGroupDraft}
-                onChange={setStartGroupDraft}
-                disabled={!canModify || !optionsReady}
-                hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
-                namePrefix="lookup-edit-personal"
-              />
-            </FormRow>
+            {hasStartGroupFeature ? (
+              <FormRow label="출발 그룹" required locked={!canModify}>
+                <StartGroupPick
+                  sections={startGroupSections}
+                  activeSectionKey={eventCategoryId || undefined}
+                  value={startGroupDraft}
+                  onChange={setStartGroupDraft}
+                  disabled={!canModify || !optionsReady}
+                  hintWhenInactive="참가종목을 선택하면 해당 거리의 출발 그룹만 표시되고 선택할 수 있습니다."
+                  namePrefix="lookup-edit-personal"
+                />
+              </FormRow>
+            ) : null}
             <FormRow label="티셔츠 사이즈" required locked={!canModify}>
               <ShirtPick
                 value={selectedSize}
@@ -748,10 +755,12 @@ export function IndividualLookupEdit({
               <dt>티셔츠 사이즈</dt>
               <dd>{selectedSize || "—"}</dd>
             </div>
-            <div>
-              <dt>출발 그룹</dt>
-              <dd>{startGroupSummary(startGroupDraft, category)}</dd>
-            </div>
+            {hasStartGroupFeature ? (
+              <div>
+                <dt>출발 그룹</dt>
+                <dd>{startGroupSummary(startGroupDraft, category)}</dd>
+              </div>
+            ) : null}
             <div>
               <dt>패키지</dt>
               <dd>
@@ -1240,8 +1249,8 @@ export function GroupLookupEdit({
                   </tr>
                   <tr>
                     <th>참가종목</th>
-                    <th>출발 그룹</th>
-                    <th colSpan={2}>사이즈</th>
+                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
+                    <th colSpan={hasStartGroupFeature ? 2 : 3}>사이즈</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1428,30 +1437,32 @@ export function GroupLookupEdit({
                               })}
                             </select>
                           </td>
-                          <td
-                            data-label="출발 그룹"
-                            className={memberFieldsLocked ? "is-locked" : undefined}
-                          >
-                            <GroupMemberStartGroup
-                              category={category}
-                              categoryId={member.eventCategoryId}
-                              value={{
-                                startGroupId: member.startGroupId ?? "",
-                                startGroupUnselected: member.startGroupUnselected,
-                              }}
-                              disabled={!optionsReady || !canEditMemberFields}
-                              namePrefix={`lookup-edit-member-${index}`}
-                              storedCode={member.storedStartGroupCode}
-                              onChange={(next) =>
-                                patchMember(index, {
-                                  startGroupId: next.startGroupUnselected
-                                    ? null
-                                    : next.startGroupId || null,
-                                  startGroupUnselected: next.startGroupUnselected,
-                                })
-                              }
-                            />
-                          </td>
+                          {hasStartGroupFeature ? (
+                            <td
+                              data-label="출발 그룹"
+                              className={memberFieldsLocked ? "is-locked" : undefined}
+                            >
+                              <GroupMemberStartGroup
+                                category={category}
+                                categoryId={member.eventCategoryId}
+                                value={{
+                                  startGroupId: member.startGroupId ?? "",
+                                  startGroupUnselected: member.startGroupUnselected,
+                                }}
+                                disabled={!optionsReady || !canEditMemberFields}
+                                namePrefix={`lookup-edit-member-${index}`}
+                                storedCode={member.storedStartGroupCode}
+                                onChange={(next) =>
+                                  patchMember(index, {
+                                    startGroupId: next.startGroupUnselected
+                                      ? null
+                                      : next.startGroupId || null,
+                                    startGroupUnselected: next.startGroupUnselected,
+                                  })
+                                }
+                              />
+                            </td>
+                          ) : null}
                           <td
                             colSpan={2}
                             data-label="사이즈"
@@ -1602,14 +1613,16 @@ export function GroupLookupEdit({
                     {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
                   </strong>
                   <span>
-                    {category ? categoryLabel(category) : "—"} ·{" "}
-                    {startGroupSummary(
-                      {
-                        startGroupId: member.startGroupId ?? "",
-                        startGroupUnselected: member.startGroupUnselected,
-                      },
-                      category,
-                    )}{" "}
+                    {category ? categoryLabel(category) : "—"}
+                    {hasStartGroupFeature
+                      ? ` · ${startGroupSummary(
+                          {
+                            startGroupId: member.startGroupId ?? "",
+                            startGroupUnselected: member.startGroupUnselected,
+                          },
+                          category,
+                        )}`
+                      : ""}{" "}
                     · {size || "—"} · {birthView(member.birth) || "—"} ·{" "}
                     {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
                     {formatPhone(member.phNum) || "—"}

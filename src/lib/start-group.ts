@@ -5,6 +5,10 @@ import type {
 } from "@/services/main/types";
 import { categoryLabel, sortedCategories } from "./registration-options";
 
+/** 출발 그룹 선택·표기·수정 UI. `1`일 때만 켬 */
+export const hasStartGroupFeature =
+  process.env.NEXT_PUBLIC_START_GROUP === "1";
+
 export type StartGroupPreviewSection = {
   key: string;
   title: string;
@@ -67,6 +71,26 @@ export function startGroupInputFromDraft(draft: StartGroupDraft): StartGroupInpu
   };
 }
 
+/** 신규 신청·결제 — UI 꺼져 있으면 미선택(후미)으로 전송 */
+export function startGroupInputForCreate(draft: StartGroupDraft): StartGroupInput {
+  if (!hasStartGroupFeature) {
+    return { startGroupId: null, startGroupUnselected: true };
+  }
+  return startGroupInputFromDraft(draft);
+}
+
+/** 조회 수정 — UI 꺼져 있으면 저장값 유지 */
+export function startGroupInputForModify(
+  draft: StartGroupDraft,
+  storedId?: string | null,
+  storedUnselected?: boolean,
+): StartGroupInput {
+  if (!hasStartGroupFeature) {
+    return startGroupInputFromStored(storedId, storedUnselected);
+  }
+  return startGroupInputFromDraft(draft);
+}
+
 /** lookup·수정 요청에 조회값 그대로 실을 때 */
 export function startGroupInputFromStored(
   startGroupId?: string | null,
@@ -94,6 +118,7 @@ export function startGroupDraftError(
   draft: StartGroupDraft,
   category: RegistrationCategory | undefined,
 ): string | null {
+  if (!hasStartGroupFeature) return null;
   const groups = sortedStartGroups(category);
   if (!groups.length) {
     return "출발 그룹 선택지를 불러오지 못했습니다.";
