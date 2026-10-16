@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { SPONSOR_MAILTO } from "@/lib/legal";
+import { resetFlowIfCurrent } from "@/lib/main/flowReset";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import { NAV_ITEMS } from "@/lib/mode";
 import { RegisterCta } from "../register/RegisterCta";
@@ -236,6 +237,7 @@ export function Header() {
             <Link
               href={lookupHref}
               className="btn btn--ghost site-header__cta site-header__lookup"
+              onClick={() => resetFlowIfCurrent(lookupHref, "lookup")}
             >
               <span>신청조회</span>
             </Link>
@@ -331,10 +333,14 @@ export function Header() {
           })}
         </nav>
         <div className="site-header__drawer-actions">
-          <RegisterCta className="btn btn--red" plain />
+          <RegisterCta className="btn btn--red" plain onNavigate={() => setOpen(false)} />
           <Link
             href={lookupHref}
             className="btn btn--ghost site-header__lookup"
+            onClick={() => {
+              setOpen(false);
+              resetFlowIfCurrent(lookupHref, "lookup");
+            }}
           >
             <span>신청조회</span>
           </Link>

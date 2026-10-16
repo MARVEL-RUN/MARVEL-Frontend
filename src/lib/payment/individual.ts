@@ -4,6 +4,7 @@ import {
   shirtSouvenir,
   souvenirSizes,
 } from "@/lib/registration-options";
+import { startGroupInputFromDraft } from "@/lib/start-group";
 import {
   filterNoSpaceName,
   guardianRequiredFor,
@@ -62,5 +63,9 @@ export function toRegistrationCreateRequest(
     guardianConsent: requireGuardian ? draft.guardianConsent : false,
     ...(draft.email.trim() ? { email: draft.email.trim() } : {}),
     ...termsAgreementFields(draft),
+    ...startGroupInputFromDraft({
+      startGroupId: draft.startGroupId,
+      startGroupUnselected: draft.startGroupUnselected,
+    }),
   };
 }

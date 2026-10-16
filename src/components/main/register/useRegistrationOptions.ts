@@ -5,10 +5,19 @@ import { DEFAULT_EVENT_ID, hasMainApi } from "@/lib/main/config";
 import { MainHttpError, isServerDownError } from "@/lib/main/fetch";
 import { sortedCategories } from "@/lib/registration-options";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
-import type { RegistrationCategory } from "@/services/main/types";
+import type {
+  RegistrationCategory,
+  RegistrationPolicyReason,
+} from "@/services/main/types";
 
 export function useRegistrationOptions() {
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
+  const [registrationAllowed, setRegistrationAllowed] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [registrationReason, setRegistrationReason] = useState<
+    RegistrationPolicyReason | null | undefined
+  >(undefined);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [down, setDown] = useState(false);
@@ -33,12 +42,24 @@ export function useRegistrationOptions() {
       .then((data) => {
         if (cancelled) return;
         setCategories(sortedCategories(data.categories ?? []));
+        setRegistrationAllowed(
+          typeof data.registrationAllowed === "boolean"
+            ? data.registrationAllowed
+            : undefined,
+        );
+        setRegistrationReason(
+          data.registrationReason === null
+            ? null
+            : data.registrationReason ?? undefined,
+        );
         setErrorMessage("");
         setDown(false);
       })
       .catch((err) => {
         if (cancelled) return;
         setCategories([]);
+        setRegistrationAllowed(undefined);
+        setRegistrationReason(undefined);
         setDown(isServerDownError(err));
         setErrorMessage(
           err instanceof MainHttpError
@@ -55,8 +76,14 @@ export function useRegistrationOptions() {
     };
   }, [tick]);
 
+  const registrationOpen =
+    registrationAllowed === undefined ? true : registrationAllowed;
+
   return {
     categories,
+    registrationAllowed,
+    registrationReason,
+    registrationOpen,
     loading,
     errorMessage,
     down,

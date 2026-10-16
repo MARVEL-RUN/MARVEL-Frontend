@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import type { ApplyKind } from "@/lib/register";
 
 const KINDS: {
@@ -43,18 +44,22 @@ export function ApplyKindPick({
   return (
     <section className="block">
       <h2>{heading}</h2>
-      <ul className="courses__grid courses__grid--stack">
-        {KINDS.map((k) => (
+      <ul className="kind-pick">
+        {KINDS.map((k, index) => (
           <li key={k.id}>
             <button
               type="button"
-              className={`course course--${k.tone}`}
+              className={`kind-pick__item kind-pick__item--${k.tone}`}
               disabled={disabled}
               onClick={() => onPick(k.id)}
             >
-              <p className="course__code">{k.code}</p>
-              <p className="course__dist">{lookup ? k.lookupTitle : k.title}</p>
-              <p className="course__desc">{lookup ? k.lookupDesc : k.desc}</p>
+              <span className="kind-pick__no">{String(index + 1).padStart(2, "0")}</span>
+              <span className="kind-pick__body">
+                <span className="kind-pick__code">{k.code}</span>
+                <strong className="kind-pick__title">{lookup ? k.lookupTitle : k.title}</strong>
+                <span className="kind-pick__desc">{lookup ? k.lookupDesc : k.desc}</span>
+              </span>
+              <ChevronRight className="kind-pick__go" size={22} strokeWidth={2.25} aria-hidden />
             </button>
           </li>
         ))}
