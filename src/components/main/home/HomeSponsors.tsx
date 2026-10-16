@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
 import {
@@ -71,7 +72,11 @@ export function HomeSponsors() {
         </div>
         <div className="sponsors__partners">
           {PARTNER_ROWS.map((row) => (
-            <div key={row.label} className="sponsors__partner">
+            <div
+              key={row.label}
+              className="sponsors__partner"
+              style={{ "--span": row.logos.length } as CSSProperties}
+            >
               <p className="sponsors__label">{row.label}</p>
               <ul className="sponsors__grid">
                 {row.logos.map((logo) => (

@@ -33,39 +33,49 @@
 .sponsors__partners {
   grid-column: 3 / -1;
   display: grid;
-  gap: var(--sponsors-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.3rem var(--sponsors-gap);
 }
 
+/* 역할마다 로고 수만큼 칸을 차지 (--span) */
 .sponsors__partner {
+  grid-column: span var(--span, 1);
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: start;
-  gap: var(--sponsors-gap);
+  align-content: end;
+  gap: 0.6rem;
 }
 
 .sponsors__partner .sponsors__grid {
-  grid-column: 2 / -1;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.sponsors__label--sponsors {
-  grid-column: 1;
-}
-
-.sponsors__grid--sponsors {
-  grid-column: 2 / -1;
+  grid-template-columns: repeat(var(--span, 1), minmax(0, 1fr));
 }
 
 .sponsors__label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   margin: 0;
-  padding-top: 0.85rem;
   color: var(--silver);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   line-height: 1.4;
-  word-break: keep-all;
-  background: linear-gradient(var(--marvel), var(--marvel)) left top / 1.3rem 2px no-repeat;
+  white-space: nowrap;
+}
+
+.sponsors__label::before {
+  content: "";
+  flex: none;
+  width: 0.9rem;
+  height: 2px;
+  background: var(--marvel);
+}
+
+/* 묶음 폭만큼 이어지는 가는 선 */
+.sponsors__label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(211, 212, 220, 0.2);
 }
 
 .sponsors__head .kicker {
@@ -96,6 +106,20 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.sponsors__label--sponsors,
+.sponsors__grid--sponsors {
+  margin-top: 2.6rem;
+}
+
+.sponsors__label--sponsors {
+  grid-column: 1;
+  height: 4.6rem;
+}
+
+.sponsors__grid--sponsors {
+  grid-column: 2 / -1;
 }
 
 .sponsors__item {
@@ -188,12 +212,16 @@
     margin-bottom: 1.4rem;
   }
 
-  .sponsors__partner {
+  .sponsors__partners {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .sponsors__partner .sponsors__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .sponsors__label--sponsors {
+    height: auto;
+  }
+
+  .sponsors__grid--sponsors {
+    margin-top: 0;
   }
 }
 
@@ -209,7 +237,18 @@
   }
 
   .sponsors__label {
+    gap: 0.45rem;
     font-size: 0.74rem;
+    white-space: normal;
+    word-break: keep-all;
+  }
+
+  .sponsors__label::before {
+    width: 0.6rem;
+  }
+
+  .sponsors__label--sponsors {
+    margin-top: 1.6rem;
   }
 
   .sponsors__head .kicker {
@@ -222,12 +261,16 @@
   }
 
   .sponsors__grid,
-  .sponsors__partner {
+  .sponsors__partners {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .sponsors__partner .sponsors__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .sponsors__partners {
+    row-gap: 1rem;
+  }
+
+  .sponsors__partner {
+    gap: 0.45rem;
   }
 
   .sponsors__item img {
