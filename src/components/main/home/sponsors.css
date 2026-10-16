@@ -105,7 +105,7 @@
   justify-content: center;
   height: 4.6rem;
   padding: 0 1.1rem;
-  background: #fff;
+  background: #f8f8f8;
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   transition: transform 0.2s ease;
 }
@@ -221,26 +221,35 @@
   }
 
   .sponsors__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
   }
 
   .sponsors__grid--split {
-    gap: 0.4rem;
+    gap: 0.45rem;
   }
 
   .sponsors__grid--split .sponsors__item {
-    flex: 1 1 0;
+    flex: 0 1 calc((100% - 0.9rem) / 3);
     min-width: 0;
-    padding: 0 0.6rem;
   }
 
   .sponsors__amp {
     font-size: 0.8rem;
   }
 
+  .sponsors__item img {
+    max-width: 78%;
+  }
+
+  .sponsors__item--fcmm img,
+  .sponsors__item--kfc img {
+    max-width: 60%;
+  }
+
   .sponsors__item {
-    height: 3.5rem;
+    height: 3.6rem;
+    padding: 0 0.5rem;
     clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
   }
 }
