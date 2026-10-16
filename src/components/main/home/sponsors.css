@@ -58,9 +58,20 @@
 }
 
 .sponsors__row:last-child {
+  position: relative;
   margin-top: 1.4rem;
   padding-top: 1.6rem;
-  border-top-color: rgba(237, 29, 36, 0.45);
+  border-top: none;
+}
+
+/* 섹션 상단과 같은 중앙 페이드 */
+.sponsors__row:last-child::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(237, 29, 36, 0.7) 50%, transparent);
 }
 
 .sponsors__role {
