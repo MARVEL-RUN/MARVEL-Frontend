@@ -17,7 +17,7 @@ export type OnsiteDriveItem = {
   lead: string;
   photo: string;
   specs: readonly OnsiteSpec[];
-  tiers?: readonly { people: string; price: string }[];
+  tiers?: readonly { people: string; price?: string }[];
 };
 
 export type OnsiteBoothItem = {
@@ -34,6 +34,9 @@ export type OnsiteBoothItem = {
   focus?: string;
   logo?: { src: string; width: number; height: number };
 };
+
+/* 인제스피디움 요금 확정 전까지 true. 실제 금액은 화면·소스에 내보내지 않음 */
+export const ONSITE_PRICE_TBA = true;
 
 export const ONSITE_DRIVE: readonly OnsiteDriveItem[] = [
   {

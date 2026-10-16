@@ -22,6 +22,7 @@ export const MAIN_ASSETS = {
   footerOrganizer: "/images/main/footer/organizer.png",
   footerMFriends: "/images/main/footer/m-friends.svg",
   footerHighcut: "/images/main/footer/highcut.svg",
+  footerMelon: "/images/main/footer/melon.png",
   introMarvel: "/images/main/intro-marvel.svg",
   introRun: "/images/main/intro-run.svg",
   introKorea: "/images/main/intro-korea.svg",
