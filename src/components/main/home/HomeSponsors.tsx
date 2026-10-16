@@ -31,11 +31,11 @@ function partnerLogo(item: PartnerGroup["items"][number]): Logo {
 }
 
 const GROUPS: { label: string; logos: Logo[] }[] = [
-  { label: "SPONSORS", logos: HOME_SPONSORS },
   ...PARTNERS.map((group) => ({
     label: group.role,
     logos: group.items.map(partnerLogo),
   })),
+  { label: "SPONSORS", logos: HOME_SPONSORS },
 ];
 
 function LogoCard({ logo }: { logo: Logo }) {
@@ -64,28 +64,26 @@ export function HomeSponsors() {
   return (
     <section className="sponsors" aria-labelledby="sponsors-title">
       <div className="sponsors__inner reveal">
-        {GROUPS.map((group, i) => (
-          <div key={group.label} className="sponsors__row">
-            <div className="sponsors__head">
-              {i === 0 ? (
-                <>
-                  <p className="kicker">BRANDS</p>
-                  <h2 className="sponsors__title" id="sponsors-title">
-                    마블런과{" "}
-                    <br />
-                    <em>함께하는 브랜드</em>
-                  </h2>
-                </>
-              ) : null}
+        <div className="sponsors__head">
+          <p className="kicker">BRANDS</p>
+          <h2 className="sponsors__title" id="sponsors-title">
+            마블런과{" "}
+            <br />
+            <em>함께하는 브랜드</em>
+          </h2>
+        </div>
+        <div className="sponsors__groups">
+          {GROUPS.map((group) => (
+            <div key={group.label} className="sponsors__group">
               <p className="sponsors__label">{group.label}</p>
+              <ul className="sponsors__grid">
+                {group.logos.map((logo) => (
+                  <LogoCard key={logo.key} logo={logo} />
+                ))}
+              </ul>
             </div>
-            <ul className="sponsors__grid">
-              {group.logos.map((logo) => (
-                <LogoCard key={logo.key} logo={logo} />
-              ))}
-            </ul>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
