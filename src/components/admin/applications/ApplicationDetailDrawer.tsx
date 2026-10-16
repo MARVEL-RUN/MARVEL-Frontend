@@ -4,6 +4,7 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { useAdminPrompt } from "@/components/admin/InputModal";
 import { adminToast } from "@/components/admin/Toast";
 import { hasAdminRefundBatch } from "@/lib/admin/config";
+import { hasStartGroupFeature } from "@/lib/start-group";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   canDeleteUnpaidRegistration,
@@ -168,7 +169,9 @@ function buildSections(row: AdminApplicationRow) {
 
   const applyFields: DetailField[] = [
     { label: "코스", value: applicationCourseLabel(row) },
-    { label: "출발 그룹", value: applicationStartGroupLabel(row) },
+    ...(hasStartGroupFeature
+      ? [{ label: "출발 그룹", value: applicationStartGroupLabel(row) }]
+      : []),
     { label: "기념품", value: dash(row.souvenir) },
     { label: "사이즈", value: dash(row.size) },
   ];

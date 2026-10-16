@@ -10,7 +10,11 @@ import {
   lookupShowPaymentButton,
   lookupShowRefundOrCancelButton,
 } from "@/lib/main/registrationActionPolicy";
-import { startGroupDisplayFromLookup, type StartGroupDraft } from "@/lib/start-group";
+import {
+  hasStartGroupFeature,
+  startGroupDisplayFromLookup,
+  type StartGroupDraft,
+} from "@/lib/start-group";
 import { registrationStatusBadge, registrationStatusLabel } from "@/lib/registration-status";
 import {
   consumeLookupRefreshAfterPayment,
@@ -378,9 +382,9 @@ function ReceiptMemberRow({
           <strong>{member.name || "참가자"}</strong>
           {member.course ? <span className="lookup-members__course">{member.course}</span> : null}
         </p>
-        {!canceled && (startGroup || size) ? (
+        {!canceled && ((hasStartGroupFeature && startGroup) || size) ? (
           <dl className="lookup-members__meta">
-            {startGroup ? (
+            {hasStartGroupFeature && startGroup ? (
               <div>
                 <dt>출발 그룹</dt>
                 <dd>{startGroup}</dd>
@@ -513,7 +517,9 @@ function ReceiptNotes({
         <p className="form__note form__note--external">
           <strong>외부 결제 건은 결제·일반 수정·환불을 진행할 수 없습니다.</strong>
           <span>
-            출발 그룹은 「출발 그룹 설정」에서 변경할 수 있습니다. 그 외 개인정보 수정은{" "}
+            {hasStartGroupFeature
+              ? "출발 그룹은 「출발 그룹 설정」에서 변경할 수 있습니다. 그 외 개인정보 수정은 "
+              : "개인정보 수정은 "}
             <Link href={inquiryHref}>문의사항</Link>을 남겨 주세요.
           </span>
         </p>
@@ -659,15 +665,17 @@ function IndividualReceiptCard({
             <dd>{course}</dd>
           </div>
         ) : null}
-        <div>
-          <dt>출발 그룹</dt>
-          <dd>
-            {startGroupDisplayFromLookup(
-              receipt.startGroupCode,
-              receipt.startGroupUnselected,
-            )}
-          </dd>
-        </div>
+        {hasStartGroupFeature ? (
+          <div>
+            <dt>출발 그룹</dt>
+            <dd>
+              {startGroupDisplayFromLookup(
+                receipt.startGroupCode,
+                receipt.startGroupUnselected,
+              )}
+            </dd>
+          </div>
+        ) : null}
         <ReceiptSouvenirSpec souvenirs={receiptSouvenirs(receipt)} />
         {receipt.orderId ? (
           <div>
@@ -1231,7 +1239,7 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
           }}
           onSubmit={(input) => void onChangePassword(input)}
         />
-        {active ? (
+        {hasStartGroupFeature && active ? (
           <LookupStartGroupModal
             kind="individual"
             open={startGroupOpen}
@@ -1708,7 +1716,7 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
           }}
           onSubmit={(input) => void onChangePassword(input)}
         />
-        {active ? (
+        {hasStartGroupFeature && active ? (
           <LookupStartGroupModal
             kind="group"
             open={startGroupOpen}
