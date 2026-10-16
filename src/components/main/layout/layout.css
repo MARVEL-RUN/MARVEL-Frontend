@@ -1013,14 +1013,20 @@ body:has(.sheet-modal) .bgm-toggle {
     padding: 1.55rem 0 calc(1.2rem + env(safe-area-inset-bottom, 0px));
   }
 
-  html.is-main .site-footer__hosts {
+  /* flex-wrap이면 미디어·멜론이 한 줄에 붙을 수 있어 grid 한 열로 통일 */
+  .site-footer__hosts {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.85rem;
     padding-bottom: 1.1rem;
   }
 
-  html.is-main .site-footer__hosts li {
+  .site-footer__hosts li {
     gap: 0.5rem;
+  }
+
+  .site-footer__hosts li:nth-child(4) {
+    margin-top: 0.85rem;
   }
 
   html.is-main .site-footer__host-logos {
