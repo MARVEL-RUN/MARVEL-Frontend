@@ -12,6 +12,7 @@ import { CoursePreview } from "../guide/CoursePreview";
 import { OpenCountdown, OpenDday } from "./OpenCountdown";
 import { HomeBoard } from "./HomeBoard";
 import { HomePopup } from "./HomePopup";
+import { HomeSponsors } from "./HomeSponsors";
 import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import { SideDock } from "./SideDock";
 
@@ -353,6 +354,8 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      <HomeSponsors />
 
       <section className="assemble" id="assemble">
         <p className="assemble__ghost" aria-hidden>

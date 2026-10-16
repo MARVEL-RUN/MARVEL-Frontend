@@ -1,0 +1,121 @@
+/* 홈 후원사 */
+
+.sponsors {
+  background: #fff;
+  color: #111;
+}
+
+.sponsors__inner {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  align-items: start;
+  gap: 3rem;
+  width: min(1120px, calc(100% - 2.5rem));
+  margin-inline: auto;
+  padding: 4.6rem 0;
+}
+
+.sponsors__title {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.42;
+  word-break: keep-all;
+}
+
+.sponsors__label {
+  margin: 1.25rem 0 0;
+  padding-top: 1.1rem;
+  color: #666;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: linear-gradient(#d4d4d4, #d4d4d4) left top / 1.3rem 1px no-repeat;
+}
+
+.sponsors__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sponsors__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4.35rem;
+  padding: 0 1.1rem;
+  border-radius: 0.9rem;
+  background: #f6f6f6;
+}
+
+.sponsors__item img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 64%;
+  max-height: 46%;
+  object-fit: contain;
+  user-select: none;
+}
+
+/* 로고 비율이 제각각이라 눈으로 맞춘 값 */
+.sponsors__item--benuts img,
+.sponsors__item--top img,
+.sponsors__item--lego img {
+  max-height: 64%;
+}
+
+.sponsors__item--crown-sport img,
+.sponsors__item--halls img,
+.sponsors__item--happiz img {
+  max-height: 54%;
+}
+
+.sponsors__item--fcmm img,
+.sponsors__item--kfc img {
+  max-width: 50%;
+}
+
+@media (max-width: 960px) {
+  .sponsors__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.8rem;
+  }
+}
+
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .sponsors__inner {
+    gap: 1.4rem;
+    padding: 3rem 0;
+  }
+
+  .sponsors__title {
+    font-size: 1.3rem;
+  }
+
+  .sponsors__title br {
+    display: none;
+  }
+
+  .sponsors__label {
+    margin-top: 0.9rem;
+    padding-top: 0.8rem;
+    font-size: 0.72rem;
+  }
+
+  .sponsors__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .sponsors__item {
+    height: 3.5rem;
+    border-radius: 0.75rem;
+  }
+}
