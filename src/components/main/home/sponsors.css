@@ -20,17 +20,28 @@
   display: grid;
   grid-template-columns: 16rem minmax(0, 1fr);
   align-items: start;
-  gap: 3rem;
+  gap: var(--sponsors-gap) 3rem;
   width: min(1120px, calc(100% - 2.5rem));
   margin-inline: auto;
   padding: 4.8rem 0 5.2rem;
 }
 
-/* 묶음 사이·라벨과 카드 사이 모두 카드 간격과 같게 */
-.sponsors__groups,
-.sponsors__group {
+.sponsors__partners {
   display: grid;
   gap: var(--sponsors-gap);
+}
+
+/* 라벨이 1열, 카드가 나머지 열. 카드 폭은 SPONSORS 격자와 같음 */
+.sponsors__partner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--sponsors-gap);
+}
+
+.sponsors__partner .sponsors__grid {
+  grid-column: 2 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .sponsors__label {
@@ -40,6 +51,8 @@
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.06em;
+  line-height: 1.4;
+  word-break: keep-all;
   background: linear-gradient(var(--marvel), var(--marvel)) left top / 1.3rem 2px no-repeat;
 }
 
@@ -151,7 +164,10 @@
 @media (max-width: 960px) {
   .sponsors__inner {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.8rem;
+  }
+
+  .sponsors__head {
+    margin-bottom: 1.4rem;
   }
 }
 
@@ -159,8 +175,11 @@
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .sponsors__inner {
     --sponsors-gap: 0.45rem;
-    gap: 1.5rem;
     padding: 3.2rem 0 3.6rem;
+  }
+
+  .sponsors__head {
+    margin-bottom: 1.05rem;
   }
 
   .sponsors__label {
@@ -176,8 +195,13 @@
     line-height: 1.05;
   }
 
-  .sponsors__grid {
+  .sponsors__grid,
+  .sponsors__partner {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sponsors__partner .sponsors__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sponsors__item img {
@@ -207,6 +231,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .sponsors__item,
   .sponsors__item::after {
     transition: none;

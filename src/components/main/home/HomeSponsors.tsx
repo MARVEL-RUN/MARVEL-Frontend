@@ -30,13 +30,10 @@ function partnerLogo(item: PartnerGroup["items"][number]): Logo {
     : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) };
 }
 
-const GROUPS: { label: string; logos: Logo[] }[] = [
-  ...PARTNERS.map((group) => ({
-    label: group.role,
-    logos: group.items.map(partnerLogo),
-  })),
-  { label: "SPONSORS", logos: HOME_SPONSORS },
-];
+const PARTNER_ROWS = PARTNERS.map((group) => ({
+  label: group.role,
+  logos: group.items.map(partnerLogo),
+}));
 
 function LogoCard({ logo }: { logo: Logo }) {
   return (
@@ -72,18 +69,24 @@ export function HomeSponsors() {
             <em>함께하는 브랜드</em>
           </h2>
         </div>
-        <div className="sponsors__groups">
-          {GROUPS.map((group) => (
-            <div key={group.label} className="sponsors__group">
-              <p className="sponsors__label">{group.label}</p>
+        <div className="sponsors__partners">
+          {PARTNER_ROWS.map((row) => (
+            <div key={row.label} className="sponsors__partner">
+              <p className="sponsors__label">{row.label}</p>
               <ul className="sponsors__grid">
-                {group.logos.map((logo) => (
+                {row.logos.map((logo) => (
                   <LogoCard key={logo.key} logo={logo} />
                 ))}
               </ul>
             </div>
           ))}
         </div>
+        <p className="sponsors__label sponsors__label--sponsors">SPONSORS</p>
+        <ul className="sponsors__grid sponsors__grid--sponsors">
+          {HOME_SPONSORS.map((logo) => (
+            <LogoCard key={logo.key} logo={logo} />
+          ))}
+        </ul>
       </div>
     </section>
   );
