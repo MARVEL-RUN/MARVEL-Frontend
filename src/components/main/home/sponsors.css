@@ -105,7 +105,7 @@
   justify-content: center;
   height: 4.6rem;
   padding: 0 1.1rem;
-  background: #f8f8f8;
+  background: rgba(248, 248, 248, 0.68);
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   transition: transform 0.2s ease;
 }
