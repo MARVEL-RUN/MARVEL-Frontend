@@ -666,7 +666,7 @@ body:has(.sheet-modal) .bgm-toggle {
 }
 
 .site-footer__host-logo--melon {
-  height: 2.05rem;
+  height: 2.6rem;
 }
 
 .site-footer__info {
@@ -1061,7 +1061,7 @@ body:has(.sheet-modal) .bgm-toggle {
 
   html.is-main .site-footer__host-logo--melon {
     width: auto;
-    height: 1.4rem;
+    height: 1.85rem;
   }
 
   html.is-main .site-footer__host-logo--melon img {
