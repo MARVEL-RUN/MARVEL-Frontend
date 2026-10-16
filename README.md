@@ -30,6 +30,7 @@ npm run dev:main             # 본사이트
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 (로컬·운영 빌드) |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | 오시는길 지도 |
 | `NEXT_PUBLIC_BGM` | `off` 끄기, `on` 기본 음원 |
+| `NEXT_PUBLIC_START_GROUP` | `1` 출발 그룹 선택·표기·수정 UI, 그 외 끔 |
 | `GOOGLE_SITE_VERIFICATION` | 구글 사이트 인증 |
 | `NAVER_SITE_VERIFICATION` | 네이버 사이트 인증 |
 | `GA_MEASUREMENT_ID` | Google Analytics |
@@ -46,6 +47,10 @@ npm run dev:main             # 본사이트
 |----------|------|
 | `TEST_FRONTEND_EVENT_ID` | 테스트 대회 ID (`test-marvelrun`) |
 | `PROD_FRONTEND_EVENT_ID` | 운영 대회 ID (`marvelrun2026`) |
+
+| Secret | 용도 |
+|--------|------|
+| `NEXT_PUBLIC_START_GROUP` | `1` 출발 그룹 UI, `0` 또는 미등록 끔 (테스트·운영 공통) |
 
 ## 폴더
 

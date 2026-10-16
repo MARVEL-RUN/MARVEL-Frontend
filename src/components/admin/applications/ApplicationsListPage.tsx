@@ -5,6 +5,7 @@ import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
 import { hasAdminApi } from "@/lib/admin/config";
+import { hasStartGroupFeature } from "@/lib/start-group";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import {
   getAdminRaceEvent,
@@ -617,7 +618,7 @@ export function ApplicationsListPage({ slug }: Props) {
       width: "124px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
-  ];
+  ].filter((col) => hasStartGroupFeature || col.key !== "startGroup");
 
   return (
     <div
@@ -704,28 +705,32 @@ export function ApplicationsListPage({ slug }: Props) {
                 ariaLabel="코스"
                 width={128}
               />
-              <AdminSelect
-                value={groupCode}
-                options={groupCodeOptions}
-                onChange={(value) => {
-                  setGroupCode(value);
-                  setApplied((prev) => ({ ...prev, startGroupCode: value }));
-                  setPage(1);
-                }}
-                ariaLabel="출발 그룹"
-                width={128}
-              />
-              <AdminSelect
-                value={groupUnselected}
-                options={UNSELECTED_OPTIONS}
-                onChange={(value) => {
-                  setGroupUnselected(value);
-                  setApplied((prev) => ({ ...prev, startGroupUnselected: value }));
-                  setPage(1);
-                }}
-                ariaLabel="그룹 선택 방식"
-                width={112}
-              />
+              {hasStartGroupFeature ? (
+                <>
+                  <AdminSelect
+                    value={groupCode}
+                    options={groupCodeOptions}
+                    onChange={(value) => {
+                      setGroupCode(value);
+                      setApplied((prev) => ({ ...prev, startGroupCode: value }));
+                      setPage(1);
+                    }}
+                    ariaLabel="출발 그룹"
+                    width={128}
+                  />
+                  <AdminSelect
+                    value={groupUnselected}
+                    options={UNSELECTED_OPTIONS}
+                    onChange={(value) => {
+                      setGroupUnselected(value);
+                      setApplied((prev) => ({ ...prev, startGroupUnselected: value }));
+                      setPage(1);
+                    }}
+                    ariaLabel="그룹 선택 방식"
+                    width={112}
+                  />
+                </>
+              ) : null}
             </div>
             <input
               className="admin-toolbar__search admin-apps-list__search"

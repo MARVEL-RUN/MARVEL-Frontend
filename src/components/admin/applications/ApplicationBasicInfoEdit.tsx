@@ -5,10 +5,12 @@ import { toApiGender } from "@/lib/registration-gender";
 import { findCategory } from "@/lib/registration-options";
 import {
   findStartGroup,
+  hasStartGroupFeature,
   sortedStartGroups,
   startGroupDraftError,
   startGroupDraftFromStored,
   startGroupInputFromDraft,
+  startGroupInputFromStored,
   startGroupSelectionChanged,
   type StartGroupDraft,
 } from "@/lib/start-group";
@@ -110,7 +112,10 @@ function validate(
   return "";
 }
 
-function toPayload(form: FormState): RegistrationBasicInfoUpdate {
+function toPayload(
+  form: FormState,
+  row: AdminApplicationRow,
+): RegistrationBasicInfoUpdate {
   const email = editableText(form.email);
   return {
     name: form.name.trim(),
@@ -123,7 +128,9 @@ function toPayload(form: FormState): RegistrationBasicInfoUpdate {
     guardianName: form.guardianName.trim(),
     guardianPhNum: form.guardianPhNum.replace(/\D/g, ""),
     guardianRelationship: form.guardianRelationship.trim(),
-    ...startGroupInputFromDraft(form.startGroup),
+    ...(hasStartGroupFeature
+      ? startGroupInputFromDraft(form.startGroup)
+      : startGroupInputFromStored(row.startGroupId, row.startGroupUnselected)),
   };
 }
 
@@ -199,7 +206,7 @@ export function ApplicationBasicInfoEdit({
       : row.courseName?.trim() || undefined;
 
   const save = useMutation({
-    mutationFn: () => updateRegistrationBasicInfo(row.id, toPayload(form)),
+    mutationFn: () => updateRegistrationBasicInfo(row.id, toPayload(form, row)),
     onSuccess: () => onSaved(),
     onError: (err) =>
       onError(err instanceof Error ? err.message : "기본정보 수정에 실패했습니다."),
@@ -230,7 +237,8 @@ export function ApplicationBasicInfoEdit({
       {lockSharedFields ? (
         <div className="admin-drawer__guide" role="note">
           <p>
-            이름·연락처·생년월일·성별·보호자·출발 그룹만 수정할 수 있습니다.
+            이름·연락처·생년월일·성별·보호자
+            {hasStartGroupFeature ? "·출발 그룹" : ""}만 수정할 수 있습니다.
             <br />
             이메일·주소는 단체 상세의 「기본정보 수정」에서 변경해 주세요.
           </p>
@@ -248,38 +256,40 @@ export function ApplicationBasicInfoEdit({
         </div>
       ) : (
         <p className="admin-drawer__edit-note">
-          신청자·주소·보호자·출발 그룹만 수정됩니다. 코스·기념품·결제 정보는 변경되지
-          않습니다.
+          신청자·주소·보호자{hasStartGroupFeature ? "·출발 그룹" : ""}만 수정됩니다. 코스·기념품·
+          결제 정보는 변경되지 않습니다.
         </p>
       )}
 
       <EditSection title="신청 정보">
-        <EditRow label="출발 그룹" hint={startGroupHint}>
-          <select
-            className="admin-drawer__edit-input admin-drawer__edit-select"
-            value={startGroupValue}
-            disabled={!groups.length}
-            onChange={(e) => {
-              const next = e.target.value;
-              patch({
-                startGroup:
-                  next === DEFER_VALUE
-                    ? { startGroupId: "", startGroupUnselected: true }
-                    : { startGroupId: next, startGroupUnselected: false },
-              });
-            }}
-          >
-            <option value="">{startGroupPlaceholder}</option>
-            {groups.map((group) => (
-              <option key={group.id} value={group.id}>
-                {group.code} · {group.description}
-              </option>
-            ))}
-            {groups.length ? (
-              <option value={DEFER_VALUE}>미선택 (후미 그룹 배정)</option>
-            ) : null}
-          </select>
-        </EditRow>
+        {hasStartGroupFeature ? (
+          <EditRow label="출발 그룹" hint={startGroupHint}>
+            <select
+              className="admin-drawer__edit-input admin-drawer__edit-select"
+              value={startGroupValue}
+              disabled={!groups.length}
+              onChange={(e) => {
+                const next = e.target.value;
+                patch({
+                  startGroup:
+                    next === DEFER_VALUE
+                      ? { startGroupId: "", startGroupUnselected: true }
+                      : { startGroupId: next, startGroupUnselected: false },
+                });
+              }}
+            >
+              <option value="">{startGroupPlaceholder}</option>
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.code} · {group.description}
+                </option>
+              ))}
+              {groups.length ? (
+                <option value={DEFER_VALUE}>미선택 (후미 그룹 배정)</option>
+              ) : null}
+            </select>
+          </EditRow>
+        ) : null}
       </EditSection>
 
       <EditSection title={lockSharedFields || row.kind === "group" ? "참가자" : "신청자"}>

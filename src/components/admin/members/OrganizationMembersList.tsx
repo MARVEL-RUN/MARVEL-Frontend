@@ -6,6 +6,7 @@ import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { RowCheck } from "@/components/admin/Table/RowCheck";
 import { hasAdminApi } from "@/lib/admin/config";
+import { hasStartGroupFeature } from "@/lib/start-group";
 import { isAdminHttp } from "@/lib/admin/fetch";
 import { formatPhone } from "@/lib/register";
 import {
@@ -371,7 +372,7 @@ export function OrganizationMembersList({
       width: "124px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
-  ];
+  ].filter((col) => hasStartGroupFeature || col.key !== "startGroup");
 
   return (
     <div className="admin-apps-list admin-org-detail__members">

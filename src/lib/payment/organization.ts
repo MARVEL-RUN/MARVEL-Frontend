@@ -5,7 +5,7 @@ import {
   termsAgreementFields,
   type GroupDraft,
 } from "@/lib/register";
-import { startGroupInputFromDraft } from "@/lib/start-group";
+import { startGroupInputForCreate } from "@/lib/start-group";
 import type { OrganizationRegistrationRequest } from "@/services/main/types";
 import type { PaymentOrder } from "./session";
 import { birthToApi, genderToApi, phoneDigits } from "./map";
@@ -37,7 +37,7 @@ export function toOrganizationRegistrationRequest(
       phNum: phoneDigits(p.phone),
       birth: birthToApi(p.birth),
       gender: genderToApi(p.gender),
-      ...startGroupInputFromDraft({
+      ...startGroupInputForCreate({
         startGroupId: p.startGroupId,
         startGroupUnselected: p.startGroupUnselected,
       }),

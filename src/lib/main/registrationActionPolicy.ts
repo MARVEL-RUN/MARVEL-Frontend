@@ -1,3 +1,4 @@
+import { hasStartGroupFeature } from "@/lib/start-group";
 import {
   canPrepareRegistrationPayment,
   closedRegistration,
@@ -139,6 +140,7 @@ function startGroupBlockedStatus(status?: string | null) {
 
 /** 출발 그룹 전용 PATCH — 수정 화면에서 못 바꿀 때(modifyAllowed false·외부결제)만 노출 */
 export function lookupPersonalStartGroupEditAllowed(receipt: RegistrationReceipt) {
+  if (!hasStartGroupFeature) return false;
   if (!receipt.registrationId?.trim()) return false;
   if (receipt.organizationId) return false;
   if (lookupModifyAllowed(receipt)) return false;
@@ -146,6 +148,7 @@ export function lookupPersonalStartGroupEditAllowed(receipt: RegistrationReceipt
 }
 
 export function lookupOrganizationStartGroupEditAllowed(receipt: RegistrationReceipt) {
+  if (!hasStartGroupFeature) return false;
   if (!receipt.organizationId?.trim()) return false;
   if (closedRegistration(receipt.registrationStatus)) return false;
   const editScreen = lookupOrganizationEditScreenAllowed(receipt);
