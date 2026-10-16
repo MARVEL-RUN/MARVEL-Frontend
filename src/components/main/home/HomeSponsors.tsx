@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { EVENT } from "@/lib/event";
-import { HOME_SPONSORS, footerPartnerLogo } from "@/lib/sponsor-logos";
+import {
+  HOME_SPONSORS,
+  footerPartnerLogo,
+  type FooterPartnerLogoKey,
+} from "@/lib/sponsor-logos";
 
 type Logo = {
   key: string;
@@ -11,18 +15,33 @@ type Logo = {
   ink?: boolean;
 };
 
+type PartnerGroup = {
+  role: string;
+  items: readonly { key: FooterPartnerLogoKey; name: string }[];
+};
+
+const PARTNERS: readonly PartnerGroup[] = EVENT.footerPartners;
+
+const PARTNER_ROWS = [
+  ["주최", "주관"],
+  ["미디어파트너", "공식 러닝 뮤직 파트너"],
+];
+
 const MELON = HOME_SPONSORS.find((s) => s.key === "melon")!;
 
 /* 푸터 로고는 흰색이라 카드 위에선 검정으로, 멜론만 컬러 */
 const GROUPS: { label: string; items: Logo[] }[] = [
   { label: "SPONSORS", items: HOME_SPONSORS },
-  ...EVENT.footerPartners.map((group) => ({
-    label: group.role,
-    items: group.items.map((item) =>
-      item.key === "melon"
-        ? { ...MELON, key: "partner-melon" }
-        : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) },
-    ),
+  ...PARTNER_ROWS.map((roles) => ({
+    label: roles.join(" & "),
+    items: PARTNERS
+      .filter((group) => roles.includes(group.role))
+      .flatMap((group) => group.items)
+      .map((item): Logo =>
+        item.key === "melon"
+          ? { ...MELON, key: "partner-melon" }
+          : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) },
+      ),
   })),
 ];
 

@@ -171,7 +171,7 @@
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .sponsors__inner {
-    gap: 0.9rem;
+    gap: 1.5rem;
     padding: 3.2rem 0 3.6rem;
   }
 
@@ -180,13 +180,7 @@
   }
 
   .sponsors__row:not(:first-child) {
-    grid-template-columns: 5.4rem minmax(0, 1fr);
-    align-items: center;
-    gap: 0.6rem;
-  }
-
-  .sponsors__row:not(:first-child) .sponsors__label {
-    word-break: keep-all;
+    gap: 0.7rem;
   }
 
   .sponsors__label {
