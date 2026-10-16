@@ -700,6 +700,10 @@ function IndividualFlow({
               </div>
             ) : null}
             <div>
+              <dt>출발 그룹</dt>
+              <dd>{startGroupSummary(draft, selectedCategory)}</dd>
+            </div>
+            <div>
               <dt>패키지</dt>
               <dd>
                 <KitFixed courseId={draft.courseId} />
