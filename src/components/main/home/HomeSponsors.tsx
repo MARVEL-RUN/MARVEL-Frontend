@@ -70,7 +70,7 @@ function LogoCard({ logo }: { logo: Logo }) {
 
 export function HomeSponsors() {
   return (
-    <section className="sponsors" aria-labelledby="sponsors-title">
+    <section className="sponsors" id="sponsors" aria-labelledby="sponsors-title">
       <div className="sponsors__inner reveal">
         <p className="kicker">BRANDS</p>
         <h2 className="sponsors__title" id="sponsors-title">
