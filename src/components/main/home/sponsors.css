@@ -105,7 +105,7 @@
   justify-content: center;
   height: 4.6rem;
   padding: 0 1.1rem;
-  background: rgba(248, 248, 248, 0.68);
+  background: #f8f8f8;
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   transition: transform 0.2s ease;
 }
@@ -213,11 +213,8 @@
   }
 
   .sponsors__title {
-    font-size: 1.45rem;
-  }
-
-  .sponsors__title br {
-    display: none;
+    font-size: clamp(1.65rem, 8vw, 2.15rem);
+    line-height: 1.05;
   }
 
   .sponsors__grid {
