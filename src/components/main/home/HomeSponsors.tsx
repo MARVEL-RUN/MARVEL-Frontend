@@ -23,11 +23,6 @@ type PartnerGroup = {
 
 const PARTNERS: readonly PartnerGroup[] = EVENT.footerPartners;
 
-const PARTNER_ROWS = [
-  ["주최", "주관"],
-  ["미디어파트너", "공식 러닝 뮤직 파트너"],
-];
-
 /* 푸터 로고는 흰색이라 카드 위에선 검정으로, 멜론만 컬러 */
 function partnerLogo(item: PartnerGroup["items"][number]): Logo {
   return item.key === "melon"
@@ -35,41 +30,32 @@ function partnerLogo(item: PartnerGroup["items"][number]): Logo {
     : { key: item.key, name: item.name, ink: true, ...footerPartnerLogo(item.key) };
 }
 
-const GROUPS: { label: string; parts: Logo[][] }[] = [
-  { label: "SPONSORS", parts: [HOME_SPONSORS] },
-  ...PARTNER_ROWS.map((roles) => ({
-    label: roles.join(" & "),
-    parts: PARTNERS.filter((group) => roles.includes(group.role)).map((group) =>
-      group.items.map(partnerLogo),
-    ),
+const GROUPS: { label: string; logos: Logo[] }[] = [
+  { label: "SPONSORS", logos: HOME_SPONSORS },
+  ...PARTNERS.map((group) => ({
+    label: group.role,
+    logos: group.items.map(partnerLogo),
   })),
 ];
 
-function LogoCard({ logo, amp }: { logo: Logo; amp: boolean }) {
+function LogoCard({ logo }: { logo: Logo }) {
   return (
-    <li className="sponsors__cell">
-      {amp ? (
-        <span className="sponsors__amp" aria-hidden>
-          &amp;
-        </span>
-      ) : null}
-      <div
-        className={[
-          "sponsors__item",
-          `sponsors__item--${logo.key}`,
-          logo.ink ? "sponsors__item--ink" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
-        <Image
-          src={logo.src}
-          alt={logo.name}
-          width={logo.width}
-          height={logo.height}
-          draggable={false}
-        />
-      </div>
+    <li
+      className={[
+        "sponsors__item",
+        `sponsors__item--${logo.key}`,
+        logo.ink ? "sponsors__item--ink" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <Image
+        src={logo.src}
+        alt={logo.name}
+        width={logo.width}
+        height={logo.height}
+        draggable={false}
+      />
     </li>
   );
 }
@@ -94,11 +80,9 @@ export function HomeSponsors() {
               <p className="sponsors__label">{group.label}</p>
             </div>
             <ul className="sponsors__grid">
-              {group.parts.flatMap((part, j) =>
-                part.map((logo, k) => (
-                  <LogoCard key={logo.key} logo={logo} amp={j > 0 && k === 0} />
-                )),
-              )}
+              {group.logos.map((logo) => (
+                <LogoCard key={logo.key} logo={logo} />
+              ))}
             </ul>
           </div>
         ))}
