@@ -245,6 +245,10 @@ export const EVENT = {
       role: "미디어파트너",
       items: [{ key: "highcut", name: "하이컷" }],
     },
+    {
+      role: "공식 러닝 뮤직 파트너",
+      items: [{ key: "melon", name: "멜론" }],
+    },
   ],
   sponsorMoreNotice: "※ 위 기념품 이미지는 예시이며, 실제품과 상이할 수 있습니다.",
   sponsorMore: "+??",

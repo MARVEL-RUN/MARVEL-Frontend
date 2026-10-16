@@ -1,8 +1,19 @@
 import Image from "next/image";
-import { ONSITE_DRIVE } from "@/lib/onsite-program";
+import { ONSITE_DRIVE, ONSITE_PRICE_TBA } from "@/lib/onsite-program";
 import { SideBanner } from "../../layout/SideBanner";
 import { MediaLoader } from "../../MediaLoader";
 import { OnsiteBooths } from "./OnsiteBooths";
+
+function PriceTba({ mask }: { mask: string }) {
+  return (
+    <span className="onsite-tba">
+      <span className="onsite-tba__mask" aria-hidden>
+        {mask}
+      </span>
+      <span className="onsite-tba__label">추후공개</span>
+    </span>
+  );
+}
 
 function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: number }) {
   return (
@@ -28,18 +39,35 @@ function DriveRow({ item, no }: { item: (typeof ONSITE_DRIVE)[number]; no: numbe
             <div key={spec.label} className={spec.price ? "is-price" : undefined}>
               <dt>{spec.label}</dt>
               <dd>
-                {spec.value}
-                {spec.note ? <small>{spec.note}</small> : null}
+                {spec.price && ONSITE_PRICE_TBA ? (
+                  <PriceTba mask="차량 1대당 0만원" />
+                ) : (
+                  <>
+                    {spec.value}
+                    {spec.note ? <small>{spec.note}</small> : null}
+                  </>
+                )}
               </dd>
             </div>
           ))}
         </dl>
         {item.tiers ? (
-          <ul className="onsite-drive__tiers" aria-label="인원별 요금">
+          <ul
+            className={
+              ONSITE_PRICE_TBA ? "onsite-drive__tiers is-tba" : "onsite-drive__tiers"
+            }
+            aria-label={ONSITE_PRICE_TBA ? "인원별 요금 추후공개" : "인원별 요금"}
+          >
             {item.tiers.map((tier) => (
               <li key={tier.people}>
                 <span>{tier.people}</span>
-                <strong>{tier.price}</strong>
+                {ONSITE_PRICE_TBA ? (
+                  <strong className="onsite-tba__mask" aria-hidden>
+                    0만원
+                  </strong>
+                ) : (
+                  <strong>{tier.price}</strong>
+                )}
               </li>
             ))}
           </ul>

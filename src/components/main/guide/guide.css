@@ -98,6 +98,10 @@
   height: 1.25rem;
 }
 
+.spec__hosts-logo--melon {
+  height: 1.2rem;
+}
+
 .guide-sec .spec>div {
   align-items: center;
 }

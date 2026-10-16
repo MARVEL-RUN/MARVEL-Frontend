@@ -8,6 +8,7 @@ import { ddayLabel, useOpenLeft } from "./OpenCountdown";
 const SECTIONS = [
   { id: "courses", label: "코스", pad: 170 },
   { id: "venue", label: "장소", pad: 170 },
+  { id: "sponsors", label: "브랜드", pad: 170 },
   { id: "assemble", label: "접수", pad: 170 },
 ] as const;
 
