@@ -18,6 +18,7 @@ import {
   type VirtualRoundId,
   VIRTUAL_ROUND_LABEL,
 } from "@/lib/admin/raceEvents";
+import { referenceFilterDisplay } from "@/lib/admin/reference-filter";
 import { courseById, type CourseId } from "@/lib/register";
 
 export type { ApplicationKind };
@@ -131,12 +132,6 @@ type RegistrationListItem = {
   startGroupUnselected?: unknown;
   referenceFilter?: unknown;
 };
-
-function referenceFilterDisplay(raw: unknown) {
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return "";
-  const row = raw as Record<string, unknown>;
-  return firstText(row.displayName, row.code);
-}
 
 type RegistrationDetail = {
   name?: unknown;
