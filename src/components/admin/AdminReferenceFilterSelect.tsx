@@ -51,22 +51,22 @@ export function AdminReferenceFilterSelect({
 
   return (
     <div className="admin-ref-filter">
-      <input
-        className="admin-ref-filter__search"
-        type="search"
-        value={keyword}
-        maxLength={50}
-        placeholder="필터 코드"
-        aria-label="참조필터 코드 검색"
-        disabled={disabled || !eventId}
-        onChange={(event) => setKeyword(event.target.value)}
-      />
       <AdminSelect
         value={value}
         options={options}
         onChange={onChange}
         ariaLabel="참조필터"
         width={width}
+      />
+      <input
+        className="admin-ref-filter__search"
+        type="search"
+        value={keyword}
+        maxLength={50}
+        placeholder="코드 검색"
+        aria-label="참조필터 코드 검색"
+        disabled={disabled || !eventId}
+        onChange={(event) => setKeyword(event.target.value)}
       />
     </div>
   );
