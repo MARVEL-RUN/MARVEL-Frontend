@@ -274,29 +274,31 @@ export function MembersListPage({ slug }: Props) {
         }
         tools={
           <>
-            <AdminSelect
-              value={searchField}
-              options={[...SEARCH_OPTIONS]}
-              onChange={(value) =>
-                setSearchField(value as (typeof SEARCH_OPTIONS)[number]["value"])
-              }
-              ariaLabel="검색 필드"
-              width={112}
-            />
-            <input
-              className="admin-toolbar__search admin-apps-list__search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") runSearch();
-              }}
-              placeholder={SEARCH_PLACEHOLDER[searchField]}
-            />
-            <AdminReferenceFilterSelect
-              eventId={apiEventId}
-              value={referenceFilterId}
-              onChange={setReferenceFilterId}
-            />
+            <div className="admin-apps-list__filter-group">
+              <AdminSelect
+                value={searchField}
+                options={[...SEARCH_OPTIONS]}
+                onChange={(value) =>
+                  setSearchField(value as (typeof SEARCH_OPTIONS)[number]["value"])
+                }
+                ariaLabel="검색 필드"
+                width={112}
+              />
+              <input
+                className="admin-toolbar__search admin-apps-list__search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") runSearch();
+                }}
+                placeholder={SEARCH_PLACEHOLDER[searchField]}
+              />
+              <AdminReferenceFilterSelect
+                eventId={apiEventId}
+                value={referenceFilterId}
+                onChange={setReferenceFilterId}
+              />
+            </div>
             <div className="admin-apps-list__search-actions">
               <button
                 type="button"

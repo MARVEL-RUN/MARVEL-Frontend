@@ -742,22 +742,25 @@ body.admin-mode {
 
 .admin-ref-filter {
   display: inline-flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
 }
 
 .admin-ref-filter__search {
-  width: min(120px, 22vw);
+  box-sizing: border-box;
+  width: 96px;
   min-width: 96px;
-  height: 36px;
+  height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--admin-line);
-  border-radius: 6px;
-  background: var(--admin-surface);
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
   color: var(--admin-ink);
   font: inherit;
   font-size: 13px;
+  flex-shrink: 0;
 }
 
 .admin-apps-list__search {
