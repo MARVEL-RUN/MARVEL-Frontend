@@ -46,11 +46,15 @@ export function ApplyTerms({
   values,
   onChange,
   onPick,
+  allowedKinds = ["individual", "group"],
 }: {
   values: Consents;
   onChange: (next: Consents) => void;
   onPick: (kind: ApplyKind) => void;
+  allowedKinds?: ApplyKind[];
 }) {
+  const showIndividual = allowedKinds.includes("individual");
+  const showGroup = allowedKinds.includes("group");
   const [openNotice, setOpenNotice] = useState(true);
   const [open, setOpen] = useState<Partial<Record<ConsentId, boolean>>>({});
   const [error, setError] = useState("");
@@ -145,12 +149,20 @@ export function ApplyTerms({
           className={stuck ? "apply-terms__actions is-stuck" : "apply-terms__actions"}
           ref={dockRef}
         >
-          <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
-            개인신청
-          </button>
-          <button type="button" className="btn btn--ghost" onClick={() => pick("group")}>
-            단체신청
-          </button>
+          {showIndividual ? (
+            <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
+              개인신청
+            </button>
+          ) : null}
+          {showGroup ? (
+            <button
+              type="button"
+              className={showIndividual ? "btn btn--ghost" : "btn btn--red"}
+              onClick={() => pick("group")}
+            >
+              단체신청
+            </button>
+          ) : null}
         </div>
       </div>
     </div>
