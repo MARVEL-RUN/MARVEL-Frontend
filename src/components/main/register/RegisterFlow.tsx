@@ -129,7 +129,7 @@ export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession 
     requestAnimationFrame(scrollPageTop);
   }
 
-  useFlowReset("register", () => {
+  useFlowReset(discount ? "discount-link" : "register", () => {
     setKind("");
     setConsents(EMPTY_CONSENTS);
     requestAnimationFrame(scrollPageTop);
@@ -142,6 +142,9 @@ export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession 
         onChange={setConsents}
         onPick={pickKind}
         allowedKinds={allowedKinds}
+        heading={discount?.entry.termsTitle}
+        lead={discount?.entry.termsLead}
+        className={discount ? "apply-terms--discount-link" : undefined}
       />
     );
   }

@@ -1,0 +1,42 @@
+/* linkCode 유입 전용 — /register 와 분리된 할인 랜딩 */
+
+.page--discount-entry .discount-entry__body {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.discount-entry__partner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.85rem;
+  margin: 0;
+  color: var(--silver);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.discount-entry__partner-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.page--discount-entry--run-crew .discount-entry__partner-tag {
+  border-color: rgba(255, 209, 102, 0.45);
+  color: var(--gold);
+}
+
+.discount-entry__form {
+  min-width: 0;
+}
+
+.page--discount-entry--run-crew .discount-link-notice {
+  border-color: rgba(255, 209, 102, 0.35);
+}

@@ -47,11 +47,17 @@ export function ApplyTerms({
   onChange,
   onPick,
   allowedKinds = ["individual", "group"],
+  heading = APPLY_TERMS_TITLE,
+  lead = APPLY_TERMS_LEAD,
+  className,
 }: {
   values: Consents;
   onChange: (next: Consents) => void;
   onPick: (kind: ApplyKind) => void;
   allowedKinds?: ApplyKind[];
+  heading?: string;
+  lead?: string;
+  className?: string;
 }) {
   const showIndividual = allowedKinds.includes("individual");
   const showGroup = allowedKinds.includes("group");
@@ -82,10 +88,10 @@ export function ApplyTerms({
   }
 
   return (
-    <div className="apply-terms">
+    <div className={className ? `apply-terms ${className}` : "apply-terms"}>
       <header className="apply-terms__head">
-        <h2>{APPLY_TERMS_TITLE}</h2>
-        <p>{APPLY_TERMS_LEAD}</p>
+        <h2>{heading}</h2>
+        <p>{lead}</p>
       </header>
 
       <section className="apply-terms__card">
