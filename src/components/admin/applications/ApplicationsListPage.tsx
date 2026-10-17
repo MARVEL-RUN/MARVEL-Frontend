@@ -41,7 +41,7 @@ import {
   type UnpaidCancellationResult,
 } from "@/services/admin/applications";
 import { fetchAdminRegistrationOptions } from "@/services/admin/registration-options";
-import { fetchAdminReferenceFilters } from "@/services/admin/reference-filters";
+import { AdminReferenceFilterSelect } from "@/components/admin/AdminReferenceFilterSelect";
 import {
   ExcelDownloadButtons,
   ExcelPageCheck,
@@ -289,23 +289,6 @@ export function ApplicationsListPage({ slug }: Props) {
     queryFn: () => fetchAdminRegistrationOptions(apiEventId),
     enabled: hasAdminApi && Boolean(apiEventId),
   });
-
-  const referenceFiltersQuery = useQuery({
-    queryKey: ["admin", "reference-filters", apiEventId],
-    queryFn: () => fetchAdminReferenceFilters(apiEventId, { size: 100 }),
-    enabled: hasAdminApi && Boolean(apiEventId),
-  });
-
-  const referenceFilterOptions = useMemo(
-    () => [
-      { value: "", label: "참조필터 전체" },
-      ...(referenceFiltersQuery.data?.content ?? []).map((filter) => ({
-        value: filter.id,
-        label: filter.displayName || filter.code,
-      })),
-    ],
-    [referenceFiltersQuery.data],
-  );
 
   // code는 종목마다 따로 정의돼 있어 대회 전체에서 중복 제거
   const groupCodeOptions = useMemo(() => {
@@ -736,16 +719,14 @@ export function ApplicationsListPage({ slug }: Props) {
                 ariaLabel="코스"
                 width={128}
               />
-              <AdminSelect
+              <AdminReferenceFilterSelect
+                eventId={apiEventId}
                 value={referenceFilterId}
-                options={referenceFilterOptions}
                 onChange={(value) => {
                   setReferenceFilterId(value);
                   setApplied((prev) => ({ ...prev, referenceFilterId: value }));
                   setPage(1);
                 }}
-                ariaLabel="참조필터"
-                width={148}
               />
               {hasStartGroupFeature ? (
                 <>

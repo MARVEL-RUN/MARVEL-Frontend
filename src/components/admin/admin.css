@@ -740,6 +740,26 @@ body.admin-mode {
   gap: 6px;
 }
 
+.admin-ref-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-ref-filter__search {
+  width: min(120px, 22vw);
+  min-width: 96px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
 .admin-apps-list__search {
   width: min(240px, 28vw);
   min-width: 160px;

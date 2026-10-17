@@ -359,6 +359,20 @@ export function OrganizationMembersList({
       ),
     },
     {
+      key: "referenceFilter",
+      header: "참조필터",
+      className: "is-clip",
+      width: "88px",
+      render: (row: AdminApplicationRow) => (
+        <span
+          className="admin-apps-list__clip"
+          title={row.referenceFilterLabel || undefined}
+        >
+          {row.referenceFilterLabel || "-"}
+        </span>
+      ),
+    },
+    {
       key: "status",
       header: "신청상태",
       className: "is-status",
