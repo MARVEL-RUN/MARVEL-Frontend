@@ -3630,3 +3630,197 @@
   display: grid;
   gap: 0.25rem;
 }
+
+/* 일반 접수 — registration-options.serviceDiscountOptions */
+.service-discount-notice {
+  margin-bottom: 1.65rem;
+  padding: 1.05rem 1.15rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+.service-discount-notice__kicker {
+  margin: 0 0 0.35rem;
+  color: var(--marvel);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.service-discount-notice__title {
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.service-discount-notice__lead {
+  margin: 0.45rem 0 0.85rem;
+  color: var(--note);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.service-discount-notice__grid {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-discount-notice__card {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.service-discount-notice__card h3 {
+  margin: 0 0 0.5rem;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.service-discount-notice__card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.service-discount-notice__card li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.65rem;
+}
+
+.service-discount-notice__desc {
+  flex: 1 1 8rem;
+  min-width: 0;
+  color: var(--silver);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.service-discount-notice__card strong {
+  color: var(--gold);
+  font-size: 0.92rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* lookup — priceCalculation */
+.price-calculation {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.price-calculation__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  color: var(--silver);
+  font-size: 0.84rem;
+}
+
+.price-calculation__row strong {
+  color: #fff;
+  font-size: 0.92rem;
+}
+
+.price-calculation__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.price-calculation__steps li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.35rem 0.65rem;
+  align-items: baseline;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--silver);
+  font-size: 0.78rem;
+}
+
+.price-calculation__after {
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.price-calculation__empty {
+  margin: 0;
+  color: var(--note);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.price-calculation__final strong {
+  color: var(--gold);
+}
+
+.price-calculation__note {
+  margin: 0.15rem 0 0;
+  color: var(--note);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.lookup-price-calc {
+  margin-top: 1rem;
+}
+
+.lookup-price-records {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.lookup-price-record {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.lookup-price-record summary {
+  padding: 0.75rem 0.85rem;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.lookup-price-record summary::-webkit-details-marker {
+  display: none;
+}
+
+.lookup-price-record .price-calculation {
+  padding: 0 0.85rem 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .service-discount-notice {
+    margin-bottom: 1.25rem;
+    padding-inline: 0.95rem;
+  }
+
+  .price-calculation__steps li {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}

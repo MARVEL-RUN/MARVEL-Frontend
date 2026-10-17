@@ -79,6 +79,7 @@ import { DiscountFeeLine } from "../discount/DiscountFeeLine";
 import { GroupFlow } from "./GroupFlow";
 import { RegisterDiscountFallback } from "./RegisterDiscountFallback";
 import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { ServiceDiscountNotice } from "./ServiceDiscountNotice";
 import { StartGroupPick } from "./StartGroupPick";
 import {
   EMPTY_START_GROUP_DRAFT,
@@ -115,6 +116,7 @@ function entryPasswordConfirmHint(password: string, confirm: string) {
 export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession }) {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
+  const registrationOptions = useRegistrationOptions();
   const allowedKinds = discount?.options
     ? applyKindsFromDiscount(discount.options.applicationType)
     : undefined;
@@ -137,15 +139,23 @@ export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession 
 
   if (!kind) {
     return (
-      <ApplyTerms
-        values={consents}
-        onChange={setConsents}
-        onPick={pickKind}
-        allowedKinds={allowedKinds}
-        heading={discount?.entry.termsTitle}
-        lead={discount?.entry.termsLead}
-        className={discount ? "apply-terms--discount-link" : undefined}
-      />
+      <>
+        {!discount ? (
+          <ServiceDiscountNotice
+            categories={registrationOptions.categories}
+            loading={registrationOptions.loading}
+          />
+        ) : null}
+        <ApplyTerms
+          values={consents}
+          onChange={setConsents}
+          onPick={pickKind}
+          allowedKinds={allowedKinds}
+          heading={discount?.entry.termsTitle}
+          lead={discount?.entry.termsLead}
+          className={discount ? "apply-terms--discount-link" : undefined}
+        />
+      </>
     );
   }
   if (kind === "group") {
