@@ -98,7 +98,10 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
   if (loading && !registration.categories.length && !discount.options) {
     return (
       <DiscountEntryShell entry={entry}>
-        <p className="discount-entry__loading">할인 안내를 불러오는 중입니다.</p>
+        <div className="discount-entry__loading" role="status">
+          <span className="discount-entry__spinner" aria-hidden />
+          할인 안내를 불러오는 중입니다.
+        </div>
       </DiscountEntryShell>
     );
   }

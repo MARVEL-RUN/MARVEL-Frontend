@@ -65,7 +65,13 @@ export function DiscountLinkNotice({
       </ul>
 
       {options.categories.length ? (
-        <div className="discount-price-grid">
+        <>
+          {options.categories.length > 1 ? (
+            <p className="discount-price-scroll-hint">
+              종목별 가격 · 좌우로 넘겨 확인
+            </p>
+          ) : null}
+          <div className="discount-price-grid">
           {options.categories.map((row) => {
             const category = findCategory(categories, row.categoryId);
             const label = category ? categoryLabel(category) : row.categoryId;
@@ -99,7 +105,8 @@ export function DiscountLinkNotice({
               </article>
             );
           })}
-        </div>
+          </div>
+        </>
       ) : null}
     </aside>
   );
