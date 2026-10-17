@@ -462,6 +462,12 @@ export function OrganizationDetailPage() {
                     <dt>대회명</dt>
                     <dd>{dash(detail.eventName)}</dd>
                   </div>
+                  {detail.referenceFilterLabel ? (
+                    <div className="admin-org-detail__row">
+                      <dt>참조필터</dt>
+                      <dd>{detail.referenceFilterLabel}</dd>
+                    </div>
+                  ) : null}
                   <div className="admin-org-detail__row">
                     <dt>총 구성원</dt>
                     <dd>{members.length > 0 ? `${members.length}명` : "-"}</dd>

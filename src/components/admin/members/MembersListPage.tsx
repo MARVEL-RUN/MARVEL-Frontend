@@ -16,6 +16,7 @@ import {
   fetchAdminEvents,
   matchRaceEvent,
 } from "@/services/admin/applications";
+import { AdminReferenceFilterSelect } from "@/components/admin/AdminReferenceFilterSelect";
 import {
   fetchAdminOrganizations,
   type AdminOrganizationListItem,
@@ -61,6 +62,8 @@ export function MembersListPage({ slug }: Props) {
     useState<(typeof SEARCH_OPTIONS)[number]["value"]>("group");
   const [q, setQ] = useState("");
   const [appliedQ, setAppliedQ] = useState("");
+  const [referenceFilterId, setReferenceFilterId] = useState("");
+  const [appliedReferenceFilterId, setAppliedReferenceFilterId] = useState("");
   const [page, setPage] = useState(1);
 
   const eventsQuery = useQuery({
@@ -90,11 +93,12 @@ export function MembersListPage({ slug }: Props) {
     apiEvent?.eventName || (slug ? getAdminRaceEvent(slug)?.name : "") || "";
 
   const listQuery = useQuery({
-    queryKey: ["admin", "organizations", apiEventId, appliedQ, page],
+    queryKey: ["admin", "organizations", apiEventId, appliedQ, appliedReferenceFilterId, page],
     queryFn: () =>
       fetchAdminOrganizations({
         eventId: apiEventId,
         keyword: appliedQ,
+        referenceFilterId: appliedReferenceFilterId,
         page: page - 1,
         size: PAGE_SIZE,
       }),
@@ -103,6 +107,8 @@ export function MembersListPage({ slug }: Props) {
   });
 
   useEffect(() => {
+    setReferenceFilterId("");
+    setAppliedReferenceFilterId("");
     setPage(1);
   }, [apiEventId]);
 
@@ -112,12 +118,15 @@ export function MembersListPage({ slug }: Props) {
 
   const runSearch = () => {
     setAppliedQ(q.trim());
+    setAppliedReferenceFilterId(referenceFilterId);
     setPage(1);
   };
 
   const resetSearch = () => {
     setQ("");
     setAppliedQ("");
+    setReferenceFilterId("");
+    setAppliedReferenceFilterId("");
     setSearchField("group");
     setPage(1);
   };
@@ -204,6 +213,19 @@ export function MembersListPage({ slug }: Props) {
         row.memberCount > 0 ? String(row.memberCount) : "-",
     },
     {
+      key: "referenceFilter",
+      header: "참조필터",
+      className: "is-clip",
+      render: (row: AdminOrganizationListItem) => (
+        <span
+          className="admin-apps-list__clip"
+          title={row.referenceFilterLabel || undefined}
+        >
+          {row.referenceFilterLabel || "-"}
+        </span>
+      ),
+    },
+    {
       key: "members",
       header: "회원리스트",
       className: "is-link",
@@ -252,24 +274,31 @@ export function MembersListPage({ slug }: Props) {
         }
         tools={
           <>
-            <AdminSelect
-              value={searchField}
-              options={[...SEARCH_OPTIONS]}
-              onChange={(value) =>
-                setSearchField(value as (typeof SEARCH_OPTIONS)[number]["value"])
-              }
-              ariaLabel="검색 필드"
-              width={112}
-            />
-            <input
-              className="admin-toolbar__search admin-apps-list__search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") runSearch();
-              }}
-              placeholder={SEARCH_PLACEHOLDER[searchField]}
-            />
+            <div className="admin-apps-list__filter-group">
+              <AdminSelect
+                value={searchField}
+                options={[...SEARCH_OPTIONS]}
+                onChange={(value) =>
+                  setSearchField(value as (typeof SEARCH_OPTIONS)[number]["value"])
+                }
+                ariaLabel="검색 필드"
+                width={112}
+              />
+              <input
+                className="admin-toolbar__search admin-apps-list__search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") runSearch();
+                }}
+                placeholder={SEARCH_PLACEHOLDER[searchField]}
+              />
+              <AdminReferenceFilterSelect
+                eventId={apiEventId}
+                value={referenceFilterId}
+                onChange={setReferenceFilterId}
+              />
+            </div>
             <div className="admin-apps-list__search-actions">
               <button
                 type="button"

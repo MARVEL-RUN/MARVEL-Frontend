@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-export type FlowResetTarget = "register" | "lookup";
+export type FlowResetTarget = "register" | "lookup" | "discount-link";
 
 const FLOW_RESET_EVENT = "main:flow-reset";
 

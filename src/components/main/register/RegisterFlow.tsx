@@ -22,6 +22,7 @@ import {
   guardianRequiredFor,
   guardianFieldsError,
   requiredConsentsOk,
+  formatFee,
   ticketFee,
   ticketLabel,
   type ApplyKind,
@@ -67,8 +68,18 @@ import {
   ShirtPick,
   birthView,
 } from "./ApplyUi";
+import { applyKindsFromDiscount } from "@/lib/discount-link/apply-kinds";
+import {
+  discountFeeForCategory,
+  discountNewRegistrationBlockedMessage,
+} from "@/lib/discount-link/pricing";
+import type { DiscountRegisterSession } from "@/lib/discount-link/session";
+import { registrationDiscountUnavailable } from "@/lib/discount-link/errors";
+import { DiscountFeeLine } from "../discount/DiscountFeeLine";
 import { GroupFlow } from "./GroupFlow";
+import { RegisterDiscountFallback } from "./RegisterDiscountFallback";
 import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { ServiceDiscountNotice } from "./ServiceDiscountNotice";
 import { StartGroupPick } from "./StartGroupPick";
 import {
   EMPTY_START_GROUP_DRAFT,
@@ -102,9 +113,13 @@ function entryPasswordConfirmHint(password: string, confirm: string) {
   return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
 }
 
-export function RegisterFlow() {
+export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession }) {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
+  const registrationOptions = useRegistrationOptions();
+  const allowedKinds = discount?.options
+    ? applyKindsFromDiscount(discount.options.applicationType)
+    : undefined;
 
   function pickKind(next: ApplyKind) {
     setKind(next);
@@ -116,7 +131,7 @@ export function RegisterFlow() {
     requestAnimationFrame(scrollPageTop);
   }
 
-  useFlowReset("register", () => {
+  useFlowReset(discount ? "discount-link" : "register", () => {
     setKind("");
     setConsents(EMPTY_CONSENTS);
     requestAnimationFrame(scrollPageTop);
@@ -124,26 +139,48 @@ export function RegisterFlow() {
 
   if (!kind) {
     return (
-      <ApplyTerms
-        values={consents}
-        onChange={setConsents}
-        onPick={pickKind}
-      />
+      <>
+        {!discount ? (
+          <ServiceDiscountNotice
+            categories={registrationOptions.categories}
+            loading={registrationOptions.loading}
+          />
+        ) : null}
+        <ApplyTerms
+          values={consents}
+          onChange={setConsents}
+          onPick={pickKind}
+          allowedKinds={allowedKinds}
+          heading={discount?.entry.termsTitle}
+          lead={discount?.entry.termsLead}
+          className={discount ? "apply-terms--discount-link" : undefined}
+        />
+      </>
     );
   }
   if (kind === "group") {
-    return <GroupFlow consents={consents} onBack={clearKind} />;
+    return (
+      <GroupFlow consents={consents} onBack={clearKind} discount={discount} />
+    );
   }
-  return <IndividualFlow consents={consents} onBack={clearKind} />;
+  return (
+    <IndividualFlow consents={consents} onBack={clearKind} discount={discount} />
+  );
 }
 
 function IndividualFlow({
   onBack,
   consents,
+  discount,
 }: {
   onBack: () => void;
   consents: Consents;
+  discount?: DiscountRegisterSession;
 }) {
+  const discountLinkCode = discount?.linkCode;
+  const discountOptions = discount?.options;
+  const [discountFallbackOpen, setDiscountFallbackOpen] = useState(false);
+  const [discountFallbackMessage, setDiscountFallbackMessage] = useState("");
   const [step, setStep] = useState<Step>(0);
   const [draft, setDraft] = useState<EntryDraft>(() => ({
     ...EMPTY_DRAFT,
@@ -200,7 +237,7 @@ function IndividualFlow({
     if (!hasMainApi) throw new Error("API 주소가 설정되지 않았습니다.");
     const created = await createRegistration(
       DEFAULT_EVENT_ID,
-      toRegistrationCreateRequest(draft, categories),
+      toRegistrationCreateRequest(draft, categories, discountLinkCode),
     );
     setRegistration(created);
     return created;
@@ -250,8 +287,10 @@ function IndividualFlow({
     if (optionsError || !categories.length) {
       return fail(optionsError || "신청 옵션을 불러오지 못했습니다.");
     }
+    const discountBlocked = discountNewRegistrationBlockedMessage(discountOptions);
+    if (discountBlocked) return fail(discountBlocked);
     try {
-      toRegistrationCreateRequest(draft, categories);
+      toRegistrationCreateRequest(draft, categories, discountLinkCode);
     } catch (err) {
       return fail(err instanceof Error ? err.message : "입력 내용을 확인하세요.");
     }
@@ -303,6 +342,10 @@ function IndividualFlow({
           : err instanceof Error
             ? err.message
             : "신청서를 제출하지 못했습니다.";
+      if (registrationDiscountUnavailable(err)) {
+        setDiscountFallbackMessage(message);
+        setDiscountFallbackOpen(true);
+      }
       fail(message);
     } finally {
       setBusyAction(null);
@@ -340,6 +383,10 @@ function IndividualFlow({
           : err instanceof Error
             ? err.message
             : "결제를 시작하지 못했습니다.";
+      if (registrationDiscountUnavailable(err)) {
+        setDiscountFallbackMessage(message);
+        setDiscountFallbackOpen(true);
+      }
       fail(message);
     } finally {
       setBusyAction(null);
@@ -361,6 +408,14 @@ function IndividualFlow({
   const guardianRequired = guardianRequiredFor(draft);
   const guardianMinor = needsGuardian(draft.birth);
   const startGroupSections = startGroupPreviewSections(categories);
+  const discountPrice = selectedCategory
+    ? discountFeeForCategory(
+        discountOptions,
+        selectedCategory.categoryId,
+        draft.birth,
+        "individual",
+      )
+    : undefined;
 
   if (optionsDown) {
     return <RegisterUnavailable onRetry={retryOptions} busy={optionsLoading} />;
@@ -608,7 +663,13 @@ function IndividualFlow({
               ) : null}
             </FormRow>
             <FormRow label="참가비">
-              {draft.courseId ? (
+              {discountLinkCode ? (
+                draft.courseId ? (
+                  <DiscountFeeLine option={discountPrice} />
+                ) : (
+                  <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
+                )
+              ) : draft.courseId ? (
                 <FeeText courseId={draft.courseId} ticket={draft.ticket} />
               ) : (
                 <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
@@ -644,7 +705,14 @@ function IndividualFlow({
               <dt>참가종목</dt>
               <dd>
                 {course.distance} · {ticketLabel(draft.ticket)}
-                <small>{ticketFee(course, draft.ticket)}</small>
+                <small>
+                  {discountPrice
+                    ? formatFee(discountPrice.finalAmount)
+                    : ticketFee(course, draft.ticket)}
+                </small>
+                {discountPrice?.description ? (
+                  <small>{discountPrice.description}</small>
+                ) : null}
               </dd>
             </div>
             <div>
@@ -772,6 +840,12 @@ function IndividualFlow({
           />
         </SheetModal>
       ) : null}
+
+      <RegisterDiscountFallback
+        open={discountFallbackOpen}
+        message={discountFallbackMessage}
+        onClose={() => setDiscountFallbackOpen(false)}
+      />
     </div>
   );
 }

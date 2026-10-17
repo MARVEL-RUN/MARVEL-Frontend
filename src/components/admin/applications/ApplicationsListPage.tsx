@@ -41,6 +41,7 @@ import {
   type UnpaidCancellationResult,
 } from "@/services/admin/applications";
 import { fetchAdminRegistrationOptions } from "@/services/admin/registration-options";
+import { AdminReferenceFilterSelect } from "@/components/admin/AdminReferenceFilterSelect";
 import {
   ExcelDownloadButtons,
   ExcelPageCheck,
@@ -83,6 +84,7 @@ type Applied = {
   eventCategoryId: string;
   startGroupCode: string;
   startGroupUnselected: StartGroupUnselectedFilter;
+  referenceFilterId: string;
 };
 
 const EMPTY_APPLIED: Applied = {
@@ -92,6 +94,7 @@ const EMPTY_APPLIED: Applied = {
   eventCategoryId: "",
   startGroupCode: "",
   startGroupUnselected: "",
+  referenceFilterId: "",
 };
 
 function errorHint(error: unknown) {
@@ -226,6 +229,7 @@ export function ApplicationsListPage({ slug }: Props) {
   const [course, setCourse] = useState("");
   const [groupCode, setGroupCode] = useState("");
   const [groupUnselected, setGroupUnselected] = useState<StartGroupUnselectedFilter>("");
+  const [referenceFilterId, setReferenceFilterId] = useState("");
   const [applied, setApplied] = useState<Applied>({
     ...EMPTY_APPLIED,
     status: statusFromUrl,
@@ -312,6 +316,7 @@ export function ApplicationsListPage({ slug }: Props) {
         eventCategoryId: applied.eventCategoryId,
         startGroupCode: applied.startGroupCode,
         startGroupUnselected: applied.startGroupUnselected,
+        referenceFilterId: applied.referenceFilterId,
         page: page - 1,
         size: PAGE_SIZE,
       });
@@ -337,7 +342,13 @@ export function ApplicationsListPage({ slug }: Props) {
   useEffect(() => {
     setCourse("");
     setGroupCode("");
-    setApplied((prev) => ({ ...prev, eventCategoryId: "", startGroupCode: "" }));
+    setReferenceFilterId("");
+    setApplied((prev) => ({
+      ...prev,
+      eventCategoryId: "",
+      startGroupCode: "",
+      referenceFilterId: "",
+    }));
     setPage(1);
   }, [apiEventId]);
 
@@ -377,6 +388,7 @@ export function ApplicationsListPage({ slug }: Props) {
       eventCategoryId: course,
       startGroupCode: groupCode,
       startGroupUnselected: groupUnselected,
+      referenceFilterId,
     });
     setPage(1);
   };
@@ -388,6 +400,7 @@ export function ApplicationsListPage({ slug }: Props) {
     setCourse("");
     setGroupCode("");
     setGroupUnselected("");
+    setReferenceFilterId("");
     setApplied(EMPTY_APPLIED);
     setPage(1);
   };
@@ -423,6 +436,7 @@ export function ApplicationsListPage({ slug }: Props) {
     status: applied.status,
     keyword: applied.q,
     eventCategoryId: applied.eventCategoryId,
+    referenceFilterId: applied.referenceFilterId,
   };
 
   const runExcel = async (task: () => Promise<void>) => {
@@ -704,6 +718,15 @@ export function ApplicationsListPage({ slug }: Props) {
                 }}
                 ariaLabel="코스"
                 width={128}
+              />
+              <AdminReferenceFilterSelect
+                eventId={apiEventId}
+                value={referenceFilterId}
+                onChange={(value) => {
+                  setReferenceFilterId(value);
+                  setApplied((prev) => ({ ...prev, referenceFilterId: value }));
+                  setPage(1);
+                }}
               />
               {hasStartGroupFeature ? (
                 <>

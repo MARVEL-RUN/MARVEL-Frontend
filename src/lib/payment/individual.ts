@@ -20,6 +20,7 @@ import { birthToApi, genderToApi, phoneDigits } from "./map";
 export function toRegistrationCreateRequest(
   draft: EntryDraft,
   categories: RegistrationCategory[],
+  discountLinkCode?: string,
 ): RegistrationCreateRequest {
   const courseId = draft.courseId;
   if (!courseId) throw new Error("참가종목을 선택하세요.");
@@ -42,7 +43,9 @@ export function toRegistrationCreateRequest(
   const guardianRelation = draft.guardianRelation.trim();
   const requireGuardian = guardianRequiredFor(draft);
 
+  const code = discountLinkCode?.trim();
   return {
+    ...(code ? { discountLinkCode: code } : {}),
     eventCategoryId: category.categoryId,
     selectedSouvenirList: [
       { souvenirId: souvenir.souvenirId, selectedSize: size },

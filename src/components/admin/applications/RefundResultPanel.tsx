@@ -8,6 +8,7 @@ import {
   refundItemMessage,
   refundItemStatusBadge,
   refundItemStatusLabel,
+  refundPreparedAmountDeduped,
 } from "@/lib/refund-result";
 import {
   fetchRefundBatch,
@@ -96,6 +97,7 @@ export function RefundResultPanel({
   const completed = (summary.status ?? "").toUpperCase() === "COMPLETED";
   const itemTotal = itemsQuery.data?.total ?? items.length;
   const itemPages = Math.max(1, Math.ceil(itemTotal / (itemsQuery.data?.size ?? 20)));
+  const preparedTotal = refundPreparedAmountDeduped(items);
 
   return (
     <section className="admin-pay admin-refund-result" aria-label={title}>
@@ -149,6 +151,17 @@ export function RefundResultPanel({
         {refundBatchStatusLabel(summary.status)}
         {completed ? " · 배치가 끝났어도 실패·차단 항목이 있을 수 있습니다." : ""}
       </p>
+      {preparedTotal > 0 ? (
+        <p className="admin-pay__hint">
+          준비 금액 합계(취소 ID 중복 제거): {formatAmount(preparedTotal)}
+        </p>
+      ) : null}
+      {review > 0 ? (
+        <p className="admin-pay__hint">
+          확인 필요 {review}건 — 일부 원결제만 반영됐을 수 있으며, 전원 미환불로 해석하지
+          마세요.
+        </p>
+      ) : null}
       <label className="admin-refund-result__filter">
         <input
           type="checkbox"

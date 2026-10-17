@@ -4,6 +4,7 @@ import { APPLICATION_PASSWORD_MIN } from "@/lib/register";
 import { statusKey } from "@/lib/registration-status";
 import { uiGenderFromApi } from "@/lib/registration-gender";
 import type { SpringPage } from "@/services/admin/boards/inquiries.types";
+import { referenceFilterDisplay } from "@/lib/admin/reference-filter";
 import type { AdminApplicationRow } from "@/services/admin/applications";
 
 export type AdminOrganizationListItem = {
@@ -15,6 +16,7 @@ export type AdminOrganizationListItem = {
   loginId: string;
   memberCount: number;
   createdAt: string;
+  referenceFilterLabel?: string;
 };
 
 export type AdminOrganizationMember = {
@@ -33,6 +35,7 @@ export type AdminOrganizationMember = {
   amount: number;
   startGroupCode: string;
   startGroupUnselected?: boolean;
+  referenceFilterLabel?: string;
 };
 
 export type AdminOrganizationDetail = {
@@ -48,6 +51,7 @@ export type AdminOrganizationDetail = {
   addressDetail: string;
   guardianConsent?: boolean;
   createdAt: string;
+  referenceFilterLabel?: string;
   members: AdminOrganizationMember[];
 };
 
@@ -65,6 +69,7 @@ export type OrganizationBasicInfoUpdate = {
 export type OrganizationListParams = {
   eventId: string;
   keyword?: string;
+  referenceFilterId?: string;
   page?: number;
   size?: number;
 };
@@ -135,6 +140,7 @@ function toListItem(row: unknown): AdminOrganizationListItem | null {
     loginId: asText(item.loginId),
     memberCount: asNumber(item.memberCount),
     createdAt: asText(item.createdAt),
+    referenceFilterLabel: referenceFilterDisplay(item.referenceFilter) || undefined,
   };
 }
 
@@ -159,6 +165,7 @@ function toMember(row: unknown): AdminOrganizationMember | null {
     amount: asNumber(item.amount),
     startGroupCode: asText(item.startGroupCode),
     startGroupUnselected: asOptionalBool(item.startGroupUnselected),
+    referenceFilterLabel: referenceFilterDisplay(item.referenceFilter) || undefined,
   };
 }
 
@@ -196,6 +203,7 @@ export function mapOrganizationMemberToApplicationRow(
     organizationId,
     startGroupCode: member.startGroupCode,
     startGroupUnselected: member.startGroupUnselected,
+    referenceFilterLabel: member.referenceFilterLabel,
   };
 }
 
@@ -244,6 +252,7 @@ function asOrganizationDetail(data: unknown): AdminOrganizationDetail | null {
     addressDetail: asText(row.addressDetail),
     guardianConsent: asOptionalBool(row.guardianConsent),
     createdAt: asText(row.createdAt),
+    referenceFilterLabel: referenceFilterDisplay(row.referenceFilter) || undefined,
     members,
   };
 }
@@ -255,6 +264,9 @@ export function fetchAdminOrganizations(params: OrganizationListParams) {
     size: String(params.size ?? 15),
   });
   if (params.keyword?.trim()) query.set("keyword", params.keyword.trim());
+  if (params.referenceFilterId?.trim()) {
+    query.set("referenceFilterId", params.referenceFilterId.trim());
+  }
   return adminFetch<unknown>(`v1/admin/organizations?${query}`).then((data) =>
     asOrganizationPage(data, params.size ?? 15, params.page ?? 0),
   );

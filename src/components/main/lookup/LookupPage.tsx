@@ -68,6 +68,12 @@ import {
   LookupRefundModal,
   type LookupModifyAction,
 } from "./LookupEditForms";
+import {
+  LookupGroupPriceCalculations,
+  LookupPriceCalculationBlock,
+} from "./LookupPriceCalculation";
+import { discountActionErrorMessage, isDiscountErrorCode } from "@/lib/discount-link/errors";
+import { MainHttpError } from "@/lib/main/fetch";
 import { LookupPasswordModal, type LookupPasswordSubmit } from "./LookupPasswordModal";
 import {
   LookupStartGroupModal,
@@ -693,6 +699,10 @@ function IndividualReceiptCard({
         </div>
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
+      <LookupPriceCalculationBlock
+        hasPriceCalculation={receipt.hasPriceCalculation}
+        priceCalculation={receipt.priceCalculation}
+      />
       <ReceiptNotes receipt={receipt} externalPayment={externalPayment} />
       <ReceiptActions
         receipt={receipt}
@@ -771,6 +781,9 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
+      <LookupGroupPriceCalculations
+        participants={organizationLookupParticipants(receipt)}
+      />
       <ReceiptNotes
         receipt={receipt}
         externalPayment={receipt.externalPayment === true}
@@ -801,6 +814,9 @@ function isTechnicalErrorMessage(message: string) {
 }
 
 function lookupErrorMessage(err: unknown, fallback = "신청 내역을 조회하지 못했습니다.") {
+  if (err instanceof MainHttpError && err.code && isDiscountErrorCode(err.code)) {
+    return discountActionErrorMessage(err, fallback);
+  }
   if (!(err instanceof Error)) return fallback;
   const message = err.message.trim();
   if (!message || isTechnicalErrorMessage(message)) return fallback;

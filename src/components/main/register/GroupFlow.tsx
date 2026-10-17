@@ -11,6 +11,15 @@ import {
   toOrganizationRegistrationRequest,
 } from "@/lib/payment/organization";
 import {
+  discountFeeForCategory,
+  discountNewRegistrationBlockedMessage,
+  sumDiscountFees,
+} from "@/lib/discount-link/pricing";
+import type { DiscountRegisterSession } from "@/lib/discount-link/session";
+import type { DiscountOptions } from "@/lib/discount-link/types";
+import { registrationDiscountUnavailable } from "@/lib/discount-link/errors";
+import { RegisterDiscountFallback } from "./RegisterDiscountFallback";
+import {
   savePendingPayment,
   type PaymentOrder,
 } from "@/lib/payment/session";
@@ -160,19 +169,38 @@ function orgAccountHint(value: string, langWarn: boolean, check: FieldCheck) {
 function memberPeek(
   p: ParticipantDraft,
   categories: RegistrationCategory[],
+  discount?: DiscountOptions | null,
 ) {
   const name = p.name.trim() || "미입력";
   const category = findCategory(categories, p.categoryId);
   if (!category) return name;
-  return `${name} · ${categoryLabel(category)} · ${formatFee(categoryFeeAmount(category, p.birth))}`;
+  const option = discount
+    ? discountFeeForCategory(discount, p.categoryId, p.birth, "group")
+    : undefined;
+  const fee = option ? option.finalAmount : categoryFeeAmount(category, p.birth);
+  return `${name} · ${categoryLabel(category)} · ${formatFee(fee)}`;
+}
+
+function memberDiscountFee(
+  p: ParticipantDraft,
+  category: RegistrationCategory | undefined,
+  discount?: DiscountOptions | null,
+) {
+  if (discount && p.categoryId) {
+    const option = discountFeeForCategory(discount, p.categoryId, p.birth, "group");
+    if (option) return formatFee(option.finalAmount);
+  }
+  return category ? formatFee(categoryFeeAmount(category, p.birth)) : "—";
 }
 
 export function GroupFlow({
   onBack,
   consents,
+  discount,
 }: {
   onBack: () => void;
   consents: Consents;
+  discount?: DiscountRegisterSession;
 }) {
   const [step, setStep] = useState<Step>(0);
   const [draft, setDraft] = useState<GroupDraft>({ ...EMPTY_GROUP, ...consents });
@@ -189,6 +217,8 @@ export function GroupFlow({
     retry: retryOptions,
   } = useRegistrationOptions();
   const [busyAction, setBusyAction] = useState<"submit" | "pay" | null>(null);
+  const [discountFallbackOpen, setDiscountFallbackOpen] = useState(false);
+  const [discountFallbackMessage, setDiscountFallbackMessage] = useState("");
   const [error, setError] = useState("");
   const [accountLangWarn, setAccountLangWarn] = useState(false);
   const [nameCheck, setNameCheck] = useState<FieldCheck>(EMPTY_FIELD_CHECK);
@@ -219,7 +249,7 @@ export function GroupFlow({
     if (!hasMainApi) throw new Error("API 주소가 설정되지 않았습니다.");
     const created = await createOrganizationRegistration(
       DEFAULT_EVENT_ID,
-      toOrganizationRegistrationRequest(draft),
+      toOrganizationRegistrationRequest(draft, discount?.linkCode),
     );
     const order = organizationPaymentOrder(created);
     setPayment(order);
@@ -512,6 +542,12 @@ export function GroupFlow({
       return fail("만 14세 미만 참가자가 있어 단체장 동의가 필요합니다.");
     }
     if (!requiredConsentsOk(draft)) return fail("필수 약관에 동의해 주세요.");
+    const discountBlocked = discountNewRegistrationBlockedMessage(discount?.options);
+    if (discountBlocked) return fail(discountBlocked);
+    const minGroup = discount?.options?.minimumGroupSize;
+    if (minGroup != null && minGroup > 0 && draft.participants.length < minGroup) {
+      return fail(`이 할인 링크는 단체 ${minGroup}명 이상부터 신청할 수 있습니다.`);
+    }
     setError("");
     setStep(1);
     setPayCheckOpen(true);
@@ -544,13 +580,17 @@ export function GroupFlow({
       await ensureOrganizationPayment();
       goSubmitted();
     } catch (err) {
-      fail(
+      const message =
         err instanceof MainHttpError
           ? err.message
           : err instanceof Error
             ? err.message
-            : "신청서를 제출하지 못했습니다.",
-      );
+            : "신청서를 제출하지 못했습니다.";
+      if (registrationDiscountUnavailable(err)) {
+        setDiscountFallbackMessage(message);
+        setDiscountFallbackOpen(true);
+      }
+      fail(message);
     } finally {
       setBusyAction(null);
     }
@@ -581,19 +621,28 @@ export function GroupFlow({
       setPayCheckOpen(false);
       openPay();
     } catch (err) {
-      fail(
+      const message =
         err instanceof MainHttpError
           ? err.message
           : err instanceof Error
             ? err.message
-            : "결제를 시작하지 못했습니다.",
-      );
+            : "결제를 시작하지 못했습니다.";
+      if (registrationDiscountUnavailable(err)) {
+        setDiscountFallbackMessage(message);
+        setDiscountFallbackOpen(true);
+      }
+      fail(message);
     } finally {
       setBusyAction(null);
     }
   }
 
-  const total = payment?.paymentAmount ?? groupOptionsFee(draft, categories);
+  const discountTotal = sumDiscountFees(
+    discount?.options,
+    draft.participants,
+    "group",
+  );
+  const total = payment?.paymentAmount ?? discountTotal ?? groupOptionsFee(draft, categories);
   const optionsReady = !optionsLoading && !optionsError && categories.length > 0;
   const needsGroupGuardian = groupNeedsGuardian(draft.participants);
   const nameHint = groupNameHint(draft.groupName, nameCheck);
@@ -796,7 +845,13 @@ export function GroupFlow({
               <p>{GUARDIAN_AGE_NOTE}</p>
               <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
               <p>{TIMING_CHIP_NOTE}</p>
-              <CourseFeeTable />
+              {discount?.options?.minimumGroupSize ? (
+                <p className="is-warn">
+                  이 할인 링크는 단체 {discount.options.minimumGroupSize}명
+                  이상부터 신청할 수 있습니다.
+                </p>
+              ) : null}
+              {discount ? null : <CourseFeeTable />}
             </ApplyHint>
             <div className="party-bar">
               <p>{draft.participants.length}명 등록</p>
@@ -866,7 +921,7 @@ export function GroupFlow({
                               type="button"
                               onClick={() => setOpenMember(i)}
                             >
-                              {memberPeek(p, categories)}
+                              {memberPeek(p, categories, discount?.options)}
                             </button>
                           </td>
                           <td data-label="이름">
@@ -931,9 +986,7 @@ export function GroupFlow({
                             </select>
                           </td>
                           <td className="party__fee" data-label="참가비" rowSpan={3}>
-                            {category
-                              ? formatFee(categoryFeeAmount(category, p.birth))
-                              : "—"}
+                            {memberDiscountFee(p, category, discount?.options)}
                           </td>
                           <td className="party__del" rowSpan={3}>
                             <button
@@ -1223,6 +1276,12 @@ export function GroupFlow({
           />
         </SheetModal>
       ) : null}
+
+      <RegisterDiscountFallback
+        open={discountFallbackOpen}
+        message={discountFallbackMessage}
+        onClose={() => setDiscountFallbackOpen(false)}
+      />
     </div>
   );
 }
