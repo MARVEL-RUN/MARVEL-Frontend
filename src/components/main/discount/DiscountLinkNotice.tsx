@@ -23,53 +23,84 @@ export function DiscountLinkNotice({
   const accepting = discountLinkAcceptingRegistration(options);
 
   return (
-    <section className="block discount-link-notice" aria-label="할인 안내">
-      {entry.lead ? <p className="discount-link-notice__lead">{entry.lead}</p> : null}
+    <aside id="discount-info" className="discount-panel" aria-label="할인 안내">
+      <div className="discount-panel__head">
+        <h2 className="discount-panel__title">할인 안내</h2>
+        <p className="discount-panel__sub">서버 기준 안내 가격 · 접수 가능 여부는 아래 상태를 확인하세요</p>
+      </div>
+
       {options.message ? (
-        <p className="discount-link-notice__message">{options.message}</p>
+        <p className="discount-panel__message">{options.message}</p>
       ) : null}
+
       {statusNote ? (
-        <p className="discount-link-notice__status" role="status">
-          {statusNote}
-          {!accepting ? " — 아래 안내 가격과 달리 지금은 할인 링크로 신규 접수가 제한될 수 있습니다." : null}
-        </p>
-      ) : null}
-      {options.minimumGroupSize != null && options.minimumGroupSize > 0 ? (
-        <p className="discount-link-notice__min">
-          단체 최소 {options.minimumGroupSize}명 이상 신청해야 합니다.
-        </p>
-      ) : null}
-      {entry.extraNotices?.map((line) => (
-        <p key={line} className="discount-link-notice__extra">
-          {line}
-        </p>
-      ))}
-      {options.categories.length ? (
-        <div className="discount-link-notice__prices">
-          <p className="discount-link-notice__prices-title">종목별 안내 참가비</p>
-          <ul>
-            {options.categories.map((row) => {
-              const category = findCategory(categories, row.categoryId);
-              const label = category ? categoryLabel(category) : row.categoryId;
-              const lines = row.priceOptions.map((opt) => (
-                <li key={`${row.categoryId}-${opt.scenario}-${opt.applicationType}`}>
-                  <span>{opt.description || label}</span>
-                  <strong>{formatFee(opt.finalAmount)}</strong>
-                  {!row.linkDiscountApplicable ? (
-                    <span className="discount-link-notice__no-link"> (링크 감액 없음)</span>
-                  ) : null}
-                </li>
-              ));
-              return (
-                <li key={row.categoryId}>
-                  <strong>{label}</strong>
-                  <ul>{lines}</ul>
-                </li>
-              );
-            })}
-          </ul>
+        <div
+          className={`discount-alert${accepting ? " discount-alert--ok" : " discount-alert--warn"}`}
+          role="status"
+        >
+          <strong>{statusNote}</strong>
+          {!accepting ? (
+            <span>
+              아래 안내 가격과 달리 지금은 할인 링크로 신규 접수가 제한될 수 있습니다.
+            </span>
+          ) : (
+            <span>현재 할인 링크로 신규 접수가 가능합니다.</span>
+          )}
         </div>
       ) : null}
-    </section>
+
+      <ul className="discount-rules">
+        {options.minimumGroupSize != null && options.minimumGroupSize > 0 ? (
+          <li>
+            <span className="discount-rules__label">인원</span>
+            <span>단체 최소 {options.minimumGroupSize}명</span>
+          </li>
+        ) : null}
+        {entry.extraNotices?.map((line) => (
+          <li key={line}>
+            <span className="discount-rules__label">안내</span>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+
+      {options.categories.length ? (
+        <div className="discount-price-grid">
+          {options.categories.map((row) => {
+            const category = findCategory(categories, row.categoryId);
+            const label = category ? categoryLabel(category) : row.categoryId;
+            return (
+              <article
+                key={row.categoryId}
+                className={`discount-price-card${row.linkDiscountApplicable ? "" : " discount-price-card--plain"}`}
+              >
+                <header className="discount-price-card__head">
+                  <h3>{label}</h3>
+                  {!row.linkDiscountApplicable ? (
+                    <span className="discount-price-card__flag">링크 감액 없음</span>
+                  ) : (
+                    <span className="discount-price-card__flag discount-price-card__flag--on">
+                      할인 적용
+                    </span>
+                  )}
+                </header>
+                <ul className="discount-price-card__list">
+                  {row.priceOptions.map((opt) => (
+                    <li key={`${row.categoryId}-${opt.scenario}-${opt.applicationType}`}>
+                      <span className="discount-price-card__desc">
+                        {opt.description || label}
+                      </span>
+                      <strong className="discount-price-card__amount">
+                        {formatFee(opt.finalAmount)}
+                      </strong>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })}
+        </div>
+      ) : null}
+    </aside>
   );
 }

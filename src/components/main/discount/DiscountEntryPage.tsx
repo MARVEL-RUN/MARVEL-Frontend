@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SideBanner } from "../layout/SideBanner";
 import { MediaLoader } from "../MediaLoader";
+import { DiscountEntryHero } from "./DiscountEntryHero";
+import { DiscountEntryMobileRail } from "./DiscountEntryMobileRail";
 import { DiscountLinkNotice } from "./DiscountLinkNotice";
 import { discountLinkEntry } from "@/lib/discount-link/config";
 import { useAppBasePath } from "@/lib/main/useAppBasePath";
@@ -22,9 +23,9 @@ function DiscountLoadError({
   onRetry?: () => void;
 }) {
   return (
-    <section className="block wait">
+    <section className="discount-state">
       <h2>{title}</h2>
-      <p className="sec__body">{message}</p>
+      <p>{message}</p>
       {onRetry ? (
         <div className="flow__nav">
           <button type="button" className="btn btn--red" onClick={onRetry}>
@@ -38,9 +39,11 @@ function DiscountLoadError({
 
 function DiscountEntryShell({
   entry,
+  mobileRail,
   children,
 }: {
   entry: NonNullable<ReturnType<typeof discountLinkEntry>>;
+  mobileRail?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -50,15 +53,10 @@ function DiscountEntryShell({
         data-discount-slug={entry.slug}
         data-link-code={entry.linkCode}
       >
-        <SideBanner kicker={entry.kicker} title={entry.title} en={entry.en} />
-        <div className="page__body wrap discount-entry__body">
-          {entry.partnerTag ? (
-            <p className="discount-entry__partner">
-              <span className="discount-entry__partner-tag">{entry.partnerTag}</span>
-              <span>할인 링크 전용 접수</span>
-            </p>
-          ) : null}
-          {children}
+        <DiscountEntryHero entry={entry} />
+        {mobileRail}
+        <div className="discount-entry__sheet">
+          <div className="wrap discount-entry__layout">{children}</div>
         </div>
       </main>
     </MediaLoader>
@@ -100,7 +98,7 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
   if (loading && !registration.categories.length && !discount.options) {
     return (
       <DiscountEntryShell entry={entry}>
-        <p className="form__hint">할인 안내를 불러오는 중입니다.</p>
+        <p className="discount-entry__loading">할인 안내를 불러오는 중입니다.</p>
       </DiscountEntryShell>
     );
   }
@@ -129,13 +127,31 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
   }
 
   return (
-    <DiscountEntryShell entry={entry}>
+    <DiscountEntryShell
+      entry={entry}
+      mobileRail={
+        discount.options ? (
+          <DiscountEntryMobileRail options={discount.options} />
+        ) : null
+      }
+    >
       <DiscountLinkNotice
         entry={entry}
         options={discount.options}
         categories={registration.categories}
       />
-      <div className="discount-entry__form">
+      <section
+        id="discount-apply"
+        className="discount-entry__form"
+        aria-label="할인 링크 참가 신청"
+      >
+        <header className="discount-entry__form-head">
+          <p className="discount-entry__form-kicker">APPLICATION</p>
+          <h2 className="discount-entry__form-title">참가 신청</h2>
+          <p className="discount-entry__form-lead">
+            입력 항목은 일반 접수와 동일하며, 할인은 이 링크로 생성한 신청에만 적용됩니다.
+          </p>
+        </header>
         <RegisterFlow
           discount={{
             entry,
@@ -151,7 +167,7 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
             },
           }}
         />
-      </div>
+      </section>
     </DiscountEntryShell>
   );
 }
