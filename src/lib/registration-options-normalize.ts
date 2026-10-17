@@ -1,3 +1,4 @@
+import { normalizePriceOption } from "@/lib/discount-link/normalize";
 import type {
   RegistrationCategory,
   RegistrationOptionsResponse,
@@ -59,6 +60,13 @@ function normalizeCategory(raw: unknown): RegistrationCategory | null {
         .map(normalizeStartGroup)
         .filter((item): item is RegistrationStartGroup => item !== null)
     : [];
+  const pricingRow = asRecord(row.pricing);
+  const serviceRaw = pricingRow?.serviceDiscountOptions;
+  const serviceDiscountOptions = Array.isArray(serviceRaw)
+    ? serviceRaw
+        .map(normalizePriceOption)
+        .filter((item): item is NonNullable<ReturnType<typeof normalizePriceOption>> => item !== null)
+    : [];
   return {
     order: typeof row.order === "number" ? row.order : 0,
     categoryId,
@@ -68,6 +76,9 @@ function normalizeCategory(raw: unknown): RegistrationCategory | null {
     amount: typeof row.amount === "number" ? row.amount : 0,
     souvenirs,
     ...(startGroups.length ? { startGroups } : {}),
+    ...(serviceDiscountOptions.length
+      ? { pricing: { serviceDiscountOptions } }
+      : {}),
   };
 }
 

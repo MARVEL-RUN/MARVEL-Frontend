@@ -11,6 +11,20 @@ export type RegistrationStartGroup = {
   description: string;
 };
 
+export type RegistrationPriceOption = {
+  scenario: "STANDARD" | "AGE_CONDITION";
+  description: string;
+  applicationType: "PERSONAL" | "ORGANIZATION";
+  baseAmount: number;
+  finalAmount: number;
+  roundingAdjustmentAmount: number;
+  appliedDiscounts: import("@/lib/discount-link/types").AppliedDiscount[];
+};
+
+export type RegistrationCategoryPricing = {
+  serviceDiscountOptions?: RegistrationPriceOption[];
+};
+
 export type RegistrationCategory = {
   order: number;
   categoryId: string;
@@ -20,6 +34,7 @@ export type RegistrationCategory = {
   amount: number;
   souvenirs: RegistrationSouvenir[];
   startGroups?: RegistrationStartGroup[];
+  pricing?: RegistrationCategoryPricing;
 };
 
 export type RegistrationPolicyReason = {
@@ -57,6 +72,7 @@ export type SelectedSouvenir = {
 };
 
 export type RegistrationCreateRequest = {
+  discountLinkCode?: string;
   eventCategoryId: string;
   selectedSouvenirList: SelectedSouvenir[];
   password: string;
@@ -112,6 +128,7 @@ export type OrganizationParticipant = {
 } & StartGroupInput;
 
 export type OrganizationRegistrationRequest = {
+  discountLinkCode?: string;
   account: OrganizationAccount;
   profile: OrganizationProfile;
   registrations: OrganizationParticipant[];
@@ -199,6 +216,8 @@ export type MemberRegistrationPolicy = {
 
 export type OrganizationLookupParticipant = {
   registrationId: string;
+  hasPriceCalculation?: boolean;
+  priceCalculation?: import("@/lib/discount-link/types").PriceCalculation;
   name: string;
   email?: string;
   birth?: string;
@@ -221,6 +240,8 @@ export type OrganizationLookupParticipant = {
 };
 
 export type RegistrationReceipt = {
+  hasPriceCalculation?: boolean;
+  priceCalculation?: import("@/lib/discount-link/types").PriceCalculation;
   registrationId?: string | null;
   organizationId?: string | null;
   organizationName?: string | null;
