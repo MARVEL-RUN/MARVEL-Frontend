@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { formatFee } from "@/lib/register";
 import type { DiscountLinkEntry } from "@/lib/discount-link/config";
 import {
@@ -20,6 +21,8 @@ import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
 import { categoryLabel, findCategory } from "@/lib/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
+
+type GuidePanel = "prices" | "notes";
 
 function guideNotes(entry: DiscountLinkEntry, options: DiscountOptions) {
   const notes = [...(entry.extraNotices ?? [])];
@@ -49,6 +52,12 @@ export function DiscountGuide({
   const accepting = discountLinkAcceptingRegistration(options);
   const blocked = discountNewRegistrationBlockedMessage(options);
   const notes = guideNotes(entry, options);
+  const hasPrices = options.categories.length > 0;
+  const [panel, setPanel] = useState<GuidePanel>(hasPrices ? "prices" : "notes");
+
+  function goPanel(next: GuidePanel) {
+    setPanel(next);
+  }
 
   return (
     <section className="dl-stage dl-guide" aria-labelledby="dl-guide-title">
@@ -100,87 +109,116 @@ export function DiscountGuide({
           </article>
         </div>
 
-        <div className="dl-guide__body">
-          {options.categories.length ? (
-            <section className="dl-block" aria-labelledby="dl-prices-title">
+        <div className="dl-guide__main">
+          <div className="dl-guide__body">
+            <section
+              className="dl-block"
+              aria-labelledby={panel === "prices" && hasPrices ? "dl-prices-title" : "dl-notes-title"}
+            >
               <header className="dl-block__head">
-                <span className="dl-block__no">A</span>
-                <h2 id="dl-prices-title">종목별 할인가</h2>
-              </header>
-              <ul className="dl-prices">
-                {options.categories.map((row) => {
-                  const category = findCategory(categories, row.categoryId);
-                  const label = category ? categoryLabel(category) : row.categoryId;
-                  return (
-                    <li
-                      key={row.categoryId}
-                      className={row.linkDiscountApplicable ? "dl-price" : "dl-price is-plain"}
+                <span className="dl-block__no">
+                  {panel === "prices" && hasPrices ? "A" : hasPrices ? "B" : "A"}
+                </span>
+                {panel === "prices" && hasPrices ? (
+                  <h2 id="dl-prices-title">종목별 할인가</h2>
+                ) : (
+                  <h2 id="dl-notes-title">신청 전 확인</h2>
+                )}
+                {hasPrices ? (
+                  <div className="dl-block__nav">
+                    <button
+                      type="button"
+                      className="dl-block__jump dl-block__jump--prev"
+                      disabled={panel === "prices"}
+                      onClick={() => goPanel("prices")}
+                      aria-label="종목별 할인가"
                     >
-                      <div className="dl-price__head">
-                        <h3>{label}</h3>
-                        <span className="dl-price__flag">
-                          {row.linkDiscountApplicable ? "할인 적용" : "할인 미적용"}
-                        </span>
-                      </div>
-                      <ul className="dl-price__opts">
-                        {row.priceOptions.map((opt) => {
-                          const pct = priceOptionPercent(opt);
-                          return (
-                            <li key={`${opt.scenario}-${opt.applicationType}`}>
-                              <span className="dl-price__kind">{priceOptionKindLabel(opt)}</span>
-                              <span className="dl-price__desc">{opt.description || label}</span>
-                              <span className="dl-price__amt">
-                                {opt.baseAmount > opt.finalAmount ? (
-                                  <s>{formatFee(opt.baseAmount)}</s>
-                                ) : null}
-                                <strong>{formatFee(opt.finalAmount)}</strong>
-                                {pct ? <em>링크 할인 {pct}%</em> : null}
-                              </span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </li>
-                  );
-                })}
-              </ul>
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      className="dl-block__jump"
+                      disabled={panel === "notes"}
+                      onClick={() => goPanel("notes")}
+                      aria-label="신청 전 확인"
+                    >
+                      →
+                    </button>
+                  </div>
+                ) : null}
+              </header>
+              {panel === "prices" && hasPrices ? (
+                <ul className="dl-prices">
+                  {options.categories.map((row) => {
+                    const category = findCategory(categories, row.categoryId);
+                    const label = category ? categoryLabel(category) : row.categoryId;
+                    return (
+                      <li
+                        key={row.categoryId}
+                        className={row.linkDiscountApplicable ? "dl-price" : "dl-price is-plain"}
+                      >
+                        <div className="dl-price__head">
+                          <h3>{label}</h3>
+                          <span className="dl-price__flag">
+                            {row.linkDiscountApplicable ? "할인 적용" : "할인 미적용"}
+                          </span>
+                        </div>
+                        <ul className="dl-price__opts">
+                          {row.priceOptions.map((opt) => {
+                            const pct = priceOptionPercent(opt);
+                            return (
+                              <li key={`${opt.scenario}-${opt.applicationType}`}>
+                                <span className="dl-price__kind">{priceOptionKindLabel(opt)}</span>
+                                <span className="dl-price__desc">{opt.description || label}</span>
+                                <span className="dl-price__amt">
+                                  {opt.baseAmount > opt.finalAmount ? (
+                                    <s>{formatFee(opt.baseAmount)}</s>
+                                  ) : null}
+                                  <strong>{formatFee(opt.finalAmount)}</strong>
+                                  {pct ? <em>링크 할인 {pct}%</em> : null}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <ol className="dl-notes">
+                  {notes.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ol>
+              )}
             </section>
-          ) : null}
+          </div>
 
-          <section className="dl-block" aria-labelledby="dl-notes-title">
-            <header className="dl-block__head">
-              <span className="dl-block__no">B</span>
-              <h2 id="dl-notes-title">신청 전 확인</h2>
-            </header>
-            <ol className="dl-notes">
-              {notes.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ol>
-          </section>
-        </div>
-
-        <div className={accepting ? "dl-cta" : "dl-cta is-blocked"}>
-          {blocked ? (
-            <p className="dl-cta__note" role="status">
-              {blocked}
-            </p>
-          ) : null}
-          {accepting ? (
-            <button type="button" className="dl-cta__go" onClick={onNext}>
-              <span>유의사항 확인하기</span>
-              <i aria-hidden>→</i>
-            </button>
-          ) : (
-            <div className="dl-cta__links">
-              <Link className="btn btn--ghost" href={withAppBase(base, "/")}>
-                대회 메인
-              </Link>
-              <Link className="btn btn--red" href={withAppBase(base, "/register")}>
-                일반 참가신청
-              </Link>
+          <div className={accepting ? "dl-cta" : "dl-cta is-blocked"}>
+            <div className="dl-cta__bar">
+              {blocked ? (
+                <p className="dl-cta__note" role="status">
+                  {blocked}
+                </p>
+              ) : null}
+              {accepting ? (
+                <button type="button" className="dl-cta__go" onClick={onNext}>
+                  <span>유의사항 동의 후 신청하기</span>
+                  <i aria-hidden>→</i>
+                </button>
+              ) : (
+                <div className="dl-cta__links">
+                  <Link className="btn btn--ghost" href={withAppBase(base, "/")}>
+                    대회 메인
+                  </Link>
+                  <Link className="btn btn--red" href={withAppBase(base, "/register")}>
+                    일반 참가신청
+                  </Link>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>
