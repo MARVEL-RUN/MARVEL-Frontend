@@ -69,6 +69,7 @@ import {
   birthView,
 } from "./ApplyUi";
 import { applyKindsFromDiscount } from "@/lib/discount-link/apply-kinds";
+import { priceOptionDescLabel } from "@/lib/discount-link/display";
 import {
   discountFeeForCategory,
   discountNewRegistrationBlockedMessage,
@@ -712,8 +713,8 @@ function IndividualFlow({
                     ? formatFee(discountPrice.finalAmount)
                     : ticketFee(course, draft.ticket)}
                 </small>
-                {discountPrice?.description ? (
-                  <small>{discountPrice.description}</small>
+                {discountPrice && priceOptionDescLabel(discountPrice) ? (
+                  <small>{priceOptionDescLabel(discountPrice)}</small>
                 ) : null}
               </dd>
             </div>

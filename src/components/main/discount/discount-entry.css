@@ -1001,7 +1001,7 @@
   white-space: nowrap;
 }
 
-.dl-price__amt.is-child strong {
+.dl-price__amt.is-sale strong {
   color: var(--marvel);
 }
 

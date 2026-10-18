@@ -9,6 +9,7 @@ import {
   discountHeadline,
   discountPeriodLabel,
   discountStatusTone,
+  priceOptionDescLabel,
   priceOptionKindLabel,
   priceOptionPercent,
 } from "@/lib/discount-link/display";
@@ -185,11 +186,13 @@ export function DiscountGuide({
                               return (
                                 <li key={`${opt.scenario}-${opt.applicationType}`}>
                                   <span className="dl-price__kind">{priceOptionKindLabel(opt)}</span>
-                                  <span className="dl-price__desc">{opt.description || label}</span>
+                                  <span className="dl-price__desc">
+                                    {priceOptionDescLabel(opt) || label}
+                                  </span>
                                   <span
                                     className={
-                                      opt.scenario === "AGE_CONDITION"
-                                        ? "dl-price__amt is-child"
+                                      row.linkDiscountApplicable && opt.baseAmount > opt.finalAmount
+                                        ? "dl-price__amt is-sale"
                                         : "dl-price__amt"
                                     }
                                   >

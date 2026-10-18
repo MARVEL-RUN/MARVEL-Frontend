@@ -72,6 +72,14 @@ export function priceOptionKindLabel(option: PriceOption) {
   return option.applicationType === "ORGANIZATION" ? "단체" : "개인";
 }
 
+/** STANDARD 설명은 "모든 서비스 내 할인 조건에 해당하지 않는 경우"처럼 길게 와서 짧게 바꿈 */
+export function priceOptionDescLabel(option: PriceOption) {
+  if (option.scenario === "STANDARD") {
+    return option.finalAmount < option.baseAmount ? "기본 할인" : "기본 참가비";
+  }
+  return option.description;
+}
+
 export function priceOptionPercent(option: PriceOption) {
   return externalPercent(option);
 }
