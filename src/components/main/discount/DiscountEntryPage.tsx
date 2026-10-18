@@ -9,9 +9,14 @@ import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
 import type { ApplyKind } from "@/lib/register";
 import { scrollPageTop } from "@/lib/scroll-page";
+import { RegisterClosed } from "../register/RegisterClosed";
 import { RegisterFlow } from "../register/RegisterFlow";
+import { RegisterRound2Standby } from "../register/RegisterRound2Standby";
 import { useDiscountOptions } from "../register/useDiscountOptions";
+import { useRegistrationOpen } from "../register/useRegistrationOpen";
 import { useRegistrationOptions } from "../register/useRegistrationOptions";
+import { useRegistrationRound2Pause } from "../register/useRegistrationRound2Pause";
+import { DiscountGateBlock } from "./DiscountGateBlock";
 import { DiscountGuide } from "./DiscountGuide";
 import { DiscountIntro } from "./DiscountIntro";
 import { DiscountPartnerMark } from "./DiscountPartnerMark";
@@ -69,6 +74,8 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
 
   const registration = useRegistrationOptions();
   const discount = useDiscountOptions(entry.linkCode);
+  const registrationOpen = useRegistrationOpen();
+  const round2Pause = useRegistrationRound2Pause();
   const [introDone, setIntroDone] = useState(false);
   const [stage, setStage] = useState<Stage>("guide");
   const [kind, setKind] = useState<ApplyKind | "">("");
@@ -102,6 +109,18 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
 
   if (!introDone) {
     body = null;
+  } else if (!registrationOpen) {
+    body = (
+      <DiscountGateBlock>
+        <RegisterClosed />
+      </DiscountGateBlock>
+    );
+  } else if (round2Pause) {
+    body = (
+      <DiscountGateBlock>
+        <RegisterRound2Standby />
+      </DiscountGateBlock>
+    );
   } else if (linkGone) {
     body = (
       <DiscountState
@@ -177,9 +196,11 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
     );
   }
 
+  const booting = !introDone;
+
   return (
-    <DiscountShell entry={entry}>
-      {introDone ? null : (
+    <DiscountShell entry={entry} booting={booting}>
+      {booting ? (
         <DiscountIntro
           entry={entry}
           settled={!loading || linkGone}
@@ -188,8 +209,8 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
             window.scrollTo(0, 0);
           }}
         />
-      )}
-      <div className="dl__body" aria-busy={!introDone}>
+      ) : null}
+      <div className="dl__body" aria-busy={booting} hidden={booting}>
         {body}
       </div>
     </DiscountShell>

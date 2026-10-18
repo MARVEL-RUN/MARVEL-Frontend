@@ -46,9 +46,17 @@
   mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 100%);
 }
 
+.dl.is-booting {
+  overflow: hidden;
+}
+
 .dl__body {
   position: relative;
   padding-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+
+.dl__body[hidden] {
+  display: none;
 }
 
 /* fixed 독(.is-stuck)이 있어 끝난 뒤 transform을 남기지 않음 */
