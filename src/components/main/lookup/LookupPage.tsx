@@ -361,6 +361,7 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
           member={member}
           status={registrationStatusLabel(member.status)}
           tone={registrationStatusBadge(member.status)}
+          defaultLedgerOpen={i === 0}
         />
       ))}
       {canceled.map((member) => (
@@ -383,15 +384,23 @@ function ReceiptMemberRow({
   status,
   tone,
   canceled = false,
+  defaultLedgerOpen = false,
 }: {
   no: string;
   member: ReceiptMemberView;
   status: string;
   tone: string;
   canceled?: boolean;
+  defaultLedgerOpen?: boolean;
 }) {
   const size = member.souvenirs[0]?.size;
   const startGroup = member.startGroup && member.startGroup !== "—" ? member.startGroup : "";
+  const subLine = [
+    hasStartGroupFeature && startGroup ? `출발 그룹 ${startGroup}` : "",
+    size ? `사이즈 ${size}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <li className={canceled ? "is-canceled" : undefined}>
       <span className="lookup-members__no">{no}</span>
@@ -400,31 +409,17 @@ function ReceiptMemberRow({
           <strong>{member.name || "참가자"}</strong>
           {member.course ? <span className="lookup-members__course">{member.course}</span> : null}
         </p>
-        {!canceled && ((hasStartGroupFeature && startGroup) || size) ? (
-          <dl className="lookup-members__meta">
-            {hasStartGroupFeature && startGroup ? (
-              <div>
-                <dt>출발 그룹</dt>
-                <dd>{startGroup}</dd>
-              </div>
-            ) : null}
-            {size ? (
-              <div>
-                <dt>사이즈</dt>
-                <dd>{size}</dd>
-              </div>
-            ) : null}
-          </dl>
+        {!canceled && subLine ? <p className="lookup-members__sub">{subLine}</p> : null}
+        {!canceled ? (
+          <LookupMemberPriceCalculation
+            hasPriceCalculation={member.hasPriceCalculation}
+            priceCalculation={member.priceCalculation}
+            defaultOpen={defaultLedgerOpen}
+          />
         ) : null}
       </div>
       {status ? (
         <span className={`lookup-members__status lookup-members__status--${tone}`}>{status}</span>
-      ) : null}
-      {!canceled ? (
-        <LookupMemberPriceCalculation
-          hasPriceCalculation={member.hasPriceCalculation}
-          priceCalculation={member.priceCalculation}
-        />
       ) : null}
     </li>
   );

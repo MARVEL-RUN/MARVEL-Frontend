@@ -1959,27 +1959,125 @@
   --tone: var(--marvel);
 }
 
-.lookup-members__calc {
-  grid-column: 1 / -1;
-  margin-top: 0.55rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+.lookup-members__sub {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
-.lookup-members__calc-title {
-  margin: 0 0 0.55rem;
-  color: var(--silver);
-  font-size: 0.72rem;
+.lookup-members__ledger {
+  margin-top: 0.35rem;
+}
+
+.lookup-ledger {
+  border: 0;
+}
+
+.lookup-ledger__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.lookup-ledger__summary::-webkit-details-marker {
+  display: none;
+}
+
+.lookup-ledger__chev {
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-top: -0.12rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.lookup-ledger[open] .lookup-ledger__chev {
+  margin-top: 0.08rem;
+  transform: rotate(-135deg);
+}
+
+.lookup-ledger__panel {
+  margin-top: 0.5rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.lookup-ledger__rows {
+  display: grid;
+  gap: 0.42rem;
+  margin: 0;
+}
+
+.lookup-ledger__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lookup-ledger__row dt {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.82rem;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+.lookup-ledger__row dd {
+  margin: 0;
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lookup-ledger__row--minus dd {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 600;
+}
+
+.lookup-ledger__row--total {
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lookup-ledger__row--total dt,
+.lookup-ledger__row--total dd {
+  color: #fff;
+  font-size: 0.9rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
 }
 
-.lookup-members__calc .price-calculation {
-  gap: 0.45rem;
+.lookup-ledger__note {
+  margin: 0.65rem 0 0;
+  color: var(--note);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  word-break: keep-all;
 }
 
-.lookup-members__calc .price-calculation__note {
-  font-size: 0.68rem;
+.lookup-ledger__empty {
+  margin: 0;
+  color: var(--note);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.lookup-price-calc {
+  margin-top: 1rem;
 }
 
 @media (max-width: 720px) {
@@ -3718,10 +3816,6 @@
   color: var(--note);
   font-size: 0.72rem;
   line-height: 1.45;
-}
-
-.lookup-price-calc {
-  margin-top: 1rem;
 }
 
 @media (max-width: 720px) {
