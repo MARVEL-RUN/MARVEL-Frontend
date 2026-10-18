@@ -1323,37 +1323,30 @@
     padding-bottom: 0;
   }
 
-  /* 오른쪽 열은 abspos라 행 높이 = 영수증 높이, CTA 하단이 영수증 하단에 붙음 */
   .dl-guide__grid {
-    position: relative;
     max-width: none;
     grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
     column-gap: 2.5rem;
-    align-items: start;
+    align-items: stretch;
   }
 
   .dl-guide__aside {
-    grid-column: 1;
-    grid-row: 1;
+    position: sticky;
+    top: calc(var(--header-h) + var(--dl-steps-h) + var(--dl-guide-pad-top));
+    align-self: start;
     width: 100%;
   }
 
   .dl-guide__main {
-    position: absolute;
-    inset: 0;
     grid-column: 2;
-    grid-row: 1;
+    display: flex;
+    flex-direction: column;
     gap: 1.1rem;
+    min-height: 100%;
   }
 
   .dl-guide__body {
     flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding-right: 0.35rem;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(var(--dl-accent-rgb), 0.35) transparent;
   }
 
   .dl-pass {
@@ -1374,6 +1367,7 @@
     position: static;
     flex: none;
     margin: 0;
+    margin-top: auto;
     padding: 0;
     background: none;
   }
