@@ -35,7 +35,9 @@ import {
   souvenirSizes,
 } from "@/lib/registration-options";
 import {
-  EMPTY_START_GROUP_DRAFT,
+  UNSELECTED_START_GROUP_DRAFT,
+  UNSELECTED_START_GROUP_INPUT,
+  startGroupInputForOrganizationLookupModify,
   hasStartGroupFeature,
   startGroupDraftError,
   startGroupDraftFromStored,
@@ -398,13 +400,15 @@ export function IndividualLookupEdit({
     if (!courseId) return;
     const next = categoryForCourse(categories, courseId, nextBirth);
     applyCategory(next, selectedSize, nextBirth);
-    if (next?.categoryId !== eventCategoryId) setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
+    if (next?.categoryId !== eventCategoryId) {
+      setStartGroupDraft(UNSELECTED_START_GROUP_DRAFT);
+    }
   }
 
   function onCourseChange(nextCourseId: CourseId) {
     const next = categoryForCourse(categories, nextCourseId, birth);
     applyCategory(next);
-    setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
+    setStartGroupDraft(UNSELECTED_START_GROUP_DRAFT);
   }
 
   function validateForm() {
@@ -1093,8 +1097,7 @@ export function GroupLookupEdit({
           phNum: toApiPhone(row.phNum),
           birth: toApiBirth(row.birth),
           gender: row.gender === "F" ? "F" : "M",
-          startGroupId: row.startGroupId,
-          startGroupUnselected: row.startGroupUnselected,
+          ...startGroupInputForOrganizationLookupModify(row),
         };
         if (row.registrationId) next.registrationId = row.registrationId;
         return next;
@@ -1408,7 +1411,7 @@ export function GroupLookupEdit({
                                     memberShirtSize(member.selectedSouvenirList, next),
                                     member.birth,
                                   ),
-                                  ...EMPTY_START_GROUP_DRAFT,
+                                  ...UNSELECTED_START_GROUP_INPUT,
                                 });
                                 if (eventCategoryId) setOpenMember(index);
                               }}
