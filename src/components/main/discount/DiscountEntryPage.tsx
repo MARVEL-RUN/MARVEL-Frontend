@@ -70,28 +70,14 @@ function DiscountState({
 }
 
 function DiscountLinkFeatureOff({ entry }: { entry: DiscountLinkEntry }) {
-  const base = useAppBasePath();
   return (
     <DiscountShell entry={entry}>
       <div className="dl__body">
-        <DiscountGateBlock>
-          <section className="block wait">
-            <p className="kicker">OFF</p>
-            <h2>할인 링크 접수를 이용할 수 없습니다</h2>
-            <p className="sec__body">
-              할인 링크 접수는 현재 제공하지 않습니다. 일반 참가신청 또는 대회 메인을
-              이용해 주세요.
-            </p>
-            <div className="flow__nav">
-              <Link className="btn btn--red" href={withAppBase(base, "/register")}>
-                일반 참가신청
-              </Link>
-              <Link className="btn btn--ghost" href={withAppBase(base, "/")}>
-                대회 메인
-              </Link>
-            </div>
-          </section>
-        </DiscountGateBlock>
+        <DiscountState
+          entry={entry}
+          title="사용할 수 없는 할인 링크입니다"
+          message="할인 링크 접수는 현재 제공하지 않습니다. 일반 참가신청을 이용해 주세요."
+        />
       </div>
     </DiscountShell>
   );
