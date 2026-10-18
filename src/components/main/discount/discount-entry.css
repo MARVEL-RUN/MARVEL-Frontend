@@ -1751,6 +1751,14 @@
 
   .dl-price {
     padding: 0.85rem 0.85rem 0.2rem;
+    border: 1px solid rgba(var(--dl-accent-rgb), 0.28);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.045);
+  }
+
+  .dl-price.is-plain {
+    border-color: var(--dl-line);
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .dl-price__head {
