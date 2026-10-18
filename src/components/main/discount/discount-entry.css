@@ -885,6 +885,10 @@
   white-space: nowrap;
 }
 
+.dl-price__amt.is-child strong {
+  color: var(--marvel);
+}
+
 .dl-price__amt em {
   color: var(--dl-accent);
   font-size: 0.66rem;

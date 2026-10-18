@@ -170,7 +170,13 @@ export function DiscountGuide({
                               <li key={`${opt.scenario}-${opt.applicationType}`}>
                                 <span className="dl-price__kind">{priceOptionKindLabel(opt)}</span>
                                 <span className="dl-price__desc">{opt.description || label}</span>
-                                <span className="dl-price__amt">
+                                <span
+                                  className={
+                                    opt.scenario === "AGE_CONDITION"
+                                      ? "dl-price__amt is-child"
+                                      : "dl-price__amt"
+                                  }
+                                >
                                   {opt.baseAmount > opt.finalAmount ? (
                                     <s>{formatFee(opt.baseAmount)}</s>
                                   ) : null}
