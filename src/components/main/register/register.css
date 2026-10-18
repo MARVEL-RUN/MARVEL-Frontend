@@ -1011,7 +1011,7 @@
   max-width: 100%;
   box-sizing: border-box;
   padding: 0.5rem 0.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 0.5px solid rgba(255, 255, 255, 0.16);
   border-radius: 4px;
   background: transparent;
   color: #fff;
@@ -3451,12 +3451,12 @@
     min-height: var(--party-m-field-h);
     box-sizing: border-box;
     padding: 0.3rem 0.55rem;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 0.5px solid rgba(255, 255, 255, 0.16);
     border-radius: 4px;
     background-color: transparent;
     color: #fff;
     font-size: var(--party-m-field-fs);
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.25;
     text-align: left;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -3485,8 +3485,8 @@
   .party input:focus,
   .party select:focus {
     outline: none;
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.06);
   }
 
   .party td[data-label="사이즈"] .seg {
