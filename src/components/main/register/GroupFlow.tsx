@@ -1091,7 +1091,10 @@ export function GroupFlow({
                             />
                           </td>
                           <td colSpan={3} data-label="패키지">
-                            <KitFixed courseId={courseId} />
+                            <div className="party__kit-line">
+                              <span className="party__kit-label">패키지</span>
+                              <KitFixed courseId={courseId} />
+                            </div>
                           </td>
                           {hasStartGroupFeature ? (
                             <td className="party__sub-pad" aria-hidden="true" />

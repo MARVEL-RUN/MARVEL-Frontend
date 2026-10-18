@@ -1039,9 +1039,27 @@
   text-align: left;
 }
 
+.party td[data-label="패키지"] .party__kit-line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.party td[data-label="패키지"] .party__kit-label {
+  flex: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .party td[data-label="패키지"] .kit-fixed {
+  flex: 1 1 auto;
   flex-wrap: nowrap;
   justify-content: flex-start;
+  min-width: 0;
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.76rem;
   font-weight: 600;
@@ -3136,6 +3154,15 @@
   .party tr.party__more.is-open td.party__peek,
   .party tr.party__more.is-open td.party__sub-pad {
     display: none;
+  }
+
+  .party td[data-label="패키지"] .party__kit-label {
+    display: none;
+  }
+
+  .party td[data-label="패키지"] .party__kit-line {
+    flex-wrap: wrap;
+    gap: 0.32rem;
   }
 
   .party td[data-label="패키지"] .kit-fixed {
