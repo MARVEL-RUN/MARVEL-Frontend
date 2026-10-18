@@ -2068,6 +2068,11 @@
   white-space: nowrap;
 }
 
+.lookup-members>li:has(.lookup-ledger[open]) .lookup-members__status {
+  align-self: start;
+  margin-top: 0.14rem;
+}
+
 .lookup-members__status::before {
   content: "";
   width: 0.4rem;
@@ -2226,9 +2231,11 @@
   }
 
   .lookup-members__status {
-    align-self: start;
-    margin-top: 0.2rem;
     font-size: 0.7rem;
+  }
+
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-members__status {
+    margin-top: 0.12rem;
   }
 }
 
