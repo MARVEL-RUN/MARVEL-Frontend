@@ -3042,6 +3042,7 @@
   }
 
   .party tr.party__info {
+    grid-template-columns: 4.85rem minmax(0, 1fr) auto;
     margin-bottom: 0.8rem;
     background: var(--party-head-bg);
   }
@@ -3113,15 +3114,18 @@
   .party .party__no {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.2rem;
     grid-column: 1;
     grid-row: 1;
-    width: auto;
-    padding-right: 0.15rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 0.35rem;
     background: var(--party-head-bg);
     color: #fff;
     font-size: 0.82rem;
     font-weight: 800;
+    text-align: center;
   }
 
   .party .party__no::before {
@@ -3200,6 +3204,9 @@
 
   .party tr.is-open .party__no {
     grid-column: 1;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
   }
 
   .party tr.party__info.is-open td[data-label="참가비"] {
