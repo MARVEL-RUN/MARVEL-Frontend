@@ -2696,6 +2696,29 @@
   color: #191919;
 }
 
+/* 결제 패널 없는 짧은 시트 — 본문 flex-shrink로 한 줄 스크롤띠로 눌리지 않게 */
+.sheet-modal:not(.sheet-modal--tall) .sheet-modal__sheet:not(:has(.payment-panel)) {
+  height: auto;
+  overflow-y: auto;
+}
+
+.sheet-modal:not(.sheet-modal--tall) .sheet-modal__body:not(:has(.payment-panel)) {
+  flex: 0 1 auto;
+  min-height: auto;
+  overflow-y: visible;
+}
+
+.sheet-modal__message {
+  margin: 0 0 1rem;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.sheet-modal__body .flow__nav {
+  margin-top: 0;
+}
+
 /* 토스 iframe이 휠을 먹어서, 본문 스크롤 + CTA는 시트 하단에 고정 */
 .sheet-modal__body:has(.payment-panel) {
   display: flex;

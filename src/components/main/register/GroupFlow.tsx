@@ -600,8 +600,10 @@ export function GroupFlow({
       if (registrationDiscountUnavailable(err)) {
         setDiscountFallbackMessage(message);
         setDiscountFallbackOpen(true);
+        setError("");
+      } else {
+        fail(message);
       }
-      fail(message);
     } finally {
       setBusyAction(null);
     }
@@ -641,8 +643,10 @@ export function GroupFlow({
       if (registrationDiscountUnavailable(err)) {
         setDiscountFallbackMessage(message);
         setDiscountFallbackOpen(true);
+        setError("");
+      } else {
+        fail(message);
       }
-      fail(message);
     } finally {
       setBusyAction(null);
     }
