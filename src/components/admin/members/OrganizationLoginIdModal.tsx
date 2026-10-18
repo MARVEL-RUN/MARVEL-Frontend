@@ -1,11 +1,8 @@
 "use client";
 
-import {
-  filterOrgAccountInput,
-  orgAccountError,
-} from "@/lib/register";
+import { orgAccountError, resolveOrgAccountInput } from "@/lib/register";
 import { checkAdminOrganizationDuplicateId } from "@/services/admin/organizations";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 type DupStatus = "idle" | "checking" | "ok" | "taken" | "error";
 
@@ -32,6 +29,7 @@ export function OrganizationLoginIdModal({
   const [dupStatus, setDupStatus] = useState<DupStatus>("idle");
   const [dupMessage, setDupMessage] = useState("");
   const [checkedValue, setCheckedValue] = useState("");
+  const composing = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -161,11 +159,28 @@ export function OrganizationLoginIdModal({
                 autoFocus
                 autoComplete="off"
                 spellCheck={false}
-                lang="en"
                 aria-invalid={hintTone === "is-error"}
                 aria-describedby={hintId}
+                onCompositionStart={() => {
+                  composing.current = true;
+                }}
+                onCompositionEnd={(e) => {
+                  composing.current = false;
+                  const { value: next } = resolveOrgAccountInput(
+                    e.currentTarget.value,
+                    false,
+                  );
+                  setValue(next);
+                  setDupStatus("idle");
+                  setDupMessage("");
+                  setCheckedValue("");
+                }}
                 onChange={(e) => {
-                  setValue(filterOrgAccountInput(e.target.value));
+                  const { value: next } = resolveOrgAccountInput(
+                    e.target.value,
+                    composing.current,
+                  );
+                  setValue(next);
                   setDupStatus("idle");
                   setDupMessage("");
                   setCheckedValue("");

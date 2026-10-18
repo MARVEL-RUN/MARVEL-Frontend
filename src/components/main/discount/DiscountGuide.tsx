@@ -10,6 +10,7 @@ import {
   discountPeriodLabel,
   discountStatusTone,
   priceOptionDescLabel,
+  priceOptionKindChipClass,
   priceOptionKindLabel,
   priceOptionPercent,
 } from "@/lib/discount-link/display";
@@ -17,7 +18,7 @@ import {
   discountLinkAcceptingRegistration,
   discountNewRegistrationBlockedMessage,
 } from "@/lib/discount-link/pricing";
-import type { DiscountOptions } from "@/lib/discount-link/types";
+import type { DiscountOptions, PriceOption } from "@/lib/discount-link/types";
 import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
 import { categoryLabel, findCategory } from "@/lib/registration-options";
@@ -25,6 +26,11 @@ import type { RegistrationCategory } from "@/services/main/types";
 import { DiscountPartnerMark } from "./DiscountPartnerMark";
 
 type GuidePanel = "prices" | "notes";
+type PriceKindPanel = "PERSONAL" | "ORGANIZATION";
+
+function priceOptionsForKind(options: PriceOption[], kind: PriceKindPanel) {
+  return options.filter((opt) => opt.applicationType === kind);
+}
 
 function guideNotes(entry: DiscountLinkEntry, options: DiscountOptions) {
   const notes = [...(entry.extraNotices ?? [])];
@@ -55,7 +61,9 @@ export function DiscountGuide({
   const blocked = discountNewRegistrationBlockedMessage(options);
   const notes = guideNotes(entry, options);
   const hasPrices = options.categories.length > 0;
+  const showPriceKindTabs = options.applicationType === "BOTH";
   const [panel, setPanel] = useState<GuidePanel>(hasPrices ? "prices" : "notes");
+  const [priceKind, setPriceKind] = useState<PriceKindPanel>("PERSONAL");
 
   function goPanel(next: GuidePanel) {
     setPanel(next);
@@ -136,12 +144,57 @@ export function DiscountGuide({
                   {panel === "prices" && hasPrices ? "A" : hasPrices ? "B" : "A"}
                 </span>
                 {panel === "prices" && hasPrices ? (
-                  <h2 id="dl-prices-title">종목별 할인가</h2>
+                  <h2 id="dl-prices-title">
+                    종목별 할인가
+                    {showPriceKindTabs ? (
+                      <span className="dl-block__kind-label">
+                        · {priceKind === "PERSONAL" ? "개인" : "단체"}
+                      </span>
+                    ) : null}
+                  </h2>
                 ) : (
                   <h2 id="dl-notes-title">신청 전 확인</h2>
                 )}
                 {hasPrices ? (
                   <div className="dl-block__nav">
+                    {showPriceKindTabs && panel === "prices" ? (
+                      <div
+                        className="dl-price-kind-tabs"
+                        role="tablist"
+                        aria-label="개인·단체 할인가"
+                      >
+                        <button
+                          type="button"
+                          role="tab"
+                          id="dl-price-kind-personal"
+                          aria-selected={priceKind === "PERSONAL"}
+                          aria-controls="dl-prices-panel"
+                          className={
+                            priceKind === "PERSONAL"
+                              ? "dl-price-kind-tabs__btn is-on dl-price-kind-tabs__btn--personal"
+                              : "dl-price-kind-tabs__btn dl-price-kind-tabs__btn--personal"
+                          }
+                          onClick={() => setPriceKind("PERSONAL")}
+                        >
+                          개인
+                        </button>
+                        <button
+                          type="button"
+                          role="tab"
+                          id="dl-price-kind-org"
+                          aria-selected={priceKind === "ORGANIZATION"}
+                          aria-controls="dl-prices-panel"
+                          className={
+                            priceKind === "ORGANIZATION"
+                              ? "dl-price-kind-tabs__btn is-on dl-price-kind-tabs__btn--org"
+                              : "dl-price-kind-tabs__btn dl-price-kind-tabs__btn--org"
+                          }
+                          onClick={() => setPriceKind("ORGANIZATION")}
+                        >
+                          단체
+                        </button>
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       className="dl-block__jump dl-block__jump--prev"
@@ -165,14 +218,40 @@ export function DiscountGuide({
               </header>
               <div className="dl-block__panels">
                 {hasPrices ? (
-                  <ul className={panel === "prices" ? "dl-prices" : "dl-prices is-off"}>
+                  <ul
+                    id={showPriceKindTabs ? "dl-prices-panel" : undefined}
+                    role={showPriceKindTabs ? "tabpanel" : undefined}
+                    aria-labelledby={
+                      showPriceKindTabs
+                        ? priceKind === "PERSONAL"
+                          ? "dl-price-kind-personal"
+                          : "dl-price-kind-org"
+                        : undefined
+                    }
+                    className={panel === "prices" ? "dl-prices" : "dl-prices is-off"}
+                  >
                     {options.categories.map((row) => {
                       const category = findCategory(categories, row.categoryId);
                       const label = category ? categoryLabel(category) : row.categoryId;
+                      const visibleOptions = showPriceKindTabs
+                        ? priceOptionsForKind(row.priceOptions, priceKind)
+                        : row.priceOptions;
+                      if (!visibleOptions.length) return null;
+                      const priceCardKind =
+                        showPriceKindTabs && visibleOptions[0]
+                          ? visibleOptions[0].applicationType === "ORGANIZATION"
+                            ? "org"
+                            : "personal"
+                          : null;
                       return (
                         <li
-                          key={row.categoryId}
-                          className={row.linkDiscountApplicable ? "dl-price" : "dl-price is-plain"}
+                          key={`${row.categoryId}-${showPriceKindTabs ? priceKind : "all"}`}
+                          className={[
+                            row.linkDiscountApplicable ? "dl-price" : "dl-price is-plain",
+                            priceCardKind ? `dl-price--${priceCardKind}` : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                         >
                           <div className="dl-price__head">
                             <h3>{label}</h3>
@@ -181,11 +260,13 @@ export function DiscountGuide({
                             </span>
                           </div>
                           <ul className="dl-price__opts">
-                            {row.priceOptions.map((opt) => {
+                            {visibleOptions.map((opt) => {
                               const pct = priceOptionPercent(opt);
                               return (
                                 <li key={`${opt.scenario}-${opt.applicationType}`}>
-                                  <span className="dl-price__kind">{priceOptionKindLabel(opt)}</span>
+                                  <span className={priceOptionKindChipClass(opt)}>
+                                    {priceOptionKindLabel(opt)}
+                                  </span>
                                   <span className="dl-price__desc">
                                     {priceOptionDescLabel(opt) || label}
                                   </span>

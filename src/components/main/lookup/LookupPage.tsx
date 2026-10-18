@@ -26,6 +26,7 @@ import {
   APPLICATION_PASSWORD_MIN,
   formatPhone,
   orgAccountError,
+  resolveOrgAccountInput,
   type ApplyKind,
 } from "@/lib/register";
 import {
@@ -56,7 +57,7 @@ import { useFlowReset } from "@/lib/main/flowReset";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useLayoutEffect, useState } from "react";
+import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 import { BirthText, PasswordField, PhoneField } from "../register/ApplyUi";
@@ -250,10 +251,10 @@ function toMemberView(
     status: row.registrationStatus || ("status" in row ? row.status ?? "" : ""),
     ...(hasPriceCalculation
       ? {
-          hasPriceCalculation: true,
-          priceCalculation:
-            "priceCalculation" in row ? row.priceCalculation ?? null : null,
-        }
+        hasPriceCalculation: true,
+        priceCalculation:
+          "priceCalculation" in row ? row.priceCalculation ?? null : null,
+      }
       : {}),
   };
 }
@@ -1287,57 +1288,57 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-    <form className="form" onSubmit={onSubmit} noValidate>
-      <div className="form__head">
-        <h2>개인 신청 조회</h2>
-        <p className="form__note">{LOOKUP_LEAD}</p>
-      </div>
-      <label className="field">
-        <span>이름</span>
-        <input
-          name="name"
-          type="text"
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </label>
-      <label className="field">
-        <span>생년월일</span>
-        <BirthText
-          name="birth"
-          autoComplete="bday"
-          value={birth}
-          onChange={setBirth}
-          required
-        />
-      </label>
-      <label className="field">
-        <span>전화번호</span>
-        <PhoneField
-          name="phone"
-          placeholder="휴대폰번호를 입력해주세요."
-          value={phone}
-          onChange={setPhone}
-          autoComplete="tel"
-          required
-        />
-      </label>
-      <div className="field">
-        <span>비밀번호</span>
-        <PasswordField
-          value={password}
-          onChange={setPassword}
-          placeholder="신청조회용 비밀번호 (6자 이상)"
-          minLength={APPLICATION_PASSWORD_MIN}
-          autoComplete="current-password"
-          required
-        />
-      </div>
-      {error ? <p className="form__err">{error}</p> : null}
-      <LookupNav busy={busy} onBack={onBack} />
-    </form>
+      <form className="form" onSubmit={onSubmit} noValidate>
+        <div className="form__head">
+          <h2>개인 신청 조회</h2>
+          <p className="form__note">{LOOKUP_LEAD}</p>
+        </div>
+        <label className="field">
+          <span>이름</span>
+          <input
+            name="name"
+            type="text"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>생년월일</span>
+          <BirthText
+            name="birth"
+            autoComplete="bday"
+            value={birth}
+            onChange={setBirth}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>전화번호</span>
+          <PhoneField
+            name="phone"
+            placeholder="휴대폰번호를 입력해주세요."
+            value={phone}
+            onChange={setPhone}
+            autoComplete="tel"
+            required
+          />
+        </label>
+        <div className="field">
+          <span>비밀번호</span>
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            placeholder="신청조회용 비밀번호 (6자 이상)"
+            minLength={APPLICATION_PASSWORD_MIN}
+            autoComplete="current-password"
+            required
+          />
+        </div>
+        {error ? <p className="form__err">{error}</p> : null}
+        <LookupNav busy={busy} onBack={onBack} />
+      </form>
     </>
   );
 }
@@ -1361,6 +1362,8 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   const [startGroupOpen, setStartGroupOpen] = useState(false);
   const [startGroupBusy, setStartGroupBusy] = useState(false);
   const [startGroupError, setStartGroupError] = useState("");
+  const [accountLangWarn, setAccountLangWarn] = useState(false);
+  const accountComposing = useRef(false);
 
   useLayoutEffect(() => {
     if (view !== "hit" || panel !== "list") return;
@@ -1764,40 +1767,68 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-    <form className="form" onSubmit={onSubmit} noValidate>
-      <div className="form__head">
-        <h2>단체 신청 조회</h2>
-        <p className="form__note">{LOOKUP_LEAD}</p>
-      </div>
-      <label className="field">
-        <span>단체 조회용 ID</span>
-        <input
-          name="account"
-          type="text"
-          autoComplete="username"
-          placeholder="5~20자, 영문·숫자·특수문자"
-          value={account}
-          onChange={(e) => setAccount(e.target.value)}
-          required
-        />
-        <p className="field__hint">신청조회 시 사용합니다.</p>
-      </label>
-      <div className="field">
-        <span>단체 비밀번호</span>
-        <PasswordField
-          value={password}
-          onChange={setPassword}
-          label="단체 비밀번호"
-          placeholder="단체 비밀번호를 입력해주세요."
-          minLength={6}
-          autoComplete="current-password"
-          required
-        />
-        <p className="field__hint">6자 이상 입력해주세요.</p>
-      </div>
-      {error ? <p className="form__err">{error}</p> : null}
-      <LookupNav busy={busy} onBack={onBack} />
-    </form>
+      <form className="form" onSubmit={onSubmit} noValidate>
+        <div className="form__head">
+          <h2>단체 신청 조회</h2>
+          <p className="form__note">{LOOKUP_LEAD}</p>
+        </div>
+        <label className="field">
+          <span>단체 조회용 ID</span>
+          <input
+            name="account"
+            type="text"
+            spellCheck={false}
+            autoComplete="username"
+            placeholder="5~20자, 영문·숫자·특수문자"
+            value={account}
+            className={accountLangWarn ? "is-err" : undefined}
+            aria-invalid={accountLangWarn}
+            onCompositionStart={() => {
+              accountComposing.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              accountComposing.current = false;
+              const { value, nonAsciiAttempt } = resolveOrgAccountInput(
+                e.currentTarget.value,
+                false,
+              );
+              setAccountLangWarn(nonAsciiAttempt);
+              setAccount(value);
+            }}
+            onChange={(e) => {
+              const { value, nonAsciiAttempt } = resolveOrgAccountInput(
+                e.target.value,
+                accountComposing.current,
+              );
+              setAccountLangWarn(nonAsciiAttempt);
+              setAccount(value);
+            }}
+            required
+          />
+          {accountLangWarn ? (
+            <p className="field__hint is-err">
+              한글은 사용할 수 없습니다. 영문·숫자·특수문자만 입력해 주세요.
+            </p>
+          ) : (
+            <p className="field__hint">신청조회 시 사용합니다.</p>
+          )}
+        </label>
+        <div className="field">
+          <span>단체 비밀번호</span>
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            label="단체 비밀번호"
+            placeholder="단체 비밀번호를 입력해주세요."
+            minLength={6}
+            autoComplete="current-password"
+            required
+          />
+          <p className="field__hint">6자 이상 입력해주세요.</p>
+        </div>
+        {error ? <p className="form__err">{error}</p> : null}
+        <LookupNav busy={busy} onBack={onBack} />
+      </form>
     </>
   );
 }

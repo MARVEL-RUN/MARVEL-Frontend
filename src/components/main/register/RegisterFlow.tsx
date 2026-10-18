@@ -349,8 +349,10 @@ function IndividualFlow({
       if (registrationDiscountUnavailable(err)) {
         setDiscountFallbackMessage(message);
         setDiscountFallbackOpen(true);
+        setError("");
+      } else {
+        fail(message);
       }
-      fail(message);
     } finally {
       setBusyAction(null);
     }
@@ -390,8 +392,10 @@ function IndividualFlow({
       if (registrationDiscountUnavailable(err)) {
         setDiscountFallbackMessage(message);
         setDiscountFallbackOpen(true);
+        setError("");
+      } else {
+        fail(message);
       }
-      fail(message);
     } finally {
       setBusyAction(null);
     }

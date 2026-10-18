@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useState } from "react";
 import { discountLinkEntry, type DiscountLinkEntry } from "@/lib/discount-link/config";
+import { hasDiscountLinkFeature } from "@/lib/discount-link/feature";
 import { useFlowReset } from "@/lib/main/flowReset";
 import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
@@ -68,10 +69,30 @@ function DiscountState({
   );
 }
 
+function DiscountLinkFeatureOff({ entry }: { entry: DiscountLinkEntry }) {
+  return (
+    <DiscountShell entry={entry}>
+      <div className="dl__body">
+        <DiscountState
+          entry={entry}
+          title="사용할 수 없는 할인 링크입니다"
+          message="할인 링크 접수는 현재 제공하지 않습니다. 일반 참가신청을 이용해 주세요."
+        />
+      </div>
+    </DiscountShell>
+  );
+}
+
 export function DiscountEntryPage({ slug }: { slug: string }) {
   const entry = discountLinkEntry(slug);
   if (!entry) notFound();
+  if (!hasDiscountLinkFeature) {
+    return <DiscountLinkFeatureOff entry={entry} />;
+  }
+  return <DiscountEntryPageActive entry={entry} />;
+}
 
+function DiscountEntryPageActive({ entry }: { entry: DiscountLinkEntry }) {
   const registration = useRegistrationOptions();
   const discount = useDiscountOptions(entry.linkCode);
   const registrationOpen = useRegistrationOpen();

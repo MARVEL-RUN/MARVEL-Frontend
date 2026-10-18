@@ -474,6 +474,19 @@ export function filterOrgAccountInput(value: string) {
   return value.replace(/[^\x21-\x7E]/g, "");
 }
 
+export function orgAccountNonAsciiAttempt(raw: string) {
+  return /[^\x00-\x7F]/.test(raw);
+}
+
+/** IME 조합 중에는 필터하지 않음 — 조합마다 strip 하면 글자가 깨져 보임 */
+export function resolveOrgAccountInput(raw: string, isComposing: boolean) {
+  const nonAsciiAttempt = orgAccountNonAsciiAttempt(raw);
+  if (isComposing) {
+    return { value: raw, nonAsciiAttempt };
+  }
+  return { value: filterOrgAccountInput(raw), nonAsciiAttempt };
+}
+
 export function orgAccountError(value: string) {
   const v = value.trim();
   if (!v) return "단체 계정을 입력하세요.";

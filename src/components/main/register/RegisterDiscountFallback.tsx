@@ -20,7 +20,7 @@ export function RegisterDiscountFallback({
 
   return (
     <SheetModal onClose={onClose} title="할인 링크 접수 불가">
-      <p>
+      <p className="sheet-modal__message">
         {message || "할인 링크 조건에 맞지 않아 접수를 진행할 수 없습니다."}
       </p>
       <div className="flow__nav">
