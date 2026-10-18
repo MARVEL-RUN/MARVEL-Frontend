@@ -1296,6 +1296,10 @@
     padding-inline: 0;
   }
 
+  .dl-guide .dl-cta:not(.is-blocked) .dl-cta__bar {
+    width: min(46rem, calc(100% - 2.5rem));
+  }
+
   .dl-apply {
     padding-top: 2.25rem;
   }
@@ -1315,29 +1319,41 @@
     animation: dl-enter-fade 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
   }
 
+  .dl-guide {
+    padding-bottom: 0;
+  }
+
+  /* 오른쪽 열은 abspos라 행 높이 = 영수증 높이, CTA 하단이 영수증 하단에 붙음 */
   .dl-guide__grid {
+    position: relative;
     max-width: none;
     grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
-    gap: 2.5rem;
+    column-gap: 2.5rem;
     align-items: start;
   }
 
-  .dl-guide {
-    --dl-guide-cta-dock: 5rem;
+  .dl-guide__aside {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
   }
 
   .dl-guide__main {
+    position: absolute;
+    inset: 0;
     grid-column: 2;
+    grid-row: 1;
+    gap: 1.1rem;
   }
 
-  .dl-guide__aside {
-    position: sticky;
-    top: calc(var(--header-h) + var(--dl-steps-h) + var(--dl-guide-pad-top));
-    align-self: start;
-    width: 100%;
-    max-height: calc(100vh - var(--header-h) - var(--dl-steps-h) - var(--dl-guide-pad-top) - var(--dl-guide-cta-dock) - 1rem);
-    overflow: auto;
+  .dl-guide__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
     overscroll-behavior: contain;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--dl-accent-rgb), 0.35) transparent;
   }
 
   .dl-pass {
@@ -1352,9 +1368,21 @@
     font-size: 1.15rem;
   }
 
+  .dl-guide .dl-cta,
+  .dl-guide .dl-cta:not(.is-blocked),
+  .dl-guide .dl-cta.is-blocked {
+    position: static;
+    flex: none;
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+
   .dl-guide .dl-cta:not(.is-blocked) .dl-cta__bar {
+    width: 100%;
+    margin: 0;
     grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
+    align-items: end;
   }
 
   .dl-guide .dl-cta.is-blocked .dl-cta__bar {
