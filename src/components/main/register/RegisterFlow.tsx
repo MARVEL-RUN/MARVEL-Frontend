@@ -80,6 +80,7 @@ import { DiscountFeeLine } from "../discount/DiscountFeeLine";
 import { GroupFlow } from "./GroupFlow";
 import { RegisterDiscountFallback } from "./RegisterDiscountFallback";
 import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { ServiceDiscountNotice } from "./ServiceDiscountNotice";
 import { StartGroupPick } from "./StartGroupPick";
 import {
   EMPTY_START_GROUP_DRAFT,

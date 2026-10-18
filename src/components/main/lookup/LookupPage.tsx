@@ -794,6 +794,9 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
+      <LookupGroupPriceCalculations
+        participants={organizationLookupParticipants(receipt)}
+      />
       <ReceiptNotes
         receipt={receipt}
         externalPayment={receipt.externalPayment === true}
