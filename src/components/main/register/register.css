@@ -90,9 +90,30 @@
 .lookup-fee-guide {
   display: flex;
   flex-wrap: wrap;
-  align-items: stretch;
+  align-items: flex-end;
   gap: 0.5rem 0.75rem;
   margin-top: 0.85rem;
+}
+
+.lookup-fee-guide__base {
+  min-width: 0;
+}
+
+.lookup-fee-guide__discount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.lookup-fee-guide__discount-label {
+  margin: 0;
+  padding: 0 0.85rem;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .lookup-fee-guide__sep {
@@ -100,7 +121,8 @@
   align-items: center;
   align-self: center;
   color: var(--gold);
-  font-size: 0.88rem;
+  font: inherit;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -116,6 +138,28 @@
 .apply-hint .lookup-discount-fees .course-pick__fees-head,
 .apply-hint .lookup-discount-fees .course-pick__fees-row {
   grid-template-columns: var(--course-fees-cols);
+}
+
+.apply-hint .lookup-discount-fees .course-pick__fees-head>span,
+.apply-hint .lookup-discount-fees .course-pick__fees-h {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.apply-hint .lookup-discount-fees .lookup-discount-fees__amt {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.apply-hint .lookup-discount-fees .lookup-discount-fees__amt.is-fee-child {
+  font-weight: 800;
+}
+
+.apply-hint .lookup-discount-fees .lookup-discount-fees__amt.is-dim {
+  color: rgba(255, 255, 255, 0.38);
+  font-weight: 400;
 }
 
 .form-row {
