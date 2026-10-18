@@ -194,6 +194,10 @@ function memberDiscountFee(
   return category ? formatFee(categoryFeeAmount(category, p.birth)) : "—";
 }
 
+function emptyParticipants(count: number) {
+  return Array.from({ length: Math.max(1, count) }, () => ({ ...EMPTY_PARTICIPANT }));
+}
+
 export function GroupFlow({
   onBack,
   consents,
@@ -204,7 +208,13 @@ export function GroupFlow({
   discount?: DiscountRegisterSession;
 }) {
   const [step, setStep] = useState<Step>(0);
-  const [draft, setDraft] = useState<GroupDraft>({ ...EMPTY_GROUP, ...consents });
+  const minGroup = discount?.options?.minimumGroupSize ?? 0;
+  const keepMembersOpen = minGroup > 1;
+  const [draft, setDraft] = useState<GroupDraft>(() => ({
+    ...EMPTY_GROUP,
+    ...consents,
+    participants: emptyParticipants(minGroup),
+  }));
   const [payment, setPayment] = useState<PaymentOrder | null>(null);
   const [payOpen, setPayOpen] = useState(false);
   const [payCheckOpen, setPayCheckOpen] = useState(false);
@@ -422,7 +432,7 @@ export function GroupFlow({
   }
 
   function removeMember(i: number) {
-    if (draft.participants.length <= 1) return;
+    if (draft.participants.length <= Math.max(1, minGroup)) return;
     patch({ participants: draft.participants.filter((_, idx) => idx !== i) });
     setOpenMember((prev) => {
       if (prev === i) return Math.max(0, i - 1);
@@ -913,7 +923,7 @@ export function GroupFlow({
                     const courseId = category
                       ? (courseForCategory(category)?.id ?? "")
                       : "";
-                    const open = openMember === i;
+                    const open = keepMembersOpen || openMember === i;
                     return (
                       <Fragment key={i}>
                         {i > 0 ? (
@@ -1054,25 +1064,29 @@ export function GroupFlow({
                             {memberDiscountFee(p, category, discount?.options)}
                           </td>
                           <td className="party__del" rowSpan={2}>
-                            <button
-                              type="button"
-                              className="party__expand"
-                              onClick={() => setOpenMember(i)}
-                            >
-                              펼치기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__fold"
-                              onClick={() => setOpenMember(-1)}
-                            >
-                              접기
-                            </button>
+                            {keepMembersOpen ? null : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="party__expand"
+                                  onClick={() => setOpenMember(i)}
+                                >
+                                  펼치기
+                                </button>
+                                <button
+                                  type="button"
+                                  className="party__fold"
+                                  onClick={() => setOpenMember(-1)}
+                                >
+                                  접기
+                                </button>
+                              </>
+                            )}
                             <button
                               type="button"
                               className="party__remove"
                               onClick={() => removeMember(i)}
-                              disabled={draft.participants.length <= 1}
+                              disabled={draft.participants.length <= Math.max(1, minGroup)}
                             >
                               삭제
                             </button>
@@ -1204,11 +1218,11 @@ export function GroupFlow({
               const fee =
                 discount?.options && p.categoryId
                   ? discountFeeForCategory(
-                      discount.options,
-                      p.categoryId,
-                      p.birth,
-                      "group",
-                    )?.finalAmount
+                    discount.options,
+                    p.categoryId,
+                    p.birth,
+                    "group",
+                  )?.finalAmount
                   : category
                     ? categoryFeeAmount(category, p.birth)
                     : undefined;
@@ -1224,12 +1238,12 @@ export function GroupFlow({
                 phoneLabel: p.phone,
                 startGroupLabel: hasStartGroupFeature
                   ? startGroupSummary(
-                      {
-                        startGroupId: p.startGroupId,
-                        startGroupUnselected: p.startGroupUnselected,
-                      },
-                      category,
-                    )
+                    {
+                      startGroupId: p.startGroupId,
+                      startGroupUnselected: p.startGroupUnselected,
+                    },
+                    category,
+                  )
                   : undefined,
               };
             })}
