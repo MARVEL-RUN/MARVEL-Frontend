@@ -46,6 +46,7 @@ import {
   startGroupInputFromStored,
   startGroupSummary,
 } from "@/lib/start-group";
+import { ConfirmMemberList } from "../register/ConfirmMemberList";
 import { GroupMemberStartGroup } from "../register/GroupMemberStartGroup";
 import { StartGroupPick } from "../register/StartGroupPick";
 import {
@@ -1237,6 +1238,8 @@ export function GroupLookupEdit({
                   <col className="party__c-birth" />
                   <col className="party__c-phone" />
                   <col className="party__c-gender" />
+                  <col className="party__c-course" />
+                  {hasStartGroupFeature ? <col className="party__c-start" /> : null}
                   <col className="party__c-fee" />
                   <col className="party__c-del" />
                 </colgroup>
@@ -1247,13 +1250,17 @@ export function GroupLookupEdit({
                     <th>생년월일</th>
                     <th>연락처</th>
                     <th>성별</th>
+                    <th>참가종목</th>
+                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
                     <th rowSpan={2}>참가비</th>
                     <th rowSpan={2}>삭제</th>
                   </tr>
                   <tr>
-                    <th>참가종목</th>
-                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
-                    <th colSpan={hasStartGroupFeature ? 2 : 3}>사이즈</th>
+                    <th colSpan={2}>사이즈</th>
+                    <th colSpan={3}>패키지</th>
+                    {hasStartGroupFeature ? (
+                      <th className="party__sub-pad" aria-hidden="true" />
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -1274,7 +1281,7 @@ export function GroupLookupEdit({
                     return (
                       <Fragment key={member.key}>
                         <tr className={open ? "party__info is-open" : "party__info"}>
-                          <td className="party__no" rowSpan={3}>
+                          <td className="party__no" rowSpan={2}>
                             {index + 1}.
                           </td>
                           <td className="party__peek">
@@ -1358,41 +1365,6 @@ export function GroupLookupEdit({
                               ))}
                             </select>
                           </td>
-                          <td className="party__fee" data-label="참가비" rowSpan={3}>
-                            {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
-                          </td>
-                          <td className="party__del" rowSpan={3}>
-                            <button
-                              type="button"
-                              className="party__expand"
-                              onClick={() => setOpenMember(index)}
-                            >
-                              펼치기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__fold"
-                              onClick={() => setOpenMember(-1)}
-                            >
-                              접기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__remove"
-                              onClick={() => removeMember(index)}
-                              disabled={
-                                busy ||
-                                members.length <= 1 ||
-                                (member.registrationId
-                                  ? !memberDeleteAllowed(member.memberPolicy, false)
-                                  : false)
-                              }
-                            >
-                              삭제
-                            </button>
-                          </td>
-                        </tr>
-                        <tr className={open ? "party__more is-open" : "party__more"}>
                           <td
                             data-label="참가종목"
                             className={memberFieldsLocked ? "is-locked" : undefined}
@@ -1466,6 +1438,42 @@ export function GroupLookupEdit({
                               />
                             </td>
                           ) : null}
+                          <td className="party__fee" data-label="참가비" rowSpan={2}>
+                            {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
+                          </td>
+                          <td className="party__del" rowSpan={2}>
+                            <button
+                              type="button"
+                              className="party__expand"
+                              onClick={() => setOpenMember(index)}
+                            >
+                              펼치기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__fold"
+                              onClick={() => setOpenMember(-1)}
+                            >
+                              접기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__remove"
+                              onClick={() => removeMember(index)}
+                              disabled={
+                                busy ||
+                                members.length <= 1 ||
+                                (member.registrationId
+                                  ? !memberDeleteAllowed(member.memberPolicy, false)
+                                  : false)
+                              }
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__more is-open" : "party__more"}>
+                          <td className="party__peek" aria-hidden="true" />
                           <td
                             colSpan={2}
                             data-label="사이즈"
@@ -1488,17 +1496,17 @@ export function GroupLookupEdit({
                               }}
                             />
                           </td>
-                        </tr>
-                        <tr className={open ? "party__kit is-open" : "party__kit"}>
-                          <td colSpan={4}>
-                            <span className="party__kit-label">패키지</span>
+                          <td colSpan={3} data-label="패키지">
                             <KitFixed courseId={courseId} />
                           </td>
+                          {hasStartGroupFeature ? (
+                            <td className="party__sub-pad" aria-hidden="true" />
+                          ) : null}
                         </tr>
                         {memberPolicyNoteLines.length ? (
                           <tr className={open ? "party__callout is-open" : "party__callout"}>
                             <td className="party__callout-pad" aria-hidden="true" />
-                            <td colSpan={4}>
+                            <td colSpan={hasStartGroupFeature ? 6 : 5}>
                               <div className="party-callout" role="status">
                                 <Info
                                   className="party-callout__icon"
@@ -1515,7 +1523,7 @@ export function GroupLookupEdit({
                           </tr>
                         ) : index < members.length - 1 ? (
                           <tr className="party__gap" aria-hidden="true">
-                            <td colSpan={7} />
+                            <td colSpan={hasStartGroupFeature ? 9 : 8} />
                           </tr>
                         ) : null}
                       </Fragment>
@@ -1605,36 +1613,35 @@ export function GroupLookupEdit({
               </div>
             ) : null}
           </dl>
-          <ul className="member-list">
-            {members.map((member, i) => {
+          <ConfirmMemberList
+            items={members.map((member) => {
               const category = findCategory(categories, member.eventCategoryId);
               const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
               const size = memberShirtSize(member.selectedSouvenirList, category);
-              return (
-                <li key={member.key}>
-                  <strong>
-                    {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
-                  </strong>
-                  <span>
-                    {category ? categoryLabel(category) : "—"}
-                    {hasStartGroupFeature
-                      ? ` · ${startGroupSummary(
-                          {
-                            startGroupId: member.startGroupId ?? "",
-                            startGroupUnselected: member.startGroupUnselected,
-                          },
-                          category,
-                        )}`
-                      : ""}{" "}
-                    · {size || "—"} · {birthView(member.birth) || "—"} ·{" "}
-                    {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
-                    {formatPhone(member.phNum) || "—"}
-                  </span>
-                  <KitFixed courseId={courseId} />
-                </li>
-              );
+              return {
+                key: member.key,
+                name: member.name.trim() || "—",
+                categoryName: category ? categoryLabel(category) : "—",
+                courseId,
+                feeLabel: category
+                  ? formatFee(categoryFeeAmount(category, member.birth))
+                  : undefined,
+                size: size || "—",
+                birthLabel: birthView(member.birth) || "—",
+                genderLabel: genderLabel(member.gender === "F" ? "female" : "male"),
+                phoneLabel: formatPhone(member.phNum) || "—",
+                startGroupLabel: hasStartGroupFeature
+                  ? startGroupSummary(
+                      {
+                        startGroupId: member.startGroupId ?? "",
+                        startGroupUnselected: member.startGroupUnselected,
+                      },
+                      category,
+                    )
+                  : undefined,
+              };
             })}
-          </ul>
+          />
           <DockNav>
             {hint || error ? (
               <p className="form__err flow__err" role="alert">

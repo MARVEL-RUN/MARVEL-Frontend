@@ -78,6 +78,7 @@ import {
 } from "@/lib/start-group";
 import { RegisterUnavailable } from "./RegisterUnavailable";
 import { RegistrationPolicyNotice } from "./RegistrationPolicyNotice";
+import { ConfirmMemberList } from "./ConfirmMemberList";
 import { GroupMemberStartGroup } from "./GroupMemberStartGroup";
 import { useRegistrationOptions } from "./useRegistrationOptions";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
@@ -876,6 +877,8 @@ export function GroupFlow({
                   <col className="party__c-birth" />
                   <col className="party__c-phone" />
                   <col className="party__c-gender" />
+                  <col className="party__c-course" />
+                  {hasStartGroupFeature ? <col className="party__c-start" /> : null}
                   <col className="party__c-fee" />
                   <col className="party__c-del" />
                 </colgroup>
@@ -886,13 +889,17 @@ export function GroupFlow({
                     <th>생년월일</th>
                     <th>연락처</th>
                     <th>성별</th>
+                    <th>참가종목</th>
+                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
                     <th rowSpan={2}>참가비</th>
                     <th rowSpan={2}>삭제</th>
                   </tr>
                   <tr>
-                    <th>참가종목</th>
-                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
-                    <th colSpan={hasStartGroupFeature ? 2 : 3}>사이즈</th>
+                    <th colSpan={2}>사이즈</th>
+                    <th colSpan={3}>패키지</th>
+                    {hasStartGroupFeature ? (
+                      <th className="party__sub-pad" aria-hidden="true" />
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -911,11 +918,11 @@ export function GroupFlow({
                       <Fragment key={i}>
                         {i > 0 ? (
                           <tr className="party__gap" aria-hidden="true">
-                            <td colSpan={7} />
+                            <td colSpan={hasStartGroupFeature ? 9 : 8} />
                           </tr>
                         ) : null}
                         <tr className={open ? "party__info is-open" : "party__info"}>
-                          <td className="party__no" rowSpan={3}>{i + 1}.</td>
+                          <td className="party__no" rowSpan={2}>{i + 1}.</td>
                           <td className="party__peek">
                             <button
                               type="button"
@@ -985,35 +992,6 @@ export function GroupFlow({
                               ))}
                             </select>
                           </td>
-                          <td className="party__fee" data-label="참가비" rowSpan={3}>
-                            {memberDiscountFee(p, category, discount?.options)}
-                          </td>
-                          <td className="party__del" rowSpan={3}>
-                            <button
-                              type="button"
-                              className="party__expand"
-                              onClick={() => setOpenMember(i)}
-                            >
-                              펼치기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__fold"
-                              onClick={() => setOpenMember(-1)}
-                            >
-                              접기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__remove"
-                              onClick={() => removeMember(i)}
-                              disabled={draft.participants.length <= 1}
-                            >
-                              삭제
-                            </button>
-                          </td>
-                        </tr>
-                        <tr className={open ? "party__more is-open" : "party__more"}>
                           <td data-label="참가종목">
                             <select
                               value={p.categoryId}
@@ -1072,6 +1050,36 @@ export function GroupFlow({
                               />
                             </td>
                           ) : null}
+                          <td className="party__fee" data-label="참가비" rowSpan={2}>
+                            {memberDiscountFee(p, category, discount?.options)}
+                          </td>
+                          <td className="party__del" rowSpan={2}>
+                            <button
+                              type="button"
+                              className="party__expand"
+                              onClick={() => setOpenMember(i)}
+                            >
+                              펼치기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__fold"
+                              onClick={() => setOpenMember(-1)}
+                            >
+                              접기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__remove"
+                              onClick={() => removeMember(i)}
+                              disabled={draft.participants.length <= 1}
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__more is-open" : "party__more"}>
+                          <td className="party__peek" aria-hidden="true" />
                           <td colSpan={2} data-label="사이즈">
                             <ShirtPick
                               value={p.selectedSize}
@@ -1082,12 +1090,12 @@ export function GroupFlow({
                               }
                             />
                           </td>
-                        </tr>
-                        <tr className={open ? "party__kit is-open" : "party__kit"}>
-                          <td colSpan={4}>
-                            <span className="party__kit-label">패키지</span>
+                          <td colSpan={3} data-label="패키지">
                             <KitFixed courseId={courseId} />
                           </td>
+                          {hasStartGroupFeature ? (
+                            <td className="party__sub-pad" aria-hidden="true" />
+                          ) : null}
                         </tr>
                       </Fragment>
                     );
@@ -1184,36 +1192,45 @@ export function GroupFlow({
               </div>
             ) : null}
           </dl>
-          <ul className="member-list">
-            {draft.participants.map((p, i) => {
+          <ConfirmMemberList
+            items={draft.participants.map((p, i) => {
               const category = findCategory(categories, p.categoryId);
               const courseId = category
                 ? (courseForCategory(category)?.id ?? "")
                 : "";
-              return (
-                <li key={`${p.name}-${i}`}>
-                  <strong>
-                    {String(i + 1).padStart(2, "0")} {p.name}
-                  </strong>
-                  <span>
-                    {category ? categoryLabel(category) : "—"}
-                    {hasStartGroupFeature
-                      ? ` · ${startGroupSummary(
-                          {
-                            startGroupId: p.startGroupId,
-                            startGroupUnselected: p.startGroupUnselected,
-                          },
-                          category,
-                        )}`
-                      : ""}{" "}
-                    · {p.selectedSize || "—"} · {birthView(p.birth)} ·{" "}
-                    {p.gender ? genderLabel(p.gender) : "—"} · {p.phone}
-                  </span>
-                  <KitFixed courseId={courseId} />
-                </li>
-              );
+              const fee =
+                discount?.options && p.categoryId
+                  ? discountFeeForCategory(
+                      discount.options,
+                      p.categoryId,
+                      p.birth,
+                      "group",
+                    )?.finalAmount
+                  : category
+                    ? categoryFeeAmount(category, p.birth)
+                    : undefined;
+              return {
+                key: `${p.name}-${i}`,
+                name: p.name,
+                categoryName: category ? categoryLabel(category) : "—",
+                courseId,
+                feeLabel: fee != null ? formatFee(fee) : undefined,
+                size: p.selectedSize || "—",
+                birthLabel: birthView(p.birth),
+                genderLabel: p.gender ? genderLabel(p.gender) : "—",
+                phoneLabel: p.phone,
+                startGroupLabel: hasStartGroupFeature
+                  ? startGroupSummary(
+                      {
+                        startGroupId: p.startGroupId,
+                        startGroupUnselected: p.startGroupUnselected,
+                      },
+                      category,
+                    )
+                  : undefined,
+              };
             })}
-          </ul>
+          />
           <DockNav>
             {error ? (
               <p ref={errorRef} className="form__err flow__err" role="alert">
