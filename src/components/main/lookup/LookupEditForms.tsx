@@ -4,6 +4,7 @@ import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import {
   CHILD_ACCOMPANY_NOTE,
+  CHILD_AGE_NOTE,
   GENDERS,
   GUARDIAN_AGE_NOTE,
   MAX_GROUP_SIZE,
@@ -23,7 +24,6 @@ import {
 import { genderLabel } from "@/lib/registration-gender";
 import {
   categoryClosedReason,
-  categoryFeeAmount,
   categoryForCourse,
   categoryLabel,
   categoryOpenForBirth,
@@ -46,6 +46,16 @@ import {
   startGroupInputFromStored,
   startGroupSummary,
 } from "@/lib/start-group";
+import {
+  lookupEditFeeAmount,
+  lookupStoredPricing,
+  type LookupStoredPricing,
+} from "@/lib/discount-link/lookup-fee";
+import {
+  hasLookupPercentDiscount,
+  LookupApplyHintFeeGuide,
+  lookupDiscountGuideFromMembers,
+} from "./LookupDiscountFeeTable";
 import { ConfirmMemberList } from "../register/ConfirmMemberList";
 import { GroupMemberStartGroup } from "../register/GroupMemberStartGroup";
 import { StartGroupPick } from "../register/StartGroupPick";
@@ -85,7 +95,6 @@ import {
   birthView,
   CoursePick,
   EmailField,
-  FeeText,
   FormRow,
   FormSec,
   GenderPick,
@@ -361,16 +370,31 @@ export function IndividualLookupEdit({
     };
   }, []);
 
+  const lookupPricing = useMemo(
+    () =>
+      lookupStoredPricing(
+        receipt.eventCategoryId || "",
+        (receipt.birth || access.birth).replace(/\D/g, ""),
+        receipt.hasPriceCalculation,
+        receipt.priceCalculation,
+      ),
+    [access.birth, receipt],
+  );
+
   const category = useMemo(
     () => findCategory(categories, eventCategoryId),
     [categories, eventCategoryId],
+  );
+
+  const individualFeeAmount = useMemo(
+    () => lookupEditFeeAmount(lookupPricing, eventCategoryId, birth, category),
+    [lookupPricing, eventCategoryId, birth, category],
   );
   const mappedCourse = category ? courseForCategory(category) : undefined;
   const courseId: CourseId | "" = mappedCourse?.id ?? "";
   const souvenir = shirtSouvenir(category);
   const sizes = souvenirSizes(souvenir, ticketForBirth(birth));
   const selectedSize = memberShirtSize(souvenirs, category);
-  const ticket = ticketForBirth(birth);
   const optionsReady = categories.length > 0;
   const guardianMinor = needsGuardian(birth);
   const guardianRequired = guardianRequiredFor({
@@ -627,6 +651,13 @@ export function IndividualLookupEdit({
           <FormSec kicker="05 / ENTRY" title="신청 정보">
             <ApplyHint>
               <p>{TIMING_CHIP_NOTE}</p>
+              {receipt.hasPriceCalculation &&
+              receipt.priceCalculation?.appliedDiscounts &&
+              hasLookupPercentDiscount(receipt.priceCalculation.appliedDiscounts) ? (
+                <LookupApplyHintFeeGuide
+                  appliedDiscounts={receipt.priceCalculation.appliedDiscounts}
+                />
+              ) : null}
             </ApplyHint>
             <FormRow label="참가종목" required locked={!canModify}>
               <CoursePick
@@ -634,6 +665,13 @@ export function IndividualLookupEdit({
                 birth={birth}
                 onChange={onCourseChange}
                 disabled={!canModify}
+                hideFeeTable={
+                  Boolean(
+                    receipt.hasPriceCalculation &&
+                      receipt.priceCalculation?.appliedDiscounts &&
+                      hasLookupPercentDiscount(receipt.priceCalculation.appliedDiscounts),
+                  )
+                }
               />
               {ageBand(birth) === "child" ? (
                 <p className="form-row__hint">{CHILD_ACCOMPANY_NOTE}</p>
@@ -670,8 +708,8 @@ export function IndividualLookupEdit({
               ) : null}
             </FormRow>
             <FormRow label="참가비">
-              {courseId ? (
-                <FeeText courseId={courseId} ticket={ticket} />
+              {category ? (
+                <p className="fee-text">{formatFee(individualFeeAmount)}</p>
               ) : (
                 <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
               )}
@@ -709,7 +747,7 @@ export function IndividualLookupEdit({
                 {category ? (
                   <>
                     {categoryLabel(category)}
-                    <small>{formatFee(categoryFeeAmount(category, birth))}</small>
+                    <small>{formatFee(individualFeeAmount)}</small>
                   </>
                 ) : (
                   "—"
@@ -822,14 +860,27 @@ export function IndividualLookupEdit({
   );
 }
 
-type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
-  key: string;
-  gender: "M" | "F" | "";
-  eventCategoryName?: string;
-  shirtSize?: string;
-  memberPolicy?: MemberRegistrationPolicy;
-  storedStartGroupCode?: string | null;
-};
+type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> &
+  LookupStoredPricing & {
+    key: string;
+    gender: "M" | "F" | "";
+    eventCategoryName?: string;
+    shirtSize?: string;
+    memberPolicy?: MemberRegistrationPolicy;
+    storedStartGroupCode?: string | null;
+  };
+
+function groupMemberFeeAmount(
+  member: GroupMemberDraft,
+  category: RegistrationCategory | undefined,
+) {
+  return lookupEditFeeAmount(
+    member,
+    member.eventCategoryId,
+    member.birth,
+    category,
+  );
+}
 
 function memberKey() {
   return `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -842,7 +893,7 @@ function groupMemberPeek(
   const name = member.name.trim() || "미입력";
   const category = findCategory(categories, member.eventCategoryId);
   if (!category) return name;
-  return `${name} · ${categoryLabel(category)} · ${formatFee(categoryFeeAmount(category, member.birth))}`;
+  return `${name} · ${categoryLabel(category)} · ${formatFee(groupMemberFeeAmount(member, category))}`;
 }
 
 function emptyMember(): GroupMemberDraft {
@@ -885,6 +936,12 @@ function participantDraft(
     memberPolicy: row.memberPolicy,
     ...startGroupInputFromStored(row.startGroupId, row.startGroupUnselected),
     storedStartGroupCode: row.startGroupCode,
+    ...lookupStoredPricing(
+      row.eventCategoryId || "",
+      row.birth || "",
+      row.hasPriceCalculation,
+      row.priceCalculation,
+    ),
   };
 }
 
@@ -949,9 +1006,13 @@ export function GroupLookupEdit({
     () =>
       members.reduce((sum, member) => {
         const category = findCategory(categories, member.eventCategoryId);
-        return sum + (category ? categoryFeeAmount(category, member.birth) : 0);
+        return sum + groupMemberFeeAmount(member, category);
       }, 0),
     [categories, members],
+  );
+  const lookupDiscountGuide = useMemo(
+    () => lookupDiscountGuideFromMembers(members),
+    [members],
   );
   useLayoutEffect(() => {
     scrollPageTop();
@@ -1213,6 +1274,18 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="05" title="참가자">
+            <ApplyHint>
+              <p>대표자도 대회에 참여하는 경우 아래 참가자 정보를 작성하시기 바랍니다.</p>
+              <p>
+                {`*(한번에 최대 ${MAX_GROUP_SIZE}명까지만 신청 가능하며, 초과 인원은 별도의 단체로 신청 해주시기 바랍니다.)*`}
+              </p>
+              <p>{CHILD_AGE_NOTE}</p>
+              <p>{CHILD_ACCOMPANY_NOTE}</p>
+              <p>{GUARDIAN_AGE_NOTE}</p>
+              <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
+              <p>{TIMING_CHIP_NOTE}</p>
+              <LookupApplyHintFeeGuide appliedDiscounts={lookupDiscountGuide} />
+            </ApplyHint>
             <div className="party-bar">
               <p>{members.length}명 등록</p>
               <button
@@ -1439,7 +1512,7 @@ export function GroupLookupEdit({
                             </td>
                           ) : null}
                           <td className="party__fee" data-label="참가비" rowSpan={2}>
-                            {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
+                            {category ? formatFee(groupMemberFeeAmount(member, category)) : "—"}
                           </td>
                           <td className="party__del" rowSpan={2}>
                             <button
@@ -1627,7 +1700,7 @@ export function GroupLookupEdit({
                 categoryName: category ? categoryLabel(category) : "—",
                 courseId,
                 feeLabel: category
-                  ? formatFee(categoryFeeAmount(category, member.birth))
+                  ? formatFee(groupMemberFeeAmount(member, category))
                   : undefined,
                 size: size || "—",
                 birthLabel: birthView(member.birth) || "—",

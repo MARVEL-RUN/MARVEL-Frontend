@@ -87,6 +87,37 @@
   font-size: 0.8rem;
 }
 
+.lookup-fee-guide {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.lookup-fee-guide__sep {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  color: var(--gold);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.apply-hint .lookup-fee-guide .course-pick__fees {
+  margin-top: 0;
+}
+
+.apply-hint .lookup-discount-fees {
+  --course-fees-cols: 6rem 11rem;
+}
+
+.apply-hint .lookup-discount-fees .course-pick__fees-head,
+.apply-hint .lookup-discount-fees .course-pick__fees-row {
+  grid-template-columns: var(--course-fees-cols);
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 11rem minmax(0, 1fr);
