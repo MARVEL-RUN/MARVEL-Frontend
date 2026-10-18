@@ -3,6 +3,9 @@
 .dl {
   --dl-accent: #00d4ff;
   --dl-accent-rgb: 0, 212, 255;
+  /* 개인=accent, 단체=같은 계열 쿨톤(틸·시안과 어울리는 라벤더) */
+  --dl-kind-org: #a4b8ff;
+  --dl-kind-org-rgb: 164, 184, 255;
   --dl-ink: #04050f;
   --dl-bg: #02031a;
   --dl-card: #0a0c2c;
@@ -885,9 +888,9 @@
 }
 
 .dl-price-kind-tabs__btn--org.is-on {
-  border-color: rgba(255, 196, 0, 0.65);
-  background: rgba(255, 196, 0, 0.12);
-  color: #ffc400;
+  border-color: rgba(var(--dl-kind-org-rgb), 0.65);
+  background: rgba(var(--dl-kind-org-rgb), 0.14);
+  color: var(--dl-kind-org);
 }
 
 .dl-block__nav {
@@ -1027,9 +1030,9 @@
 }
 
 .dl-price__kind--org {
-  border-color: rgba(255, 196, 0, 0.55);
-  background: rgba(255, 196, 0, 0.1);
-  color: #ffc400;
+  border-color: rgba(var(--dl-kind-org-rgb), 0.55);
+  background: rgba(var(--dl-kind-org-rgb), 0.12);
+  color: var(--dl-kind-org);
 }
 
 .dl-price--personal {
@@ -1037,7 +1040,7 @@
 }
 
 .dl-price--org {
-  border-top-color: rgba(255, 196, 0, 0.85);
+  border-top-color: rgba(var(--dl-kind-org-rgb), 0.88);
 }
 
 .dl-price__desc {
