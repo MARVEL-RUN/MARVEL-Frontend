@@ -72,6 +72,14 @@ export function priceOptionKindLabel(option: PriceOption) {
   return option.applicationType === "ORGANIZATION" ? "단체" : "개인";
 }
 
+export function priceOptionKindChipClass(option: PriceOption) {
+  const kind =
+    option.applicationType === "ORGANIZATION"
+      ? "dl-price__kind--org"
+      : "dl-price__kind--personal";
+  return `dl-price__kind ${kind}`;
+}
+
 /** STANDARD 설명은 "모든 서비스 내 할인 조건에 해당하지 않는 경우"처럼 길게 와서 짧게 바꿈 */
 export function priceOptionDescLabel(option: PriceOption) {
   if (option.scenario === "STANDARD") {
