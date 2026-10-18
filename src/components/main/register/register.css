@@ -2235,7 +2235,35 @@
   }
 
   .lookup-members>li:has(.lookup-ledger[open]) .lookup-members__status {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
     margin-top: 0.12rem;
+  }
+
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-members__main {
+    display: contents;
+  }
+
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-members__head {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-members__sub {
+    grid-column: 2 / -1;
+  }
+
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-members__ledger {
+    grid-column: 2 / -1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-ledger,
+  .lookup-members>li:has(.lookup-ledger[open]) .lookup-ledger__panel {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
