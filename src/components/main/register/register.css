@@ -840,6 +840,7 @@
 }
 
 .party {
+  --party-head-bg: rgba(255, 255, 255, 0.06);
   width: 100%;
   min-width: 64rem;
   table-layout: fixed;
@@ -918,7 +919,7 @@
 }
 
 .party th {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--party-head-bg);
   color: #fff;
   font-weight: 800;
   white-space: nowrap;
@@ -993,7 +994,9 @@
 }
 
 .party .party__no {
-  color: var(--silver);
+  background: var(--party-head-bg);
+  color: #fff;
+  font-weight: 800;
 }
 
 .party .party__fee {
@@ -2930,7 +2933,7 @@
 
   .party tr.party__info {
     margin-bottom: 0.8rem;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--party-head-bg);
   }
 
   .party tr.party__info.is-open {
@@ -3005,6 +3008,7 @@
     grid-row: 1;
     width: auto;
     padding-right: 0.15rem;
+    background: var(--party-head-bg);
     color: #fff;
     font-size: 0.82rem;
     font-weight: 800;
