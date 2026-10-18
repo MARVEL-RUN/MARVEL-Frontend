@@ -29,6 +29,19 @@ export function hasLookupPercentDiscount(appliedDiscounts: AppliedDiscount[]) {
   );
 }
 
+function lookupDiscountLinkCaption(appliedDiscounts: AppliedDiscount[]) {
+  const external = appliedDiscounts.find(
+    (item) =>
+      item.stage === "EXTERNAL" &&
+      item.method === "PERCENT" &&
+      item.ratePercent != null,
+  );
+  if (external?.ratePercent != null) {
+    return `할인 링크 적용된 (${external.ratePercent}%)`;
+  }
+  return "할인 링크 적용된";
+}
+
 function LookupDiscountFeeSide({
   appliedDiscounts,
 }: {
@@ -55,8 +68,16 @@ function LookupDiscountFeeSide({
                 : lookupApplyPercentDiscounts(childBase, appliedDiscounts);
             return (
               <div key={course.id} className="course-pick__fees-row">
-                <span>{feeDigits(formatFee(adultFee))}</span>
-                <span className={childFee != null ? "is-fee-child" : undefined}>
+                <span className="lookup-discount-fees__amt">
+                  {feeDigits(formatFee(adultFee))}
+                </span>
+                <span
+                  className={
+                    childFee != null
+                      ? "lookup-discount-fees__amt is-fee-child"
+                      : "lookup-discount-fees__amt is-dim"
+                  }
+                >
                   {childFee != null ? feeDigits(formatFee(childFee)) : "참가 불가"}
                 </span>
               </div>
@@ -78,13 +99,20 @@ export function LookupApplyHintFeeGuide({
 
   return (
     <div className="lookup-fee-guide">
-      <CourseFeeTable />
+      <div className="lookup-fee-guide__base">
+        <CourseFeeTable />
+      </div>
       {showDiscount ? (
         <>
           <span className="lookup-fee-guide__sep" aria-hidden="true">
             {">>"}
           </span>
-          <LookupDiscountFeeSide appliedDiscounts={appliedDiscounts} />
+          <div className="lookup-fee-guide__discount">
+            <p className="lookup-fee-guide__discount-label">
+              {lookupDiscountLinkCaption(appliedDiscounts)}
+            </p>
+            <LookupDiscountFeeSide appliedDiscounts={appliedDiscounts} />
+          </div>
         </>
       ) : null}
     </div>

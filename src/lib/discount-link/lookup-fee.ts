@@ -26,6 +26,13 @@ export function lookupStoredPricing(
   };
 }
 
+export function lookupApplyPercentDiscounts(
+  baseAmount: number,
+  appliedDiscounts: AppliedDiscount[],
+) {
+  return applyStoredPercentDiscounts(baseAmount, appliedDiscounts);
+}
+
 function applyStoredPercentDiscounts(baseAmount: number, appliedDiscounts: AppliedDiscount[]) {
   if (!appliedDiscounts.length) return baseAmount;
   let amount = baseAmount;
