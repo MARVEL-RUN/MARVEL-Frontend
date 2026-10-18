@@ -26,6 +26,7 @@ import {
   APPLICATION_PASSWORD_MIN,
   formatPhone,
   orgAccountError,
+  resolveOrgAccountInput,
   type ApplyKind,
 } from "@/lib/register";
 import {
@@ -56,7 +57,7 @@ import { useFlowReset } from "@/lib/main/flowReset";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useLayoutEffect, useState } from "react";
+import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import { SideBanner } from "../layout/SideBanner";
 import { ApplyKindPick } from "../register/ApplyKindPick";
 import { BirthText, PasswordField, PhoneField } from "../register/ApplyUi";
@@ -68,6 +69,13 @@ import {
   LookupRefundModal,
   type LookupModifyAction,
 } from "./LookupEditForms";
+import {
+  LookupMemberPriceCalculation,
+  LookupPriceCalculationBlock,
+} from "./LookupPriceCalculation";
+import type { PriceCalculation } from "@/lib/discount-link/types";
+import { discountActionErrorMessage, isDiscountErrorCode } from "@/lib/discount-link/errors";
+import { MainHttpError } from "@/lib/main/fetch";
 import { LookupPasswordModal, type LookupPasswordSubmit } from "./LookupPasswordModal";
 import {
   LookupStartGroupModal,
@@ -195,6 +203,8 @@ type ReceiptMemberView = {
   souvenirs: { id: string; name: string; size: string; quantity: number }[];
   canceled: boolean;
   status: string;
+  hasPriceCalculation?: boolean;
+  priceCalculation?: PriceCalculation | null;
 };
 
 function memberSouvenirs(
@@ -221,6 +231,8 @@ function toMemberView(
   row: RegistrationReceiptMember | OrganizationLookupParticipant,
   index: number,
 ): ReceiptMemberView {
+  const hasPriceCalculation =
+    "hasPriceCalculation" in row && row.hasPriceCalculation === true;
   return {
     id: row.registrationId || String(index),
     name: row.name ?? "",
@@ -237,6 +249,13 @@ function toMemberView(
     })),
     canceled: row.canceled === true,
     status: row.registrationStatus || ("status" in row ? row.status ?? "" : ""),
+    ...(hasPriceCalculation
+      ? {
+        hasPriceCalculation: true,
+        priceCalculation:
+          "priceCalculation" in row ? row.priceCalculation ?? null : null,
+      }
+      : {}),
   };
 }
 
@@ -343,6 +362,7 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
           member={member}
           status={registrationStatusLabel(member.status)}
           tone={registrationStatusBadge(member.status)}
+          defaultLedgerOpen={i === 0}
         />
       ))}
       {canceled.map((member) => (
@@ -365,15 +385,23 @@ function ReceiptMemberRow({
   status,
   tone,
   canceled = false,
+  defaultLedgerOpen = false,
 }: {
   no: string;
   member: ReceiptMemberView;
   status: string;
   tone: string;
   canceled?: boolean;
+  defaultLedgerOpen?: boolean;
 }) {
   const size = member.souvenirs[0]?.size;
   const startGroup = member.startGroup && member.startGroup !== "—" ? member.startGroup : "";
+  const subLine = [
+    hasStartGroupFeature && startGroup ? `출발 그룹 ${startGroup}` : "",
+    size ? `사이즈 ${size}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <li className={canceled ? "is-canceled" : undefined}>
       <span className="lookup-members__no">{no}</span>
@@ -382,21 +410,13 @@ function ReceiptMemberRow({
           <strong>{member.name || "참가자"}</strong>
           {member.course ? <span className="lookup-members__course">{member.course}</span> : null}
         </p>
-        {!canceled && ((hasStartGroupFeature && startGroup) || size) ? (
-          <dl className="lookup-members__meta">
-            {hasStartGroupFeature && startGroup ? (
-              <div>
-                <dt>출발 그룹</dt>
-                <dd>{startGroup}</dd>
-              </div>
-            ) : null}
-            {size ? (
-              <div>
-                <dt>사이즈</dt>
-                <dd>{size}</dd>
-              </div>
-            ) : null}
-          </dl>
+        {!canceled && subLine ? <p className="lookup-members__sub">{subLine}</p> : null}
+        {!canceled ? (
+          <LookupMemberPriceCalculation
+            hasPriceCalculation={member.hasPriceCalculation}
+            priceCalculation={member.priceCalculation}
+            defaultOpen={defaultLedgerOpen}
+          />
         ) : null}
       </div>
       {status ? (
@@ -693,6 +713,10 @@ function IndividualReceiptCard({
         </div>
         <ReceiptPaymentSpec receipt={receipt} />
       </dl>
+      <LookupPriceCalculationBlock
+        hasPriceCalculation={receipt.hasPriceCalculation}
+        priceCalculation={receipt.priceCalculation}
+      />
       <ReceiptNotes receipt={receipt} externalPayment={externalPayment} />
       <ReceiptActions
         receipt={receipt}
@@ -801,6 +825,9 @@ function isTechnicalErrorMessage(message: string) {
 }
 
 function lookupErrorMessage(err: unknown, fallback = "신청 내역을 조회하지 못했습니다.") {
+  if (err instanceof MainHttpError && err.code && isDiscountErrorCode(err.code)) {
+    return discountActionErrorMessage(err, fallback);
+  }
   if (!(err instanceof Error)) return fallback;
   const message = err.message.trim();
   if (!message || isTechnicalErrorMessage(message)) return fallback;
@@ -1261,57 +1288,57 @@ function IndividualLookup({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-    <form className="form" onSubmit={onSubmit} noValidate>
-      <div className="form__head">
-        <h2>개인 신청 조회</h2>
-        <p className="form__note">{LOOKUP_LEAD}</p>
-      </div>
-      <label className="field">
-        <span>이름</span>
-        <input
-          name="name"
-          type="text"
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </label>
-      <label className="field">
-        <span>생년월일</span>
-        <BirthText
-          name="birth"
-          autoComplete="bday"
-          value={birth}
-          onChange={setBirth}
-          required
-        />
-      </label>
-      <label className="field">
-        <span>전화번호</span>
-        <PhoneField
-          name="phone"
-          placeholder="휴대폰번호를 입력해주세요."
-          value={phone}
-          onChange={setPhone}
-          autoComplete="tel"
-          required
-        />
-      </label>
-      <div className="field">
-        <span>비밀번호</span>
-        <PasswordField
-          value={password}
-          onChange={setPassword}
-          placeholder="신청조회용 비밀번호 (6자 이상)"
-          minLength={APPLICATION_PASSWORD_MIN}
-          autoComplete="current-password"
-          required
-        />
-      </div>
-      {error ? <p className="form__err">{error}</p> : null}
-      <LookupNav busy={busy} onBack={onBack} />
-    </form>
+      <form className="form" onSubmit={onSubmit} noValidate>
+        <div className="form__head">
+          <h2>개인 신청 조회</h2>
+          <p className="form__note">{LOOKUP_LEAD}</p>
+        </div>
+        <label className="field">
+          <span>이름</span>
+          <input
+            name="name"
+            type="text"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>생년월일</span>
+          <BirthText
+            name="birth"
+            autoComplete="bday"
+            value={birth}
+            onChange={setBirth}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>전화번호</span>
+          <PhoneField
+            name="phone"
+            placeholder="휴대폰번호를 입력해주세요."
+            value={phone}
+            onChange={setPhone}
+            autoComplete="tel"
+            required
+          />
+        </label>
+        <div className="field">
+          <span>비밀번호</span>
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            placeholder="신청조회용 비밀번호 (6자 이상)"
+            minLength={APPLICATION_PASSWORD_MIN}
+            autoComplete="current-password"
+            required
+          />
+        </div>
+        {error ? <p className="form__err">{error}</p> : null}
+        <LookupNav busy={busy} onBack={onBack} />
+      </form>
     </>
   );
 }
@@ -1335,6 +1362,8 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
   const [startGroupOpen, setStartGroupOpen] = useState(false);
   const [startGroupBusy, setStartGroupBusy] = useState(false);
   const [startGroupError, setStartGroupError] = useState("");
+  const [accountLangWarn, setAccountLangWarn] = useState(false);
+  const accountComposing = useRef(false);
 
   useLayoutEffect(() => {
     if (view !== "hit" || panel !== "list") return;
@@ -1738,40 +1767,68 @@ function GroupLookup({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-    <form className="form" onSubmit={onSubmit} noValidate>
-      <div className="form__head">
-        <h2>단체 신청 조회</h2>
-        <p className="form__note">{LOOKUP_LEAD}</p>
-      </div>
-      <label className="field">
-        <span>단체 조회용 ID</span>
-        <input
-          name="account"
-          type="text"
-          autoComplete="username"
-          placeholder="5~20자, 영문·숫자·특수문자"
-          value={account}
-          onChange={(e) => setAccount(e.target.value)}
-          required
-        />
-        <p className="field__hint">신청조회 시 사용합니다.</p>
-      </label>
-      <div className="field">
-        <span>단체 비밀번호</span>
-        <PasswordField
-          value={password}
-          onChange={setPassword}
-          label="단체 비밀번호"
-          placeholder="단체 비밀번호를 입력해주세요."
-          minLength={6}
-          autoComplete="current-password"
-          required
-        />
-        <p className="field__hint">6자 이상 입력해주세요.</p>
-      </div>
-      {error ? <p className="form__err">{error}</p> : null}
-      <LookupNav busy={busy} onBack={onBack} />
-    </form>
+      <form className="form" onSubmit={onSubmit} noValidate>
+        <div className="form__head">
+          <h2>단체 신청 조회</h2>
+          <p className="form__note">{LOOKUP_LEAD}</p>
+        </div>
+        <label className="field">
+          <span>단체 조회용 ID</span>
+          <input
+            name="account"
+            type="text"
+            spellCheck={false}
+            autoComplete="username"
+            placeholder="5~20자, 영문·숫자·특수문자"
+            value={account}
+            className={accountLangWarn ? "is-err" : undefined}
+            aria-invalid={accountLangWarn}
+            onCompositionStart={() => {
+              accountComposing.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              accountComposing.current = false;
+              const { value, nonAsciiAttempt } = resolveOrgAccountInput(
+                e.currentTarget.value,
+                false,
+              );
+              setAccountLangWarn(nonAsciiAttempt);
+              setAccount(value);
+            }}
+            onChange={(e) => {
+              const { value, nonAsciiAttempt } = resolveOrgAccountInput(
+                e.target.value,
+                accountComposing.current,
+              );
+              setAccountLangWarn(nonAsciiAttempt);
+              setAccount(value);
+            }}
+            required
+          />
+          {accountLangWarn ? (
+            <p className="field__hint is-err">
+              한글은 사용할 수 없습니다. 영문·숫자·특수문자만 입력해 주세요.
+            </p>
+          ) : (
+            <p className="field__hint">신청조회 시 사용합니다.</p>
+          )}
+        </label>
+        <div className="field">
+          <span>단체 비밀번호</span>
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            label="단체 비밀번호"
+            placeholder="단체 비밀번호를 입력해주세요."
+            minLength={6}
+            autoComplete="current-password"
+            required
+          />
+          <p className="field__hint">6자 이상 입력해주세요.</p>
+        </div>
+        {error ? <p className="form__err">{error}</p> : null}
+        <LookupNav busy={busy} onBack={onBack} />
+      </form>
     </>
   );
 }

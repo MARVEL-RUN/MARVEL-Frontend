@@ -18,6 +18,7 @@ import {
   type VirtualRoundId,
   VIRTUAL_ROUND_LABEL,
 } from "@/lib/admin/raceEvents";
+import { referenceFilterDisplay } from "@/lib/admin/reference-filter";
 import { courseById, type CourseId } from "@/lib/register";
 
 export type { ApplicationKind };
@@ -97,6 +98,7 @@ export type AdminApplicationRow = {
   startGroupId?: string;
   startGroupCode?: string;
   startGroupUnselected?: boolean;
+  referenceFilterLabel?: string;
 };
 
 export type AdminSelectedSouvenir = {
@@ -128,6 +130,7 @@ type RegistrationListItem = {
   startGroupId?: string;
   startGroupCode?: string;
   startGroupUnselected?: unknown;
+  referenceFilter?: unknown;
 };
 
 type RegistrationDetail = {
@@ -175,6 +178,7 @@ type RegistrationDetail = {
   startGroupId?: unknown;
   startGroupCode?: unknown;
   startGroupUnselected?: unknown;
+  referenceFilter?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -184,6 +188,7 @@ export type RegistrationFilterParams = {
   status?: RegistrationStatus | "";
   keyword?: string;
   eventCategoryId?: string;
+  referenceFilterId?: string;
 };
 
 export type StartGroupUnselectedFilter = "" | "true" | "false";
@@ -398,6 +403,7 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     startGroupId: asText(item.startGroupId) || undefined,
     startGroupCode: asText(item.startGroupCode) || undefined,
     startGroupUnselected: asOptionalBool(item.startGroupUnselected),
+    referenceFilterLabel: referenceFilterDisplay(item.referenceFilter) || undefined,
   };
 }
 
@@ -469,6 +475,8 @@ export function applyRegistrationDetail(
       const list = asSelectedSouvenirList(data.selectedSouvenirList);
       return list.length ? list : row.selectedSouvenirList;
     })(),
+    referenceFilterLabel:
+      referenceFilterDisplay(data.referenceFilter) || row.referenceFilterLabel,
   };
 }
 
@@ -511,6 +519,9 @@ function registrationFilterQuery(params: RegistrationFilterParams) {
   }
   if (params.organizationId?.trim()) {
     query.set("organizationId", params.organizationId.trim());
+  }
+  if (params.referenceFilterId?.trim()) {
+    query.set("referenceFilterId", params.referenceFilterId.trim());
   }
   return query;
 }

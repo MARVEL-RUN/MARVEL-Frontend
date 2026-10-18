@@ -1,5 +1,9 @@
 import { statusKey } from "@/lib/registration-status";
-import type { AdminRefundCounts, AdminRefundItem } from "@/services/admin/refunds";
+import type {
+  AdminRefundCounts,
+  AdminRefundItem,
+  AdminRefundPreparedCancel,
+} from "@/services/admin/refunds";
 
 export const REFUND_ITEM_STATUS_LABEL: Record<string, string> = {
   PENDING: "처리 대기",
@@ -47,6 +51,10 @@ export const REFUND_ERROR_HINT: Record<string, string> = {
   EXECUTION_INTERRUPTED: "처리를 확정할 수 없습니다. 저장 결과와 증거를 확인하세요.",
   REFUND_RESULT_REQUIRES_CHECK: "외부 환불 결과를 확인하세요.",
   INVALID_REFUND_REQUEST: "요청 값을 확인하세요.",
+  DISCOUNT_GROUP_MINIMUM_NOT_MET:
+    "할인 단체 최소 인원 조건 때문에 선택 묶음이 차단되었습니다. 최신 명단·인원을 확인하세요.",
+  DISCOUNT_ZERO_AMOUNT_NOT_SUPPORTED: "0원 환불·취소는 지원되지 않습니다.",
+  DISCOUNT_CONFIGURATION_ERROR: "할인·참가비 설정 오류입니다. 운영자 확인이 필요합니다.",
 };
 
 export function refundItemStatusLabel(value?: string | null) {
@@ -96,7 +104,31 @@ export function refundItemMessage(item: AdminRefundItem) {
   if (item.errorCode && mapped) {
     return `${item.errorCode} · ${mapped}`;
   }
+  if (statusKey(item.status) === "NEEDS_REVIEW") {
+    return "일부만 처리됐을 수 있습니다. 전원 미환불로 간주하지 마세요.";
+  }
   return refundItemStatusLabel(item.status);
+}
+
+export function refundPreparedAmountDeduped(items: AdminRefundItem[]) {
+  const seen = new Set<string>();
+  let total = 0;
+  const collect = (refunds: AdminRefundPreparedCancel[] | undefined) => {
+    for (const refund of refunds ?? []) {
+      const id = refund.paymentCancelId?.trim();
+      if (id) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+      }
+      if (typeof refund.amount === "number" && Number.isFinite(refund.amount)) {
+        total += refund.amount;
+      }
+    }
+  };
+  for (const item of items) {
+    collect(item.preparation?.refunds);
+  }
+  return total;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

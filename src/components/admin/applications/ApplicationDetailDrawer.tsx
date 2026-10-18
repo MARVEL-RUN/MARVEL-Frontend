@@ -168,6 +168,9 @@ function buildSections(row: AdminApplicationRow) {
   const addressDetail = row.leader?.addressDetail || row.addressDetail;
 
   const applyFields: DetailField[] = [
+    ...(row.referenceFilterLabel
+      ? [{ label: "참조필터", value: dash(row.referenceFilterLabel) }]
+      : []),
     { label: "코스", value: applicationCourseLabel(row) },
     ...(hasStartGroupFeature
       ? [{ label: "출발 그룹", value: applicationStartGroupLabel(row) }]

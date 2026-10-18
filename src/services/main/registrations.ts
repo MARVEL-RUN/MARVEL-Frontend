@@ -1,3 +1,4 @@
+import { normalizePriceCalculation } from "@/lib/discount-link/normalize";
 import {
   parseMemberPolicy,
   parseOrganizationPolicy,
@@ -87,8 +88,14 @@ function asLookupParticipant(raw: unknown): OrganizationLookupParticipant | null
   const registrationId = asText(row.registrationId);
   if (!registrationId) return null;
   const status = firstText(row.registrationStatus, row.status);
+  const hasPriceCalculation = row.hasPriceCalculation === true;
+  const priceCalculation = hasPriceCalculation
+    ? normalizePriceCalculation(row.priceCalculation)
+    : undefined;
   return {
     registrationId,
+    ...(hasPriceCalculation ? { hasPriceCalculation: true } : {}),
+    ...(priceCalculation ? { priceCalculation } : {}),
     name: asText(row.name),
     email: asText(row.email),
     birth: asText(row.birth),
@@ -138,8 +145,14 @@ function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
     const participant = asLookupParticipant(item);
     return participant ? [participant] : [];
   });
+  const hasPriceCalculation = row.hasPriceCalculation === true;
+  const priceCalculation = hasPriceCalculation
+    ? normalizePriceCalculation(row.priceCalculation)
+    : undefined;
   return {
     ...receipt,
+    ...(hasPriceCalculation ? { hasPriceCalculation: true } : {}),
+    ...(priceCalculation ? { priceCalculation } : {}),
     organizationId: asText(receipt.organizationId) || null,
     organizationName:
       asText(receipt.organizationName) ||

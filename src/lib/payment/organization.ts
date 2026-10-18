@@ -12,8 +12,11 @@ import { birthToApi, genderToApi, phoneDigits } from "./map";
 
 export function toOrganizationRegistrationRequest(
   draft: GroupDraft,
+  discountLinkCode?: string,
 ): OrganizationRegistrationRequest {
+  const code = discountLinkCode?.trim();
   return {
+    ...(code ? { discountLinkCode: code } : {}),
     account: {
       organizationName: filterNoSpaceName(draft.groupName),
       organizationLoginId: draft.organizationAccount.trim(),

@@ -257,11 +257,13 @@ export function CoursePick({
   birth,
   onChange,
   disabled: fieldsDisabled,
+  hideFeeTable,
 }: {
   value: CourseId | "";
   birth: string;
   onChange: (courseId: CourseId, ticket: TicketKind) => void;
   disabled?: boolean;
+  hideFeeTable?: boolean;
 }) {
   const selected = value ? courseById(value) : undefined;
   const ticket =
@@ -314,7 +316,7 @@ export function CoursePick({
           </div>
         </div>
       </div>
-      <CourseFeeTable value={value} ticket={ticket} />
+      {hideFeeTable ? null : <CourseFeeTable value={value} ticket={ticket} />}
     </div>
   );
 }

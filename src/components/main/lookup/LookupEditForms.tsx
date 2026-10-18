@@ -4,6 +4,7 @@ import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import {
   CHILD_ACCOMPANY_NOTE,
+  CHILD_AGE_NOTE,
   GENDERS,
   GUARDIAN_AGE_NOTE,
   MAX_GROUP_SIZE,
@@ -23,7 +24,6 @@ import {
 import { genderLabel } from "@/lib/registration-gender";
 import {
   categoryClosedReason,
-  categoryFeeAmount,
   categoryForCourse,
   categoryLabel,
   categoryOpenForBirth,
@@ -35,7 +35,9 @@ import {
   souvenirSizes,
 } from "@/lib/registration-options";
 import {
-  EMPTY_START_GROUP_DRAFT,
+  UNSELECTED_START_GROUP_DRAFT,
+  UNSELECTED_START_GROUP_INPUT,
+  startGroupInputForOrganizationLookupModify,
   hasStartGroupFeature,
   startGroupDraftError,
   startGroupDraftFromStored,
@@ -44,6 +46,17 @@ import {
   startGroupInputFromStored,
   startGroupSummary,
 } from "@/lib/start-group";
+import {
+  lookupEditFeeAmount,
+  lookupStoredPricing,
+  type LookupStoredPricing,
+} from "@/lib/discount-link/lookup-fee";
+import {
+  hasLookupPercentDiscount,
+  LookupApplyHintFeeGuide,
+  lookupDiscountGuideFromMembers,
+} from "./LookupDiscountFeeTable";
+import { ConfirmMemberList } from "../register/ConfirmMemberList";
 import { GroupMemberStartGroup } from "../register/GroupMemberStartGroup";
 import { StartGroupPick } from "../register/StartGroupPick";
 import {
@@ -82,7 +95,6 @@ import {
   birthView,
   CoursePick,
   EmailField,
-  FeeText,
   FormRow,
   FormSec,
   GenderPick,
@@ -358,16 +370,31 @@ export function IndividualLookupEdit({
     };
   }, []);
 
+  const lookupPricing = useMemo(
+    () =>
+      lookupStoredPricing(
+        receipt.eventCategoryId || "",
+        (receipt.birth || access.birth).replace(/\D/g, ""),
+        receipt.hasPriceCalculation,
+        receipt.priceCalculation,
+      ),
+    [access.birth, receipt],
+  );
+
   const category = useMemo(
     () => findCategory(categories, eventCategoryId),
     [categories, eventCategoryId],
+  );
+
+  const individualFeeAmount = useMemo(
+    () => lookupEditFeeAmount(lookupPricing, eventCategoryId, birth, category),
+    [lookupPricing, eventCategoryId, birth, category],
   );
   const mappedCourse = category ? courseForCategory(category) : undefined;
   const courseId: CourseId | "" = mappedCourse?.id ?? "";
   const souvenir = shirtSouvenir(category);
   const sizes = souvenirSizes(souvenir, ticketForBirth(birth));
   const selectedSize = memberShirtSize(souvenirs, category);
-  const ticket = ticketForBirth(birth);
   const optionsReady = categories.length > 0;
   const guardianMinor = needsGuardian(birth);
   const guardianRequired = guardianRequiredFor({
@@ -398,13 +425,15 @@ export function IndividualLookupEdit({
     if (!courseId) return;
     const next = categoryForCourse(categories, courseId, nextBirth);
     applyCategory(next, selectedSize, nextBirth);
-    if (next?.categoryId !== eventCategoryId) setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
+    if (next?.categoryId !== eventCategoryId) {
+      setStartGroupDraft(UNSELECTED_START_GROUP_DRAFT);
+    }
   }
 
   function onCourseChange(nextCourseId: CourseId) {
     const next = categoryForCourse(categories, nextCourseId, birth);
     applyCategory(next);
-    setStartGroupDraft(EMPTY_START_GROUP_DRAFT);
+    setStartGroupDraft(UNSELECTED_START_GROUP_DRAFT);
   }
 
   function validateForm() {
@@ -622,6 +651,13 @@ export function IndividualLookupEdit({
           <FormSec kicker="05 / ENTRY" title="신청 정보">
             <ApplyHint>
               <p>{TIMING_CHIP_NOTE}</p>
+              {receipt.hasPriceCalculation &&
+              receipt.priceCalculation?.appliedDiscounts &&
+              hasLookupPercentDiscount(receipt.priceCalculation.appliedDiscounts) ? (
+                <LookupApplyHintFeeGuide
+                  appliedDiscounts={receipt.priceCalculation.appliedDiscounts}
+                />
+              ) : null}
             </ApplyHint>
             <FormRow label="참가종목" required locked={!canModify}>
               <CoursePick
@@ -629,6 +665,13 @@ export function IndividualLookupEdit({
                 birth={birth}
                 onChange={onCourseChange}
                 disabled={!canModify}
+                hideFeeTable={
+                  Boolean(
+                    receipt.hasPriceCalculation &&
+                      receipt.priceCalculation?.appliedDiscounts &&
+                      hasLookupPercentDiscount(receipt.priceCalculation.appliedDiscounts),
+                  )
+                }
               />
               {ageBand(birth) === "child" ? (
                 <p className="form-row__hint">{CHILD_ACCOMPANY_NOTE}</p>
@@ -665,8 +708,8 @@ export function IndividualLookupEdit({
               ) : null}
             </FormRow>
             <FormRow label="참가비">
-              {courseId ? (
-                <FeeText courseId={courseId} ticket={ticket} />
+              {category ? (
+                <p className="fee-text">{formatFee(individualFeeAmount)}</p>
               ) : (
                 <p className="fee-text fee-text--wait">종목을 선택하면 표시됩니다</p>
               )}
@@ -704,7 +747,7 @@ export function IndividualLookupEdit({
                 {category ? (
                   <>
                     {categoryLabel(category)}
-                    <small>{formatFee(categoryFeeAmount(category, birth))}</small>
+                    <small>{formatFee(individualFeeAmount)}</small>
                   </>
                 ) : (
                   "—"
@@ -817,14 +860,27 @@ export function IndividualLookupEdit({
   );
 }
 
-type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> & {
-  key: string;
-  gender: "M" | "F" | "";
-  eventCategoryName?: string;
-  shirtSize?: string;
-  memberPolicy?: MemberRegistrationPolicy;
-  storedStartGroupCode?: string | null;
-};
+type GroupMemberDraft = Omit<OrganizationParticipantModifyRequest, "gender"> &
+  LookupStoredPricing & {
+    key: string;
+    gender: "M" | "F" | "";
+    eventCategoryName?: string;
+    shirtSize?: string;
+    memberPolicy?: MemberRegistrationPolicy;
+    storedStartGroupCode?: string | null;
+  };
+
+function groupMemberFeeAmount(
+  member: GroupMemberDraft,
+  category: RegistrationCategory | undefined,
+) {
+  return lookupEditFeeAmount(
+    member,
+    member.eventCategoryId,
+    member.birth,
+    category,
+  );
+}
 
 function memberKey() {
   return `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -837,7 +893,7 @@ function groupMemberPeek(
   const name = member.name.trim() || "미입력";
   const category = findCategory(categories, member.eventCategoryId);
   if (!category) return name;
-  return `${name} · ${categoryLabel(category)} · ${formatFee(categoryFeeAmount(category, member.birth))}`;
+  return `${name} · ${categoryLabel(category)} · ${formatFee(groupMemberFeeAmount(member, category))}`;
 }
 
 function emptyMember(): GroupMemberDraft {
@@ -880,6 +936,12 @@ function participantDraft(
     memberPolicy: row.memberPolicy,
     ...startGroupInputFromStored(row.startGroupId, row.startGroupUnselected),
     storedStartGroupCode: row.startGroupCode,
+    ...lookupStoredPricing(
+      row.eventCategoryId || "",
+      row.birth || "",
+      row.hasPriceCalculation,
+      row.priceCalculation,
+    ),
   };
 }
 
@@ -944,9 +1006,13 @@ export function GroupLookupEdit({
     () =>
       members.reduce((sum, member) => {
         const category = findCategory(categories, member.eventCategoryId);
-        return sum + (category ? categoryFeeAmount(category, member.birth) : 0);
+        return sum + groupMemberFeeAmount(member, category);
       }, 0),
     [categories, members],
+  );
+  const lookupDiscountGuide = useMemo(
+    () => lookupDiscountGuideFromMembers(members),
+    [members],
   );
   useLayoutEffect(() => {
     scrollPageTop();
@@ -1093,8 +1159,7 @@ export function GroupLookupEdit({
           phNum: toApiPhone(row.phNum),
           birth: toApiBirth(row.birth),
           gender: row.gender === "F" ? "F" : "M",
-          startGroupId: row.startGroupId,
-          startGroupUnselected: row.startGroupUnselected,
+          ...startGroupInputForOrganizationLookupModify(row),
         };
         if (row.registrationId) next.registrationId = row.registrationId;
         return next;
@@ -1209,6 +1274,18 @@ export function GroupLookupEdit({
             </FormRow>
           </FormSec>
           <FormSec kicker="05" title="참가자">
+            <ApplyHint>
+              <p>대표자도 대회에 참여하는 경우 아래 참가자 정보를 작성하시기 바랍니다.</p>
+              <p>
+                {`*(한번에 최대 ${MAX_GROUP_SIZE}명까지만 신청 가능하며, 초과 인원은 별도의 단체로 신청 해주시기 바랍니다.)*`}
+              </p>
+              <p>{CHILD_AGE_NOTE}</p>
+              <p>{CHILD_ACCOMPANY_NOTE}</p>
+              <p>{GUARDIAN_AGE_NOTE}</p>
+              <p>어린이 해당 종목은 어린이 요금이 적용됩니다.</p>
+              <p>{TIMING_CHIP_NOTE}</p>
+              <LookupApplyHintFeeGuide appliedDiscounts={lookupDiscountGuide} />
+            </ApplyHint>
             <div className="party-bar">
               <p>{members.length}명 등록</p>
               <button
@@ -1234,6 +1311,8 @@ export function GroupLookupEdit({
                   <col className="party__c-birth" />
                   <col className="party__c-phone" />
                   <col className="party__c-gender" />
+                  <col className="party__c-course" />
+                  {hasStartGroupFeature ? <col className="party__c-start" /> : null}
                   <col className="party__c-fee" />
                   <col className="party__c-del" />
                 </colgroup>
@@ -1244,13 +1323,17 @@ export function GroupLookupEdit({
                     <th>생년월일</th>
                     <th>연락처</th>
                     <th>성별</th>
+                    <th>참가종목</th>
+                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
                     <th rowSpan={2}>참가비</th>
                     <th rowSpan={2}>삭제</th>
                   </tr>
                   <tr>
-                    <th>참가종목</th>
-                    {hasStartGroupFeature ? <th>출발 그룹</th> : null}
-                    <th colSpan={hasStartGroupFeature ? 2 : 3}>사이즈</th>
+                    <th colSpan={2}>사이즈</th>
+                    <th colSpan={3}>패키지</th>
+                    {hasStartGroupFeature ? (
+                      <th className="party__sub-pad" aria-hidden="true" />
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -1271,7 +1354,7 @@ export function GroupLookupEdit({
                     return (
                       <Fragment key={member.key}>
                         <tr className={open ? "party__info is-open" : "party__info"}>
-                          <td className="party__no" rowSpan={3}>
+                          <td className="party__no" rowSpan={2}>
                             {index + 1}.
                           </td>
                           <td className="party__peek">
@@ -1355,41 +1438,6 @@ export function GroupLookupEdit({
                               ))}
                             </select>
                           </td>
-                          <td className="party__fee" data-label="참가비" rowSpan={3}>
-                            {category ? formatFee(categoryFeeAmount(category, member.birth)) : "—"}
-                          </td>
-                          <td className="party__del" rowSpan={3}>
-                            <button
-                              type="button"
-                              className="party__expand"
-                              onClick={() => setOpenMember(index)}
-                            >
-                              펼치기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__fold"
-                              onClick={() => setOpenMember(-1)}
-                            >
-                              접기
-                            </button>
-                            <button
-                              type="button"
-                              className="party__remove"
-                              onClick={() => removeMember(index)}
-                              disabled={
-                                busy ||
-                                members.length <= 1 ||
-                                (member.registrationId
-                                  ? !memberDeleteAllowed(member.memberPolicy, false)
-                                  : false)
-                              }
-                            >
-                              삭제
-                            </button>
-                          </td>
-                        </tr>
-                        <tr className={open ? "party__more is-open" : "party__more"}>
                           <td
                             data-label="참가종목"
                             className={memberFieldsLocked ? "is-locked" : undefined}
@@ -1408,7 +1456,7 @@ export function GroupLookupEdit({
                                     memberShirtSize(member.selectedSouvenirList, next),
                                     member.birth,
                                   ),
-                                  ...EMPTY_START_GROUP_DRAFT,
+                                  ...UNSELECTED_START_GROUP_INPUT,
                                 });
                                 if (eventCategoryId) setOpenMember(index);
                               }}
@@ -1463,6 +1511,42 @@ export function GroupLookupEdit({
                               />
                             </td>
                           ) : null}
+                          <td className="party__fee" data-label="참가비" rowSpan={2}>
+                            {category ? formatFee(groupMemberFeeAmount(member, category)) : "—"}
+                          </td>
+                          <td className="party__del" rowSpan={2}>
+                            <button
+                              type="button"
+                              className="party__expand"
+                              onClick={() => setOpenMember(index)}
+                            >
+                              펼치기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__fold"
+                              onClick={() => setOpenMember(-1)}
+                            >
+                              접기
+                            </button>
+                            <button
+                              type="button"
+                              className="party__remove"
+                              onClick={() => removeMember(index)}
+                              disabled={
+                                busy ||
+                                members.length <= 1 ||
+                                (member.registrationId
+                                  ? !memberDeleteAllowed(member.memberPolicy, false)
+                                  : false)
+                              }
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                        <tr className={open ? "party__more is-open" : "party__more"}>
+                          <td className="party__peek" aria-hidden="true" />
                           <td
                             colSpan={2}
                             data-label="사이즈"
@@ -1485,17 +1569,20 @@ export function GroupLookupEdit({
                               }}
                             />
                           </td>
-                        </tr>
-                        <tr className={open ? "party__kit is-open" : "party__kit"}>
-                          <td colSpan={4}>
-                            <span className="party__kit-label">패키지</span>
-                            <KitFixed courseId={courseId} />
+                          <td colSpan={3} data-label="패키지">
+                            <div className="party__kit-line">
+                              <span className="party__kit-label">패키지</span>
+                              <KitFixed courseId={courseId} />
+                            </div>
                           </td>
+                          {hasStartGroupFeature ? (
+                            <td className="party__sub-pad" aria-hidden="true" />
+                          ) : null}
                         </tr>
                         {memberPolicyNoteLines.length ? (
                           <tr className={open ? "party__callout is-open" : "party__callout"}>
                             <td className="party__callout-pad" aria-hidden="true" />
-                            <td colSpan={4}>
+                            <td colSpan={hasStartGroupFeature ? 6 : 5}>
                               <div className="party-callout" role="status">
                                 <Info
                                   className="party-callout__icon"
@@ -1512,7 +1599,7 @@ export function GroupLookupEdit({
                           </tr>
                         ) : index < members.length - 1 ? (
                           <tr className="party__gap" aria-hidden="true">
-                            <td colSpan={7} />
+                            <td colSpan={hasStartGroupFeature ? 9 : 8} />
                           </tr>
                         ) : null}
                       </Fragment>
@@ -1602,36 +1689,35 @@ export function GroupLookupEdit({
               </div>
             ) : null}
           </dl>
-          <ul className="member-list">
-            {members.map((member, i) => {
+          <ConfirmMemberList
+            items={members.map((member) => {
               const category = findCategory(categories, member.eventCategoryId);
               const courseId = category ? (courseForCategory(category)?.id ?? "") : "";
               const size = memberShirtSize(member.selectedSouvenirList, category);
-              return (
-                <li key={member.key}>
-                  <strong>
-                    {String(i + 1).padStart(2, "0")} {member.name.trim() || "—"}
-                  </strong>
-                  <span>
-                    {category ? categoryLabel(category) : "—"}
-                    {hasStartGroupFeature
-                      ? ` · ${startGroupSummary(
-                          {
-                            startGroupId: member.startGroupId ?? "",
-                            startGroupUnselected: member.startGroupUnselected,
-                          },
-                          category,
-                        )}`
-                      : ""}{" "}
-                    · {size || "—"} · {birthView(member.birth) || "—"} ·{" "}
-                    {genderLabel(member.gender === "F" ? "female" : "male")} ·{" "}
-                    {formatPhone(member.phNum) || "—"}
-                  </span>
-                  <KitFixed courseId={courseId} />
-                </li>
-              );
+              return {
+                key: member.key,
+                name: member.name.trim() || "—",
+                categoryName: category ? categoryLabel(category) : "—",
+                courseId,
+                feeLabel: category
+                  ? formatFee(groupMemberFeeAmount(member, category))
+                  : undefined,
+                size: size || "—",
+                birthLabel: birthView(member.birth) || "—",
+                genderLabel: genderLabel(member.gender === "F" ? "female" : "male"),
+                phoneLabel: formatPhone(member.phNum) || "—",
+                startGroupLabel: hasStartGroupFeature
+                  ? startGroupSummary(
+                      {
+                        startGroupId: member.startGroupId ?? "",
+                        startGroupUnselected: member.startGroupUnselected,
+                      },
+                      category,
+                    )
+                  : undefined,
+              };
             })}
-          </ul>
+          />
           <DockNav>
             {hint || error ? (
               <p className="form__err flow__err" role="alert">
