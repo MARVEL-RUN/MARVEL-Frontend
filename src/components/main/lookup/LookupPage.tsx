@@ -69,9 +69,10 @@ import {
   type LookupModifyAction,
 } from "./LookupEditForms";
 import {
-  LookupGroupPriceCalculations,
+  LookupMemberPriceCalculation,
   LookupPriceCalculationBlock,
 } from "./LookupPriceCalculation";
+import type { PriceCalculation } from "@/lib/discount-link/types";
 import { discountActionErrorMessage, isDiscountErrorCode } from "@/lib/discount-link/errors";
 import { MainHttpError } from "@/lib/main/fetch";
 import { LookupPasswordModal, type LookupPasswordSubmit } from "./LookupPasswordModal";
@@ -201,6 +202,8 @@ type ReceiptMemberView = {
   souvenirs: { id: string; name: string; size: string; quantity: number }[];
   canceled: boolean;
   status: string;
+  hasPriceCalculation?: boolean;
+  priceCalculation?: PriceCalculation | null;
 };
 
 function memberSouvenirs(
@@ -227,6 +230,8 @@ function toMemberView(
   row: RegistrationReceiptMember | OrganizationLookupParticipant,
   index: number,
 ): ReceiptMemberView {
+  const hasPriceCalculation =
+    "hasPriceCalculation" in row && row.hasPriceCalculation === true;
   return {
     id: row.registrationId || String(index),
     name: row.name ?? "",
@@ -243,6 +248,13 @@ function toMemberView(
     })),
     canceled: row.canceled === true,
     status: row.registrationStatus || ("status" in row ? row.status ?? "" : ""),
+    ...(hasPriceCalculation
+      ? {
+          hasPriceCalculation: true,
+          priceCalculation:
+            "priceCalculation" in row ? row.priceCalculation ?? null : null,
+        }
+      : {}),
   };
 }
 
@@ -349,6 +361,7 @@ function ReceiptMemberList({ members }: { members: ReceiptMemberView[] }) {
           member={member}
           status={registrationStatusLabel(member.status)}
           tone={registrationStatusBadge(member.status)}
+          defaultLedgerOpen={i === 0}
         />
       ))}
       {canceled.map((member) => (
@@ -371,15 +384,23 @@ function ReceiptMemberRow({
   status,
   tone,
   canceled = false,
+  defaultLedgerOpen = false,
 }: {
   no: string;
   member: ReceiptMemberView;
   status: string;
   tone: string;
   canceled?: boolean;
+  defaultLedgerOpen?: boolean;
 }) {
   const size = member.souvenirs[0]?.size;
   const startGroup = member.startGroup && member.startGroup !== "—" ? member.startGroup : "";
+  const subLine = [
+    hasStartGroupFeature && startGroup ? `출발 그룹 ${startGroup}` : "",
+    size ? `사이즈 ${size}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <li className={canceled ? "is-canceled" : undefined}>
       <span className="lookup-members__no">{no}</span>
@@ -388,21 +409,13 @@ function ReceiptMemberRow({
           <strong>{member.name || "참가자"}</strong>
           {member.course ? <span className="lookup-members__course">{member.course}</span> : null}
         </p>
-        {!canceled && ((hasStartGroupFeature && startGroup) || size) ? (
-          <dl className="lookup-members__meta">
-            {hasStartGroupFeature && startGroup ? (
-              <div>
-                <dt>출발 그룹</dt>
-                <dd>{startGroup}</dd>
-              </div>
-            ) : null}
-            {size ? (
-              <div>
-                <dt>사이즈</dt>
-                <dd>{size}</dd>
-              </div>
-            ) : null}
-          </dl>
+        {!canceled && subLine ? <p className="lookup-members__sub">{subLine}</p> : null}
+        {!canceled ? (
+          <LookupMemberPriceCalculation
+            hasPriceCalculation={member.hasPriceCalculation}
+            priceCalculation={member.priceCalculation}
+            defaultOpen={defaultLedgerOpen}
+          />
         ) : null}
       </div>
       {status ? (
@@ -781,9 +794,6 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
-      <LookupGroupPriceCalculations
-        participants={organizationLookupParticipants(receipt)}
-      />
       <ReceiptNotes
         receipt={receipt}
         externalPayment={receipt.externalPayment === true}

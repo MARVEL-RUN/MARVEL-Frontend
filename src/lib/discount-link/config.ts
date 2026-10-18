@@ -1,3 +1,5 @@
+import { MAIN_ASSETS } from "@/lib/assets";
+
 export type DiscountLinkSlug = "inje" | "runnable" | "29cm" | "kream";
 
 export type DiscountLinkVariant = "standard" | "run-crew";
@@ -8,6 +10,9 @@ export type DiscountLinkEntry = {
   variant: DiscountLinkVariant;
   /** 외부 사이트 배너·유입 표기용 */
   partnerTag?: string;
+  partnerLogo?: string;
+  /** 검정 로고를 어두운 배경에서 흰색으로 */
+  partnerLogoInvert?: boolean;
   kicker: string;
   title: string;
   en: string;
@@ -35,6 +40,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     linkCode: "TEST_RUNNABLE",
     variant: "standard",
     partnerTag: "RUNNABLE",
+    partnerLogo: MAIN_ASSETS.discountRunnable,
     kicker: "RUNNABLE",
     title: "러너블 할인 참가신청",
     en: "RUNNABLE DISCOUNT",
@@ -47,6 +53,8 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     linkCode: "TEST_29CM",
     variant: "run-crew",
     partnerTag: "29CM",
+    partnerLogo: MAIN_ASSETS.discount29cm,
+    partnerLogoInvert: true,
     kicker: "RUN CREW",
     title: "러닝크루 특별 할인",
     en: "CREW DISCOUNT",
@@ -64,6 +72,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     linkCode: "TEST_KREAM",
     variant: "run-crew",
     partnerTag: "KREAM",
+    partnerLogo: MAIN_ASSETS.discountKream,
     kicker: "RUN CREW",
     title: "러닝크루 특별 할인",
     en: "CREW DISCOUNT",

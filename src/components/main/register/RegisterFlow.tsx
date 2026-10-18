@@ -69,6 +69,7 @@ import {
   birthView,
 } from "./ApplyUi";
 import { applyKindsFromDiscount } from "@/lib/discount-link/apply-kinds";
+import { priceOptionDescLabel } from "@/lib/discount-link/display";
 import {
   discountFeeForCategory,
   discountNewRegistrationBlockedMessage,
@@ -113,13 +114,24 @@ function entryPasswordConfirmHint(password: string, confirm: string) {
   return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
 }
 
-export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession }) {
+export function RegisterFlow({
+  discount,
+  onKindChange,
+}: {
+  discount?: DiscountRegisterSession;
+  onKindChange?: (kind: ApplyKind | "") => void;
+}) {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
-  const registrationOptions = useRegistrationOptions();
   const allowedKinds = discount?.options
     ? applyKindsFromDiscount(discount.options.applicationType)
     : undefined;
+  const kindListener = useRef(onKindChange);
+  kindListener.current = onKindChange;
+
+  useEffect(() => {
+    kindListener.current?.(kind);
+  }, [kind]);
 
   function pickKind(next: ApplyKind) {
     setKind(next);
@@ -139,23 +151,15 @@ export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession 
 
   if (!kind) {
     return (
-      <>
-        {!discount ? (
-          <ServiceDiscountNotice
-            categories={registrationOptions.categories}
-            loading={registrationOptions.loading}
-          />
-        ) : null}
-        <ApplyTerms
-          values={consents}
-          onChange={setConsents}
-          onPick={pickKind}
-          allowedKinds={allowedKinds}
-          heading={discount?.entry.termsTitle}
-          lead={discount?.entry.termsLead}
-          className={discount ? "apply-terms--discount-link" : undefined}
-        />
-      </>
+      <ApplyTerms
+        values={consents}
+        onChange={setConsents}
+        onPick={pickKind}
+        allowedKinds={allowedKinds}
+        heading={discount?.entry.termsTitle}
+        lead={discount?.entry.termsLead}
+        className={discount ? "apply-terms--discount-link" : undefined}
+      />
     );
   }
   if (kind === "group") {
@@ -710,8 +714,8 @@ function IndividualFlow({
                     ? formatFee(discountPrice.finalAmount)
                     : ticketFee(course, draft.ticket)}
                 </small>
-                {discountPrice?.description ? (
-                  <small>{discountPrice.description}</small>
+                {discountPrice && priceOptionDescLabel(discountPrice) ? (
+                  <small>{priceOptionDescLabel(discountPrice)}</small>
                 ) : null}
               </dd>
             </div>

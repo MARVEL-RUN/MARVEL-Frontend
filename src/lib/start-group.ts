@@ -36,6 +36,17 @@ export const EMPTY_START_GROUP_DRAFT: StartGroupDraft = {
   startGroupUnselected: false,
 };
 
+/** 종목 변경·UI 꺼짐 등 — API 미선택(후미) */
+export const UNSELECTED_START_GROUP_INPUT: StartGroupInput = {
+  startGroupId: null,
+  startGroupUnselected: true,
+};
+
+export const UNSELECTED_START_GROUP_DRAFT: StartGroupDraft = {
+  startGroupId: "",
+  startGroupUnselected: true,
+};
+
 export function sortedStartGroups(
   category: RegistrationCategory | undefined,
 ): RegistrationStartGroup[] {
@@ -79,16 +90,37 @@ export function startGroupInputForCreate(draft: StartGroupDraft): StartGroupInpu
   return startGroupInputFromDraft(draft);
 }
 
-/** 조회 수정 — UI 꺼져 있으면 저장값 유지 */
+/** 조회 수정 — UI 꺼져 있으면 미선택(후미) */
 export function startGroupInputForModify(
   draft: StartGroupDraft,
-  storedId?: string | null,
-  storedUnselected?: boolean,
+  _storedId?: string | null,
+  _storedUnselected?: boolean,
 ): StartGroupInput {
   if (!hasStartGroupFeature) {
-    return startGroupInputFromStored(storedId, storedUnselected);
+    return UNSELECTED_START_GROUP_INPUT;
+  }
+  if (!draft.startGroupUnselected && !draft.startGroupId.trim()) {
+    return UNSELECTED_START_GROUP_INPUT;
   }
   return startGroupInputFromDraft(draft);
+}
+
+/** 단체 조회 수정 registrations[] */
+export function startGroupInputForOrganizationLookupModify(row: {
+  startGroupId?: string | null;
+  startGroupUnselected?: boolean;
+}): StartGroupInput {
+  if (!hasStartGroupFeature) {
+    return UNSELECTED_START_GROUP_INPUT;
+  }
+  if (row.startGroupUnselected === true) {
+    return UNSELECTED_START_GROUP_INPUT;
+  }
+  const id = (row.startGroupId ?? "").trim();
+  if (!id) {
+    return UNSELECTED_START_GROUP_INPUT;
+  }
+  return { startGroupId: id, startGroupUnselected: false };
 }
 
 /** lookup·수정 요청에 조회값 그대로 실을 때 */
