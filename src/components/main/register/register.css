@@ -2054,9 +2054,14 @@
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.lookup-ledger__row--total dt,
+.lookup-ledger__row--total dt {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 .lookup-ledger__row--total dd {
-  color: #fff;
+  color: var(--gold);
   font-size: 0.9rem;
   font-weight: 800;
 }
@@ -2345,6 +2350,63 @@
   color: var(--silver);
   font-size: 0.82rem;
   font-weight: 600;
+}
+
+.lookup-members-block {
+  margin-top: 1.35rem;
+  text-align: left;
+}
+
+.lookup-members-block__title {
+  margin: 0 0 0.35rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.lookup-members--confirm {
+  margin-top: 0;
+  border-top: 0;
+}
+
+.lookup-members__detail {
+  margin: 0;
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.lookup-members__fee {
+  align-self: start;
+  margin-top: 0.12rem;
+  color: var(--gold);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.lookup-members__kit {
+  margin: 0;
+}
+
+.lookup-members--confirm .kit-fixed {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.lookup-members--confirm .kit-fixed li {
+  display: inline;
+  padding: 0;
+  border: 0;
 }
 
 .member-list .kit-fixed li {
@@ -3392,9 +3454,20 @@
 
   .ticket .spec dd,
   .member-list strong,
-  .member-list span {
+  .member-list span,
+  .lookup-members__head strong,
+  .lookup-members__detail {
     word-break: keep-all;
     overflow-wrap: anywhere;
+  }
+
+  .lookup-members--confirm>li {
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    padding-inline: 0;
+  }
+
+  .lookup-members__fee {
+    font-size: 0.8rem;
   }
 
   .ticket .btn,
