@@ -1223,6 +1223,11 @@
   line-height: 1.55;
 }
 
+.field__hint.is-err {
+  color: var(--marvel);
+  font-weight: 700;
+}
+
 .field input:focus {
   outline: none;
   border-bottom-color: var(--marvel);

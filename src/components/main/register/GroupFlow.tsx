@@ -52,7 +52,7 @@ import {
   genderLabel,
   emailOk,
   filterNoSpaceName,
-  filterOrgAccountInput,
+  resolveOrgAccountInput,
   groupNeedsGuardian,
   orgAccountError,
   applicationPasswordError,
@@ -152,7 +152,10 @@ function groupNameHint(value: string, check: FieldCheck) {
 
 function orgAccountHint(value: string, langWarn: boolean, check: FieldCheck) {
   if (langWarn) {
-    return { text: "영문으로 입력해주세요.", tone: "is-err" as const };
+    return {
+      text: "한글은 사용할 수 없습니다. 영문·숫자·특수문자만 입력해 주세요.",
+      tone: "is-err" as const,
+    };
   }
   if (!value) {
     if (matchesField(check, value) && check.hint) return check.hint;
@@ -237,6 +240,7 @@ export function GroupFlow({
     useState<FieldCheck>(EMPTY_FIELD_CHECK);
   const [openMember, setOpenMember] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
+  const accountComposing = useRef(false);
   const router = useRouter();
   const base = useAppBasePath();
 
@@ -734,18 +738,30 @@ export function GroupFlow({
               <div className="field-with-btn">
                 <input
                   type="text"
-                  lang="en"
                   spellCheck={false}
                   placeholder="5~20자, 영문·숫자·특수문자"
                   value={draft.organizationAccount}
                   className={accountHint.tone === "is-err" ? "is-err" : undefined}
                   aria-invalid={accountHint.tone === "is-err"}
+                  onCompositionStart={() => {
+                    accountComposing.current = true;
+                  }}
+                  onCompositionEnd={(e) => {
+                    accountComposing.current = false;
+                    const { value, nonAsciiAttempt } = resolveOrgAccountInput(
+                      e.currentTarget.value,
+                      false,
+                    );
+                    setAccountLangWarn(nonAsciiAttempt);
+                    patch({ organizationAccount: value });
+                  }}
                   onChange={(e) => {
-                    const raw = e.target.value;
-                    const next = filterOrgAccountInput(raw);
-                    // 한글 등 비ASCII 입력 시도 시에만 안내
-                    setAccountLangWarn(/[^\x00-\x7F]/.test(raw));
-                    patch({ organizationAccount: next });
+                    const { value, nonAsciiAttempt } = resolveOrgAccountInput(
+                      e.target.value,
+                      accountComposing.current,
+                    );
+                    setAccountLangWarn(nonAsciiAttempt);
+                    patch({ organizationAccount: value });
                   }}
                   autoComplete="username"
                   required
