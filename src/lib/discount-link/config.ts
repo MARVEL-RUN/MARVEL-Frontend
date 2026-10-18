@@ -1,6 +1,6 @@
 import { MAIN_ASSETS } from "@/lib/assets";
 
-export type DiscountLinkSlug = "inje" | "runnable" | "29cm" | "kream";
+export type DiscountLinkSlug = "inje" | "runable" | "29cm" | "kream";
 
 export type DiscountLinkVariant = "standard" | "run-crew";
 
@@ -36,14 +36,14 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
       "할인 링크로 접속하셨습니다. 아래 유의사항·동의 후 할인 조건에 맞게 신청해 주세요.",
   },
   {
-    slug: "runnable",
+    slug: "runable",
     linkCode: "TEST_RUNNABLE",
     variant: "standard",
-    partnerTag: "RUNNABLE",
-    partnerLogo: MAIN_ASSETS.discountRunnable,
-    kicker: "RUNNABLE",
+    partnerTag: "RUNABLE",
+    partnerLogo: MAIN_ASSETS.discountRunable,
+    kicker: "RUNABLE",
     title: "러너블 할인 참가신청",
-    en: "RUNNABLE DISCOUNT",
+    en: "RUNABLE DISCOUNT",
     termsTitle: "러너블 할인 링크 참가 동의",
     termsLead:
       "티켓사 할인 링크로 접속하셨습니다. 단체 할인 조건을 확인한 뒤 신청해 주세요.",

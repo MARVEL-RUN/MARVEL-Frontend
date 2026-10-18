@@ -28,7 +28,7 @@
   --dl-accent-rgb: 94, 234, 212;
 }
 
-.dl[data-discount-slug="runnable"] {
+.dl[data-discount-slug="runable"] {
   --dl-accent: var(--gold);
   --dl-accent-rgb: 224, 195, 106;
 }
