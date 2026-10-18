@@ -14,6 +14,7 @@ import { useDiscountOptions } from "../register/useDiscountOptions";
 import { useRegistrationOptions } from "../register/useRegistrationOptions";
 import { DiscountGuide } from "./DiscountGuide";
 import { DiscountIntro } from "./DiscountIntro";
+import { DiscountPartnerMark } from "./DiscountPartnerMark";
 import { DiscountShell } from "./DiscountShell";
 import { DiscountStepBar } from "./DiscountStepBar";
 
@@ -37,7 +38,10 @@ function DiscountState({
         <span className="dl-state__mark" aria-hidden>
           !
         </span>
-        <p className="dl-state__tag">{entry.partnerTag ?? "DISCOUNT"} · {entry.en}</p>
+        <p className="dl-state__tag">
+          <DiscountPartnerMark entry={entry} />
+          <span>{entry.en}</span>
+        </p>
         <h1 className="dl-state__title">{title}</h1>
         <p className="dl-state__msg">{message}</p>
         <div className="dl-state__actions">
@@ -147,7 +151,7 @@ export function DiscountEntryPage({ slug }: { slug: string }) {
           <div className="wrap dl-apply__inner">
             {step === 2 ? (
               <p className="dl-ribbon">
-                <span>{entry.partnerTag ?? "DISCOUNT"}</span>
+                <DiscountPartnerMark entry={entry} />
                 {entry.title} 적용 중
               </p>
             ) : null}

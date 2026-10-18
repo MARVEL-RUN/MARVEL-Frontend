@@ -21,6 +21,7 @@ import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
 import { categoryLabel, findCategory } from "@/lib/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
+import { DiscountPartnerMark } from "./DiscountPartnerMark";
 
 type GuidePanel = "prices" | "notes";
 
@@ -65,7 +66,7 @@ export function DiscountGuide({
         <div className="dl-guide__aside">
           <article className="dl-pass">
             <div className="dl-pass__head">
-              <span className="dl-pass__partner">{entry.partnerTag ?? "DISCOUNT"}</span>
+              <DiscountPartnerMark entry={entry} className="dl-pass__partner" />
               <span className={`dl-chip dl-chip--${status.tone}`}>{status.label}</span>
             </div>
 
@@ -100,7 +101,14 @@ export function DiscountGuide({
               {period ? (
                 <div className="is-wide">
                   <dt>할인 접수 기간</dt>
-                  <dd>{period}</dd>
+                  <dd className="dl-pass__period">
+                    {period.split(" ~ ").map((part, i, all) => (
+                      <span key={part}>
+                        {part}
+                        {i < all.length - 1 ? " ~" : ""}
+                      </span>
+                    ))}
+                  </dd>
                 </div>
               ) : null}
             </dl>

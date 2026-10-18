@@ -1,6 +1,7 @@
 "use client";
 
 import type { DiscountLinkEntry } from "@/lib/discount-link/config";
+import { DiscountPartnerMark } from "./DiscountPartnerMark";
 
 export const DISCOUNT_STEPS = ["할인 안내", "유의사항 동의", "신청 작성"] as const;
 
@@ -37,7 +38,7 @@ export function DiscountStepBar({
             </svg>
           </button>
         ) : (
-          <span className="dl-steps__tag">{entry.partnerTag ?? "DISCOUNT"}</span>
+          <DiscountPartnerMark entry={entry} className="dl-steps__tag" />
         )}
 
         <div className="dl-steps__now">

@@ -575,6 +575,12 @@
   filter: brightness(0) invert(1);
 }
 
+/* 로고 파일의 진회색 바탕을 검정으로 밀어 screen으로 지움 */
+.dl[data-discount-slug="kream"] .dl-partner img {
+  filter: contrast(2.4);
+  mix-blend-mode: screen;
+}
+
 .dl-pass__partner {
   color: var(--dl-accent);
   font-size: 0.72rem;
@@ -632,9 +638,9 @@
 .dl-pass__kicker {
   margin-top: 1.3rem;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.2em;
 }
 
 .dl-pass__title {
@@ -676,15 +682,15 @@
 }
 
 .dl-pass__headline span {
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
 .dl-pass__lead {
   margin-top: 0.9rem;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.9rem;
-  line-height: 1.65;
+  line-height: 1.6;
   word-break: keep-all;
 }
 
@@ -720,7 +726,7 @@
 .dl-pass__facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.9rem 1rem;
+  gap: 1rem 1rem;
   margin: 0;
 }
 
@@ -729,28 +735,34 @@
 }
 
 .dl-pass__facts dt {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .dl-pass__facts dd {
-  margin: 0.28rem 0 0;
-  font-size: 0.92rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.95rem;
   font-weight: 800;
   line-height: 1.4;
   word-break: keep-all;
 }
 
+.dl-pass__facts .dl-pass__period {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .dl-pass__msg {
-  margin-top: 1.05rem;
-  padding: 0.7rem 0.85rem;
+  margin-top: 1.15rem;
+  padding: 0.75rem 0.9rem;
   border-left: 2px solid var(--dl-accent);
   background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 0.82rem;
-  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  line-height: 1.6;
   word-break: keep-all;
 }
 
@@ -758,7 +770,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.95rem;
 }
 
 .dl-block__no {
@@ -829,14 +841,14 @@
 
 .dl-prices {
   display: grid;
-  gap: 0.7rem;
+  gap: 0.85rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .dl-price {
-  padding: 0.95rem 1rem 0.3rem;
+  padding: 1rem 1.1rem 0.35rem;
   border: 1px solid var(--dl-line);
   border-top: 2px solid var(--dl-accent);
   background: rgba(255, 255, 255, 0.035);
@@ -851,26 +863,31 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  padding-bottom: 0.65rem;
+  padding-bottom: 0.7rem;
   border-bottom: 1px solid var(--dl-line);
 }
 
 .dl-price__head h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.08rem;
   font-weight: 800;
+  letter-spacing: -0.01em;
   word-break: keep-all;
 }
 
 .dl-price__flag {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgba(var(--dl-accent-rgb), 0.4);
+  border-radius: 999px;
   color: var(--dl-accent);
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
 .dl-price.is-plain .dl-price__flag {
+  border-color: rgba(255, 255, 255, 0.22);
   color: var(--note);
 }
 
@@ -884,8 +901,8 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.35rem 0.6rem;
-  padding: 0.72rem 0;
+  gap: 0.4rem 0.75rem;
+  padding: 0.85rem 0;
 }
 
 .dl-price__opts li+li {
@@ -893,17 +910,20 @@
 }
 
 .dl-price__kind {
-  padding: 0.18rem 0.42rem;
+  padding: 0.2rem 0.45rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.64rem;
-  font-weight: 800;
+  border-radius: 3px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .dl-price__desc {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.8rem;
-  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.84rem;
+  line-height: 1.5;
   word-break: keep-all;
 }
 
@@ -911,18 +931,21 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 0.05rem;
   line-height: 1.25;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .dl-price__amt s {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 0.74rem;
 }
 
 .dl-price__amt strong {
-  font-size: 1.08rem;
+  font-size: 1.15rem;
   font-weight: 800;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -931,10 +954,12 @@
 }
 
 .dl-price__amt em {
+  margin-top: 0.1rem;
   color: var(--dl-accent);
-  font-size: 0.66rem;
-  font-weight: 800;
+  font-size: 0.7rem;
+  font-weight: 700;
   font-style: normal;
+  white-space: nowrap;
 }
 
 .dl-notes {
@@ -948,11 +973,11 @@
 
 .dl-notes li {
   display: grid;
-  grid-template-columns: 1.9rem minmax(0, 1fr);
-  gap: 0.35rem;
-  padding: 0.85rem 1rem;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.88rem;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.4rem;
+  padding: 1rem 1.1rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.92rem;
   line-height: 1.6;
   word-break: keep-all;
   counter-increment: dl-note;
@@ -1024,6 +1049,7 @@
   font: inherit;
   font-size: 1rem;
   font-weight: 800;
+  letter-spacing: -0.01em;
   cursor: pointer;
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
   transition: transform 0.15s ease, filter 0.2s ease;
@@ -1115,7 +1141,7 @@
   word-break: keep-all;
 }
 
-.dl-ribbon > span:not(.dl-partner) {
+.dl-ribbon>span:not(.dl-partner) {
   flex: none;
   padding: 0.18rem 0.5rem;
   border-radius: 999px;
@@ -1409,8 +1435,48 @@
     margin-inline: -1.6rem;
   }
 
+  .dl-pass__title {
+    font-size: 1.9rem;
+  }
+
+  .dl-pass__headline strong {
+    font-size: 3.5rem;
+  }
+
   .dl-block__head h2 {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
+  }
+
+  .dl-block__no {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.76rem;
+  }
+
+  .dl-block__jump {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .dl-price {
+    padding: 1.1rem 1.2rem 0.4rem;
+  }
+
+  .dl-price__head h3 {
+    font-size: 1.12rem;
+  }
+
+  /* 2행 카드가 영수증 높이 안에 들어가야 CTA 하단이 맞음 */
+  .dl-price__opts li {
+    padding: 0.68rem 0;
+  }
+
+  .dl-price__amt {
+    gap: 0;
+  }
+
+  .dl-price__amt strong {
+    font-size: 1.22rem;
   }
 
   .dl-guide .dl-cta,

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import type { DiscountLinkEntry } from "@/lib/discount-link/config";
+import { DiscountPartnerMark } from "./DiscountPartnerMark";
 
 /* 응답이 빨라도 한 번은 보여 줌 */
 const MIN_SHOW_MS = 1700;
@@ -85,8 +86,8 @@ export function DiscountIntro({
           <span className="dl-intro__scan" />
           <div className="dl-intro__pass-top">
             <span className="dl-intro__label">SPECIAL ACCESS</span>
-            {entry.partnerTag ? (
-              <span className="dl-intro__partner">{entry.partnerTag}</span>
+            {entry.partnerTag || entry.partnerLogo ? (
+              <DiscountPartnerMark entry={entry} className="dl-intro__partner" />
             ) : null}
           </div>
           <strong className="dl-intro__title">{entry.title}</strong>
