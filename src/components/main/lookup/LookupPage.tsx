@@ -69,9 +69,10 @@ import {
   type LookupModifyAction,
 } from "./LookupEditForms";
 import {
-  LookupGroupPriceCalculations,
+  LookupMemberPriceCalculation,
   LookupPriceCalculationBlock,
 } from "./LookupPriceCalculation";
+import type { PriceCalculation } from "@/lib/discount-link/types";
 import { discountActionErrorMessage, isDiscountErrorCode } from "@/lib/discount-link/errors";
 import { MainHttpError } from "@/lib/main/fetch";
 import { LookupPasswordModal, type LookupPasswordSubmit } from "./LookupPasswordModal";
@@ -201,6 +202,8 @@ type ReceiptMemberView = {
   souvenirs: { id: string; name: string; size: string; quantity: number }[];
   canceled: boolean;
   status: string;
+  hasPriceCalculation?: boolean;
+  priceCalculation?: PriceCalculation | null;
 };
 
 function memberSouvenirs(
@@ -227,6 +230,8 @@ function toMemberView(
   row: RegistrationReceiptMember | OrganizationLookupParticipant,
   index: number,
 ): ReceiptMemberView {
+  const hasPriceCalculation =
+    "hasPriceCalculation" in row && row.hasPriceCalculation === true;
   return {
     id: row.registrationId || String(index),
     name: row.name ?? "",
@@ -243,6 +248,13 @@ function toMemberView(
     })),
     canceled: row.canceled === true,
     status: row.registrationStatus || ("status" in row ? row.status ?? "" : ""),
+    ...(hasPriceCalculation
+      ? {
+          hasPriceCalculation: true,
+          priceCalculation:
+            "priceCalculation" in row ? row.priceCalculation ?? null : null,
+        }
+      : {}),
   };
 }
 
@@ -407,6 +419,12 @@ function ReceiptMemberRow({
       </div>
       {status ? (
         <span className={`lookup-members__status lookup-members__status--${tone}`}>{status}</span>
+      ) : null}
+      {!canceled ? (
+        <LookupMemberPriceCalculation
+          hasPriceCalculation={member.hasPriceCalculation}
+          priceCalculation={member.priceCalculation}
+        />
       ) : null}
     </li>
   );
@@ -781,9 +799,6 @@ function GroupReceiptCard({
         <ReceiptSouvenirSpec souvenirs={receipt.souvenirs ?? []} />
       </dl>
       <ReceiptMemberList members={members} />
-      <LookupGroupPriceCalculations
-        participants={organizationLookupParticipants(receipt)}
-      />
       <ReceiptNotes
         receipt={receipt}
         externalPayment={receipt.externalPayment === true}

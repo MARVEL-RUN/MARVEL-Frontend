@@ -1,6 +1,19 @@
 import { PriceCalculationBreakdown } from "../discount/PriceCalculationBreakdown";
 import type { PriceCalculation } from "@/lib/discount-link/types";
 
+function LookupPriceCalculationBody({
+  priceCalculation,
+}: {
+  priceCalculation?: PriceCalculation | null;
+}) {
+  if (priceCalculation) {
+    return <PriceCalculationBreakdown calculation={priceCalculation} />;
+  }
+  return (
+    <p className="price-calculation__empty">적용된 할인 없이 계산되었습니다.</p>
+  );
+}
+
 export function LookupPriceCalculationBlock({
   title = "참가비 계산",
   hasPriceCalculation,
@@ -15,45 +28,25 @@ export function LookupPriceCalculationBlock({
   return (
     <section className="ticket-notice lookup-price-calc" aria-label={title}>
       <p className="ticket-notice__title">{title}</p>
-      {priceCalculation ? (
-        <PriceCalculationBreakdown calculation={priceCalculation} />
-      ) : (
-        <p className="price-calculation__empty">적용된 할인 없이 계산되었습니다.</p>
-      )}
+      <LookupPriceCalculationBody priceCalculation={priceCalculation} />
     </section>
   );
 }
 
-export function LookupGroupPriceCalculations({
-  participants,
+/** 단체 조회 — 구성원 행 안 */
+export function LookupMemberPriceCalculation({
+  hasPriceCalculation,
+  priceCalculation,
 }: {
-  participants: {
-    registrationId: string;
-    name?: string;
-    hasPriceCalculation?: boolean;
-    priceCalculation?: PriceCalculation | null;
-    canceled?: boolean;
-  }[];
+  hasPriceCalculation?: boolean;
+  priceCalculation?: PriceCalculation | null;
 }) {
-  const rows = participants.filter(
-    (row) => row.hasPriceCalculation && !row.canceled,
-  );
-  if (!rows.length) return null;
+  if (!hasPriceCalculation) return null;
 
   return (
-    <div className="lookup-price-records" aria-label="구성원별 참가비 계산">
-      {rows.map((row) => (
-        <details key={row.registrationId} className="lookup-price-record">
-          <summary>
-            {row.name?.trim() || "참가자"} · 참가비 계산
-          </summary>
-          {row.priceCalculation ? (
-            <PriceCalculationBreakdown calculation={row.priceCalculation} />
-          ) : (
-            <p className="price-calculation__empty">적용된 할인 없이 계산되었습니다.</p>
-          )}
-        </details>
-      ))}
+    <div className="lookup-members__calc" aria-label="참가비 계산">
+      <p className="lookup-members__calc-title">참가비 계산</p>
+      <LookupPriceCalculationBody priceCalculation={priceCalculation} />
     </div>
   );
 }
