@@ -2,175 +2,192 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MediaLoader } from "../MediaLoader";
-import { DiscountEntryHero } from "./DiscountEntryHero";
-import { DiscountEntryMobileRail } from "./DiscountEntryMobileRail";
-import { DiscountLinkNotice } from "./DiscountLinkNotice";
-import { discountLinkEntry } from "@/lib/discount-link/config";
+import { useState } from "react";
+import { discountLinkEntry, type DiscountLinkEntry } from "@/lib/discount-link/config";
+import { useFlowReset } from "@/lib/main/flowReset";
 import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
+import type { ApplyKind } from "@/lib/register";
+import { scrollPageTop } from "@/lib/scroll-page";
 import { RegisterFlow } from "../register/RegisterFlow";
-import { useRegistrationOptions } from "../register/useRegistrationOptions";
 import { useDiscountOptions } from "../register/useDiscountOptions";
+import { useRegistrationOptions } from "../register/useRegistrationOptions";
+import { DiscountGuide } from "./DiscountGuide";
+import { DiscountIntro } from "./DiscountIntro";
+import { DiscountShell } from "./DiscountShell";
+import { DiscountStepBar } from "./DiscountStepBar";
 
-function DiscountLoadError({
+type Stage = "guide" | "apply";
+
+function DiscountState({
+  entry,
   title,
   message,
   onRetry,
 }: {
+  entry: DiscountLinkEntry;
   title: string;
   message: string;
   onRetry?: () => void;
 }) {
+  const base = useAppBasePath();
   return (
-    <section className="discount-state">
-      <h2>{title}</h2>
-      <p>{message}</p>
-      {onRetry ? (
-        <div className="flow__nav">
-          <button type="button" className="btn btn--red" onClick={onRetry}>
-            다시 시도
-          </button>
+    <section className="dl-stage dl-state" role="alert">
+      <div className="wrap dl-state__inner">
+        <span className="dl-state__mark" aria-hidden>
+          !
+        </span>
+        <p className="dl-state__tag">{entry.partnerTag ?? "DISCOUNT"} · {entry.en}</p>
+        <h1 className="dl-state__title">{title}</h1>
+        <p className="dl-state__msg">{message}</p>
+        <div className="dl-state__actions">
+          {onRetry ? (
+            <button type="button" className="btn btn--red" onClick={onRetry}>
+              다시 시도
+            </button>
+          ) : (
+            <Link className="btn btn--red" href={withAppBase(base, "/register")}>
+              일반 참가신청
+            </Link>
+          )}
+          <Link className="btn btn--ghost" href={withAppBase(base, "/")}>
+            대회 메인
+          </Link>
         </div>
-      ) : null}
+      </div>
     </section>
-  );
-}
-
-function DiscountEntryShell({
-  entry,
-  mobileRail,
-  children,
-}: {
-  entry: NonNullable<ReturnType<typeof discountLinkEntry>>;
-  mobileRail?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <MediaLoader>
-      <main
-        className={`page page--discount-entry page--discount-entry--${entry.variant}`}
-        data-discount-slug={entry.slug}
-        data-link-code={entry.linkCode}
-      >
-        <DiscountEntryHero entry={entry} />
-        {mobileRail}
-        <div className="discount-entry__sheet">
-          <div className="wrap discount-entry__layout">{children}</div>
-        </div>
-      </main>
-    </MediaLoader>
   );
 }
 
 export function DiscountEntryPage({ slug }: { slug: string }) {
   const entry = discountLinkEntry(slug);
-  const base = useAppBasePath();
   if (!entry) notFound();
 
   const registration = useRegistrationOptions();
   const discount = useDiscountOptions(entry.linkCode);
+  const [introDone, setIntroDone] = useState(false);
+  const [stage, setStage] = useState<Stage>("guide");
+  const [kind, setKind] = useState<ApplyKind | "">("");
 
   const loading = registration.loading || discount.loading;
   const down = registration.down || discount.down;
 
-  if (
+  function go(next: Stage) {
+    setStage(next);
+    if (next === "guide") setKind("");
+    requestAnimationFrame(scrollPageTop);
+  }
+
+  function retry() {
+    setIntroDone(false);
+    discount.retry();
+    registration.retry();
+  }
+
+  useFlowReset("discount-link", () => go("guide"));
+
+  const linkGone =
     discount.errorCode === "DISCOUNT_LINK_NOT_FOUND" ||
-    discount.errorCode === "DISCOUNT_LINK_DISABLED"
-  ) {
-    return (
-      <DiscountEntryShell entry={entry}>
-        <DiscountLoadError
-          title="할인 링크를 사용할 수 없습니다"
-          message={
-            discount.errorMessage ||
-            "할인 링크를 찾을 수 없거나 사용할 수 없습니다."
-          }
-        />
-        <p className="discount-link-fallback">
-          <Link href={withAppBase(base, "/")}>대회 메인으로 이동</Link>
-          <Link href={withAppBase(base, "/register")}>일반 참가신청으로 이동</Link>
-        </p>
-      </DiscountEntryShell>
-    );
-  }
-
-  if (loading && !registration.categories.length && !discount.options) {
-    return (
-      <DiscountEntryShell entry={entry}>
-        <div className="discount-entry__loading" role="status">
-          <span className="discount-entry__spinner" aria-hidden />
-          할인 안내를 불러오는 중입니다.
-        </div>
-      </DiscountEntryShell>
-    );
-  }
-
-  if (
+    discount.errorCode === "DISCOUNT_LINK_DISABLED";
+  const loadFailed =
     !loading &&
     ((registration.errorMessage && !registration.categories.length) ||
-      (discount.errorMessage && !discount.options))
-  ) {
-    return (
-      <DiscountEntryShell entry={entry}>
-        <DiscountLoadError
-          title={down ? "접속이 원활하지 않습니다" : "할인 안내를 불러오지 못했습니다"}
-          message={
-            discount.errorMessage ||
-            registration.errorMessage ||
-            "할인 안내를 불러오지 못했습니다."
-          }
-          onRetry={() => {
-            discount.retry();
-            registration.retry();
-          }}
+      (discount.errorMessage && !discount.options));
+
+  let body: React.ReactNode = null;
+
+  if (!introDone) {
+    body = null;
+  } else if (linkGone) {
+    body = (
+      <DiscountState
+        entry={entry}
+        title="사용할 수 없는 할인 링크입니다"
+        message={discount.errorMessage || "할인 링크를 찾을 수 없거나 사용이 중지되었습니다."}
+      />
+    );
+  } else if (loadFailed || !discount.options) {
+    body = (
+      <DiscountState
+        entry={entry}
+        title={down ? "접속이 원활하지 않습니다" : "할인 안내를 불러오지 못했습니다"}
+        message={
+          discount.errorMessage ||
+          registration.errorMessage ||
+          "잠시 후 다시 시도해 주세요."
+        }
+        onRetry={retry}
+      />
+    );
+  } else if (stage === "guide") {
+    body = (
+      <>
+        <DiscountStepBar entry={entry} step={0} />
+        <DiscountGuide
+          entry={entry}
+          options={discount.options}
+          categories={registration.categories}
+          onNext={() => go("apply")}
         />
-      </DiscountEntryShell>
+      </>
+    );
+  } else {
+    const step = kind ? 2 : 1;
+    body = (
+      <>
+        <DiscountStepBar
+          entry={entry}
+          step={step}
+          onBack={step === 1 ? () => go("guide") : undefined}
+        />
+        <section
+          className={`dl-stage dl-apply dl-apply--${step === 1 ? "terms" : "form"}`}
+          aria-label={step === 1 ? "유의사항 동의" : "신청 작성"}
+        >
+          <div className="wrap dl-apply__inner">
+            {step === 2 ? (
+              <p className="dl-ribbon">
+                <span>{entry.partnerTag ?? "DISCOUNT"}</span>
+                {entry.title} 적용 중
+              </p>
+            ) : null}
+            <RegisterFlow
+              onKindChange={setKind}
+              discount={{
+                entry,
+                linkCode: entry.linkCode,
+                options: discount.options,
+                optionsLoading: discount.loading,
+                optionsError: discount.errorMessage,
+                optionsErrorCode: discount.errorCode,
+                optionsDown: discount.down,
+                retryOptions: () => {
+                  discount.retry();
+                  registration.retry();
+                },
+              }}
+            />
+          </div>
+        </section>
+      </>
     );
   }
 
   return (
-    <DiscountEntryShell
-      entry={entry}
-      mobileRail={
-        discount.options ? (
-          <DiscountEntryMobileRail options={discount.options} />
-        ) : null
-      }
-    >
-      <DiscountLinkNotice
-        entry={entry}
-        options={discount.options}
-        categories={registration.categories}
-      />
-      <section
-        id="discount-apply"
-        className="discount-entry__form"
-        aria-label="할인 링크 참가 신청"
-      >
-        <header className="discount-entry__form-head">
-          <p className="discount-entry__form-kicker">APPLICATION</p>
-          <h2 className="discount-entry__form-title">참가 신청</h2>
-          <p className="discount-entry__form-lead">
-            입력 항목은 일반 접수와 동일하며, 할인은 이 링크로 생성한 신청에만 적용됩니다.
-          </p>
-        </header>
-        <RegisterFlow
-          discount={{
-            entry,
-            linkCode: entry.linkCode,
-            options: discount.options,
-            optionsLoading: discount.loading,
-            optionsError: discount.errorMessage,
-            optionsErrorCode: discount.errorCode,
-            optionsDown: discount.down,
-            retryOptions: () => {
-              discount.retry();
-              registration.retry();
-            },
+    <DiscountShell entry={entry}>
+      {introDone ? null : (
+        <DiscountIntro
+          entry={entry}
+          settled={!loading || linkGone}
+          onDone={() => {
+            setIntroDone(true);
+            window.scrollTo(0, 0);
           }}
         />
-      </section>
-    </DiscountEntryShell>
+      )}
+      <div className="dl__body" aria-busy={!introDone}>
+        {body}
+      </div>
+    </DiscountShell>
   );
 }

@@ -113,13 +113,25 @@ function entryPasswordConfirmHint(password: string, confirm: string) {
   return { text: "비밀번호가 일치하지 않습니다.", tone: "is-err" as const };
 }
 
-export function RegisterFlow({ discount }: { discount?: DiscountRegisterSession }) {
+export function RegisterFlow({
+  discount,
+  onKindChange,
+}: {
+  discount?: DiscountRegisterSession;
+  onKindChange?: (kind: ApplyKind | "") => void;
+}) {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
   const registrationOptions = useRegistrationOptions();
   const allowedKinds = discount?.options
     ? applyKindsFromDiscount(discount.options.applicationType)
     : undefined;
+  const kindListener = useRef(onKindChange);
+  kindListener.current = onKindChange;
+
+  useEffect(() => {
+    kindListener.current?.(kind);
+  }, [kind]);
 
   function pickKind(next: ApplyKind) {
     setKind(next);
