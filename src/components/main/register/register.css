@@ -3064,29 +3064,6 @@
     background: #08091d;
   }
 
-  /* 펼친 카드: 기본 정보 / 신청 정보 묶음 제목 */
-  .party tr.party__info.is-open::after,
-  .party tr.party__more.is-open::before {
-    grid-column: 1 / -1;
-    margin: 0.55rem 0.55rem 0.12rem;
-    padding-left: 0.45rem;
-    border-left: 2px solid var(--marvel);
-    color: #fff;
-    font-size: var(--party-m-label-fs);
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.06em;
-  }
-
-  .party tr.party__info.is-open::after {
-    content: "기본 정보";
-    grid-row: 2;
-  }
-
-  .party tr.party__more.is-open::before {
-    content: "신청 정보";
-  }
-
   .party th,
   .party td {
     display: grid;
