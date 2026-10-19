@@ -42,7 +42,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     partnerTag: "RUNABLE",
     partnerLogo: MAIN_ASSETS.discountRunable,
     kicker: "RUNABLE",
-    title: "러너블 할인 참가신청",
+    title: "러너블 러닝크루 특별 할인",
     en: "RUNABLE DISCOUNT",
     termsTitle: "러너블 할인 링크 참가 동의",
     termsLead:
