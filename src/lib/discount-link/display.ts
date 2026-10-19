@@ -7,27 +7,17 @@ const DATE_FMT = new Intl.DateTimeFormat("ko-KR", {
   day: "2-digit",
   hour: "2-digit",
   minute: "2-digit",
-  hour12: false,
+  hourCycle: "h23",
 });
 
-function formatKst(iso: string) {
-  if (!iso) return "";
-  const date = new Date(iso);
+export function discountPeriodLabel(options: DiscountOptions) {
+  if (!options.acquisitionEndsAt) return "";
+  const date = new Date(options.acquisitionEndsAt);
   if (Number.isNaN(date.getTime())) return "";
   const parts = Object.fromEntries(
     DATE_FMT.formatToParts(date).map((part) => [part.type, part.value]),
   );
-  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:${parts.minute}`;
-}
-
-/** 종료 시각은 신규 취득 범위에서 제외 */
-export function discountPeriodLabel(options: DiscountOptions) {
-  const start = formatKst(options.acquisitionStartsAt);
-  const end = formatKst(options.acquisitionEndsAt);
-  if (start && end) return `${start} ~ ${end} 전`;
-  if (start) return `${start}부터`;
-  if (end) return `${end} 전까지`;
-  return "";
+  return `${parts.year}. ${parts.month}. ${parts.day}. ${parts.hour}:${parts.minute}까지`;
 }
 
 export function discountApplyTypeLabel(type: DiscountOptions["applicationType"]) {
@@ -90,4 +80,14 @@ export function priceOptionDescLabel(option: PriceOption) {
 
 export function priceOptionPercent(option: PriceOption) {
   return externalPercent(option);
+}
+
+/* 링크 할인 전. baseAmount는 종목 정가 */
+export function priceOptionListAmount(option: PriceOption) {
+  let amount = option.baseAmount;
+  for (const item of option.appliedDiscounts) {
+    if (item.stage === "EXTERNAL") break;
+    amount = item.amountAfter;
+  }
+  return amount;
 }

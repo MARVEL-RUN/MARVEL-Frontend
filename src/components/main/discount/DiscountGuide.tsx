@@ -12,6 +12,7 @@ import {
   priceOptionDescLabel,
   priceOptionKindChipClass,
   priceOptionKindLabel,
+  priceOptionListAmount,
   priceOptionPercent,
 } from "@/lib/discount-link/display";
 import {
@@ -111,19 +112,10 @@ export function DiscountGuide({
                 {period ? (
                   <div>
                     <dt>할인 접수 기간</dt>
-                    <dd className="dl-pass__period">
-                      {period.split(" ~ ").map((part, i, all) => (
-                        <span key={part}>
-                          {part}
-                          {i < all.length - 1 ? " ~" : ""}
-                        </span>
-                      ))}
-                    </dd>
+                    <dd className="dl-pass__period">{period}</dd>
                   </div>
                 ) : null}
               </dl>
-
-              {options.message ? <p className="dl-pass__msg">{options.message}</p> : null}
 
               <div className="dl-pass__code" aria-hidden>
                 <span />
@@ -262,6 +254,7 @@ export function DiscountGuide({
                           <ul className="dl-price__opts">
                             {visibleOptions.map((opt) => {
                               const pct = priceOptionPercent(opt);
+                              const listAmount = priceOptionListAmount(opt);
                               const course = category ? courseForCategory(category) : undefined;
                               const childClosed =
                                 opt.scenario === "AGE_CONDITION" &&
@@ -281,13 +274,13 @@ export function DiscountGuide({
                                     <span
                                       className={
                                         row.linkDiscountApplicable &&
-                                        opt.baseAmount > opt.finalAmount
+                                        listAmount > opt.finalAmount
                                           ? "dl-price__amt is-sale"
                                           : "dl-price__amt"
                                       }
                                     >
-                                      {opt.baseAmount > opt.finalAmount ? (
-                                        <s>{formatFee(opt.baseAmount)}</s>
+                                      {listAmount > opt.finalAmount ? (
+                                        <s>{formatFee(listAmount)}</s>
                                       ) : null}
                                       <strong>{formatFee(opt.finalAmount)}</strong>
                                       {pct ? <em>링크 할인 {pct}%</em> : null}
