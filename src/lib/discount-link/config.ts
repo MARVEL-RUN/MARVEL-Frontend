@@ -37,7 +37,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
   },
   {
     slug: "runable",
-    linkCode: "TEST_RUNNABLE",
+    linkCode: "TEST_RUNABLE",
     variant: "standard",
     partnerTag: "RUNABLE",
     partnerLogo: MAIN_ASSETS.discountRunable,
