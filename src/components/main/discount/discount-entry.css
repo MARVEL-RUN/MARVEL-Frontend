@@ -1085,6 +1085,14 @@
   white-space: nowrap;
 }
 
+.dl-price__empty {
+  justify-self: end;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .dl-notes {
   margin: 0;
   padding: 0;
