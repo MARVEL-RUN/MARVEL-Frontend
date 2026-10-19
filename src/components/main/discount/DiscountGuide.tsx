@@ -21,7 +21,7 @@ import {
 import type { DiscountOptions, PriceOption } from "@/lib/discount-link/types";
 import { useAppBasePath } from "@/lib/main/useAppBasePath";
 import { withAppBase } from "@/lib/preview";
-import { categoryLabel, findCategory } from "@/lib/registration-options";
+import { categoryLabel, courseForCategory, findCategory } from "@/lib/registration-options";
 import type { RegistrationCategory } from "@/services/main/types";
 import { DiscountPartnerMark } from "./DiscountPartnerMark";
 
@@ -262,6 +262,11 @@ export function DiscountGuide({
                           <ul className="dl-price__opts">
                             {visibleOptions.map((opt) => {
                               const pct = priceOptionPercent(opt);
+                              const course = category ? courseForCategory(category) : undefined;
+                              const childClosed =
+                                opt.scenario === "AGE_CONDITION" &&
+                                course != null &&
+                                !("childFee" in course);
                               return (
                                 <li key={`${opt.scenario}-${opt.applicationType}`}>
                                   <span className={priceOptionKindChipClass(opt)}>
@@ -270,19 +275,24 @@ export function DiscountGuide({
                                   <span className="dl-price__desc">
                                     {priceOptionDescLabel(opt) || label}
                                   </span>
-                                  <span
-                                    className={
-                                      row.linkDiscountApplicable && opt.baseAmount > opt.finalAmount
-                                        ? "dl-price__amt is-sale"
-                                        : "dl-price__amt"
-                                    }
-                                  >
-                                    {opt.baseAmount > opt.finalAmount ? (
-                                      <s>{formatFee(opt.baseAmount)}</s>
-                                    ) : null}
-                                    <strong>{formatFee(opt.finalAmount)}</strong>
-                                    {pct ? <em>링크 할인 {pct}%</em> : null}
-                                  </span>
+                                  {childClosed ? (
+                                    <span className="dl-price__empty">참가 불가</span>
+                                  ) : (
+                                    <span
+                                      className={
+                                        row.linkDiscountApplicable &&
+                                        opt.baseAmount > opt.finalAmount
+                                          ? "dl-price__amt is-sale"
+                                          : "dl-price__amt"
+                                      }
+                                    >
+                                      {opt.baseAmount > opt.finalAmount ? (
+                                        <s>{formatFee(opt.baseAmount)}</s>
+                                      ) : null}
+                                      <strong>{formatFee(opt.finalAmount)}</strong>
+                                      {pct ? <em>링크 할인 {pct}%</em> : null}
+                                    </span>
+                                  )}
                                 </li>
                               );
                             })}
