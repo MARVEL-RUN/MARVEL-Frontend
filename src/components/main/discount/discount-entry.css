@@ -787,17 +787,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.dl-pass__msg {
-  margin-top: 0.9rem;
-  padding: 0.65rem 0.85rem;
-  border-left: 2px solid var(--dl-accent);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.78rem;
-  line-height: 1.55;
-  word-break: keep-all;
-}
-
 .dl-pass__code {
   display: grid;
   justify-items: center;
@@ -1785,12 +1774,6 @@
 
   .dl-pass__facts .dl-pass__period {
     font-size: 0.82rem;
-  }
-
-  .dl-pass__msg {
-    margin-top: 0.8rem;
-    padding: 0.6rem 0.75rem;
-    font-size: 0.76rem;
   }
 
   .dl-pass__code {
