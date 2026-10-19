@@ -15,6 +15,8 @@ export type DiscountLinkEntry = {
   partnerLogoInvert?: boolean;
   kicker: string;
   title: string;
+  /** 카카오·X 공유 제목. 화면 제목과 다름 */
+  shareTitle: string;
   en: string;
   lead?: string;
   termsTitle?: string;
@@ -30,6 +32,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     partnerTag: "INJE",
     kicker: "INJE",
     title: "인제군민 할인 참가신청",
+    shareTitle: "마블런 인제군민 할인 참가신청",
     en: "INJE DISCOUNT",
     termsTitle: "인제군민 할인 링크 참가 동의",
     termsLead:
@@ -42,7 +45,8 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     partnerTag: "RUNABLE",
     partnerLogo: MAIN_ASSETS.discountRunable,
     kicker: "RUNABLE",
-    title: "러너블 러닝크루 특별 할인",
+    title: "러닝크루 특별 할인",
+    shareTitle: "마블런 러너블 · 러닝크루 특별 할인",
     en: "RUNABLE DISCOUNT",
     termsTitle: "러너블 할인 링크 참가 동의",
     termsLead:
@@ -57,6 +61,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     partnerLogoInvert: true,
     kicker: "RUN CREW",
     title: "러닝크루 특별 할인",
+    shareTitle: "마블런 29CM · 러닝크루 특별 할인",
     en: "CREW DISCOUNT",
     lead: "5인 이상 러닝크루 단체 전용 할인 접수입니다.",
     termsTitle: "러닝크루 특별 할인 이벤트 링크",
@@ -75,6 +80,7 @@ export const DISCOUNT_LINK_ENTRIES: DiscountLinkEntry[] = [
     partnerLogo: MAIN_ASSETS.discountKream,
     kicker: "RUN CREW",
     title: "러닝크루 특별 할인",
+    shareTitle: "마블런 KREAM · 러닝크루 특별 할인",
     en: "CREW DISCOUNT",
     lead: "5인 이상 러닝크루 단체 전용 할인 접수입니다.",
     termsTitle: "러닝크루 특별 할인 이벤트 링크",
