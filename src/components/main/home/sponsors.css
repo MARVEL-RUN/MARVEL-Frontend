@@ -142,6 +142,16 @@
 }
 
 /* 로고 비율이 제각각이라 눈으로 맞춘 값 */
+.sponsors__item--osg img {
+  max-width: 72%;
+  max-height: 58%;
+}
+
+.sponsors__item--inje-county img {
+  max-width: 46%;
+  max-height: 62%;
+}
+
 .sponsors__item--benuts img,
 .sponsors__item--top img,
 .sponsors__item--lego img {
