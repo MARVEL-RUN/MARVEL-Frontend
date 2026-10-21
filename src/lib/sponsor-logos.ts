@@ -20,6 +20,14 @@ const FOOTER_LOGO = {
 
 /* 후원사 확정 노출 순위 */
 const HOME_SPONSOR_LIST = [
+  { key: "osg", file: "osg.svg", name: "OSG KOREA", width: 298, height: 99 },
+  {
+    key: "inje-county",
+    file: "inje-county.svg",
+    name: "인제군청",
+    width: 64,
+    height: 74,
+  },
   { key: "benuts", file: "benuts.svg", name: "비넛츠", width: 325, height: 232 },
   { key: "sleeplus", file: "sleeplus.svg", name: "Muska(슬립플러스)", width: 519, height: 104 },
   { key: "samtree-chickpea", file: "samtree-chickpea.svg", name: "맛병아리콩", width: 689, height: 202 },
