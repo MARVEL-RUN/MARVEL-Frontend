@@ -85,14 +85,15 @@ export function DirectionsPage() {
                 </div>
               ) : null}
               <figure className="directions-parking__figure">
-                <Image
-                  src={MAIN_ASSETS.directionsParking}
-                  alt="인제스피디움 주차장 위치, 카카오T 셔틀 승하차존·티켓박스, 행사장 도보 이동 경로 안내"
-                  width={995}
-                  height={580}
-                  sizes="(max-width: 720px) 100vw, min(1100px, 100vw - 3rem)"
-                  className="directions-parking__img"
-                />
+                <div className="kakao-map directions-parking__map">
+                  <Image
+                    src={MAIN_ASSETS.directionsParking}
+                    alt="인제스피디움 주차장 위치, 카카오T 셔틀 승하차존·티켓박스, 행사장 도보 이동 경로 안내"
+                    fill
+                    sizes="(max-width: 720px) 100vw, min(1100px, 100vw - 3rem)"
+                    className="directions-parking__img"
+                  />
+                </div>
               </figure>
             </div>
           </section>

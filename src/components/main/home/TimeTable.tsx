@@ -9,8 +9,8 @@ const MARK_CLASS = {
 
 export function TimeTable() {
   return (
-    <div className="time-table-wrap time-table-wrap--tba">
-      <table className="time-table" aria-hidden="true">
+    <div className="time-table-wrap">
+      <table className="time-table">
         <thead>
           <tr>
             <th>시간</th>
@@ -50,10 +50,7 @@ export function TimeTable() {
           })}
         </tbody>
       </table>
-      <div className="time-table__tba" role="status">
-        <p className="kicker">TBA</p>
-        <p className="time-table__tba-title">추후 공개</p>
-      </div>
+      <p className="time-table__disclaimer">{EVENT.timelineDisclaimer}</p>
     </div>
   );
 }

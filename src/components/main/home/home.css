@@ -742,6 +742,15 @@ html.is-live .hero__actions {
   margin-top: 0.5rem;
 }
 
+.time-table__disclaimer {
+  margin: 1.15rem 0 0;
+  color: var(--note);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
 .venue__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1438,6 +1447,7 @@ html.is-live .reveal.is-in .timeline li:nth-child(7) {
 
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+
   html.is-live .reveal:not(.is-in),
   html.is-live .reveal.is-in {
     opacity: 1;
