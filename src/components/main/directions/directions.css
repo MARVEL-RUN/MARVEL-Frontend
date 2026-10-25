@@ -190,60 +190,77 @@
   .directions {
     gap: 1.35rem;
   }
+
   .directions-parking__row {
     gap: 1.35rem;
   }
+
   .directions-parking__title {
     margin-bottom: 1.1rem;
     font-size: 1.35rem;
   }
+
   .venue-copy {
     gap: 1.55rem;
   }
+
   .directions-parking__copy .venue-access__list {
     border-left: 2px solid var(--marvel);
     padding-left: 0.95rem;
   }
+
   .venue-access__head {
     gap: 0.15rem;
     margin-bottom: 0.15rem;
   }
+
   .venue-access__title {
     font-size: 0.95rem;
   }
+
   .venue-access__note {
     width: 100%;
     font-size: 0.82rem;
     font-weight: 500;
   }
+
   .venue-access__list {
     border-left: 2px solid var(--marvel);
     padding-left: 0.95rem;
   }
+
   .venue-access__row {
     grid-template-columns: 2.5rem minmax(0, 1fr);
     gap: 0.65rem;
     align-items: start;
     padding: 0.7rem 0;
   }
+
   .venue-access__badge {
     font-size: 0.82rem;
   }
+
   .venue-access__text {
     font-size: 0.95rem;
     line-height: 1.4;
   }
+
   .venue-access__sub {
     font-size: 0.82rem;
   }
+
   .venue-actions {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
   }
+
   .venue-actions .btn {
     width: 100%;
+    min-width: 0;
     min-height: var(--tap);
+    padding-inline: 0.65rem;
     justify-content: center;
+    font-size: 0.88rem;
   }
 }
