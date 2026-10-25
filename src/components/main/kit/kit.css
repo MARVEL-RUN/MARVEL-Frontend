@@ -544,12 +544,21 @@
   list-style: none;
 }
 
+.kit-finish--medal-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .kit-finish--pair {
+  display: none;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .kit-finish--grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.kit-finish--grid-rest {
+  display: none;
 }
 
 .kit-finish__figure {
@@ -643,7 +652,17 @@
     gap: 2.65rem 0.85rem;
   }
 
-  .kit-finish--grid {
+  .kit-finish--medal-solo,
+  .kit-finish--grid-from-case {
+    display: none;
+  }
+
+  .kit-finish--pair {
+    display: grid;
+  }
+
+  .kit-finish--grid-rest {
+    display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 

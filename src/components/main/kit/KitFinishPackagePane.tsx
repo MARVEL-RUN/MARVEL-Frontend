@@ -30,7 +30,9 @@ function FinishPackageItemCard({ item }: { item: FinishPackageItem }) {
   );
 }
 
+const FINISH_MEDAL = FINISH_PACKAGE_ITEMS.filter((item) => item.no === 1);
 const FINISH_PAIR = FINISH_PACKAGE_ITEMS.filter((item) => item.no <= 2);
+const FINISH_FROM_CASE = FINISH_PACKAGE_ITEMS.filter((item) => item.no >= 2);
 const FINISH_GRID = FINISH_PACKAGE_ITEMS.filter((item) => item.no > 2);
 
 export function KitFinishPackagePane() {
@@ -42,12 +44,22 @@ export function KitFinishPackagePane() {
         <p className="kit-finish__banner-en">FINISHER PACKAGE</p>
       </header>
       <div className="kit-finish-wrap">
+        <ol className="kit-finish kit-finish--medal-solo">
+          {FINISH_MEDAL.map((item) => (
+            <FinishPackageItemCard key={item.no} item={item} />
+          ))}
+        </ol>
         <ol className="kit-finish kit-finish--pair">
           {FINISH_PAIR.map((item) => (
             <FinishPackageItemCard key={item.no} item={item} />
           ))}
         </ol>
-        <ol className="kit-finish kit-finish--grid">
+        <ol className="kit-finish kit-finish--grid kit-finish--grid-from-case">
+          {FINISH_FROM_CASE.map((item) => (
+            <FinishPackageItemCard key={item.no} item={item} />
+          ))}
+        </ol>
+        <ol className="kit-finish kit-finish--grid kit-finish--grid-rest">
           {FINISH_GRID.map((item) => (
             <FinishPackageItemCard key={item.no} item={item} />
           ))}
