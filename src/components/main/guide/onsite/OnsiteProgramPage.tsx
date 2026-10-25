@@ -118,7 +118,7 @@ export function OnsiteProgramPage() {
             <header className="onsite-sec__head">
               <p className="kicker">03 / ARTIST</p>
               <h2 id="onsite-artist-heading">
-                출연 아티스트 <em>공개</em>
+                출연 <em>아티스트</em>
               </h2>
             </header>
             <OnsiteArtists />
