@@ -4,7 +4,6 @@ export type FinishPackageItem = {
   no: number;
   title: string;
   image?: string;
-  wide?: boolean;
   note?: string;
 };
 
@@ -13,16 +12,10 @@ export const FINISH_PACKAGE_ITEMS: FinishPackageItem[] = [
     no: 1,
     title: "완주 메달",
     image: `${FINISH_PACKAGE_BASE}/medals.png`,
-    wide: true,
   },
   { no: 2, title: "메달 케이스", image: `${FINISH_PACKAGE_BASE}/medal-case.png` },
   { no: 3, title: "마블런 스티커", image: `${FINISH_PACKAGE_BASE}/stickers.png` },
   { no: 4, title: "KFC 쿠폰", image: `${FINISH_PACKAGE_BASE}/kfc-coupon.png` },
-  {
-    no: 5,
-    title: "크라운스포츠 뉴트리션 검바",
-    note: "※ 3종 중 2종 랜덤 증정",
-  },
   {
     no: 6,
     title: "슬리플러스 딥 슬립 + 슬리프레소",
