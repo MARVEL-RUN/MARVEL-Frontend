@@ -31,6 +31,13 @@ export const BOARD_SECTIONS = [
 
 export const BOARD_HREF = "/notices";
 
+export const DIRECTIONS_HREF = "/directions";
+
+export const DIRECTIONS_SECTIONS = [
+  { href: DIRECTIONS_HREF, label: "오시는길" },
+  { href: `${DIRECTIONS_HREF}#parking`, label: "주차안내" },
+] as const;
+
 export const NAV_ITEMS = [
   { href: "/", label: "마블런2026" },
   {
@@ -40,7 +47,12 @@ export const NAV_ITEMS = [
     children: GUIDE_SECTIONS,
   },
   { href: KIT_HREF, label: "기념품" },
-  { href: "/directions", label: "오시는길" },
+  {
+    href: DIRECTIONS_HREF,
+    label: "오시는길",
+    pickChild: true,
+    children: DIRECTIONS_SECTIONS,
+  },
   { href: BOARD_HREF, label: "커뮤니티", pickChild: true, children: BOARD_SECTIONS },
   { href: "/virtual", label: "버추얼런" },
 ] as const;

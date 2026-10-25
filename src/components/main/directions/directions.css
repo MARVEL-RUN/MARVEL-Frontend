@@ -125,8 +125,55 @@
   font-weight: 500;
 }
 
+.directions-parking {
+  scroll-margin-top: calc(var(--header-h) + 0.5rem);
+}
+
+.directions-parking .guide-rule {
+  margin: 0 0 2.5rem;
+}
+
+.directions-parking__title {
+  margin: 0 0 1.1rem;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+}
+
+.directions-parking__row {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.95fr) minmax(0, 1.2fr);
+  gap: 2.4rem 3rem;
+  align-items: start;
+}
+
+.directions-parking__copy {
+  min-height: 0;
+}
+
+.directions-parking__figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.directions-parking__map {
+  position: relative;
+  aspect-ratio: 995 / 580;
+  box-shadow: none;
+}
+
+.directions-parking__img {
+  object-fit: cover;
+}
+
 @media (max-width: 960px) {
   .directions__row {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .directions-parking__row {
     grid-template-columns: 1fr;
     gap: 1.75rem;
   }
@@ -151,49 +198,85 @@
   .directions {
     gap: 1.35rem;
   }
+
+  .directions-parking__row {
+    gap: 1.35rem;
+  }
+
+  .directions-parking__title {
+    margin-bottom: 0;
+    font-size: 1.35rem;
+  }
+
+  .directions-parking__copy {
+    gap: 0.45rem;
+  }
+
+  .directions-parking__head .kicker {
+    margin-bottom: 0.55rem;
+  }
+
   .venue-copy {
     gap: 1.55rem;
   }
+
+  .directions-parking__copy .venue-access__list {
+    border-left: 2px solid var(--marvel);
+    padding-left: 0.95rem;
+  }
+
   .venue-access__head {
     gap: 0.15rem;
     margin-bottom: 0.15rem;
   }
+
   .venue-access__title {
     font-size: 0.95rem;
   }
+
   .venue-access__note {
     width: 100%;
     font-size: 0.82rem;
     font-weight: 500;
   }
+
   .venue-access__list {
     border-left: 2px solid var(--marvel);
     padding-left: 0.95rem;
   }
+
   .venue-access__row {
     grid-template-columns: 2.5rem minmax(0, 1fr);
     gap: 0.65rem;
     align-items: start;
     padding: 0.7rem 0;
   }
+
   .venue-access__badge {
     font-size: 0.82rem;
   }
+
   .venue-access__text {
     font-size: 0.95rem;
     line-height: 1.4;
   }
+
   .venue-access__sub {
     font-size: 0.82rem;
   }
+
   .venue-actions {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
   }
+
   .venue-actions .btn {
     width: 100%;
+    min-width: 0;
     min-height: var(--tap);
+    padding-inline: 0.65rem;
     justify-content: center;
+    font-size: 0.88rem;
   }
 }

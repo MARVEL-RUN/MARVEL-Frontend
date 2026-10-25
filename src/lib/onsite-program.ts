@@ -70,28 +70,6 @@ export const ONSITE_DRIVE: readonly OnsiteDriveItem[] = [
       },
     ],
   },
-  {
-    id: "drift",
-    tone: "gold",
-    en: "DRIFT",
-    title: "드리프트 체험",
-    lead: "한계를 넘나드는 짜릿한 드리프트",
-    photo: MAIN_ASSETS.onsiteDriveDrift,
-    specs: [
-      { label: "탑승시간", value: "15분", note: "준비 과정 포함" },
-      {
-        label: "요금",
-        value: "기본 6만원",
-        note: "인원 추가 시 인당 3만원",
-        price: true,
-      },
-    ],
-    tiers: [
-      { people: "1인", price: "6만원" },
-      { people: "2인", price: "9만원" },
-      { people: "3인", price: "12만원" },
-    ],
-  },
 ] as const;
 
 export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
@@ -142,3 +120,40 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     logo: { src: MAIN_ASSETS.onsiteSasasaLogo, width: 1235, height: 270 },
   },
 ] as const;
+
+export type OnsiteArtistItem = {
+  id: string;
+  role: string;
+  name: string;
+  photo: string;
+};
+
+export const ONSITE_ARTISTS: readonly OnsiteArtistItem[] = [
+  {
+    id: "jung-hyuk",
+    role: "마블런 MC",
+    name: "정혁",
+    photo: MAIN_ASSETS.onsiteArtistJungHyuk,
+  },
+  {
+    id: "kim-min",
+    role: "보헤미안",
+    name: "김민",
+    photo: MAIN_ASSETS.onsiteArtistKimMin,
+  },
+  {
+    id: "yun-sungbin",
+    role: "대한민국 아이언맨",
+    name: "윤성빈",
+    photo: MAIN_ASSETS.onsiteArtistYunSungbin,
+  },
+  {
+    id: "jung-chansung",
+    role: "코리안좀비",
+    name: "정찬성",
+    photo: MAIN_ASSETS.onsiteArtistJungChansung,
+  },
+] as const;
+
+export const ONSITE_ARTIST_DISCLAIMER =
+  "※ 현장 운영 상황에 따라 출연진은 변경될 수 있습니다.";
