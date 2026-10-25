@@ -743,11 +743,12 @@ html.is-live .hero__actions {
 }
 
 .time-table__disclaimer {
-  margin: 1.15rem 0 0;
+  margin: 1.25rem 0 0;
   color: var(--note);
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 500;
   line-height: 1.55;
+  text-align: left;
   word-break: keep-all;
 }
 

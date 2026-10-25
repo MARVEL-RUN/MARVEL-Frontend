@@ -233,7 +233,7 @@ export const EVENT = {
       to: "15:30",
       rt: "–",
       program: "FINISH",
-      note: "",
+      note: "전 종목 완주",
     },
     {
       from: "16:00",
@@ -261,7 +261,7 @@ export const EVENT = {
       to: "",
       rt: "–",
       program: "행사 종료",
-      note: "",
+      note: "공식 폐장",
       mark: "gate",
     },
   ],
