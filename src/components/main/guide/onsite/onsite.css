@@ -385,7 +385,6 @@
   display: block;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  border: 2px solid #fff;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 40px) 100%, 0 100%);
 }
 
@@ -572,7 +571,6 @@
   position: relative;
   aspect-ratio: 21 / 9;
   overflow: hidden;
-  border: 2px solid #fff;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 56px) 100%, 0 100%);
 }
 
@@ -887,7 +885,6 @@
     position: relative;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    border: 2px solid #fff;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 40px) 100%, 0 100%);
   }
 
