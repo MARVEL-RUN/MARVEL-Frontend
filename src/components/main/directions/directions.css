@@ -129,8 +129,12 @@
   margin: 0 0 2.5rem;
 }
 
-.directions-parking__head .sec__title {
-  margin-bottom: 1.1rem;
+.directions-parking__title {
+  margin: 0 0 1.1rem;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
 }
 
 .directions-parking__row {
@@ -188,6 +192,10 @@
   }
   .directions-parking__row {
     gap: 1.35rem;
+  }
+  .directions-parking__title {
+    margin-bottom: 1.1rem;
+    font-size: 1.35rem;
   }
   .venue-copy {
     gap: 1.55rem;

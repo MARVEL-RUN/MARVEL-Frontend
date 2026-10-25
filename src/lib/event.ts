@@ -73,8 +73,6 @@ export const EVENT = {
     {
       title: "주차",
       kicker: "PARKING",
-      headline: "주차 안내",
-      en: "PARKING GUIDE",
       items: [
         {
           badge: "주차",

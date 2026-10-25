@@ -73,16 +73,8 @@ export function DirectionsPage() {
                     {"kicker" in parkingAccess && parkingAccess.kicker ? (
                       <p className="kicker">{parkingAccess.kicker}</p>
                     ) : null}
-                    <h2 className="sec__title" id="directions-parking-title">
-                      {"headline" in parkingAccess && parkingAccess.headline
-                        ? parkingAccess.headline
-                        : parkingAccess.title}
-                      {"en" in parkingAccess && parkingAccess.en ? (
-                        <>
-                          <br />
-                          <em>{parkingAccess.en}</em>
-                        </>
-                      ) : null}
+                    <h2 className="directions-parking__title" id="directions-parking-title">
+                      주차 안내
                     </h2>
                   </header>
                   <article className="venue-access">
