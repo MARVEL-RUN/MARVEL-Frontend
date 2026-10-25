@@ -36,7 +36,7 @@ const FINISH_GRID = FINISH_PACKAGE_ITEMS.filter((item) => item.no > 2);
 export function KitFinishPackagePane() {
   return (
     <section className="kit-gallery__pane kit-gallery__pane--finish">
-      <header className="kit-finish__head">
+      <header className="kit-gallery__head kit-finish__head">
         <p className="kicker">FINISH</p>
         <h3 className="kit-finish__banner-title">완주 패키지</h3>
         <p className="kit-finish__banner-en">FINISHER PACKAGE</p>

@@ -494,18 +494,19 @@
 
 .kit-gallery__pane--finish {
   gap: 1rem;
-  padding-top: 0;
 }
 
 .kit-finish__head {
-  margin: 0 -1.05rem;
-  padding: 1.35rem 1.05rem 1.2rem;
-  background: #00042e;
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.15rem;
+  padding-bottom: 0.85rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .kit-finish__head .kicker {
-  margin-bottom: 0.75rem;
+  margin: 0;
+  width: fit-content;
   font-size: 0.78rem;
 }
 
@@ -520,7 +521,7 @@
 }
 
 .kit-finish__banner-en {
-  margin: 0.55rem 0 0;
+  margin: 0;
   color: var(--gold);
   font-size: clamp(0.78rem, 1.4vw, 0.95rem);
   font-weight: 700;
@@ -533,7 +534,6 @@
 .kit-finish-wrap {
   display: grid;
   gap: 1rem;
-  padding-top: 0.15rem;
 }
 
 .kit-finish {
@@ -619,7 +619,6 @@
 @media (max-width: 720px),
   (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .kit-finish__head .kicker {
-    margin-bottom: 0.4rem;
     font-size: 0.6rem;
   }
 
@@ -629,7 +628,6 @@
   }
 
   .kit-finish__banner-en {
-    margin-top: 0.32rem;
     font-size: 0.62rem;
     letter-spacing: 0.12em;
   }
