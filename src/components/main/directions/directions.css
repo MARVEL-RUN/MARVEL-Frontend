@@ -125,6 +125,35 @@
   font-weight: 500;
 }
 
+.directions-parking {
+  display: grid;
+  gap: 1.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.directions-parking__head {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.directions-parking__head .sec__title {
+  margin: 0;
+}
+
+.directions-parking__figure {
+  margin: 0;
+}
+
+.directions-parking__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #0c0d22;
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  box-shadow: inset 0 0 0 1px var(--marvel);
+}
+
 @media (max-width: 960px) {
   .directions__row {
     grid-template-columns: 1fr;
@@ -145,6 +174,10 @@
   .kakao-map {
     aspect-ratio: 16 / 10;
     min-height: 14rem;
+    clip-path: none;
+  }
+
+  .directions-parking__img {
     clip-path: none;
   }
 

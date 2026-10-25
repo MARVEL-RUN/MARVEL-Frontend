@@ -78,4 +78,5 @@ export const MAIN_ASSETS = {
   discount29cm: "/images/main/discount/29cm-logo.avif",
   discountRunable: "/images/main/discount/runable-logo.png",
   discountKream: "/images/main/discount/kream-logo.png",
+  directionsParking: "/images/main/directions/parking.png",
 } as const;
