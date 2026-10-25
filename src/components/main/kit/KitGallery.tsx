@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import { type CourseId } from "@/lib/register";
+import { KitFinishPackagePane } from "./KitFinishPackagePane";
 import { KitMedalReel } from "./KitMedalReel";
 import { ScarfPreview, type ScarfFace } from "./ScarfPreview";
 
@@ -38,6 +39,7 @@ export function KitGallery() {
       <KitShirtPane />
       <KitBibPane />
       <KitScarfPane />
+      <KitFinishPackagePane />
     </div>
   );
 }
