@@ -125,6 +125,10 @@
   font-weight: 500;
 }
 
+.directions-parking {
+  scroll-margin-top: calc(var(--header-h) + 0.5rem);
+}
+
 .directions-parking .guide-rule {
   margin: 0 0 2.5rem;
 }

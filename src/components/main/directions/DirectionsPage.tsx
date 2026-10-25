@@ -64,7 +64,11 @@ export function DirectionsPage() {
               })}
             </section>
           </div>
-          <section className="directions-parking" aria-labelledby="directions-parking-title">
+          <section
+            id="parking"
+            className="directions-parking"
+            aria-labelledby="directions-parking-title"
+          >
             <hr className="guide-rule" />
             <div className="directions-parking__row">
               {parkingAccess ? (
