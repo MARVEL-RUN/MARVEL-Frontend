@@ -492,9 +492,48 @@
   line-height: 1.5;
 }
 
+.kit-gallery__pane--finish {
+  gap: 1rem;
+  padding-top: 0;
+}
+
+.kit-finish__head {
+  margin: 0 -1.05rem;
+  padding: 1.35rem 1.05rem 1.2rem;
+  background: #00042e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kit-finish__head .kicker {
+  margin-bottom: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.kit-finish__banner-title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.75rem, 4vw, 2.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  word-break: keep-all;
+}
+
+.kit-finish__banner-en {
+  margin: 0.55rem 0 0;
+  color: var(--gold);
+  font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  line-height: 1.3;
+  transform: skewX(-8deg);
+  transform-origin: left;
+}
+
 .kit-finish-wrap {
   display: grid;
   gap: 1rem;
+  padding-top: 0.15rem;
 }
 
 .kit-finish {
@@ -575,6 +614,25 @@
   letter-spacing: 0.02em;
   line-height: 1.45;
   word-break: keep-all;
+}
+
+@media (max-width: 720px),
+  (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .kit-finish__head .kicker {
+    margin-bottom: 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .kit-finish__banner-title {
+    font-size: clamp(1.35rem, 6.2vw, 1.75rem);
+    line-height: 1.15;
+  }
+
+  .kit-finish__banner-en {
+    margin-top: 0.32rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
 }
 
 @media (min-width: 721px) {
