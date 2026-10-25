@@ -533,12 +533,12 @@
 
 .kit-finish-wrap {
   display: grid;
-  gap: 1rem;
+  gap: 2.35rem;
 }
 
 .kit-finish {
   display: grid;
-  gap: 1rem 0.65rem;
+  gap: 2.35rem 0.65rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -635,11 +635,11 @@
 
 @media (min-width: 721px) {
   .kit-finish-wrap {
-    gap: 1.15rem;
+    gap: 2.65rem;
   }
 
   .kit-finish {
-    gap: 1.15rem 0.85rem;
+    gap: 2.65rem 0.85rem;
   }
 
   .kit-finish--grid {
