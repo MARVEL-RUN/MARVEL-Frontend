@@ -70,6 +70,26 @@ export const EVENT = {
         },
       ],
     },
+    {
+      title: "주차",
+      kicker: "PARKING",
+      headline: "주차 안내",
+      en: "PARKING GUIDE",
+      items: [
+        {
+          badge: "주차",
+          text: "인제스피디움 주차장",
+        },
+        {
+          badge: "셔틀",
+          text: "카카오T 셔틀 승·하차존 | 티켓박스",
+        },
+        {
+          badge: "도보",
+          text: "행사장까지 도보 이동",
+        },
+      ],
+    },
   ],
   info: [
     {

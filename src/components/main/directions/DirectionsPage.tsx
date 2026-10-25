@@ -69,10 +69,23 @@ export function DirectionsPage() {
             <div className="directions-parking__row">
               {parkingAccess ? (
                 <div className="venue-copy directions-parking__copy">
-                  <article className="venue-access">
-                    <h2 className="directions-parking__title" id="directions-parking-title">
-                      주차 안내
+                  <header className="directions-parking__head">
+                    {"kicker" in parkingAccess && parkingAccess.kicker ? (
+                      <p className="kicker">{parkingAccess.kicker}</p>
+                    ) : null}
+                    <h2 className="sec__title" id="directions-parking-title">
+                      {"headline" in parkingAccess && parkingAccess.headline
+                        ? parkingAccess.headline
+                        : parkingAccess.title}
+                      {"en" in parkingAccess && parkingAccess.en ? (
+                        <>
+                          <br />
+                          <em>{parkingAccess.en}</em>
+                        </>
+                      ) : null}
                     </h2>
+                  </header>
+                  <article className="venue-access">
                     <ul className="venue-access__list">
                       {accessItemRows(parkingAccess.items)}
                     </ul>
