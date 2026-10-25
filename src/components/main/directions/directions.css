@@ -153,10 +153,14 @@
   min-width: 0;
 }
 
+.directions-parking__map {
+  position: relative;
+  aspect-ratio: 995 / 580;
+  box-shadow: none;
+}
+
 .directions-parking__img {
-  display: block;
-  width: 100%;
-  height: auto;
+  object-fit: cover;
 }
 
 @media (max-width: 960px) {
