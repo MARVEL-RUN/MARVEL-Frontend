@@ -323,13 +323,12 @@
   }
 }
 
-/* 출연 아티스트 — 2×2 카드 */
+/* 출연 아티스트 — 1행 4열 */
 .onsite-artists {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  max-width: 52rem;
-  margin: 0 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -345,13 +344,12 @@
 }
 
 .onsite-artists__disclaimer {
-  max-width: 52rem;
-  margin: 1.25rem auto 0;
+  margin: 1.25rem 0 0;
   color: var(--note);
   font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.55;
-  text-align: center;
+  text-align: left;
   word-break: keep-all;
 }
 
@@ -783,6 +781,7 @@
 @media (max-width: 720px) {
 
   .onsite-artists {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.65rem;
   }
 

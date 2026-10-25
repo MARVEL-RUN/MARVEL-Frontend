@@ -12,7 +12,7 @@ export function OnsiteArtists() {
               alt={`${artist.role} ${artist.name}`}
               width={404}
               height={404}
-              sizes="(max-width: 720px) 46vw, 404px"
+              sizes="(max-width: 720px) 46vw, 25vw"
               className="onsite-artists__img"
             />
           </li>
