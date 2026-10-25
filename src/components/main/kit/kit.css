@@ -510,7 +510,7 @@
   font-size: 0.78rem;
 }
 
-.kit-finish__banner-title {
+.kit-gallery__pane--finish .kit-finish__banner-title {
   margin: 0;
   color: #fff;
   font-size: clamp(1.75rem, 4vw, 2.85rem);
@@ -622,9 +622,10 @@
     font-size: 0.6rem;
   }
 
-  .kit-finish__banner-title {
-    font-size: clamp(1.35rem, 6.2vw, 1.75rem);
-    line-height: 1.15;
+  .kit-gallery__pane--finish .kit-finish__banner-title {
+    font-size: clamp(2.15rem, 10vw, 2.85rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
   }
 
   .kit-finish__banner-en {
@@ -939,6 +940,12 @@
 
   .kit-gallery__pane h3 {
     font-size: 1.05rem;
+  }
+
+  .kit-gallery__pane--finish .kit-finish__banner-title {
+    font-size: clamp(1.75rem, 4vw, 2.85rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
   }
 
   .kit-gallery__lineup {
