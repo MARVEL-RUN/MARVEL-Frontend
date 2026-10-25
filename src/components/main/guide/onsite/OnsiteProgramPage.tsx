@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ONSITE_DRIVE, ONSITE_PRICE_TBA } from "@/lib/onsite-program";
 import { SideBanner } from "../../layout/SideBanner";
 import { MediaLoader } from "../../MediaLoader";
+import { OnsiteArtists } from "./OnsiteArtists";
 import { OnsiteBooths } from "./OnsiteBooths";
 
 function PriceTba({ mask }: { mask: string }) {
@@ -111,6 +112,16 @@ export function OnsiteProgramPage() {
               </p>
             </header>
             <OnsiteBooths />
+          </section>
+
+          <section className="onsite-sec" aria-labelledby="onsite-artist-heading">
+            <header className="onsite-sec__head">
+              <p className="kicker">03 / ARTIST</p>
+              <h2 id="onsite-artist-heading">
+                출연 아티스트 <em>공개</em>
+              </h2>
+            </header>
+            <OnsiteArtists />
           </section>
         </div>
       </main>

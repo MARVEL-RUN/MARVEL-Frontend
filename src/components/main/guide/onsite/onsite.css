@@ -323,6 +323,38 @@
   }
 }
 
+/* 출연 아티스트 — 2×2 카드 */
+.onsite-artists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.onsite-artists__item {
+  min-width: 0;
+}
+
+.onsite-artists__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.onsite-artists__disclaimer {
+  max-width: 52rem;
+  margin: 1.25rem auto 0;
+  color: var(--note);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.55;
+  text-align: center;
+  word-break: keep-all;
+}
+
 /* 부스 · 프로그램 — 체험과 같은 코믹 컷. 열면 화살표 탭 + 사진|설명 */
 .onsite-booths {
   display: grid;
@@ -749,6 +781,16 @@
 }
 
 @media (max-width: 720px) {
+
+  .onsite-artists {
+    gap: 0.65rem;
+  }
+
+  .onsite-artists__disclaimer {
+    margin-top: 1rem;
+    font-size: 0.72rem;
+    text-align: left;
+  }
 
   .onsite-booths {
     grid-template-columns: repeat(2, minmax(0, 1fr));

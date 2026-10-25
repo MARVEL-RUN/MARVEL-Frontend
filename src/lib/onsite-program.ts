@@ -120,3 +120,40 @@ export const ONSITE_BOOTHS: readonly OnsiteBoothItem[] = [
     logo: { src: MAIN_ASSETS.onsiteSasasaLogo, width: 1235, height: 270 },
   },
 ] as const;
+
+export type OnsiteArtistItem = {
+  id: string;
+  role: string;
+  name: string;
+  photo: string;
+};
+
+export const ONSITE_ARTISTS: readonly OnsiteArtistItem[] = [
+  {
+    id: "jung-hyuk",
+    role: "마블런 MC",
+    name: "정혁",
+    photo: MAIN_ASSETS.onsiteArtistJungHyuk,
+  },
+  {
+    id: "kim-min",
+    role: "보헤미안",
+    name: "김민",
+    photo: MAIN_ASSETS.onsiteArtistKimMin,
+  },
+  {
+    id: "yun-sungbin",
+    role: "대한민국 아이언맨",
+    name: "윤성빈",
+    photo: MAIN_ASSETS.onsiteArtistYunSungbin,
+  },
+  {
+    id: "jung-chansung",
+    role: "코리안좀비",
+    name: "정찬성",
+    photo: MAIN_ASSETS.onsiteArtistJungChansung,
+  },
+] as const;
+
+export const ONSITE_ARTIST_DISCLAIMER =
+  "※ 현장 운영 상황에 따라 출연진은 변경될 수 있습니다.";
