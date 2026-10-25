@@ -58,7 +58,6 @@ export const MAIN_ASSETS = {
   medal10kRibbon: "/images/main/guide/medal-10k-ribbon.png",
   onsiteDriveLeisureKart: "/images/main/guide/onsite/drive-leisure-kart.png",
   onsiteDriveOffroad: "/images/main/guide/onsite/drive-offroad.png",
-  onsiteDriveDrift: "/images/main/guide/onsite/drive-drift.png",
   onsiteRunningDjPhoto: "/images/main/guide/onsite/booth-running-dj-photo.jpg",
   onsiteMsqLogo: "/images/main/guide/onsite/booth-msq-logo.png",
   onsiteTapingPhoto: "/images/main/guide/onsite/booth-taping-photo.jpg",
