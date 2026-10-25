@@ -125,37 +125,47 @@
   font-weight: 500;
 }
 
-.directions-parking {
-  display: grid;
-  gap: 1.35rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+.directions-parking .guide-rule {
+  margin: 0 0 2.5rem;
 }
 
-.directions-parking__head {
-  display: grid;
-  gap: 0.55rem;
+.directions-parking__title {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
 }
 
-.directions-parking__head .sec__title {
-  margin: 0;
+.directions-parking__row {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.95fr) minmax(0, 1.2fr);
+  gap: 2.4rem 3rem;
+  align-items: start;
+}
+
+.directions-parking__copy {
+  min-height: 0;
 }
 
 .directions-parking__figure {
   margin: 0;
+  min-width: 0;
 }
 
 .directions-parking__img {
   display: block;
   width: 100%;
   height: auto;
-  background: #0c0d22;
-  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
-  box-shadow: inset 0 0 0 1px var(--marvel);
 }
 
 @media (max-width: 960px) {
   .directions__row {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .directions-parking__row {
     grid-template-columns: 1fr;
     gap: 1.75rem;
   }
@@ -177,15 +187,22 @@
     clip-path: none;
   }
 
-  .directions-parking__img {
-    clip-path: none;
-  }
-
   .directions {
     gap: 1.35rem;
   }
+  .directions-parking__row {
+    gap: 1.35rem;
+  }
+  .directions-parking__title {
+    margin-bottom: 1.1rem;
+    font-size: 1.35rem;
+  }
   .venue-copy {
     gap: 1.55rem;
+  }
+  .directions-parking__copy .venue-access__list {
+    border-left: 2px solid var(--marvel);
+    padding-left: 0.95rem;
   }
   .venue-access__head {
     gap: 0.15rem;
