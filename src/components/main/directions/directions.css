@@ -196,8 +196,16 @@
   }
 
   .directions-parking__title {
-    margin-bottom: 1.1rem;
+    margin-bottom: 0;
     font-size: 1.35rem;
+  }
+
+  .directions-parking__copy {
+    gap: 0.45rem;
+  }
+
+  .directions-parking__head .kicker {
+    margin-bottom: 0.55rem;
   }
 
   .venue-copy {
