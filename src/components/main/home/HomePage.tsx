@@ -397,7 +397,9 @@ export function HomePage() {
           </h2>
           {registrationClosed ? (
             <p className="assemble__closed">
-              추가 접수가 종료되었습니다. 접수 내역은 신청조회에서 확인할 수 있습니다.
+              추가 접수가 종료되었습니다.
+              <br />
+              접수 내역은 신청조회에서 확인할 수 있습니다.
             </p>
           ) : (
             <OpenCountdown />

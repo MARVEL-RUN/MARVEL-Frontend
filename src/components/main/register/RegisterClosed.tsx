@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { registrationClosedKind } from "@/lib/register-schedule";
@@ -5,12 +6,19 @@ import { registrationClosedKind } from "@/lib/register-schedule";
 export function RegisterClosed({
   body,
 }: {
-  body?: string;
+  body?: ReactNode;
 }) {
   const ended = registrationClosedKind() === "ended";
-  const copy = body ?? (ended
-    ? "추가 접수 기간이 종료되었습니다. 접수 내역은 신청조회에서 확인해 주세요."
-    : "접수는 아직 열리지 않았습니다. 오픈 시각에 이 페이지에서 개인 또는 단체 신청을 할 수 있습니다.");
+  const defaultBody = ended ? (
+    <>
+      추가 접수 기간이 종료되었습니다.
+      <br />
+      접수 내역은 신청조회에서 확인해 주세요.
+    </>
+  ) : (
+    "접수는 아직 열리지 않았습니다. 오픈 시각에 이 페이지에서 개인 또는 단체 신청을 할 수 있습니다."
+  );
+  const copy = body ?? defaultBody;
 
   return (
     <section className="block wait">
