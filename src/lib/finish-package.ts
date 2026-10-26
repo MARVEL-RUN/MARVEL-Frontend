@@ -17,8 +17,14 @@ export const FINISH_PACKAGE_ITEMS: FinishPackageItem[] = [
   { no: 3, title: "마블런 스티커", image: MAIN_ASSETS.kitFinishStickers },
   { no: 4, title: "KFC 쿠폰", image: MAIN_ASSETS.kitFinishKfcCoupon },
   {
+    no: 5,
+    title: "크라운 스포츠 뉴트리션 검바 (구미)",
+    image: MAIN_ASSETS.kitFinishCrownGumBar,
+    note: "※ 3종 중 2종 랜덤 증정",
+  },
+  {
     no: 6,
-    title: "슬리플러스 딥 슬립 + 슬리프레소",
+    title: "슬리플러스 슬림핏 + 슬리프레소",
     image: MAIN_ASSETS.kitFinishSleeplusSleepresso,
   },
   {
@@ -33,7 +39,7 @@ export const FINISH_PACKAGE_ITEMS: FinishPackageItem[] = [
     note: "※ 3종 중 1종 랜덤 증정",
   },
   { no: 9, title: "빙그레 왕실말차", image: MAIN_ASSETS.kitFinishBinggraeMatcha },
-  { no: 10, title: "샘표 맛병아리콩", image: MAIN_ASSETS.kitFinishSempioChickpeas },
+  { no: 10, title: "샘트리 맛병아리콩", image: MAIN_ASSETS.kitFinishSempioChickpeas },
   { no: 11, title: "아워홈 지리산수", image: MAIN_ASSETS.kitFinishJirisanWater },
 ];
 
