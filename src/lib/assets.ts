@@ -56,6 +56,7 @@ export const MAIN_ASSETS = {
   kitFinishMedalCase: "/images/main/guide/kit-finish-medal-case.png",
   kitFinishStickers: "/images/main/guide/kit-finish-stickers.png",
   kitFinishKfcCoupon: "/images/main/guide/kit-finish-kfc-coupon.png",
+  kitFinishCrownGumBar: "/images/main/guide/kit-finish-crown-gum-bar.png",
   kitFinishSleeplusSleepresso: "/images/main/guide/kit-finish-sleeplus-sleepresso.png",
   kitFinishAndrosBeNuts: "/images/main/guide/kit-finish-andros-be-nuts.png",
   kitFinishHappiz: "/images/main/guide/kit-finish-happiz.png",
