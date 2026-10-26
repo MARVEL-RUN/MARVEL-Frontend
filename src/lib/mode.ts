@@ -22,6 +22,12 @@ export const GUIDE_SECTIONS = [
 export const GUIDE_TABS = GUIDE_SECTIONS.filter((item) => item.href.includes("#"));
 
 export const KIT_HREF = "/kit";
+export const KIT_BRANDS_HREF = "/kit/brands";
+
+export const KIT_SECTIONS = [
+  { href: KIT_HREF, label: "기념품" },
+  { href: KIT_BRANDS_HREF, label: "브랜드" },
+] as const;
 
 export const BOARD_SECTIONS = [
   { href: "/faq", label: "FAQ" },
@@ -46,7 +52,12 @@ export const NAV_ITEMS = [
     pickChild: true,
     children: GUIDE_SECTIONS,
   },
-  { href: KIT_HREF, label: "기념품" },
+  {
+    href: KIT_HREF,
+    label: "기념품",
+    pickChild: true,
+    children: KIT_SECTIONS,
+  },
   {
     href: DIRECTIONS_HREF,
     label: "오시는길",
