@@ -39,7 +39,7 @@ export const FINISH_PACKAGE_ITEMS: FinishPackageItem[] = [
     note: "※ 3종 중 1종 랜덤 증정",
   },
   { no: 9, title: "빙그레 왕실말차", image: MAIN_ASSETS.kitFinishBinggraeMatcha },
-  { no: 10, title: "샘표 맛병아리콩", image: MAIN_ASSETS.kitFinishSempioChickpeas },
+  { no: 10, title: "샘트리 맛병아리콩", image: MAIN_ASSETS.kitFinishSempioChickpeas },
   { no: 11, title: "아워홈 지리산수", image: MAIN_ASSETS.kitFinishJirisanWater },
 ];
 
