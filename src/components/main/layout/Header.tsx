@@ -21,6 +21,9 @@ function childOn(pathname: string, hash: string, childHref: string, parentHref: 
   const id = childHref.split("#")[1];
   if (id) return pathname.startsWith(parentHref) && hash === "#" + id;
   const path = hrefPath(childHref);
+  if (path === hrefPath(parentHref)) {
+    return pathname === path;
+  }
   return pathname === path || pathname.startsWith(`${path}/`);
 }
 
