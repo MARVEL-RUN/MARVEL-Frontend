@@ -34,6 +34,14 @@
   line-height: 1.2;
 }
 
+.assemble__closed {
+  max-width: 22rem;
+  margin: 0 auto 1.15rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .assemble__count {
   display: flex;
   align-items: stretch;

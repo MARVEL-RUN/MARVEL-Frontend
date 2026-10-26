@@ -1,6 +1,21 @@
 import { EVENT } from "@/lib/event";
 import { registrationForced } from "@/lib/mode";
 
+const registrationCloseAt = () => Date.parse(EVENT.registrationCloseAt);
+
+/** 접수 닫힘 UI — 오픈 전 STANDBY vs 최종 마감 CLOSED */
+export function registrationClosedKind(now = Date.now()): "standby" | "ended" {
+  const openMs = Date.parse(EVENT.openAt);
+  const closeMs = registrationCloseAt();
+  if (registrationForced === false) {
+    return now >= openMs ? "ended" : "standby";
+  }
+  if (registrationForced === true) return "standby";
+  if (Number.isFinite(closeMs) && now >= closeMs) return "ended";
+  if (now < openMs) return "standby";
+  return "standby";
+}
+
 export type CountdownSlots = {
   d: string;
   h: string;

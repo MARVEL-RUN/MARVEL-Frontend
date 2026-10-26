@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { EVENT } from "@/lib/event";
 import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
+import { registrationClosedKind } from "@/lib/register-schedule";
 import { RegisterCta } from "../register/RegisterCta";
 import { MOBILE_MQ } from "@/lib/viewport";
 import type { CourseId } from "@/lib/register";
@@ -16,7 +17,7 @@ import { HomeSponsors } from "./HomeSponsors";
 import { KeyVisualCopyright } from "../layout/KeyVisualCopyright";
 import { SideDock } from "./SideDock";
 
-const TICKER = [
+const TICKER_OPEN = [
   "마블런2026",
   "MARVEL RUN 2026",
   "9.22 14:00 OPEN",
@@ -26,7 +27,19 @@ const TICKER = [
   "KOREA",
 ];
 
+const TICKER_CLOSED = [
+  "마블런2026",
+  "MARVEL RUN 2026",
+  "10.26 17:00 CLOSED",
+  "INJE SPEEDIUM",
+  "10.31 SAT",
+  "ASSEMBLE",
+  "KOREA",
+];
+
 export function HomePage() {
+  const registrationClosed = registrationClosedKind() === "ended";
+  const ticker = registrationClosed ? TICKER_CLOSED : TICKER_OPEN;
   const heroRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLElement>(null);
   const [previewId, setPreview] = useState<CourseId | null>(null);
@@ -153,11 +166,15 @@ export function HomePage() {
             href="#assemble"
             className="hero__dday"
             onClick={goAssemble}
-            aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
+            aria-label={
+              registrationClosed
+                ? `${EVENT.closeNoticeDate} ${EVENT.closeNoticeTime} ${EVENT.closeNoticeAction}`
+                : `${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`
+            }
           >
             <span className="hero__open">
               <span>접수</span>
-              <span>OPEN</span>
+              <span>{registrationClosed ? "마감" : "OPEN"}</span>
             </span>
             <i aria-hidden />
             <OpenDday />
@@ -188,7 +205,7 @@ export function HomePage() {
         <div className="ticker__track">
           {[0, 1].map((copy) => (
             <ul key={copy}>
-              {TICKER.map((bit) => (
+              {ticker.map((bit) => (
                 <li
                   key={`${copy}-${bit}`}
                   className={/[가-힣]/.test(bit) ? "is-ko" : undefined}
@@ -362,13 +379,31 @@ export function HomePage() {
           ASSEMBLE
         </p>
         <div className="assemble__inner reveal">
-          <p className="kicker kicker--on-red">OPEN</p>
+          <p className="kicker kicker--on-red">{registrationClosed ? "CLOSED" : "OPEN"}</p>
           <h2>
-            {EVENT.openNoticeDate}
-            <br />
-            {EVENT.openNoticeTime} {EVENT.openNoticeAction}
+            {registrationClosed ? (
+              <>
+                {EVENT.closeNoticeDate}
+                <br />
+                {EVENT.closeNoticeTime} {EVENT.closeNoticeAction}
+              </>
+            ) : (
+              <>
+                {EVENT.openNoticeDate}
+                <br />
+                {EVENT.openNoticeTime} {EVENT.openNoticeAction}
+              </>
+            )}
           </h2>
-          <OpenCountdown />
+          {registrationClosed ? (
+            <p className="assemble__closed">
+              추가 접수가 종료되었습니다.
+              <br />
+              접수 내역은 신청조회에서 확인할 수 있습니다.
+            </p>
+          ) : (
+            <OpenCountdown />
+          )}
           <RegisterCta className="btn btn--on-red" />
         </div>
       </section>

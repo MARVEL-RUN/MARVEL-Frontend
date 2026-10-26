@@ -2,6 +2,8 @@
 
 import { Fragment, useEffect, useState } from "react";
 import { EVENT } from "@/lib/event";
+import { registrationClosedKind } from "@/lib/register-schedule";
+import { useRegistrationOpen } from "../register/useRegistrationOpen";
 
 const OPEN_AT = Date.parse(EVENT.openAt);
 
@@ -64,14 +66,20 @@ export function ddayLabel(n: number, spaced = false) {
 }
 
 export function OpenDday({ className }: { className?: string }) {
-  const { left, ready } = useOpenLeft();
-  const label = !ready ? "D - --" : left ? ddayLabel(left.n, true) : "OPEN";
+  const registrationOpen = useRegistrationOpen();
+  const ended = registrationClosedKind() === "ended";
+  const { left, ready } = useOpenLeft(registrationOpen && !ended);
+  let label = !ready ? "D - --" : left ? ddayLabel(left.n, true) : "OPEN";
+  if (ended) label = "END";
 
   return <span className={className}>{label}</span>;
 }
 
 export function OpenCountdown() {
-  const { left, ready } = useOpenLeft();
+  const registrationOpen = useRegistrationOpen();
+  const ended = registrationClosedKind() === "ended";
+  const { left, ready } = useOpenLeft(registrationOpen && !ended);
+  if (ended) return null;
   if (ready && !left) return null;
 
   const slots = left ?? { d: "--", h: "--", m: "--", s: "--" };

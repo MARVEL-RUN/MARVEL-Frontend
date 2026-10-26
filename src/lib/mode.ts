@@ -86,6 +86,9 @@ export const registrationForced: boolean | null =
       : null;
 
 export function isRegistrationOpen(now = Date.now()) {
-  if (registrationForced !== null) return registrationForced;
+  if (registrationForced === false) return false;
+  if (registrationForced === true) return true;
+  const closeMs = Date.parse(EVENT.registrationCloseAt);
+  if (Number.isFinite(closeMs) && now >= closeMs) return false;
   return now >= Date.parse(EVENT.openAt);
 }
