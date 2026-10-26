@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { EVENT } from "@/lib/event";
+import { registrationClosedKind } from "@/lib/register-schedule";
 import { ddayLabel, openLeftNow, useOpenLeft } from "../home/OpenCountdown";
 import { RegisterStandbyCount } from "./RegisterStandbyCount";
 
@@ -15,8 +16,9 @@ type Props = {
 export function RegisterClosedModal({ open, onClose }: Props) {
   const titleId = useId();
   const [mounted, setMounted] = useState(false);
-  const { left } = useOpenLeft(open);
-  const live = left ?? (open ? openLeftNow() : null);
+  const ended = registrationClosedKind() === "ended";
+  const { left } = useOpenLeft(open && !ended);
+  const live = left ?? (open && !ended ? openLeftNow() : null);
   const slots = live ?? { d: "00", h: "00", m: "00", s: "00" };
   const dday = live ? ddayLabel(live.n, true) : "OPEN";
 
@@ -55,7 +57,7 @@ export function RegisterClosedModal({ open, onClose }: Props) {
         aria-labelledby={titleId}
       >
         <header className="standby-v1__head">
-          <p className="kicker">STANDBY</p>
+          <p className="kicker">{ended ? "CLOSED" : "STANDBY"}</p>
           <button
             type="button"
             className="standby-v1__x"
@@ -65,16 +67,35 @@ export function RegisterClosedModal({ open, onClose }: Props) {
             <X size={20} strokeWidth={2.25} />
           </button>
         </header>
-        <h2 id={titleId}>아직 접수 기간이 아닙니다</h2>
-        <p className="standby-v1__chip">
-          <span>접수 OPEN</span>
-          <i aria-hidden />
-          <span>{dday}</span>
-        </p>
-        <RegisterStandbyCount slots={slots} />
+        <h2 id={titleId}>
+          {ended ? "참가 신청이 마감되었습니다" : "아직 접수 기간이 아닙니다"}
+        </h2>
+        {ended ? (
+          <p className="standby-v1__chip">
+            <span>{EVENT.closeNoticeAction}</span>
+            <i aria-hidden />
+            <span>END</span>
+          </p>
+        ) : (
+          <>
+            <p className="standby-v1__chip">
+              <span>접수 OPEN</span>
+              <i aria-hidden />
+              <span>{dday}</span>
+            </p>
+            <RegisterStandbyCount slots={slots} />
+          </>
+        )}
         <p className="standby-v1__when">
-          {EVENT.openNoticeDate} · {EVENT.openNoticeTime}
+          {ended
+            ? `${EVENT.closeNoticeDate} · ${EVENT.closeNoticeTime}`
+            : `${EVENT.openNoticeDate} · ${EVENT.openNoticeTime}`}
         </p>
+        {ended ? (
+          <p className="form__note">
+            추가 접수 기간이 종료되었습니다. 접수 내역은 신청조회에서 확인할 수 있습니다.
+          </p>
+        ) : null}
         <div className="standby-v1__actions">
           <button type="button" className="btn btn--red" onClick={onClose}>
             확인

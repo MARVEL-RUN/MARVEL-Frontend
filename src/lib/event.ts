@@ -15,6 +15,11 @@ export const EVENT = {
   round2OpenNoticeDate: "2026. 10. 14. 수요일",
   round2OpenNoticeTime: "오후 2시",
   round2OpenNoticeAction: "추가 접수 OPEN",
+  /* 2차(추가) 접수 종료 — CTA·/register 마감 안내 (KST) */
+  registrationCloseAt: "2026-10-26T17:00:00+09:00",
+  closeNoticeDate: "2026. 10. 26. 월요일",
+  closeNoticeTime: "오후 5시",
+  closeNoticeAction: "접수 마감",
   /* 홈 팝업. nextAt(KST)부터 next. 해당 팝업만 끄려면 next.enabled: false */
   popup: {
     enabled: false,
