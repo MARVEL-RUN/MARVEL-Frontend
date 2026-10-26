@@ -31,7 +31,6 @@ npm run dev:main             # 본사이트
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | 오시는길 지도 |
 | `NEXT_PUBLIC_BGM` | `off` 끄기, `on` 기본 음원 |
 | `NEXT_PUBLIC_START_GROUP` | `1` 출발 그룹 선택·표기·수정 UI, 그 외 끔 |
-| `NEXT_PUBLIC_DISCOUNT_LINK` | `1` 할인 링크 path(`/discount/*`), 그 외 끔 |
 | `GOOGLE_SITE_VERIFICATION` | 구글 사이트 인증 |
 | `NAVER_SITE_VERIFICATION` | 네이버 사이트 인증 |
 | `GA_MEASUREMENT_ID` | Google Analytics |
@@ -52,7 +51,6 @@ npm run dev:main             # 본사이트
 | Secret | 용도 |
 |--------|------|
 | `NEXT_PUBLIC_START_GROUP` | `1` 출발 그룹 UI, `0` 또는 미등록 끔 (테스트·운영 공통) |
-| `NEXT_PUBLIC_DISCOUNT_LINK` | `1` 할인 링크 UI, `0` 또는 미등록 끔 (테스트·운영 공통) |
 
 ## 폴더
 
