@@ -16,12 +16,13 @@ export function useRegistrationOpen() {
     }
     setOpen(isRegistrationOpen());
     if (registrationForced !== null) return;
-    const remain = Date.parse(EVENT.openAt) - Date.now();
-    if (remain <= 0) return;
-    const timer = window.setTimeout(
-      () => setOpen(isRegistrationOpen()),
-      remain + 50,
-    );
+    const now = Date.now();
+    const edges = [Date.parse(EVENT.openAt), Date.parse(EVENT.registrationCloseAt)]
+      .map((ms) => ms - now)
+      .filter((ms) => ms > 0);
+    if (!edges.length) return;
+    const remain = Math.min(...edges);
+    const timer = window.setTimeout(() => setOpen(isRegistrationOpen()), remain + 50);
     return () => window.clearTimeout(timer);
   }, [preview]);
 

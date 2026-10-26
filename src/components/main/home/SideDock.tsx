@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { EVENT } from "@/lib/event";
+import { registrationClosedKind } from "@/lib/register-schedule";
+import { useRegistrationOpen } from "../register/useRegistrationOpen";
 import { ddayLabel, useOpenLeft } from "./OpenCountdown";
 
 const SECTIONS = [
@@ -15,8 +17,10 @@ const SECTIONS = [
 export function SideDock() {
   const [active, setActive] = useState<string>("hero");
   const jumping = useRef(false);
-  const { left, ready } = useOpenLeft();
-  const dday = !ready ? "D--" : left ? ddayLabel(left.n) : null;
+  const registrationOpen = useRegistrationOpen();
+  const ended = registrationClosedKind() === "ended";
+  const { left, ready } = useOpenLeft(registrationOpen && !ended);
+  const dday = !ended && !ready ? "D--" : !ended && left ? ddayLabel(left.n) : null;
 
   useEffect(() => {
     const onScroll = () => {
@@ -66,10 +70,14 @@ export function SideDock() {
       <button
         type="button"
         className={active === "assemble" ? "side-dock__open is-on" : "side-dock__open"}
-        aria-label={`${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`}
+        aria-label={
+          ended
+            ? `${EVENT.closeNoticeDate} ${EVENT.closeNoticeTime} ${EVENT.closeNoticeAction}`
+            : `${EVENT.openNoticeDate} ${EVENT.openNoticeTime} ${EVENT.openNoticeAction}`
+        }
         onClick={() => jump("assemble")}
       >
-        <span>OPEN</span>
+        <span>{ended ? "END" : "OPEN"}</span>
         {dday ? (
           <>
             <i aria-hidden>|</i>
