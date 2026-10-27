@@ -254,14 +254,6 @@ export const EVENT = {
       program: "경품 시상식 및 퀴즈 이벤트",
       note: "",
     },
-    {
-      from: "19:00",
-      to: "",
-      rt: "–",
-      program: "행사 종료",
-      note: "공식 폐장",
-      mark: "gate",
-    },
   ],
   timelineDisclaimer:
     "※ 현장 운영 상황에 따라 타임테이블은 변경될 수 있습니다",
