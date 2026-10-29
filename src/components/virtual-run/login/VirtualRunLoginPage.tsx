@@ -1,8 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { VrLink } from "./VrLink";
-import { VirtualRunSubPage } from "./VirtualRunSubPage";
+import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
+import { VrLink } from "../layout/VrLink";
 
 export function VirtualRunLoginPage() {
   const [sent, setSent] = useState(false);

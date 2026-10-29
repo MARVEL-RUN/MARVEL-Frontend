@@ -1,5 +1,5 @@
 import { OverviewTable } from "./OverviewTable";
-import { VirtualRunSubPage } from "./VirtualRunSubPage";
+import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 
 export function VirtualRunEventPage() {
   return (

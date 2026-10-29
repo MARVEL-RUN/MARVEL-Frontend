@@ -5,7 +5,7 @@ import { MAIN_ASSETS } from "@/lib/assets";
 import { EVENT } from "@/lib/event";
 import { LEGAL_DOCS, OFFICE } from "@/lib/legal";
 import { footerPartnerLogo, footerPartnerLogoClass } from "@/lib/sponsor-logos";
-import { useLegalModal } from "../main/legal/LegalModal";
+import { useLegalModal } from "../../main/legal/LegalModal";
 import { VrLink } from "./VrLink";
 
 const OFFICE_FACTS = [

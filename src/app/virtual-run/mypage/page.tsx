@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { VirtualRunMypageHub } from "@/components/virtual-run/VirtualRunMypageHub";
+import { VirtualRunMypageHub } from "@/components/virtual-run/mypage/VirtualRunMypageHub";
 
 export const metadata: Metadata = { title: "마이페이지" };
 

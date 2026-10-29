@@ -1,5 +1,5 @@
 @import "./theme.css";
-@import "./virtual-run-home.css";
+@import "./home/home.css";
 
 .virtual-run .vr-grid-2 {
   display: grid;

@@ -1,4 +1,4 @@
-import { VirtualRunSubPage } from "./VirtualRunSubPage";
+import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 
 type Props = {
   title: string;

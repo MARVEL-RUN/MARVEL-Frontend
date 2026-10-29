@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { VirtualRunGuidePage } from "@/components/virtual-run/VirtualRunGuidePage";
+import { VirtualRunGuidePage } from "@/components/virtual-run/guide/VirtualRunGuidePage";
 
 export const metadata: Metadata = { title: "인증 가이드" };
 

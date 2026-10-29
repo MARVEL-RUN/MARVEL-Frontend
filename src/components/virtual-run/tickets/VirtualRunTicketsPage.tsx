@@ -1,6 +1,6 @@
 import { VIRTUAL_RUN_EVENT } from "@/lib/virtual-run/event";
-import { VrLink } from "./VrLink";
-import { VirtualRunSubPage } from "./VirtualRunSubPage";
+import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
+import { VrLink } from "../layout/VrLink";
 
 export function VirtualRunTicketsPage() {
   return (

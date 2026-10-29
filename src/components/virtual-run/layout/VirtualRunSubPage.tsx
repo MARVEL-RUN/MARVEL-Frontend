@@ -1,4 +1,4 @@
-import { SideBanner } from "../main/layout/SideBanner";
+import { VirtualRunSideBanner } from "./VirtualRunSideBanner";
 
 export function VirtualRunSubPage({
   kicker,
@@ -13,7 +13,7 @@ export function VirtualRunSubPage({
 }) {
   return (
     <main className="page">
-      <SideBanner kicker={kicker} title={title} en={en} />
+      <VirtualRunSideBanner kicker={kicker} title={title} en={en} />
       {children}
     </main>
   );

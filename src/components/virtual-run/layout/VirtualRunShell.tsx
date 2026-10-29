@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { CinematicFX } from "../main/fx/CinematicFX";
-import { MainToastHost } from "../main/feedback/MainFeedback";
-import { KeyboardInset } from "../main/layout/KeyboardInset";
-import { LegalModalProvider } from "../main/legal/LegalModal";
+import { CinematicFX } from "../../main/fx/CinematicFX";
+import { MainToastHost } from "../../main/feedback/MainFeedback";
+import { KeyboardInset } from "../../main/layout/KeyboardInset";
+import { LegalModalProvider } from "../../main/legal/LegalModal";
 import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
-import "./virtual-run.css";
+import "../virtual-run.css";
 
 export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {

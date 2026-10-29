@@ -1,7 +1,7 @@
 import { virtualRunSpotsEnabled } from "@/lib/virtual-run/site";
 import { VIRTUAL_RUN_MYPAGE_NAV } from "@/lib/virtual-run/nav";
-import { VrLink } from "./VrLink";
-import { VirtualRunSubPage } from "./VirtualRunSubPage";
+import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
+import { VrLink } from "../layout/VrLink";
 
 export function VirtualRunMypageHub() {
   const items = VIRTUAL_RUN_MYPAGE_NAV.filter(

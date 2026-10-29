@@ -2,14 +2,15 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
+import { COMING_SOON_ASSETS } from "@/lib/assets";
+import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import {
   VIRTUAL_RUN_EVENT,
   VIRTUAL_RUN_OVERVIEW_ROWS,
 } from "@/lib/virtual-run/event";
-import { KeyVisualCopyright } from "../main/layout/KeyVisualCopyright";
+import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
+import { VrLink } from "../layout/VrLink";
 import { HeroCountdown } from "./HeroCountdown";
-import { VrLink } from "./VrLink";
 
 const TICKER = [
   "버추얼런",
@@ -69,7 +70,7 @@ export function VirtualRunHomePage() {
       <section className="hero" id="hero" ref={heroRef}>
         <div className="hero__art" aria-hidden>
           <Image
-            src={MAIN_ASSETS.virtualSoonHero}
+            src={VIRTUAL_RUN_ASSETS.banner}
             alt=""
             fill
             priority

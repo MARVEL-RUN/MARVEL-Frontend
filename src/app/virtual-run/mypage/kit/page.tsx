@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { VirtualRunMypageSection } from "@/components/virtual-run/VirtualRunMypageSection";
+import { VirtualRunMypageSection } from "@/components/virtual-run/mypage/VirtualRunMypageSection";
 
 export const metadata: Metadata = { title: "키트 카드" };
 

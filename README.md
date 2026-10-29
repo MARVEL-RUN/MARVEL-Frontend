@@ -106,7 +106,8 @@ src/
   components/
     coming-soon/
     main/                    # 공개 UI + main.css
-    virtual-run/             # 버추얼런 UI (theme.css + main.css 재사용)
+    virtual-run/             # 버추얼런 UI (theme.css + virtual-run.css + main.css)
+      layout/ home/ event/ guide/ login/ tickets/ mypage/
     admin/
   layouts/admin/
   lib/

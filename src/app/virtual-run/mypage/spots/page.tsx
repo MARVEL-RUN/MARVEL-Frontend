@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { VirtualRunMypageSection } from "@/components/virtual-run/VirtualRunMypageSection";
+import { VirtualRunMypageSection } from "@/components/virtual-run/mypage/VirtualRunMypageSection";
 import { virtualRunSpotsEnabled } from "@/lib/virtual-run/site";
 
 export const metadata: Metadata = { title: "거점 이벤트" };

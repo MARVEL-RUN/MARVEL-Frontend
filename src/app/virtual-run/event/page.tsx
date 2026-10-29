@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { VirtualRunEventPage } from "@/components/virtual-run/VirtualRunEventPage";
+import { VirtualRunEventPage } from "@/components/virtual-run/event/VirtualRunEventPage";
 
 export const metadata: Metadata = { title: "행사 안내" };
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { VirtualRunShell } from "@/components/virtual-run/VirtualRunShell";
+import { VirtualRunShell } from "@/components/virtual-run/layout/VirtualRunShell";
 
 export const metadata: Metadata = {
   title: {
