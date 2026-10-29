@@ -5,8 +5,7 @@ html:has(.info-sheet) body {
 }
 
 .info-sheet {
-  display: flex;
-  flex-direction: column;
+  display: block;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -21,7 +20,6 @@ html:has(.info-sheet) body {
   width: 100%;
   height: auto;
   margin: 0;
-  margin-bottom: -1px;
   padding: 0;
   border: 0;
   outline: 0;
@@ -30,8 +28,9 @@ html:has(.info-sheet) body {
   -webkit-user-drag: none;
 }
 
-.info-sheet__img:last-child {
-  margin-bottom: 0;
+/* 다음 장 맨 위 한 줄이 반투명해서, 안 겹치면 배경이 실선으로 비침 */
+.info-sheet__img:not(:last-child) {
+  margin-bottom: calc(-1px - 0.15%);
 }
 
 .info-sheet__top {
