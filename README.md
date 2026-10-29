@@ -117,7 +117,10 @@ src/
     main/                    # 공개 API base · fetch
     payment/                 # 토스 · 세션 · 종목 매핑
     admin/
-    virtual-run/             # 버추얼런 상수·내비
+    virtual-run/             # 버추얼런 상수·내비·assets.ts
+  public/images/
+    main/
+    virtual-run/             # banner.png 등 (루트 *.png 금지)
   services/
     main/                    # 공개 신청·결제·게시판
     admin/                   # 관리자 API
