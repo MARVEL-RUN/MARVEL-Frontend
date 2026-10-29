@@ -1,0 +1,68 @@
+.virtual-run.site {
+  --navy: #030806;
+  --navy-0: rgba(3, 8, 6, 0);
+  --marvel: #00e676;
+  --marvel-deep: #004d26;
+  background: var(--navy);
+}
+
+.virtual-run .hero__shade {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 30, 16, 0.82) 0%,
+      rgba(0, 20, 12, 0.62) 38%,
+      rgba(0, 12, 8, 0.28) 68%,
+      rgba(0, 8, 5, 0.18) 100%
+    ),
+    linear-gradient(180deg, rgba(0, 40, 20, 0.55) 0%, transparent 28%, var(--navy) 96%);
+}
+
+.virtual-run .hero__bloom {
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 40%),
+    color-mix(in srgb, var(--marvel) 28%, transparent),
+    transparent 55%
+  );
+}
+
+.virtual-run .hero__spot {
+  background: radial-gradient(
+    ellipse 90% 70% at 72% 18%,
+    color-mix(in srgb, var(--marvel-deep) 55%, transparent),
+    transparent 62%
+  );
+}
+
+.virtual-run .hero__slash {
+  background: linear-gradient(
+    118deg,
+    transparent 42%,
+    color-mix(in srgb, var(--marvel) 42%, transparent) 50%,
+    transparent 58%
+  );
+}
+
+.virtual-run .ticker {
+  background: var(--marvel-deep);
+}
+
+.virtual-run .side-banner__copy .kicker {
+  color: var(--marvel);
+}
+
+.vr-home__plan {
+  margin-top: 0.35rem;
+}
+
+.vr-home__cta {
+  margin-top: 1rem;
+}
+
+.virtual-run .vr-home .vr-countdown {
+  margin-bottom: 0.25rem;
+}
+
+.virtual-run .vr-home__overview {
+  padding-top: 3.5rem;
+}
