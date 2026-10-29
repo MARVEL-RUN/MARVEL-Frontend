@@ -7,7 +7,7 @@
 }
 
 .virtual-run .side-banner--virtual-run {
-  min-height: clamp(6.5rem, 16vw, 8.75rem);
+  min-height: clamp(10rem, 24vw, 13.5rem);
   overflow: hidden;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .virtual-run .side-banner--virtual-run .side-banner__copy {
-  padding: 1.35rem 0;
+  padding: 2rem 0;
 }
 
 /* 카피는 메인 히어로와 동일. 비주얼만 오른쪽 */
@@ -255,20 +255,20 @@
   }
 
   .virtual-run .side-banner--virtual-run {
-    aspect-ratio: 2.4 / 0.72;
+    aspect-ratio: 2 / 0.92;
     min-height: 0;
   }
 
   .virtual-run .side-banner--virtual-run .side-banner__copy {
     max-width: min(14rem, 48%);
-    padding: 0.75rem 0;
+    padding: 1rem 0;
   }
 }
 
 @media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   .virtual-run .side-banner--virtual-run {
-    height: 3.6rem;
-    min-height: 3.6rem;
+    height: 4.2rem;
+    min-height: 4.2rem;
     aspect-ratio: auto;
   }
 }
