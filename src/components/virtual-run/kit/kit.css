@@ -1,69 +1,183 @@
+.virtual-run .vr-kit-page {
+  padding-bottom: 3rem;
+}
+
+.virtual-run .vr-kit {
+  margin-top: 0.5rem;
+}
+
+.virtual-run .vr-kit__bar {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--rule) 22%, transparent);
+}
+
 .virtual-run .vr-kit__themes {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.35rem 1.25rem;
 }
 
 .virtual-run .vr-kit__themes button {
-  padding: 0.55rem 1.1rem;
-  border: 1px solid color-mix(in srgb, var(--rule) 45%, transparent);
-  background: color-mix(in srgb, var(--navy) 88%, #fff 12%);
-  color: var(--ink);
-  font-size: 0.88rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  padding: 0.35rem 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--dim);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   cursor: pointer;
 }
 
 .virtual-run .vr-kit__themes button.is-on {
-  border-color: var(--marvel);
-  background: color-mix(in srgb, var(--marvel) 22%, var(--navy));
+  color: #fff;
+  border-bottom-color: var(--marvel);
 }
 
 .virtual-run .vr-kit__lead {
-  margin: 0 0 1.75rem;
+  margin: 0.85rem 0 0;
   color: var(--note);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
 }
 
-.virtual-run .vr-kit__frame--ribbon {
-  aspect-ratio: 3 / 5;
-  max-width: 280px;
-  margin-inline: auto;
+.virtual-run .vr-kit__layout {
+  display: grid;
+  gap: 2.5rem 3rem;
+  align-items: start;
 }
 
-.virtual-run .vr-kit__frame--ribbon img {
+@media (min-width: 960px) {
+  .virtual-run .vr-kit__layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
+
+  .virtual-run .vr-kit__aside {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+.virtual-run .vr-kit__manifest {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+  border-top: 1px solid color-mix(in srgb, var(--rule) 18%, transparent);
+  padding-top: 1.1rem;
+}
+
+.virtual-run .vr-kit__manifest li {
+  position: relative;
+  padding-left: 0.85rem;
+  color: var(--label);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.virtual-run .vr-kit__manifest li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--marvel);
+}
+
+.virtual-run .vr-kit__fine {
+  margin: 1rem 0 0;
+  color: var(--note);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.virtual-run .vr-kit__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+  min-width: 0;
+}
+
+.virtual-run .vr-kit__block-title {
+  margin: 0 0 1rem;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.virtual-run .vr-kit__shot {
+  margin: 0;
+}
+
+.virtual-run .vr-kit__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(72vh, 820px);
   object-fit: contain;
 }
 
-.virtual-run .vr-kit__frame--square {
-  aspect-ratio: 1;
-  max-width: 420px;
+.virtual-run .vr-kit__shot--ribbon .vr-kit__img {
+  max-width: 220px;
+  margin-inline: auto;
+  max-height: min(68vh, 640px);
+}
+
+.virtual-run .vr-kit__shot--tile .vr-kit__img {
+  max-width: 320px;
   margin-inline: auto;
 }
 
-.virtual-run .vr-kit__frame--wide {
-  aspect-ratio: 16 / 10;
-  width: 100%;
-  max-width: 960px;
+.virtual-run .vr-kit__shot--landscape .vr-kit__img {
+  max-height: none;
+}
+
+.virtual-run .vr-kit__shot--banner .vr-kit__img {
+  max-height: none;
+}
+
+.virtual-run .vr-kit__shot figcaption {
+  margin-top: 0.55rem;
+  color: var(--note);
+  font-size: 0.78rem;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.virtual-run .vr-kit__medals {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem 1.75rem;
 }
 
 .virtual-run .vr-kit__goods {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
 }
 
-.virtual-run .vr-kit__case {
-  margin-top: 1.5rem;
-  max-width: 360px;
-  margin-inline: auto;
+.virtual-run .vr-kit__run {
+  display: grid;
+  gap: 1.75rem;
 }
 
-.virtual-run .vr-kit__pane--package .vr-kit__frame--wide {
-  aspect-ratio: 4 / 3;
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__run {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .virtual-run .vr-kit__run .vr-kit__shot--banner {
+    grid-column: 1 / -1;
+  }
+}
+
+.virtual-run .vr-kit-page .btn {
+  margin-top: 2.5rem;
 }
