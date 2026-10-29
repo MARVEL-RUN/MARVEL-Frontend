@@ -8,6 +8,7 @@ import { LegalModalProvider } from "../../main/legal/LegalModal";
 import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
 import "../virtual-run.css";
+import "../home/home.css";
 
 export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {

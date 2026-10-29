@@ -1,42 +1,9 @@
 .virtual-run.site {
-  /* 홈: --vr-hero-inset-x. 서브 배너: cover + --vr-sub-banner-inset-x(좌우 검은 여백) */
-  --vr-hero-inset-x: 3%;
-  --vr-hero-scale: 1;
   --vr-sub-banner-inset-x: 15%;
   --vr-sub-banner-scale: 1;
   --vr-sub-banner-focus-x: 50%;
-  /* PNG 밝은 가장자리 잘림 (여백 변수와 별개) */
   --vr-banner-edge-clip: 0.35%;
   background: var(--navy);
-}
-
-.virtual-run .hero__shade {
-  background:
-    linear-gradient(90deg,
-      rgba(0, 22, 12, 0.88) 0%,
-      rgba(0, 16, 10, 0.68) 38%,
-      rgba(0, 10, 7, 0.32) 68%,
-      rgba(0, 6, 4, 0.2) 100%),
-    linear-gradient(180deg, rgba(0, 28, 16, 0.62) 0%, transparent 28%, var(--navy) 96%);
-}
-
-.virtual-run .hero__bloom {
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 40%),
-      color-mix(in srgb, var(--marvel) 28%, transparent),
-      transparent 55%);
-}
-
-.virtual-run .hero__spot {
-  background: radial-gradient(ellipse 90% 70% at 72% 18%,
-      color-mix(in srgb, var(--marvel-deep) 55%, transparent),
-      transparent 62%);
-}
-
-.virtual-run .hero__slash {
-  background: linear-gradient(118deg,
-      transparent 42%,
-      color-mix(in srgb, var(--marvel) 42%, transparent) 50%,
-      transparent 58%);
 }
 
 .virtual-run .side-banner--virtual-run {
@@ -68,26 +35,123 @@
   padding: 1.35rem 0;
 }
 
+/* 왼쪽 카피 38% / 오른쪽 비주얼. 라인업은 오른쪽 상단, 전경은 그 아래 */
+
 .virtual-run .vr-home .hero {
-  background: var(--navy);
+  display: grid;
+  grid-template-columns: minmax(16rem, 38%) minmax(0, 1fr);
+  align-items: center;
+  justify-content: stretch;
+  padding: 0;
+  background:
+    radial-gradient(ellipse 70% 95% at 68% 55%, #22a85c 0%, #0d5a30 28%, #042014 52%, transparent 74%),
+    #000;
 }
 
-.virtual-run .vr-home .hero__art {
-  inset: 0 var(--vr-hero-inset-x) 0 var(--vr-hero-inset-x);
+.virtual-run .vr-home .hero__copy {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  z-index: 3;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding-left: max(1.25rem, calc((100vw - 1120px) / 2 + 1.25rem));
+  padding-right: 1.5rem;
+}
+
+.virtual-run .fx-scan {
+  background: linear-gradient(transparent, color-mix(in srgb, var(--marvel) 16%, transparent), transparent);
+}
+
+.virtual-run .fx-dust__bit {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--marvel) 40%, transparent);
+}
+
+.virtual-run .vr-home .hero__halftone,
+.virtual-run .vr-home .hero__lines,
+.virtual-run .vr-home .hero__bloom,
+.virtual-run .vr-home .hero__spot,
+.virtual-run .vr-home .hero__sweep {
+  display: none;
+}
+
+.virtual-run .vr-home .hero__shade {
+  z-index: 1;
+  background: linear-gradient(90deg, #000 0%, #000 18%, transparent 42%);
+}
+
+.virtual-run .vr-home .hero__slash {
+  display: none;
+}
+
+.virtual-run .vr-home__stage {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  z-index: 0;
+  align-self: stretch;
+  min-height: 100%;
+  height: 100svh;
   overflow: hidden;
-  background: #000;
+  pointer-events: none;
+  background: transparent;
 }
 
-.virtual-run .vr-home .hero__img {
-  object-fit: contain;
-  object-position: center center;
+.virtual-run .vr-home__stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse 90% 75% at 55% 38%,
+      color-mix(in srgb, var(--marvel) 32%, transparent),
+      transparent 65%);
+  pointer-events: none;
+}
+
+.virtual-run .vr-home__banner {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54%;
+  overflow: hidden;
+  mask-image:
+    linear-gradient(90deg, transparent 0%, #000 10%),
+    linear-gradient(180deg, #000 58%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.virtual-run .vr-home__banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #063018 55%, transparent);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.virtual-run .vr-home__banner-art {
+  object-fit: cover;
+  object-position: 50% 28%;
   clip-path: inset(var(--vr-banner-edge-clip));
-  border: 0;
-  outline: none;
-  box-shadow: none;
-  background: var(--navy);
-  transform: scale(var(--vr-hero-scale));
-  transform-origin: center center;
+  filter: grayscale(0.2) saturate(0.65) brightness(1);
+}
+
+.virtual-run .vr-home__figure {
+  position: absolute;
+  z-index: 2;
+  right: -2%;
+  bottom: 0;
+  width: 78%;
+  height: 92%;
+}
+
+.virtual-run .vr-home__figure-art {
+  object-fit: cover;
+  object-position: 32% 2%;
 }
 
 .vr-home__plan {
@@ -108,15 +172,34 @@
 
 @media (max-width: 720px) {
   .virtual-run.site {
-    --vr-hero-inset-x: 2%;
     --vr-sub-banner-inset-x: 5%;
+  }
+
+  .virtual-run .vr-home .hero {
+    grid-template-columns: 1fr;
+    align-items: end;
+    padding: calc(var(--header-h) + 0.5rem) var(--gutter, 1.25rem) 2.3rem;
+  }
+
+  .virtual-run .vr-home .hero__copy {
+    padding: 0;
+  }
+
+  .virtual-run .vr-home__stage {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    min-height: 0;
+  }
+
+  .virtual-run .vr-home .hero__shade {
+    background: linear-gradient(180deg, transparent 20%, #000 72%);
   }
 
   .virtual-run .side-banner--virtual-run {
     aspect-ratio: 2.4 / 0.72;
     min-height: 0;
   }
-
 
   .virtual-run .side-banner--virtual-run .side-banner__copy {
     max-width: min(14rem, 48%);
