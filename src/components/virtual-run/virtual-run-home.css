@@ -1,8 +1,8 @@
 .virtual-run.site {
   --navy: #030806;
   --navy-0: rgba(3, 8, 6, 0);
-  --marvel: #00e676;
-  --marvel-deep: #004d26;
+  --marvel: #147a45;
+  --marvel-deep: #002a16;
   background: var(--navy);
 }
 
@@ -10,12 +10,12 @@
   background:
     linear-gradient(
       90deg,
-      rgba(0, 30, 16, 0.82) 0%,
-      rgba(0, 20, 12, 0.62) 38%,
-      rgba(0, 12, 8, 0.28) 68%,
-      rgba(0, 8, 5, 0.18) 100%
+      rgba(0, 22, 12, 0.88) 0%,
+      rgba(0, 16, 10, 0.68) 38%,
+      rgba(0, 10, 7, 0.32) 68%,
+      rgba(0, 6, 4, 0.2) 100%
     ),
-    linear-gradient(180deg, rgba(0, 40, 20, 0.55) 0%, transparent 28%, var(--navy) 96%);
+    linear-gradient(180deg, rgba(0, 28, 16, 0.62) 0%, transparent 28%, var(--navy) 96%);
 }
 
 .virtual-run .hero__bloom {
@@ -47,8 +47,69 @@
   background: var(--marvel-deep);
 }
 
+.virtual-run .side-banner--virtual-run {
+  min-height: clamp(6.5rem, 16vw, 8.75rem);
+  background: #000;
+}
+
+.virtual-run .side-banner--virtual-run::before {
+  background: linear-gradient(180deg, #000, transparent);
+}
+
+.virtual-run .side-banner--virtual-run::after {
+  width: min(52%, 22rem);
+  background: linear-gradient(
+    90deg,
+    #000 4%,
+    color-mix(in srgb, var(--navy) 92%, #000) 38%,
+    transparent 88%
+  );
+}
+
+.virtual-run .side-banner--virtual-run .side-banner__art {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(1.045);
+  transform-origin: center center;
+  object-fit: cover;
+  object-position: center 40%;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: #000;
+}
+
+.virtual-run .side-banner--virtual-run .side-banner__copy {
+  padding: 1.35rem 0;
+}
+
 .virtual-run .side-banner__copy .kicker {
   color: var(--marvel);
+}
+
+.virtual-run .side-banner__en {
+  color: color-mix(in srgb, var(--marvel) 72%, #fff);
+}
+
+.virtual-run .vr-home .hero {
+  background: #000;
+}
+
+.virtual-run .vr-home .hero__art {
+  inset: 0 3% 0 3%;
+  overflow: hidden;
+}
+
+.virtual-run .vr-home .hero__img {
+  object-fit: cover;
+  object-position: center 38%;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: #000;
+  transform: scale(1.04);
+  transform-origin: center center;
 }
 
 .vr-home__plan {
@@ -65,4 +126,28 @@
 
 .virtual-run .vr-home__overview {
   padding-top: 3.5rem;
+}
+
+@media (max-width: 720px) {
+  .virtual-run .side-banner--virtual-run {
+    aspect-ratio: 2.4 / 0.72;
+    min-height: 0;
+  }
+
+  .virtual-run .side-banner--virtual-run .side-banner__copy {
+    max-width: min(14rem, 48%);
+    padding: 0.75rem 0;
+  }
+
+  .virtual-run .vr-home .hero__art {
+    inset: 0 2% 0 2%;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .virtual-run .side-banner--virtual-run {
+    height: 3.6rem;
+    min-height: 3.6rem;
+    aspect-ratio: auto;
+  }
 }
