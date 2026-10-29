@@ -30,10 +30,13 @@ export function BgmPlayer({ src }: { src: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const wantedRef = useRef(true);
   const [on, setOn] = useState(true);
-  const admin = pathname.startsWith("/admin");
+  const hidden =
+    pathname.startsWith("/admin") ||
+    pathname === "/info" ||
+    pathname.startsWith("/info/");
 
   useEffect(() => {
-    if (admin) {
+    if (hidden) {
       audioRef.current?.pause();
       return;
     }
@@ -72,9 +75,9 @@ export function BgmPlayer({ src }: { src: string }) {
       window.removeEventListener("pointerdown", onGesture);
       window.removeEventListener("keydown", onGesture);
     };
-  }, [admin]);
+  }, [hidden]);
 
-  if (admin) return null;
+  if (hidden) return null;
 
   function toggle() {
     const el = audioRef.current;
