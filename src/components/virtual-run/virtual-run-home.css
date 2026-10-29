@@ -1,8 +1,3 @@
-/* 본사이트 CinematicFX 레터박스 — 버추얼런은 인트로 없어 상단 검은 띠만 보임 */
-.virtual-run .fx-letterbox {
-  display: none;
-}
-
 .virtual-run.site {
   --navy: #030806;
   --navy-0: rgba(3, 8, 6, 0);
