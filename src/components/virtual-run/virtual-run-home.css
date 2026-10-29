@@ -3,44 +3,43 @@
   --navy-0: rgba(3, 8, 6, 0);
   --marvel: #147a45;
   --marvel-deep: #002a16;
+  /* 배너(4.png) — object-fit: contain, 비율 유지. 여백만 키우면 이미지는 같이 줄어듦 */
+  --vr-hero-inset-x: 5%;
+  --vr-hero-scale: 1;
+  --vr-sub-banner-width: 100%;
+  --vr-sub-banner-scale: 1;
+  /* PNG 밝은 가장자리 잘림 (여백 변수와 별개) */
+  --vr-banner-edge-clip: 0.35%;
   background: var(--navy);
 }
 
 .virtual-run .hero__shade {
   background:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       rgba(0, 22, 12, 0.88) 0%,
       rgba(0, 16, 10, 0.68) 38%,
       rgba(0, 10, 7, 0.32) 68%,
-      rgba(0, 6, 4, 0.2) 100%
-    ),
+      rgba(0, 6, 4, 0.2) 100%),
     linear-gradient(180deg, rgba(0, 28, 16, 0.62) 0%, transparent 28%, var(--navy) 96%);
 }
 
 .virtual-run .hero__bloom {
-  background: radial-gradient(
-    circle at var(--mx, 50%) var(--my, 40%),
-    color-mix(in srgb, var(--marvel) 28%, transparent),
-    transparent 55%
-  );
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 40%),
+      color-mix(in srgb, var(--marvel) 28%, transparent),
+      transparent 55%);
 }
 
 .virtual-run .hero__spot {
-  background: radial-gradient(
-    ellipse 90% 70% at 72% 18%,
-    color-mix(in srgb, var(--marvel-deep) 55%, transparent),
-    transparent 62%
-  );
+  background: radial-gradient(ellipse 90% 70% at 72% 18%,
+      color-mix(in srgb, var(--marvel-deep) 55%, transparent),
+      transparent 62%);
 }
 
 .virtual-run .hero__slash {
-  background: linear-gradient(
-    118deg,
-    transparent 42%,
-    color-mix(in srgb, var(--marvel) 42%, transparent) 50%,
-    transparent 58%
-  );
+  background: linear-gradient(118deg,
+      transparent 42%,
+      color-mix(in srgb, var(--marvel) 42%, transparent) 50%,
+      transparent 58%);
 }
 
 .virtual-run .ticker {
@@ -58,22 +57,24 @@
 
 .virtual-run .side-banner--virtual-run::after {
   width: min(52%, 22rem);
-  background: linear-gradient(
-    90deg,
-    #000 4%,
-    color-mix(in srgb, var(--navy) 92%, #000) 38%,
-    transparent 88%
-  );
+  background: linear-gradient(90deg,
+      #000 4%,
+      color-mix(in srgb, var(--navy) 92%, #000) 38%,
+      transparent 88%);
 }
 
 .virtual-run .side-banner--virtual-run .side-banner__art {
-  inset: 0;
-  width: 100%;
+  top: 0;
+  right: auto;
+  bottom: 0;
+  left: 50%;
+  width: var(--vr-sub-banner-width);
   height: 100%;
-  transform: scale(1.045);
+  transform: translateX(-50%) scale(var(--vr-sub-banner-scale));
   transform-origin: center center;
-  object-fit: cover;
-  object-position: center 40%;
+  object-fit: contain;
+  object-position: center center;
+  clip-path: inset(var(--vr-banner-edge-clip));
   border: 0;
   outline: none;
   box-shadow: none;
@@ -97,18 +98,20 @@
 }
 
 .virtual-run .vr-home .hero__art {
-  inset: 0 3% 0 3%;
+  inset: 0 var(--vr-hero-inset-x) 0 var(--vr-hero-inset-x);
   overflow: hidden;
+  background: #000;
 }
 
 .virtual-run .vr-home .hero__img {
-  object-fit: cover;
-  object-position: center 38%;
+  object-fit: contain;
+  object-position: center center;
+  clip-path: inset(var(--vr-banner-edge-clip));
   border: 0;
   outline: none;
   box-shadow: none;
   background: #000;
-  transform: scale(1.04);
+  transform: scale(var(--vr-hero-scale));
   transform-origin: center center;
 }
 
@@ -129,6 +132,10 @@
 }
 
 @media (max-width: 720px) {
+  .virtual-run.site {
+    --vr-hero-inset-x: 2%;
+  }
+
   .virtual-run .side-banner--virtual-run {
     aspect-ratio: 2.4 / 0.72;
     min-height: 0;
@@ -137,10 +144,6 @@
   .virtual-run .side-banner--virtual-run .side-banner__copy {
     max-width: min(14rem, 48%);
     padding: 0.75rem 0;
-  }
-
-  .virtual-run .vr-home .hero__art {
-    inset: 0 2% 0 2%;
   }
 }
 
