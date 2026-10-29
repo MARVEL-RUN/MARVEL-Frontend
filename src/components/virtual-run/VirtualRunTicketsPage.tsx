@@ -15,18 +15,18 @@ export function VirtualRunTicketsPage() {
               <input type="radio" name="ticket" value="single" defaultChecked />
               <div>
                 <strong>1회차</strong>
-                <p className="vr-hint">{VIRTUAL_RUN_EVENT.ticketSingle}</p>
+                <p className="vr-form-note">{VIRTUAL_RUN_EVENT.ticketSingle}</p>
               </div>
             </label>
             <label className="vr-ticket-option">
               <input type="radio" name="ticket" value="package" />
               <div>
                 <strong>3회차 PKG</strong>
-                <p className="vr-hint">{VIRTUAL_RUN_EVENT.ticketPackage}</p>
+                <p className="vr-form-note">{VIRTUAL_RUN_EVENT.ticketPackage}</p>
               </div>
             </label>
           </form>
-          <p className="vr-hint vr-stack-sm">결제·재고 연동은 추후 API와 연결됩니다.</p>
+          <p className="vr-form-note vr-stack-sm">결제·재고 연동은 추후 API와 연결됩니다.</p>
           <VrLink href="/login" className="btn btn--red vr-stack-sm">
             로그인 후 구매
           </VrLink>

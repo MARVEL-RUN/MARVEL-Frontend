@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { countdownSlotsTo } from "@/lib/register-schedule";
 import { VIRTUAL_RUN_EVENT } from "@/lib/virtual-run/event";
 
@@ -17,23 +17,26 @@ export function HeroCountdown() {
   }, []);
 
   if (!slots) {
-    return <p className="vr-hint">티켓 오픈 일정은 행사 안내를 확인해 주세요.</p>;
+    return <p className="vr-form-note">티켓 오픈 일정은 행사 안내를 확인해 주세요.</p>;
   }
 
-  const cells = [
-    { label: "DAY", value: slots.d },
-    { label: "HOUR", value: slots.h },
-    { label: "MIN", value: slots.m },
-    { label: "SEC", value: slots.s },
-  ];
+  const units = [
+    [slots.d, "DAY"],
+    [slots.h, "HR"],
+    [slots.m, "MIN"],
+    [slots.s, "SEC"],
+  ] as const;
 
   return (
-    <div className="vr-countdown" aria-live="polite">
-      {cells.map((cell) => (
-        <div key={cell.label} className="vr-countdown__cell">
-          <span className="vr-countdown__num">{cell.value}</span>
-          <span className="vr-countdown__label">{cell.label}</span>
-        </div>
+    <div className="assemble__count" aria-live="polite">
+      {units.map(([n, u], i) => (
+        <Fragment key={u}>
+          {i > 0 ? <i aria-hidden>:</i> : null}
+          <span className="assemble__tick">
+            <strong>{n}</strong>
+            <em>{u}</em>
+          </span>
+        </Fragment>
       ))}
     </div>
   );

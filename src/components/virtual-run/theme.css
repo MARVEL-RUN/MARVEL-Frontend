@@ -1,0 +1,42 @@
+/* 버추얼런 — globals :root 와 동일 토큰, 색만 그린 */
+.virtual-run.site {
+  --navy: #030806;
+  --navy-0: rgba(3, 8, 6, 0);
+  --silver: #d3d4dc;
+  --label: #eef0f6;
+  --note: #a4a5b4;
+  --rule: rgba(255, 255, 255, 0.62);
+  --dim: #b7b9c6;
+  --marvel: #147a45;
+  --marvel-deep: #002a16;
+  --gold: #e0c36a;
+  --cyan: #4ec8e0;
+  --violet: #7a6bff;
+  background: var(--navy);
+  color: #fff;
+}
+
+.virtual-run .side-banner {
+  background: var(--navy);
+}
+
+.virtual-run .side-banner::before {
+  background: linear-gradient(180deg, var(--navy), transparent);
+}
+
+.virtual-run .side-banner::after {
+  background: linear-gradient(
+    90deg,
+    var(--navy) 12%,
+    color-mix(in srgb, var(--navy) 88%, transparent) 48%,
+    transparent
+  );
+}
+
+.virtual-run .inquiry-secret__control:focus-within {
+  border-color: color-mix(in srgb, var(--marvel) 70%, transparent);
+}
+
+.virtual-run .inquiry-secret__control.is-error {
+  border-color: color-mix(in srgb, var(--marvel) 85%, transparent);
+}

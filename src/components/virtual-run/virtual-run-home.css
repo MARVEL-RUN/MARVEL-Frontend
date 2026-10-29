@@ -1,13 +1,10 @@
 .virtual-run.site {
-  --navy: #030806;
-  --navy-0: rgba(3, 8, 6, 0);
-  --marvel: #147a45;
-  --marvel-deep: #002a16;
-  /* 배너(4.png) — object-fit: contain, 비율 유지. 여백만 키우면 이미지는 같이 줄어듦 */
-  --vr-hero-inset-x: 5%;
+  /* 홈: --vr-hero-inset-x. 서브 배너: cover + --vr-sub-banner-inset-x(좌우 검은 여백) */
+  --vr-hero-inset-x: 3%;
   --vr-hero-scale: 1;
-  --vr-sub-banner-width: 100%;
+  --vr-sub-banner-inset-x: 15%;
   --vr-sub-banner-scale: 1;
+  --vr-sub-banner-focus-x: 50%;
   /* PNG 밝은 가장자리 잘림 (여백 변수와 별개) */
   --vr-banner-edge-clip: 0.35%;
   background: var(--navy);
@@ -42,59 +39,37 @@
       transparent 58%);
 }
 
-.virtual-run .ticker {
-  background: var(--marvel-deep);
-}
-
 .virtual-run .side-banner--virtual-run {
   min-height: clamp(6.5rem, 16vw, 8.75rem);
-  background: #000;
-}
-
-.virtual-run .side-banner--virtual-run::before {
-  background: linear-gradient(180deg, #000, transparent);
+  overflow: hidden;
 }
 
 .virtual-run .side-banner--virtual-run::after {
   width: min(52%, 22rem);
-  background: linear-gradient(90deg,
-      #000 4%,
-      color-mix(in srgb, var(--navy) 92%, #000) 38%,
-      transparent 88%);
 }
 
 .virtual-run .side-banner--virtual-run .side-banner__art {
   top: 0;
-  right: auto;
   bottom: 0;
   left: 50%;
-  width: var(--vr-sub-banner-width);
+  width: calc(100% - 2 * var(--vr-sub-banner-inset-x));
   height: 100%;
   transform: translateX(-50%) scale(var(--vr-sub-banner-scale));
   transform-origin: center center;
-  object-fit: contain;
-  object-position: center center;
+  object-fit: cover;
+  object-position: var(--vr-sub-banner-focus-x) center;
   clip-path: inset(var(--vr-banner-edge-clip));
   border: 0;
   outline: none;
   box-shadow: none;
-  background: #000;
 }
 
 .virtual-run .side-banner--virtual-run .side-banner__copy {
   padding: 1.35rem 0;
 }
 
-.virtual-run .side-banner__copy .kicker {
-  color: var(--marvel);
-}
-
-.virtual-run .side-banner__en {
-  color: color-mix(in srgb, var(--marvel) 72%, #fff);
-}
-
 .virtual-run .vr-home .hero {
-  background: #000;
+  background: var(--navy);
 }
 
 .virtual-run .vr-home .hero__art {
@@ -110,7 +85,7 @@
   border: 0;
   outline: none;
   box-shadow: none;
-  background: #000;
+  background: var(--navy);
   transform: scale(var(--vr-hero-scale));
   transform-origin: center center;
 }
@@ -134,12 +109,14 @@
 @media (max-width: 720px) {
   .virtual-run.site {
     --vr-hero-inset-x: 2%;
+    --vr-sub-banner-inset-x: 5%;
   }
 
   .virtual-run .side-banner--virtual-run {
     aspect-ratio: 2.4 / 0.72;
     min-height: 0;
   }
+
 
   .virtual-run .side-banner--virtual-run .side-banner__copy {
     max-width: min(14rem, 48%);
