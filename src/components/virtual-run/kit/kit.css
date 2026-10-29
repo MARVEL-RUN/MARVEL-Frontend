@@ -161,7 +161,9 @@
 }
 
 .virtual-run .vr-kit__shot--landscape .vr-kit__img {
-  max-height: none;
+  max-width: min(100%, 520px);
+  max-height: 200px;
+  margin-inline: auto;
 }
 
 .virtual-run .vr-kit__shot--banner .vr-kit__img {
