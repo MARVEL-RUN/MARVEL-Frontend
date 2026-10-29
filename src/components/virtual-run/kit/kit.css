@@ -1,0 +1,69 @@
+.virtual-run .vr-kit__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.virtual-run .vr-kit__themes button {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 45%, transparent);
+  background: color-mix(in srgb, var(--navy) 88%, #fff 12%);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.virtual-run .vr-kit__themes button.is-on {
+  border-color: var(--marvel);
+  background: color-mix(in srgb, var(--marvel) 22%, var(--navy));
+}
+
+.virtual-run .vr-kit__lead {
+  margin: 0 0 1.75rem;
+  color: var(--note);
+  font-size: 0.9rem;
+}
+
+.virtual-run .vr-kit__frame--ribbon {
+  aspect-ratio: 3 / 5;
+  max-width: 280px;
+  margin-inline: auto;
+}
+
+.virtual-run .vr-kit__frame--ribbon img {
+  object-fit: contain;
+}
+
+.virtual-run .vr-kit__frame--square {
+  aspect-ratio: 1;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.virtual-run .vr-kit__frame--wide {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  max-width: 960px;
+}
+
+.virtual-run .vr-kit__goods {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.virtual-run .vr-kit__case {
+  margin-top: 1.5rem;
+  max-width: 360px;
+  margin-inline: auto;
+}
+
+.virtual-run .vr-kit__pane--package .vr-kit__frame--wide {
+  aspect-ratio: 4 / 3;
+}

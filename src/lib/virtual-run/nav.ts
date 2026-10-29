@@ -1,6 +1,7 @@
 export const VIRTUAL_RUN_NAV = [
   { href: "/", label: "메인" },
   { href: "/event", label: "행사 안내" },
+  { href: "/kit", label: "기념품" },
   { href: "/tickets", label: "티켓 구매" },
   { href: "/guide", label: "인증 가이드" },
   { href: "/mypage", label: "마이페이지" },
