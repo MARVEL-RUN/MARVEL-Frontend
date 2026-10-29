@@ -35,29 +35,16 @@
   padding: 1.35rem 0;
 }
 
-/* 왼쪽 카피 38% / 오른쪽 비주얼. 라인업은 오른쪽 상단, 전경은 그 아래 */
+/* 카피는 메인 히어로와 동일. 비주얼만 오른쪽 */
 
 .virtual-run .vr-home .hero {
-  display: grid;
-  grid-template-columns: minmax(16rem, 38%) minmax(0, 1fr);
-  align-items: center;
-  justify-content: stretch;
-  padding: 0;
   background:
     radial-gradient(ellipse 70% 95% at 68% 55%, #22a85c 0%, #0d5a30 28%, #042014 52%, transparent 74%),
     #000;
 }
 
 .virtual-run .vr-home .hero__copy {
-  grid-column: 1;
-  grid-row: 1;
-  position: relative;
   z-index: 3;
-  width: auto;
-  max-width: none;
-  margin: 0;
-  padding-left: max(1.25rem, calc((100vw - 1120px) / 2 + 1.25rem));
-  padding-right: 1.5rem;
 }
 
 .virtual-run .fx-scan {
@@ -86,13 +73,12 @@
 }
 
 .virtual-run .vr-home__stage {
-  grid-column: 2;
-  grid-row: 1;
-  position: relative;
+  position: absolute;
   z-index: 0;
-  align-self: stretch;
-  min-height: 100%;
-  height: 100svh;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 62%;
   overflow: hidden;
   pointer-events: none;
   background: transparent;
@@ -154,18 +140,6 @@
   object-position: 32% 2%;
 }
 
-.vr-home__plan {
-  margin-top: 0.35rem;
-}
-
-.vr-home__cta {
-  margin-top: 1rem;
-}
-
-.virtual-run .vr-home .vr-countdown {
-  margin-bottom: 0.25rem;
-}
-
 .virtual-run .vr-home__overview {
   padding-top: 3.5rem;
 }
@@ -175,21 +149,8 @@
     --vr-sub-banner-inset-x: 5%;
   }
 
-  .virtual-run .vr-home .hero {
-    grid-template-columns: 1fr;
-    align-items: end;
-    padding: calc(var(--header-h) + 0.5rem) var(--gutter, 1.25rem) 2.3rem;
-  }
-
-  .virtual-run .vr-home .hero__copy {
-    padding: 0;
-  }
-
   .virtual-run .vr-home__stage {
-    position: absolute;
-    inset: 0;
-    height: auto;
-    min-height: 0;
+    width: 100%;
   }
 
   .virtual-run .vr-home .hero__shade {
