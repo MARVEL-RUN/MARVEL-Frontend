@@ -1,0 +1,82 @@
+/* 사파리 상태바·오버스크롤 — 첫 장 상단 연회색에 맞춤 */
+html:has(.info-sheet),
+html:has(.info-sheet) body {
+  background: #e0e0e0;
+}
+
+.info-sheet {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100dvh;
+  line-height: 0;
+  font-size: 0;
+  background: #e0e0e0;
+}
+
+.info-sheet__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  margin-bottom: -1px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  vertical-align: top;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.info-sheet__img:last-child {
+  margin-bottom: 0;
+}
+
+.info-sheet__top {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #07081c;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.info-sheet__top:hover {
+  background: var(--marvel);
+}
+
+.info-sheet__top span {
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0.42rem 0.58rem;
+  border-color: transparent transparent currentColor;
+}
+
+@media (max-width: 720px) {
+  .info-sheet__top {
+    width: 2.35rem;
+    height: 2.35rem;
+    right: max(0.85rem, env(safe-area-inset-right, 0px));
+    bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 1px 0 rgba(0, 0, 0, 0.14);
+  }
+
+  .info-sheet__top span {
+    border-width: 0 0.34rem 0.46rem;
+  }
+}
