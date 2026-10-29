@@ -127,8 +127,8 @@ export function VirtualRunHomePage() {
         </div>
       </section>
 
-      <div className="ticker" aria-hidden>
-        <div className="ticker__track">
+      <div className="vr-ticker" aria-hidden>
+        <div className="vr-ticker__track">
           {[0, 1].map((copy) => (
             <ul key={copy}>
               {TICKER.map((bit) => (

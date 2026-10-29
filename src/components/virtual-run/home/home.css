@@ -72,9 +72,96 @@
   display: none;
 }
 
-.virtual-run .vr-home .ticker {
+.virtual-run .vr-ticker {
+  position: relative;
+  z-index: 2;
   margin-top: 0;
-  transform: none;
+  padding: 0.35rem 0;
+  background:
+    linear-gradient(180deg, #000 0%, #021208 45%, #031a0e 55%, #000 100%);
+  border-block: 3px solid var(--marvel);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--marvel) 55%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+
+.virtual-run .vr-ticker::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -62deg,
+    transparent 0 14px,
+    color-mix(in srgb, var(--marvel) 14%, transparent) 14px 15px
+  );
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.virtual-run .vr-ticker__track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: max-content;
+  animation: vr-ticker-marquee 36s linear infinite;
+}
+
+.virtual-run .vr-ticker ul {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 1.15rem 2.75rem;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.virtual-run .vr-ticker li {
+  display: flex;
+  align-items: center;
+  color: #f2f4f8;
+  font-size: clamp(0.88rem, 1.35vw, 1.05rem);
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.virtual-run .vr-ticker li.is-ko {
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+.virtual-run .vr-ticker li::before {
+  content: none;
+  margin: 0;
+}
+
+.virtual-run .vr-ticker li::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 1.15em;
+  margin-inline: 1.75rem;
+  background: color-mix(in srgb, var(--marvel) 75%, #fff 25%);
+  transform: skewX(-18deg);
+  opacity: 0.9;
+}
+
+.virtual-run .vr-ticker li:last-child::after {
+  display: none;
+}
+
+@keyframes vr-ticker-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .virtual-run .vr-ticker__track {
+    animation: none;
+  }
 }
 
 .virtual-run .vr-home__stage {
