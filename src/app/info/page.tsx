@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import Image from "next/image";
+import { InfoThemeTint } from "@/components/main/info/InfoThemeTint";
 import { InfoTopButton } from "@/components/main/info/InfoTopButton";
 import "./info.css";
 
-/** 첫 장(행사장) 상단 연회색 — 사파리 상태바·주소창 틴트 */
-const INFO_THEME = "#e0e0e0";
+/** 첫 장 상단 남색 — 사파리 상태바·주소창 틴트 (스크롤 중엔 InfoThemeTint가 맞춤) */
+const INFO_THEME = "#000320";
 
 export const metadata: Metadata = {
   title: "안내",
@@ -16,10 +17,10 @@ export const viewport: Viewport = {
 };
 
 const SHEETS = [
-  { src: "/images/info/1.png", alt: "행사장과 피니셔 키트", width: 1500, height: 7349 },
-  { src: "/images/info/2.png", alt: "위치와 현장 프로그램", width: 1500, height: 8945 },
-  { src: "/images/info/3.png", alt: "대회 유의사항", width: 1501, height: 7257 },
-  { src: "/images/info/4.png", alt: "코스와 타임테이블", width: 1500, height: 7849 },
+  { src: "/images/info/1.png", alt: "코스와 타임테이블", width: 1500, height: 7849 },
+  { src: "/images/info/2.png", alt: "행사장과 피니셔 키트", width: 1500, height: 7349 },
+  { src: "/images/info/3.png", alt: "위치와 현장 프로그램", width: 1500, height: 8945 },
+  { src: "/images/info/4.png", alt: "대회 유의사항", width: 1501, height: 7257 },
 ] as const;
 
 export default function InfoPage() {
@@ -38,6 +39,7 @@ export default function InfoPage() {
           className="info-sheet__img"
         />
       ))}
+      <InfoThemeTint />
       <InfoTopButton />
     </main>
   );
