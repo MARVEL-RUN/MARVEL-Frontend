@@ -72,6 +72,11 @@
   display: none;
 }
 
+.virtual-run .vr-home .ticker {
+  margin-top: 0;
+  transform: none;
+}
+
 .virtual-run .vr-home__stage {
   position: absolute;
   z-index: 0;
@@ -101,11 +106,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 54%;
+  height: 72%;
   overflow: hidden;
   mask-image:
-    linear-gradient(90deg, transparent 0%, #000 10%),
-    linear-gradient(180deg, #000 58%, transparent 100%);
+    linear-gradient(90deg, transparent 0%, #000 8%),
+    linear-gradient(180deg, #000 72%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
@@ -121,7 +126,9 @@
 
 .virtual-run .vr-home__banner-art {
   object-fit: cover;
-  object-position: 50% 28%;
+  object-position: 50% 22%;
+  transform: scale(1.28);
+  transform-origin: 50% 18%;
   clip-path: inset(var(--vr-banner-edge-clip));
   filter: grayscale(0.2) saturate(0.65) brightness(1);
 }
@@ -129,18 +136,18 @@
 .virtual-run .vr-home__figure {
   position: absolute;
   z-index: 2;
-  right: 2%;
-  bottom: 0;
-  width: 78%;
-  height: 74%;
+  right: 0;
+  bottom: -12%;
+  width: 86%;
+  height: 82%;
   overflow: hidden;
 }
 
 .virtual-run .vr-home__figure-art {
   object-fit: cover;
   object-position: 40% 0%;
-  transform: scale(1.08);
-  transform-origin: 46% 0%;
+  transform: scale(1.16);
+  transform-origin: 46% 8%;
 }
 
 .virtual-run .vr-home__overview {

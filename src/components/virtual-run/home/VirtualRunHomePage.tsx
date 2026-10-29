@@ -67,23 +67,30 @@ export function VirtualRunHomePage() {
 
   return (
     <main className="home vr-home" ref={rootRef}>
-      <section className="hero" id="hero" ref={heroRef}>
-        <div className="hero__art" aria-hidden>
-          <Image
-            src={VIRTUAL_RUN_ASSETS.banner}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="hero__img"
-          />
+      <section className="hero hero--vr-split" id="hero" ref={heroRef}>
+        <div className="vr-home__stage" aria-hidden>
+          <div className="vr-home__banner">
+            <Image
+              src={VIRTUAL_RUN_ASSETS.banner}
+              alt=""
+              fill
+              priority
+              sizes="(max-width: 720px) 55vw, 42vw"
+              className="vr-home__banner-art"
+            />
+          </div>
+          <div className="vr-home__figure">
+            <Image
+              src={VIRTUAL_RUN_ASSETS.heroFigure}
+              alt=""
+              fill
+              priority
+              sizes="(max-width: 720px) 50vw, 38vw"
+              className="vr-home__figure-art"
+            />
+          </div>
         </div>
         <span className="hero__shade" aria-hidden />
-        <span className="hero__halftone" aria-hidden />
-        <span className="hero__lines" aria-hidden />
-        <span className="hero__bloom" aria-hidden />
-        <span className="hero__spot" aria-hidden />
-        <span className="hero__sweep" aria-hidden />
         <span className="hero__slash" aria-hidden />
 
         <div className="hero__copy">
