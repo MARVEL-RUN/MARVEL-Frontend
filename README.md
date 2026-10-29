@@ -11,9 +11,29 @@
 
 ```bash
 cp .env.example .env.local   # 필요 시
-npm run dev                  # 커밍순
-npm run dev:main             # 본사이트
+pnpm dev                     # 커밍순
+pnpm dev:main                # 본사이트
+pnpm dev:virtual             # 버추얼런 (아래 URL)
 ```
+
+| 명령 | 로컬 URL |
+|------|----------|
+| `pnpm dev:virtual` | `http://localhost:3000/` — 서브도메인과 같이 `/event`, `/tickets` 등 (미들웨어 rewrite) |
+| `pnpm dev` / `pnpm dev:main` | `http://localhost:3000/virtual-run` — 경로 prefix로만 접근 |
+
+`dev:virtual`은 `NEXT_PUBLIC_VIRTUAL_RUN_HOST=localhost`를 켠다. 같은 포트에서 마블런 본사이트(`/`)와 동시에 쓰지 않는다.
+
+`output: "export"` 정적 배포에서는 Next 미들웨어가 실행되지 않는다. 서브도메인 루트(`/event` 등)는 Nginx 등에서 `/virtual-run`으로 넘기면 된다.
+
+```nginx
+# 예: virtual.example.com → out/virtual-run/*
+location / {
+  try_files $uri $uri/ /virtual-run/index.html;
+}
+# 또는 rewrite ^/(.*)$ /virtual-run/$1 last;
+```
+
+`next dev` + `NEXT_PUBLIC_VIRTUAL_RUN_HOST` 설정 시에는 `src/middleware.ts`가 동일 rewrite를 한다.
 
 ## 환경 변수
 
@@ -23,6 +43,8 @@ npm run dev:main             # 본사이트
 | 변수 | 용도 |
 |------|------|
 | `NEXT_PUBLIC_APP_MODE` | `coming-soon` \| `main` |
+| `NEXT_PUBLIC_VIRTUAL_RUN_HOST` | 버추얼런 호스트(쉼표 구분). `dev:virtual`은 `localhost` |
+| `NEXT_PUBLIC_VIRTUAL_RUN_SPOTS` | `1` 거점 이벤트 페이지 노출, 그 외 404 |
 | `NEXT_PUBLIC_REGISTRATION_OPEN` | `0` 닫기, `1` 열기, `3` 접수 시각 자동 |
 | `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제·게시판 API |
 | `NEXT_PUBLIC_API_BASE_URL_ADMIN` | 관리자 API |
@@ -56,7 +78,7 @@ npm run dev:main             # 본사이트
 
 ## 폴더
 
-영역은 **커밍순 / 메인 / 관리자** 세 곳. 파일이 어느 사이트인지 경로만 봐도 알게 둔다.
+영역은 **커밍순 / 메인 / 버추얼런 / 관리자** 네 곳. 파일이 어느 사이트인지 경로만 봐도 알게 둔다.
 
 ```
 src/
@@ -70,8 +92,9 @@ src/
       lookup/                # 신청조회
       register/              # 참가신청
       payment/               # 토스 결제 (success/fail)
-      virtual/               # 버추얼런
+      virtual/               # 본사이트 내 버추얼런 커밍순 안내
       notices/ faq/ inquiry/ # 커뮤니티
+    virtual-run/             # 버추얼런 전용 사이트 (서브도메인 rewrite)
       terms/ privacy/        # 약관
     admin/
       login/
@@ -83,6 +106,7 @@ src/
   components/
     coming-soon/
     main/                    # 공개 UI + main.css
+    virtual-run/             # 버추얼런 UI + virtual-run.css
     admin/
   layouts/admin/
   lib/
@@ -92,6 +116,7 @@ src/
     main/                    # 공개 API base · fetch
     payment/                 # 토스 · 세션 · 종목 매핑
     admin/
+    virtual-run/             # 버추얼런 상수·내비
   services/
     main/                    # 공개 신청·결제·게시판
     admin/                   # 관리자 API
