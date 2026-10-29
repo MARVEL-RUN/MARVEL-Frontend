@@ -1,0 +1,82 @@
+/* 사파리 상태바·오버스크롤 — 맨 위 장 배경색에 맞춤 (--info-chrome) */
+html:has(.info-sheet),
+html:has(.info-sheet) body {
+  background: var(--info-chrome, #000320);
+  transition: background-color 120ms linear;
+}
+
+.info-sheet {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100dvh;
+  line-height: 0;
+  font-size: 0;
+  background: var(--info-chrome, #000320);
+}
+
+.info-sheet__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  vertical-align: top;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 다음 장 맨 위 한 줄이 반투명해서, 안 겹치면 배경이 실선으로 비침 */
+.info-sheet__img:not(:last-child) {
+  margin-bottom: calc(-1px - 0.15%);
+}
+
+.info-sheet__top {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #07081c;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.info-sheet__top:hover {
+  background: var(--marvel);
+}
+
+.info-sheet__top span {
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0.42rem 0.58rem;
+  border-color: transparent transparent currentColor;
+}
+
+@media (max-width: 720px) {
+  .info-sheet__top {
+    width: 2.35rem;
+    height: 2.35rem;
+    right: max(0.85rem, env(safe-area-inset-right, 0px));
+    bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 1px 0 rgba(0, 0, 0, 0.14);
+  }
+
+  .info-sheet__top span {
+    border-width: 0 0.34rem 0.46rem;
+  }
+}
