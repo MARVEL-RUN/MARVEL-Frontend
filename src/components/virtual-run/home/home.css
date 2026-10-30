@@ -644,29 +644,6 @@
     font-size: clamp(1.35rem, 5.6vw, 1.65rem);
   }
 
-  .virtual-run .vr-home__figure {
-    inset-inline: 0;
-    width: auto;
-    max-width: none;
-    height: 94%;
-    bottom: -24%;
-    transform: scale(1.08) translateY(7%) translateX(12%);
-  }
-
-  .virtual-run .vr-home__figure.is-in {
-    transform: scale(1.05) translateY(7%) translateX(12%);
-  }
-
-  .virtual-run .vr-home__figure-art {
-    object-position: 80% 100%;
-    transform: scale(1.05);
-    transform-origin: 80% 100%;
-  }
-
-  .virtual-run .vr-home__banner-art {
-    object-position: 68% 22%;
-  }
-
   .virtual-run .side-banner--virtual-run {
     aspect-ratio: 2 / 0.92;
     min-height: 0;
