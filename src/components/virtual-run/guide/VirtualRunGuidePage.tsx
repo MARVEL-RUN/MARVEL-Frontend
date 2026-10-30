@@ -40,8 +40,10 @@ export function VirtualRunGuidePage() {
             <div>
               <dt>버추얼런 인증은 어떻게 하나요?</dt>
               <dd>
-                마이페이지 회차 카드에서 회차별 인증을 제출합니다. 상세는 위 인증 예시를
-                참고해 주세요.
+                <VrLink href="/mypage/sessions" className="vr-inline-link">
+                  마이페이지 회차 카드
+                </VrLink>
+                에서 회차별 러닝 인증을 제출합니다. 상세는 위 인증 예시를 참고해 주세요.
               </dd>
             </div>
           </dl>
