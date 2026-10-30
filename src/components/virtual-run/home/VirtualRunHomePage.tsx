@@ -109,18 +109,21 @@ export function VirtualRunHomePage() {
               className="vr-home__banner-art"
             />
           </div>
-          <div className={figureIn ? "vr-home__figure is-in" : "vr-home__figure"}>
-            <Image
-              src={VIRTUAL_RUN_ASSETS.heroFigure}
-              alt=""
-              fill
-              priority
-              sizes="(max-width: 720px) 50vw, 38vw"
-              className="vr-home__figure-art"
-            />
-          </div>
         </div>
         <span className="hero__shade" aria-hidden />
+        <div
+          className={figureIn ? "vr-home__figure is-in" : "vr-home__figure"}
+          aria-hidden
+        >
+          <Image
+            src={VIRTUAL_RUN_ASSETS.heroFigure}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 720px) 50vw, 38vw"
+            className="vr-home__figure-art"
+          />
+        </div>
         <span className="hero__slash" aria-hidden />
 
         <div className="hero__copy">

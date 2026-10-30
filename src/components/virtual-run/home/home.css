@@ -38,9 +38,11 @@
 /* 카피는 메인 히어로와 동일. 비주얼만 오른쪽 */
 
 .virtual-run .vr-home .hero {
+  --vr-home-stage-w: 62%;
   background:
     radial-gradient(ellipse 70% 95% at 68% 55%, #22a85c 0%, #0d5a30 28%, #042014 52%, transparent 74%),
     #000;
+  isolation: isolate;
 }
 
 .virtual-run .vr-home .hero__copy {
@@ -201,7 +203,7 @@
   height: 72%;
   overflow: hidden;
   mask-image:
-    linear-gradient(90deg, transparent 0%, #000 8%),
+    linear-gradient(90deg, transparent 0%, #000 20%),
     linear-gradient(180deg, #000 72%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
@@ -218,7 +220,7 @@
 
 .virtual-run .vr-home__banner-art {
   object-fit: cover;
-  object-position: 50% 22%;
+  object-position: 58% 22%;
   transform: scale(1.28);
   transform-origin: 50% 18%;
   clip-path: inset(var(--vr-banner-edge-clip));
@@ -228,13 +230,14 @@
 .virtual-run .vr-home__figure {
   position: absolute;
   z-index: 2;
-  right: 0;
-  bottom: -12%;
-  width: 86%;
-  height: 82%;
-  overflow: hidden;
+  right: -3%;
+  bottom: -18%;
+  width: calc(var(--vr-home-stage-w) + 20%);
+  max-width: 92%;
+  height: 98%;
+  overflow: visible;
   opacity: 0;
-  transform: scale(1.032) translateY(0.4%);
+  transform: scale(1.09) translateY(3%) translateX(10%);
   filter: blur(4px) brightness(1.12);
   transition:
     opacity 0.72s ease-out,
@@ -244,15 +247,15 @@
 
 .virtual-run .vr-home__figure.is-in {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: scale(1.06) translateY(3%) translateX(10%);
   filter: none;
 }
 
 .virtual-run .vr-home__figure-art {
-  object-fit: cover;
-  object-position: 40% 0%;
-  transform: scale(1.16);
-  transform-origin: 46% 8%;
+  object-fit: contain;
+  object-position: 76% 100%;
+  transform: scale(1.04);
+  transform-origin: 76% 100%;
 }
 
 .virtual-run .vr-home__glitch {
@@ -458,12 +461,39 @@
     --vr-sub-banner-inset-x: 5%;
   }
 
+  .virtual-run .vr-home .hero {
+    --vr-home-stage-w: 100%;
+  }
+
   .virtual-run .vr-home__stage {
     width: 100%;
   }
 
   .virtual-run .vr-home .hero__shade {
     background: linear-gradient(180deg, transparent 20%, #000 72%);
+  }
+
+  .virtual-run .vr-home__figure {
+    inset-inline: 0;
+    width: auto;
+    max-width: none;
+    height: 94%;
+    bottom: -14%;
+    transform: scale(1.08) translateY(2.5%) translateX(12%);
+  }
+
+  .virtual-run .vr-home__figure.is-in {
+    transform: scale(1.05) translateY(2.5%) translateX(12%);
+  }
+
+  .virtual-run .vr-home__figure-art {
+    object-position: 80% 100%;
+    transform: scale(1.05);
+    transform-origin: 80% 100%;
+  }
+
+  .virtual-run .vr-home__banner-art {
+    object-position: 68% 22%;
   }
 
   .virtual-run .side-banner--virtual-run {
