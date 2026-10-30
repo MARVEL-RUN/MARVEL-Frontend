@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { OG_DESCRIPTION, OG_TITLE, SEO_TITLE, SITE_URL } from "@/lib/event";
+import {
+  OG_DESCRIPTION,
+  OG_IMAGE,
+  OG_TITLE,
+  SEO_TITLE,
+  SITE_URL,
+} from "@/lib/event";
 import { APP_MODE, isMain } from "@/lib/mode";
 import { PREVIEW_BASE_PATH } from "@/lib/preview";
 import { BgmPlayer } from "@/components/main/layout/BgmPlayer";
@@ -40,7 +46,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og.jpg",
+        url: OG_IMAGE,
         width: 1024,
         height: 537,
         alt: OG_TITLE,
@@ -51,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: OG_TITLE,
     description: OG_DESCRIPTION,
-    images: ["/og.jpg"],
+    images: [OG_IMAGE],
   },
   verification: {
     ...(googleVerification ? { google: googleVerification } : {}),

@@ -13,6 +13,10 @@ export const VIRTUAL_RUN_EVENT = {
   countdownTarget: "2026-11-11T10:00:00+09:00",
 } as const;
 
+export const VIRTUAL_RUN_OG_TITLE = "2026 마블 버추얼런 MARVEL VIRTUAL RUN";
+export const VIRTUAL_RUN_OG_DESCRIPTION =
+  "전국 어디서나 달리는 마블 버추얼런";
+
 export type VirtualRunTimelineRow = {
   from: string;
   to: string;

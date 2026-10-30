@@ -296,5 +296,6 @@ export const EVENT = {
 
 export const SITE_URL = "https://marvelrunkorea2026.com";
 export const SEO_TITLE = "마블런 2026 인제 MARVEL RUN";
-export const OG_TITLE = SEO_TITLE;
+export const OG_TITLE = "2026 마블런 MARVEL RUN";
 export const OG_DESCRIPTION = `마블런 2026, MARVEL RUN, ${EVENT.dateLong}, ${EVENT.venue}`;
+export const OG_IMAGE = "/images/og/marvel-run.jpg";
