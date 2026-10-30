@@ -6,7 +6,7 @@ import {
   discountLinkEntry,
   isDiscountLinkSlug,
 } from "@/lib/discount-link/config";
-import { OG_DESCRIPTION, OG_TITLE, SITE_URL } from "@/lib/event";
+import { OG_DESCRIPTION, OG_IMAGE, OG_TITLE, SITE_URL } from "@/lib/event";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: "/og.jpg",
+          url: OG_IMAGE,
           width: 1024,
           height: 537,
           alt: OG_TITLE,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: shareTitle,
       description: OG_DESCRIPTION,
-      images: ["/og.jpg"],
+      images: [OG_IMAGE],
     },
     robots: { index: false, follow: false },
   };
