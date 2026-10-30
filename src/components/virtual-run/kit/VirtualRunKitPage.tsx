@@ -1,12 +1,12 @@
-import { MediaLoader } from "../../main/MediaLoader";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VrLink } from "../layout/VrLink";
 import { VirtualRunKitGallery } from "./VirtualRunKitGallery";
+import { VirtualRunKitMedalLoader } from "./VirtualRunKitMedalLoader";
 import "./kit.css";
 
 export function VirtualRunKitPage() {
   return (
-    <MediaLoader>
+    <VirtualRunKitMedalLoader>
       <VirtualRunSubPage kicker="KIT" title="기념품" en="RACE KIT">
         <section className="guide-sec">
           <div className="wrap vr-kit-page vr-page-inner">
@@ -21,6 +21,6 @@ export function VirtualRunKitPage() {
           </div>
         </section>
       </VirtualRunSubPage>
-    </MediaLoader>
+    </VirtualRunKitMedalLoader>
   );
 }
