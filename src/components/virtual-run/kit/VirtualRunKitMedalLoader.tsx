@@ -6,6 +6,9 @@ import { MAIN_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import "./kit-medal-load.css";
 
+/** 레이아웃·위치 조정 중 true — 자동 종료·SKIP 없음. 끝나면 false */
+const KIT_LOAD_LAYOUT_DEBUG = false;
+
 const MIN_SHOW_MS = 2800;
 const GIVE_UP_MS = 12000;
 const FADE_MS = 750;
@@ -62,19 +65,22 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
   const hostRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<"load" | "out" | "gone">("load");
   const [progress, setProgress] = useState({ done: 0, total: 0 });
-  const [clusterHold, setClusterHold] = useState(false);
+  const [clusterHold, setClusterHold] = useState(KIT_LOAD_LAYOUT_DEBUG);
 
   function dismiss() {
+    if (KIT_LOAD_LAYOUT_DEBUG) return;
     setPhase("out");
     window.setTimeout(() => setPhase("gone"), FADE_MS);
   }
 
   useEffect(() => {
+    if (KIT_LOAD_LAYOUT_DEBUG) return;
     const hold = window.setTimeout(() => setClusterHold(true), 2050);
     return () => window.clearTimeout(hold);
   }, []);
 
   useEffect(() => {
+    if (KIT_LOAD_LAYOUT_DEBUG) return;
     const host = hostRef.current;
     if (!host) return;
 
@@ -128,7 +134,13 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
       </div>
       {phase !== "gone" ? (
         <div
-          className={phase === "out" ? "vr-kit-load is-out" : "vr-kit-load"}
+          className={
+            phase === "out"
+              ? "vr-kit-load is-out"
+              : KIT_LOAD_LAYOUT_DEBUG
+                ? "vr-kit-load is-layout-debug"
+                : "vr-kit-load"
+          }
           role="status"
           aria-live="polite"
           aria-label="불러오는 중"

@@ -41,6 +41,31 @@
   animation: introOut 0.75s ease forwards;
 }
 
+/* VirtualRunKitMedalLoader KIT_LOAD_LAYOUT_DEBUG */
+.vr-kit-load.is-layout-debug .vr-kit-load__flash {
+  animation: none;
+  opacity: 0;
+}
+
+.vr-kit-load.is-layout-debug .vr-kit-load__piece {
+  animation: none;
+  opacity: 1;
+  transform: translate(-50%, calc(-1 * var(--vr-kit-piece-hub-y))) translate(var(--vr-kit-nudge-x), var(--vr-kit-nudge-y)) rotate(var(--vr-kit-rot));
+}
+
+.vr-kit-load.is-layout-debug .vr-kit-load__cluster {
+  animation: none;
+}
+
+.vr-kit-load.is-layout-debug .vr-kit-load__logo,
+.vr-kit-load.is-layout-debug .vr-kit-load__bar,
+.vr-kit-load.is-layout-debug .vr-kit-load__text {
+  animation: none;
+  opacity: 1;
+  filter: none;
+  scale: 1;
+}
+
 .vr-kit-load__flash {
   position: absolute;
   inset: 0;
@@ -274,6 +299,36 @@
 
   100% {
     opacity: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .vr-kit-load {
+    --vr-kit-strip-h: min(148vmin, 880px);
+
+    --vr-kit-cluster-x: 0px;
+    --vr-kit-cluster-y: 6vh;
+
+    --vr-kit-avengers-hub-y: 86.15%;
+    --vr-kit-avengers-rot: 0deg;
+    --vr-kit-avengers-x: 0px;
+    --vr-kit-avengers-y: -150px;
+
+    --vr-kit-xmen-hub-y: 86.15%;
+    --vr-kit-xmen-rot: 120deg;
+    --vr-kit-xmen-x: 85px;
+    --vr-kit-xmen-y: 0px;
+
+    --vr-kit-f4-hub-y: 86.15%;
+    --vr-kit-f4-rot: 240deg;
+    --vr-kit-f4-x: -90px;
+    --vr-kit-f4-y: 0px;
+
+    --vr-kit-brand-bottom: max(14rem, calc(env(safe-area-inset-bottom) + 11rem));
+    --vr-kit-brand-width: min(92vw, 520px);
+    --vr-kit-brand-logo-box: min(38vw, 8.5rem);
+    --vr-kit-brand-logo-run: min(68vw, 14.5rem);
+    --vr-kit-brand-bar: min(68vw, 13rem);
   }
 }
 
