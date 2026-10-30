@@ -13,47 +13,63 @@ export const VIRTUAL_RUN_EVENT = {
   countdownTarget: "2026-11-11T10:00:00+09:00",
 } as const;
 
-export type VirtualRunTimelineItem = {
-  date: string;
-  dateTime?: string;
-  label: string;
+export type VirtualRunTimelineRow = {
+  from: string;
+  to: string;
+  rt: string;
+  program: string;
+  note: string;
 };
 
-export const VIRTUAL_RUN_TIMELINE: VirtualRunTimelineItem[] = [
+export const VIRTUAL_RUN_TIMELINE: VirtualRunTimelineRow[] = [
   {
-    date: "11/2",
-    dateTime: "2026-11-02",
-    label: "개최 공지, 메달·굿즈 공개",
+    from: "11/2",
+    to: "",
+    rt: "–",
+    program: "개최 공지, 메달·굿즈 공개",
+    note: "",
   },
   {
-    date: "11/11",
-    dateTime: "2026-11-11",
-    label: "티켓 오픈 (1·2·3차)",
+    from: "11/11",
+    to: "",
+    rt: "–",
+    program: "티켓 오픈 (1·2·3차)",
+    note: "",
   },
   {
-    date: "11/30",
-    dateTime: "2026-11-30",
-    label: "키트 배송 시작",
+    from: "11/30",
+    to: "",
+    rt: "–",
+    program: "키트 배송 시작",
+    note: "",
   },
   {
-    date: "12/16",
-    dateTime: "2026-12-16",
-    label: "둠스데이 영화 개봉",
+    from: "12/16",
+    to: "",
+    rt: "–",
+    program: "둠스데이 영화 개봉",
+    note: "",
   },
   {
-    date: "1/19",
-    dateTime: "2027-01-19",
-    label: "티켓 마감",
+    from: "1/19",
+    to: "",
+    rt: "–",
+    program: "티켓 마감",
+    note: "",
   },
   {
-    date: "1/20 ~ 1/25",
-    dateTime: "2027-01-20/2027-01-25",
-    label: "이벤트 진행 · 1/25 상품 전달",
+    from: "1/20",
+    to: "1/25",
+    rt: "–",
+    program: "이벤트 진행",
+    note: "1/25 상품 전달",
   },
   {
-    date: "1/29",
-    dateTime: "2027-01-29",
-    label: "행사 종료",
+    from: "1/29",
+    to: "",
+    rt: "–",
+    program: "행사 종료",
+    note: "",
   },
 ];
 
