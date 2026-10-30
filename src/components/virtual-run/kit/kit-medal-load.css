@@ -1,6 +1,34 @@
 .vr-kit-load {
-  --vr-kit-medal-h: min(46vmin, 248px);
-  --vr-kit-hub-y: 86.2%;
+  --vr-kit-strip-h: min(175vmin, 1120px);
+
+  /* 묶음 전체 */
+  --vr-kit-cluster-x: 0px;
+  --vr-kit-cluster-y: 0px;
+
+  /* 어벤저스 */
+  --vr-kit-avengers-hub-y: 86.15%;
+  --vr-kit-avengers-rot: 0deg;
+  --vr-kit-avengers-x: 0px;
+  --vr-kit-avengers-y: -120px;
+
+  /* 엑스맨 */
+  --vr-kit-xmen-hub-y: 86.15%;
+  --vr-kit-xmen-rot: 120deg;
+  --vr-kit-xmen-x: 140px;
+  --vr-kit-xmen-y: 120px;
+
+  /* 판타4 */
+  --vr-kit-f4-hub-y: 86.15%;
+  --vr-kit-f4-rot: 240deg;
+  --vr-kit-f4-x: -140px;
+  --vr-kit-f4-y: 120px;
+
+  /* 로딩 UI — 메달과 분리 */
+  --vr-kit-brand-bottom: max(6.5rem, calc(env(safe-area-inset-bottom) + 4.75rem));
+  --vr-kit-brand-width: min(92vw, 520px);
+  --vr-kit-brand-logo-box: min(42vw, 9.5rem);
+  --vr-kit-brand-logo-run: min(72vw, 16rem);
+  --vr-kit-brand-bar: min(72vw, 14rem);
   position: fixed;
   inset: 0;
   z-index: 90;
@@ -22,26 +50,21 @@
   animation: vrKitLoadFlash 0.55s 1.15s ease-out forwards;
 }
 
-.vr-kit-load__center {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-}
-
 .vr-kit-load__cluster {
-  position: absolute;
+  position: fixed;
   left: 50%;
   top: 50%;
-  width: min(92vmin, 520px);
-  height: min(92vmin, 520px);
-  transform: translate(-50%, -50%);
+  z-index: 4;
+  width: 0;
+  height: 0;
+  transform: translate(calc(-50% + var(--vr-kit-cluster-x)), calc(-50% + var(--vr-kit-cluster-y)));
+  pointer-events: none;
 }
 
 .vr-kit-load__piece {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-origin: 50% var(--vr-kit-hub-y);
+  left: 0;
+  top: 0;
   opacity: 0;
   will-change: transform, opacity;
   animation-duration: 0.82s;
@@ -51,57 +74,74 @@
 
 .vr-kit-load__piece img {
   display: block;
-  height: var(--vr-kit-medal-h);
+  height: var(--vr-kit-strip-h);
   width: auto;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55));
+  max-width: none;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.5));
 }
 
 .vr-kit-load__piece--avengers {
   z-index: 3;
-  --vr-kit-rot: 0deg;
+  --vr-kit-piece-hub-y: var(--vr-kit-avengers-hub-y);
+  --vr-kit-rot: var(--vr-kit-avengers-rot);
+  --vr-kit-nudge-x: var(--vr-kit-avengers-x);
+  --vr-kit-nudge-y: var(--vr-kit-avengers-y);
   --vr-kit-fly-x: 0;
   --vr-kit-fly-y: -108vh;
+  transform-origin: 50% var(--vr-kit-piece-hub-y);
   animation-name: vrKitMedalSnap;
   animation-delay: 0.08s;
 }
 
 .vr-kit-load__piece--f4 {
   z-index: 1;
-  --vr-kit-rot: 240deg;
+  --vr-kit-piece-hub-y: var(--vr-kit-f4-hub-y);
+  --vr-kit-rot: var(--vr-kit-f4-rot);
+  --vr-kit-nudge-x: var(--vr-kit-f4-x);
+  --vr-kit-nudge-y: var(--vr-kit-f4-y);
   --vr-kit-fly-x: -88vw;
   --vr-kit-fly-y: 72vh;
+  transform-origin: 50% var(--vr-kit-piece-hub-y);
   animation-name: vrKitMedalSnap;
   animation-delay: 0.22s;
 }
 
 .vr-kit-load__piece--xmen {
   z-index: 2;
-  --vr-kit-rot: 120deg;
+  --vr-kit-piece-hub-y: var(--vr-kit-xmen-hub-y);
+  --vr-kit-rot: var(--vr-kit-xmen-rot);
+  --vr-kit-nudge-x: var(--vr-kit-xmen-x);
+  --vr-kit-nudge-y: var(--vr-kit-xmen-y);
   --vr-kit-fly-x: 88vw;
   --vr-kit-fly-y: 72vh;
+  transform-origin: 50% var(--vr-kit-piece-hub-y);
   animation-name: vrKitMedalSnap;
   animation-delay: 0.36s;
+}
+
+.vr-kit-load__cluster.is-hold .vr-kit-load__piece {
+  animation: none;
+  opacity: 1;
+  transform: translate(-50%, calc(-1 * var(--vr-kit-piece-hub-y))) translate(var(--vr-kit-nudge-x), var(--vr-kit-nudge-y)) rotate(var(--vr-kit-rot));
 }
 
 .vr-kit-load__cluster.is-hold {
   animation: vrKitClusterLock 0.45s ease-out forwards;
 }
 
-.vr-kit-load__cluster.is-hold .vr-kit-load__piece {
-  animation: none;
-  opacity: 1;
-  transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y))) rotate(var(--vr-kit-rot));
-}
-
 .vr-kit-load__brand {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  top: calc(50% + min(34vmin, 178px));
+  right: auto;
+  top: auto;
+  bottom: var(--vr-kit-brand-bottom);
+  z-index: 6;
   transform: translateX(-50%);
   display: grid;
   justify-items: center;
   gap: 0.65rem;
-  width: min(92vw, 520px);
+  width: var(--vr-kit-brand-width);
+  pointer-events: none;
 }
 
 .vr-kit-load__logo {
@@ -109,7 +149,7 @@
   justify-items: center;
   gap: 0.35rem;
   opacity: 0;
-  animation: logoSlam 0.55s 1.05s cubic-bezier(0.12, 1.35, 0.2, 1) forwards;
+  animation: vrKitLogoSlam 0.55s 1.05s cubic-bezier(0.12, 1.35, 0.2, 1) forwards;
 }
 
 .vr-kit-load__logo .media-load__box,
@@ -120,21 +160,21 @@
 }
 
 .vr-kit-load__logo .media-load__box {
-  width: min(42vw, 9.5rem);
+  width: var(--vr-kit-brand-logo-box);
 }
 
 .vr-kit-load__logo .media-load__run {
-  width: min(72vw, 16rem);
+  width: var(--vr-kit-brand-logo-run);
 }
 
 .vr-kit-load__bar {
   display: block;
-  width: min(72vw, 14rem);
+  width: var(--vr-kit-brand-bar);
   height: 3px;
   background: rgba(255, 255, 255, 0.14);
   overflow: hidden;
   opacity: 0;
-  animation: logoSlam 0.4s 1.15s ease forwards;
+  animation: vrKitLogoSlam 0.4s 1.15s ease forwards;
 }
 
 .vr-kit-load__fill {
@@ -150,14 +190,14 @@
   font-weight: 700;
   letter-spacing: 0.28em;
   opacity: 0;
-  animation: logoSlam 0.4s 1.2s ease forwards;
+  animation: vrKitLogoSlam 0.4s 1.2s ease forwards;
 }
 
 .vr-kit-load__skip {
   position: absolute;
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
-  z-index: 5;
+  z-index: 7;
   padding: 0.45rem 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.35);
   background: transparent;
@@ -169,49 +209,48 @@
   cursor: pointer;
 }
 
+
 @keyframes vrKitMedalSnap {
   from {
     opacity: 0;
-    transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y)))
-      translate(var(--vr-kit-fly-x), var(--vr-kit-fly-y)) rotate(var(--vr-kit-rot)) scale(1.12);
+    transform: translate(-50%, calc(-1 * var(--vr-kit-piece-hub-y))) translate(var(--vr-kit-fly-x), var(--vr-kit-fly-y)) rotate(var(--vr-kit-rot)) scale(1.12);
   }
 
   72% {
     opacity: 1;
-    transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y))) translate(0, 0)
-      rotate(var(--vr-kit-rot)) scale(1.03);
+    transform: translate(-50%, calc(-1 * var(--vr-kit-piece-hub-y))) translate(var(--vr-kit-nudge-x), var(--vr-kit-nudge-y)) rotate(var(--vr-kit-rot)) scale(1.03);
   }
 
   to {
     opacity: 1;
-    transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y))) rotate(var(--vr-kit-rot));
+    transform: translate(-50%, calc(-1 * var(--vr-kit-piece-hub-y))) translate(var(--vr-kit-nudge-x), var(--vr-kit-nudge-y)) rotate(var(--vr-kit-rot));
   }
 }
 
 @keyframes vrKitClusterLock {
   0% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(calc(-50% + var(--vr-kit-cluster-x)), calc(-50% + var(--vr-kit-cluster-y))) scale(1);
   }
 
   40% {
-    transform: translate(-50%, -50%) scale(1.04);
+    transform: translate(calc(-50% + var(--vr-kit-cluster-x)), calc(-50% + var(--vr-kit-cluster-y))) scale(1.04);
   }
 
   100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(calc(-50% + var(--vr-kit-cluster-x)), calc(-50% + var(--vr-kit-cluster-y))) scale(1);
   }
 }
 
-@keyframes logoSlam {
+@keyframes vrKitLogoSlam {
   from {
     opacity: 0;
-    transform: scale(1.55);
+    scale: 1.55;
     filter: blur(10px);
   }
 
   to {
     opacity: 1;
-    transform: scale(1);
+    scale: 1;
     filter: none;
   }
 }
@@ -238,6 +277,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .vr-kit-load__piece,
   .vr-kit-load__flash,
   .vr-kit-load__logo,
@@ -247,16 +287,12 @@
     opacity: 1;
   }
 
-  .vr-kit-load__piece--avengers {
-    transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y))) rotate(0deg);
-  }
-
-  .vr-kit-load__piece--f4 {
-    transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y))) rotate(240deg);
-  }
-
+  .vr-kit-load__piece--avengers,
+  .vr-kit-load__piece--f4,
   .vr-kit-load__piece--xmen {
-    transform: translate(-50%, calc(-1 * var(--vr-kit-hub-y))) rotate(120deg);
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, calc(-1 * var(--vr-kit-piece-hub-y))) translate(var(--vr-kit-nudge-x), var(--vr-kit-nudge-y)) rotate(var(--vr-kit-rot));
   }
 
   .vr-kit-load.is-out {
