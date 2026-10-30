@@ -13,6 +13,53 @@ export const VIRTUAL_RUN_EVENT = {
   countdownTarget: "2026-11-11T10:00:00+09:00",
 } as const;
 
+export type VirtualRunTimelineItem = {
+  date: string;
+  dateTime?: string;
+  label: string;
+};
+
+export const VIRTUAL_RUN_TIMELINE: VirtualRunTimelineItem[] = [
+  {
+    date: "11/2",
+    dateTime: "2026-11-02",
+    label: "개최 공지, 메달·굿즈 공개",
+  },
+  {
+    date: "11/11",
+    dateTime: "2026-11-11",
+    label: "티켓 오픈 (1·2·3차)",
+  },
+  {
+    date: "11/30",
+    dateTime: "2026-11-30",
+    label: "키트 배송 시작",
+  },
+  {
+    date: "12/16",
+    dateTime: "2026-12-16",
+    label: "둠스데이 영화 개봉",
+  },
+  {
+    date: "1/19",
+    dateTime: "2027-01-19",
+    label: "티켓 마감",
+  },
+  {
+    date: "1/20 ~ 1/25",
+    dateTime: "2027-01-20/2027-01-25",
+    label: "이벤트 진행 · 1/25 상품 전달",
+  },
+  {
+    date: "1/29",
+    dateTime: "2027-01-29",
+    label: "행사 종료",
+  },
+];
+
+export const VIRTUAL_RUN_TIMELINE_DISCLAIMER =
+  "※ 러닝·키트 인증은 11/30(일)부터 1/19(월)까지 제출 가능합니다. 일정은 협의·운영 상황에 따라 변경될 수 있습니다.";
+
 export type VirtualRunOverviewRow = { label: string; value: string };
 
 export const VIRTUAL_RUN_OVERVIEW_ROWS: VirtualRunOverviewRow[] = [

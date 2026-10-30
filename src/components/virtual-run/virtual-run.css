@@ -114,3 +114,11 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.virtual-run .vr-timeline__note {
+  margin: 1.25rem 0 0;
+  color: var(--note);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}

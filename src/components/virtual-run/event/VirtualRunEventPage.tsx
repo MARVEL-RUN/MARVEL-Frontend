@@ -1,4 +1,5 @@
 import { OverviewTable } from "./OverviewTable";
+import { VirtualRunTimeline } from "./VirtualRunTimeline";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 
 export function VirtualRunEventPage() {
@@ -25,6 +26,14 @@ export function VirtualRunEventPage() {
           <div className="vr-stack-top">
             <OverviewTable />
           </div>
+        </div>
+      </section>
+
+      <section className="guide-sec" id="timeline">
+        <hr className="guide-rule" />
+        <div className="wrap">
+          <h2>타임라인</h2>
+          <VirtualRunTimeline />
         </div>
       </section>
     </VirtualRunSubPage>
