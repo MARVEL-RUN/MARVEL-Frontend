@@ -1,6 +1,6 @@
 export const VIRTUAL_RUN_EVENT = {
   title: "MARVEL RUN 2026 버추얼런",
-  planLabel: "버추얼런 플랜",
+  planLabel: "버추얼런",
   lead: "러닝이 가능한 전국 원하는 곳 어디서나",
   schedule: "11.11(화) – 1.19(월)",
   scheduleDays: "70일",

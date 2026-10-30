@@ -1,5 +1,5 @@
 export const VIRTUAL_RUN_NAV = [
-  { href: "/", label: "메인" },
+  { href: "/", label: "마블 버추얼런" },
   { href: "/event", label: "행사 안내" },
   { href: "/kit", label: "기념품" },
   { href: "/tickets", label: "티켓 구매" },

@@ -28,13 +28,17 @@ export function HeroCountdown() {
   ] as const;
 
   return (
-    <div className="assemble__count" aria-live="polite">
+    <div className="vr-home__countdown" role="timer" aria-live="polite">
       {units.map(([n, u], i) => (
         <Fragment key={u}>
-          {i > 0 ? <i aria-hidden>:</i> : null}
-          <span className="assemble__tick">
-            <strong>{n}</strong>
-            <em>{u}</em>
+          {i > 0 ? (
+            <span className="vr-home__countdown-sep" aria-hidden>
+              :
+            </span>
+          ) : null}
+          <span className="vr-home__countdown-unit">
+            <span className="vr-home__countdown-value">{n}</span>
+            <span className="vr-home__countdown-label">{u}</span>
           </span>
         </Fragment>
       ))}
