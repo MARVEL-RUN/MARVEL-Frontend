@@ -245,9 +245,9 @@
   opacity: 0;
   transform: scale(1.09) translateX(calc(var(--vr-fig-tx) + var(--vr-fig-slide)));
   filter: blur(4px) brightness(1.12);
+  /* transform은 vw/clamp 연동 — transition 넣으면 리사이즈마다 0.82s 추적되어 버벅임 */
   transition:
     opacity 0.72s ease-out,
-    transform 0.82s cubic-bezier(0.18, 1, 0.28, 1),
     filter 0.75s ease-out;
 }
 
