@@ -22,18 +22,18 @@ export const EVENT = {
   closeNoticeAction: "접수 마감",
   /* 홈 팝업. nextAt(KST)부터 next. 해당 팝업만 끄려면 next.enabled: false */
   popup: {
-    enabled: false,
-    id: "shuttle-survey-2026-v3",
-    title: "마블런 셔틀버스 추가 운행지역 수요조사",
-    image: MAIN_ASSETS.popupShuttleSurvey,
-    href: "https://forms.gle/x9925cioc1HGnSEs8",
-    nextAt: "2026-10-13T00:00:00+09:00",
+    enabled: true,
+    id: "extra-registration-2026-v3",
+    title: "2026 마블런 추가 접수 안내",
+    image: MAIN_ASSETS.popupExtraRegistration,
+    href: "",
+    nextAt: "2026-10-31T13:00:00+09:00",
     next: {
       enabled: true,
-      id: "extra-registration-2026-v3",
-      title: "2026 마블런 추가 접수 안내",
-      image: MAIN_ASSETS.popupExtraRegistration,
-      href: "",
+      id: "record-inquiry-2026",
+      title: "2026 마블런 기록 조회 안내",
+      image: MAIN_ASSETS.popupRecordInquiry,
+      href: "https://smartchip.co.kr/",
     },
   },
   dateShort: "2026.10.31 SAT",
@@ -296,5 +296,6 @@ export const EVENT = {
 
 export const SITE_URL = "https://marvelrunkorea2026.com";
 export const SEO_TITLE = "마블런 2026 인제 MARVEL RUN";
-export const OG_TITLE = SEO_TITLE;
+export const OG_TITLE = "2026 마블런 MARVEL RUN";
 export const OG_DESCRIPTION = `마블런 2026, MARVEL RUN, ${EVENT.dateLong}, ${EVENT.venue}`;
+export const OG_IMAGE = "/images/og/marvel-run.jpg";
