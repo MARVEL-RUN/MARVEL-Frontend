@@ -90,11 +90,9 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    -62deg,
-    transparent 0 14px,
-    color-mix(in srgb, var(--marvel) 14%, transparent) 14px 15px
-  );
+  background: repeating-linear-gradient(-62deg,
+      transparent 0 14px,
+      color-mix(in srgb, var(--marvel) 14%, transparent) 14px 15px);
   opacity: 0.55;
   pointer-events: none;
 }
@@ -162,6 +160,13 @@
   .virtual-run .vr-ticker__track {
     animation: none;
   }
+
+  .virtual-run .vr-home__figure {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
 }
 
 .virtual-run .vr-home__stage {
@@ -228,6 +233,19 @@
   width: 86%;
   height: 82%;
   overflow: hidden;
+  opacity: 0;
+  transform: scale(1.032) translateY(0.4%);
+  filter: blur(4px) brightness(1.12);
+  transition:
+    opacity 0.72s ease-out,
+    transform 0.82s cubic-bezier(0.18, 1, 0.28, 1),
+    filter 0.75s ease-out;
+}
+
+.virtual-run .vr-home__figure.is-in {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: none;
 }
 
 .virtual-run .vr-home__figure-art {
@@ -235,6 +253,200 @@
   object-position: 40% 0%;
   transform: scale(1.16);
   transform-origin: 46% 8%;
+}
+
+.virtual-run .vr-home__glitch {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+  animation: vrHomeGlitchFade 0.92s ease-out both;
+}
+
+.virtual-run .vr-home__glitch__rgb,
+.virtual-run .vr-home__glitch__cut,
+.virtual-run .vr-home__glitch__scan {
+  position: absolute;
+  pointer-events: none;
+}
+
+.virtual-run .vr-home__glitch__rgb {
+  inset: 0;
+  mix-blend-mode: screen;
+  animation: vrHomeGlitchRgb 0.92s steps(3, end) both;
+}
+
+.virtual-run .vr-home__glitch__rgb--a {
+  background: color-mix(in srgb, var(--marvel) 62%, #fff 8%);
+}
+
+.virtual-run .vr-home__glitch__rgb--b {
+  background: color-mix(in srgb, #4ec8e0 52%, transparent);
+  animation-direction: reverse;
+}
+
+.virtual-run .vr-home__glitch__cut {
+  left: -9%;
+  right: -9%;
+  background: rgba(255, 255, 255, 0.38);
+  mix-blend-mode: overlay;
+  animation: vrHomeGlitchCut 0.92s steps(3, end) both;
+}
+
+.virtual-run .vr-home__glitch__cut--a {
+  top: 12%;
+  height: 9%;
+}
+
+.virtual-run .vr-home__glitch__cut--b {
+  top: 38%;
+  height: 6%;
+  animation-delay: 0.05s;
+}
+
+.virtual-run .vr-home__glitch__cut--c {
+  top: 58%;
+  height: 10%;
+  animation-delay: 0.06s;
+}
+
+.virtual-run .vr-home__glitch__scan {
+  inset: 0;
+  background:
+    repeating-linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.11) 0 1px,
+      transparent 1px 4px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.35'/%3E%3C/svg%3E");
+  background-size: auto, 130px 170px;
+  mix-blend-mode: overlay;
+  animation: vrHomeGlitchScan 0.92s steps(6, end) both;
+}
+
+@keyframes vrHomeGlitchFade {
+  0% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vrHomeGlitchRgb {
+  0%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+
+  12% {
+    opacity: 0.38;
+    transform: translate(-7px, 0);
+  }
+
+  22% {
+    opacity: 0.18;
+    transform: translate(8px, 1px);
+  }
+
+  34% {
+    opacity: 0.42;
+    transform: translate(-5px, -1px);
+  }
+
+  48% {
+    opacity: 0;
+    transform: none;
+  }
+
+  58% {
+    opacity: 0.32;
+    transform: translate(6px, 0);
+  }
+
+  72% {
+    opacity: 0.14;
+    transform: translate(-3px, 1px);
+  }
+
+  86% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes vrHomeGlitchCut {
+  0%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+
+  14% {
+    opacity: 0.55;
+    transform: translateX(-11px);
+  }
+
+  26% {
+    opacity: 0.28;
+    transform: translateX(13px);
+  }
+
+  38% {
+    opacity: 0.62;
+    transform: translateX(-7px);
+  }
+
+  52% {
+    opacity: 0;
+    transform: translateX(9px);
+  }
+
+  64% {
+    opacity: 0.48;
+    transform: translateX(6px);
+  }
+
+  80% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes vrHomeGlitchScan {
+  0%,
+  100% {
+    opacity: 0;
+    background-position: 0 0, 0 0;
+  }
+
+  10%,
+  28%,
+  46% {
+    opacity: 0.42;
+    background-position: 10px 0, -16px 6px;
+  }
+
+  18%,
+  36% {
+    opacity: 0.22;
+    background-position: -6px 0, 12px -8px;
+  }
+
+  58% {
+    opacity: 0.32;
+    background-position: 5px 0, 6px 4px;
+  }
+
+  74% {
+    opacity: 0.12;
+  }
 }
 
 .virtual-run .vr-home__overview {

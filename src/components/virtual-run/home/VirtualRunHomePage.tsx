@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import {
@@ -21,9 +21,29 @@ const TICKER = [
   "ONLINE",
 ];
 
+const HERO_FIGURE_IN_MS = 380;
+const HERO_GLITCH_MS = 980;
+
 export function VirtualRunHomePage() {
   const rootRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const [glitchOn, setGlitchOn] = useState(true);
+  const [figureIn, setFigureIn] = useState(false);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setGlitchOn(false);
+      setFigureIn(true);
+      return;
+    }
+    const figureTimer = window.setTimeout(() => setFigureIn(true), HERO_FIGURE_IN_MS);
+    const glitchTimer = window.setTimeout(() => setGlitchOn(false), HERO_GLITCH_MS);
+    return () => {
+      window.clearTimeout(figureTimer);
+      window.clearTimeout(glitchTimer);
+    };
+  }, []);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -68,6 +88,16 @@ export function VirtualRunHomePage() {
   return (
     <main className="home vr-home" ref={rootRef}>
       <section className="hero hero--vr-split" id="hero" ref={heroRef}>
+        {glitchOn ? (
+          <span className="vr-home__glitch" aria-hidden>
+            <span className="vr-home__glitch__rgb vr-home__glitch__rgb--a" />
+            <span className="vr-home__glitch__rgb vr-home__glitch__rgb--b" />
+            <span className="vr-home__glitch__cut vr-home__glitch__cut--a" />
+            <span className="vr-home__glitch__cut vr-home__glitch__cut--b" />
+            <span className="vr-home__glitch__cut vr-home__glitch__cut--c" />
+            <span className="vr-home__glitch__scan" />
+          </span>
+        ) : null}
         <div className="vr-home__stage" aria-hidden>
           <div className="vr-home__banner">
             <Image
@@ -79,7 +109,7 @@ export function VirtualRunHomePage() {
               className="vr-home__banner-art"
             />
           </div>
-          <div className="vr-home__figure">
+          <div className={figureIn ? "vr-home__figure is-in" : "vr-home__figure"}>
             <Image
               src={VIRTUAL_RUN_ASSETS.heroFigure}
               alt=""
