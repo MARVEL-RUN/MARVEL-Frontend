@@ -22,10 +22,6 @@ export function CinematicFX() {
 
   return (
     <div className="fx" aria-hidden>
-      <div className="fx-letterbox">
-        <span />
-        <span />
-      </div>
       <span className="fx-vignette" />
       <span className="fx-grain" />
       <span className="fx-scan" />
