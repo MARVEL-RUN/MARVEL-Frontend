@@ -231,13 +231,13 @@
   position: absolute;
   z-index: 2;
   right: -3%;
-  bottom: -18%;
+  bottom: -28%;
   width: calc(var(--vr-home-stage-w) + 20%);
   max-width: 92%;
   height: 98%;
   overflow: visible;
   opacity: 0;
-  transform: scale(1.09) translateY(3%) translateX(10%);
+  transform: scale(1.09) translateY(9%) translateX(10%);
   filter: blur(4px) brightness(1.12);
   transition:
     opacity 0.72s ease-out,
@@ -247,7 +247,7 @@
 
 .virtual-run .vr-home__figure.is-in {
   opacity: 1;
-  transform: scale(1.06) translateY(3%) translateX(10%);
+  transform: scale(1.06) translateY(9%) translateX(10%);
   filter: none;
 }
 
@@ -478,12 +478,12 @@
     width: auto;
     max-width: none;
     height: 94%;
-    bottom: -14%;
-    transform: scale(1.08) translateY(2.5%) translateX(12%);
+    bottom: -24%;
+    transform: scale(1.08) translateY(8%) translateX(12%);
   }
 
   .virtual-run .vr-home__figure.is-in {
-    transform: scale(1.05) translateY(2.5%) translateX(12%);
+    transform: scale(1.05) translateY(8%) translateX(12%);
   }
 
   .virtual-run .vr-home__figure-art {
