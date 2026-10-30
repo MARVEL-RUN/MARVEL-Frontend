@@ -6,7 +6,7 @@ import { MAIN_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import "./kit-medal-load.css";
 
-const MIN_SHOW_MS = 2200;
+const MIN_SHOW_MS = 2800;
 const GIVE_UP_MS = 12000;
 const FADE_MS = 750;
 
@@ -70,7 +70,7 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
   }
 
   useEffect(() => {
-    const hold = window.setTimeout(() => setClusterHold(true), 1080);
+    const hold = window.setTimeout(() => setClusterHold(true), 2050);
     return () => window.clearTimeout(hold);
   }, []);
 
