@@ -178,11 +178,55 @@
   letter-spacing: 0.03em;
 }
 
-.virtual-run .vr-kit__medals {
+.virtual-run .vr-kit__medal-board {
+  display: grid;
+  gap: 1.5rem 2rem;
+  align-items: start;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__medal-board {
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, 16rem);
+  }
+}
+
+.virtual-run .vr-kit__medal-ribbons {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.25rem 1.75rem;
+  gap: 1rem 1.5rem;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__medal-ribbons {
+    justify-content: flex-start;
+  }
+}
+
+.virtual-run .vr-kit__medal-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  align-items: center;
+  width: 100%;
+  max-width: 280px;
+  margin-inline: auto;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__medal-stack {
+    margin-inline: 0;
+    align-self: stretch;
+  }
+
+  .virtual-run .vr-kit__medal-stack .vr-kit__shot--tile .vr-kit__img {
+    max-width: 100%;
+  }
+
+  .virtual-run .vr-kit__medal-stack .vr-kit__shot--landscape .vr-kit__img {
+    max-width: 100%;
+    max-height: 160px;
+  }
 }
 
 .virtual-run .vr-kit__goods {
@@ -207,5 +251,5 @@
 }
 
 .virtual-run .vr-kit-page .btn {
-  margin-top: 2.5rem;
+  margin-top: 0;
 }

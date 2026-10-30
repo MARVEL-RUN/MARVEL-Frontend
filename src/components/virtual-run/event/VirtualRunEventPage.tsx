@@ -6,8 +6,8 @@ export function VirtualRunEventPage() {
   return (
     <VirtualRunSubPage kicker="EVENT" title="행사 안내" en="VIRTUAL RUN BRIEFING">
       <section className="guide-sec">
-        <div className="wrap">
-          <p className="page__body vr-page-lead">
+        <div className="wrap vr-page-inner">
+          <p className="vr-page-lead">
             참가 방법과 메달·리워드 구성을 안내합니다.
           </p>
           <div className="vr-grid-2">
@@ -23,15 +23,13 @@ export function VirtualRunEventPage() {
               <p>메달·실물 리워드는 행사 안내 및 마이페이지에서 확인할 수 있습니다.</p>
             </article>
           </div>
-          <div className="vr-stack-top">
-            <OverviewTable />
-          </div>
+          <OverviewTable />
         </div>
       </section>
 
       <section className="guide-sec" id="timeline">
         <hr className="guide-rule" />
-        <div className="wrap">
+        <div className="wrap vr-page-inner">
           <h2>타임라인</h2>
           <VirtualRunTimeline />
         </div>

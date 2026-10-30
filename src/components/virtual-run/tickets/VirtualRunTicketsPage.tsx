@@ -6,8 +6,8 @@ export function VirtualRunTicketsPage() {
   return (
     <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
       <section className="guide-sec">
-        <div className="wrap wrap--narrow">
-          <p className="page__body vr-page-lead">
+        <div className="wrap wrap--narrow vr-page-inner">
+          <p className="vr-page-lead">
             회차를 선택한 뒤 결제 페이지로 이동합니다.
           </p>
           <form className="vr-ticket-options">
@@ -26,8 +26,8 @@ export function VirtualRunTicketsPage() {
               </div>
             </label>
           </form>
-          <p className="vr-form-note vr-stack-sm">결제·재고 연동은 추후 API와 연결됩니다.</p>
-          <VrLink href="/login" className="btn btn--red vr-stack-sm">
+          <p className="vr-form-note">결제·재고 연동은 추후 API와 연결됩니다.</p>
+          <VrLink href="/login" className="btn btn--red">
             로그인 후 구매
           </VrLink>
         </div>

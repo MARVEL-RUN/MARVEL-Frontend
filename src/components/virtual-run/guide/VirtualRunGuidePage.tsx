@@ -5,8 +5,8 @@ export function VirtualRunGuidePage() {
   return (
     <VirtualRunSubPage kicker="GUIDE" title="인증 가이드" en="VERIFICATION">
       <section className="guide-sec">
-        <div className="wrap">
-          <p className="page__body vr-page-lead">
+        <div className="wrap vr-page-inner">
+          <p className="vr-page-lead">
             인증 예시와 자주 묻는 질문을 확인하세요.
           </p>
           <div className="vr-grid-2">
@@ -34,7 +34,7 @@ export function VirtualRunGuidePage() {
       </section>
       <section className="guide-sec" id="faq">
         <hr className="guide-rule" />
-        <div className="wrap">
+        <div className="wrap vr-page-inner">
           <h2>자주 묻는 질문</h2>
           <dl className="spec">
             <div>

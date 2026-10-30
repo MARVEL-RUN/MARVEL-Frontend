@@ -11,8 +11,8 @@ export function VirtualRunMypageHub() {
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="마이페이지" en="VERIFY · REWARD">
       <section className="guide-sec">
-        <div className="wrap wrap--narrow">
-          <p className="page__body vr-page-lead">
+        <div className="wrap wrap--narrow vr-page-inner">
+          <p className="vr-page-lead">
             인증·리워드를 회차·키트 단위로 관리합니다.
           </p>
           <div className="vr-mypage-nav">

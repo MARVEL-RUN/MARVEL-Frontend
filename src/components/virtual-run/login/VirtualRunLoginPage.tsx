@@ -15,11 +15,11 @@ export function VirtualRunLoginPage() {
   return (
     <VirtualRunSubPage kicker="LOGIN" title="로그인" en="BIB · SMS">
       <section className="guide-sec">
-        <div className="wrap wrap--narrow">
-          <p className="page__body vr-page-lead">
+        <div className="wrap wrap--narrow vr-page-inner vr-page-inner--auth">
+          <p className="vr-page-lead">
             회원가입 없이 배번호와 휴대폰 문자 인증으로 로그인합니다.
           </p>
-          <form className="inquiry-secret__form--stack" onSubmit={onSubmit}>
+          <form className="inquiry-secret__form--stack" onSubmit={onSubmit} noValidate>
             <label className="inquiry-secret__field">
               <span>배번호</span>
               <span className="inquiry-secret__control">
@@ -65,7 +65,7 @@ export function VirtualRunLoginPage() {
               </>
             )}
           </form>
-          <p className="vr-form-note vr-stack-top">
+          <p className="vr-form-note">
             티켓이 없으신가요?{" "}
             <VrLink href="/tickets" className="vr-inline-link">
               티켓 구매

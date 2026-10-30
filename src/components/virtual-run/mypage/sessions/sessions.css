@@ -1,13 +1,7 @@
-.virtual-run .vr-sessions-page {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
 .virtual-run .vr-session-bar {
   display: grid;
   gap: 0.65rem;
-  margin: 0 0 2rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -54,7 +48,7 @@
 }
 
 .virtual-run .vr-cert-form {
-  gap: 2rem;
+  gap: 1.65rem;
 }
 
 .virtual-run .vr-cert-form__grid {
@@ -254,5 +248,5 @@
 }
 
 .virtual-run .vr-sessions-page__foot {
-  margin-top: 2rem;
+  margin: 0;
 }

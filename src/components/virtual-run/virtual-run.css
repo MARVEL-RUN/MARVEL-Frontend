@@ -1,23 +1,102 @@
 @import "./theme.css";
 
+.virtual-run.site {
+  --vr-sec-pad: 2rem;
+  --vr-sec-pad-tight: 1.5rem;
+  --vr-block-gap: 1.25rem;
+  --vr-form-gap: 1.1rem;
+  --vr-field-gap: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.virtual-run.site > .page {
+  flex: 1 0 auto;
+}
+
+.virtual-run .site-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.virtual-run .guide-sec {
+  padding: var(--vr-sec-pad) 0;
+}
+
+.virtual-run .page > .guide-sec:first-child {
+  padding-top: var(--vr-sec-pad-tight);
+}
+
+.virtual-run .guide-sec:has(> .guide-rule) {
+  padding-top: 0;
+}
+
+.virtual-run .guide-sec > .guide-rule {
+  margin-bottom: var(--vr-sec-pad);
+}
+
+.virtual-run .guide-sec + .guide-sec:not(:has(> .guide-rule)) {
+  padding-top: 0;
+}
+
+.virtual-run .guide-sec h2 {
+  margin-bottom: 1rem;
+}
+
+.virtual-run .page__body {
+  padding: 0;
+}
+
+.virtual-run .vr-page-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vr-block-gap);
+  padding-bottom: 2.5rem;
+}
+
+.virtual-run .vr-page-inner--auth {
+  max-width: 26rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
 .virtual-run .vr-grid-2 {
   display: grid;
   gap: 1rem;
 }
 
 .virtual-run .vr-stack-top {
-  margin-top: 2rem;
+  margin-top: var(--vr-block-gap);
 }
 
 .virtual-run .vr-stack-sm {
-  margin-top: 1.25rem;
+  margin-top: 0.85rem;
 }
 
 .virtual-run .vr-page-lead {
-  margin: 0 0 1.5rem;
+  margin: 0;
   color: var(--note);
   font-size: 0.92rem;
   line-height: 1.55;
+}
+
+.virtual-run .inquiry-secret__form--stack {
+  gap: var(--vr-form-gap);
+}
+
+.virtual-run .inquiry-secret__field {
+  gap: var(--vr-field-gap);
+}
+
+.virtual-run .inquiry-secret__form--stack > .btn {
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+.virtual-run .inquiry-secret__control {
+  min-height: 3.15rem;
+  padding: 0 0.5rem 0 1rem;
 }
 
 .virtual-run .vr-panel {
@@ -83,7 +162,7 @@
 
 .virtual-run .vr-ticket-options {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--vr-form-gap);
 }
 
 .virtual-run .vr-ticket-option {
@@ -112,6 +191,22 @@
 @media (min-width: 768px) {
   .virtual-run .vr-grid-2 {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+.virtual-run .time-table-wrap {
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 720px) {
+  .virtual-run.site {
+    --vr-sec-pad: 1.65rem;
+    --vr-sec-pad-tight: 1.15rem;
+    --vr-block-gap: 1.1rem;
+  }
+
+  .virtual-run .vr-page-inner {
+    padding-bottom: 2rem;
   }
 }
 

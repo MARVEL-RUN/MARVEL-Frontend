@@ -110,30 +110,30 @@ export function VirtualRunKitGallery() {
         </aside>
 
         <div className="vr-kit__main">
-          {(groups.medals.length > 0 || groups.medalCase) && (
+          {(groups.medals.length > 0 || groups.medalCase || groups.bib) && (
             <section className="vr-kit__block" aria-labelledby="vr-kit-medal">
               <h2 id="vr-kit-medal" className="vr-kit__block-title">
-                Medal
+                Medal · Bib
               </h2>
-              <div className="vr-kit__medals">
-                {groups.medals.map((item) => (
-                  <KitShot key={item.kind} themeId={themeId} item={item} />
-                ))}
-                {groups.medalCase ? (
-                  <KitShot themeId={themeId} item={groups.medalCase} />
+              <div className="vr-kit__medal-board">
+                {groups.medals.length > 0 ? (
+                  <div className="vr-kit__medal-ribbons">
+                    {groups.medals.map((item) => (
+                      <KitShot key={item.kind} themeId={themeId} item={item} />
+                    ))}
+                  </div>
+                ) : null}
+                {groups.medalCase || groups.bib ? (
+                  <div className="vr-kit__medal-stack">
+                    {groups.medalCase ? (
+                      <KitShot themeId={themeId} item={groups.medalCase} />
+                    ) : null}
+                    {groups.bib ? <KitShot themeId={themeId} item={groups.bib} /> : null}
+                  </div>
                 ) : null}
               </div>
             </section>
           )}
-
-          {groups.bib ? (
-            <section className="vr-kit__block" aria-labelledby="vr-kit-bib">
-              <h2 id="vr-kit-bib" className="vr-kit__block-title">
-                Bib
-              </h2>
-              <KitShot themeId={themeId} item={groups.bib} />
-            </section>
-          ) : null}
 
           {groups.goods.length > 0 ? (
             <section className="vr-kit__block" aria-labelledby="vr-kit-goods">
