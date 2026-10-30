@@ -25,12 +25,10 @@
 }
 
 .virtual-run .side-banner::after {
-  background: linear-gradient(
-    90deg,
-    var(--navy) 12%,
-    color-mix(in srgb, var(--navy) 88%, transparent) 48%,
-    transparent
-  );
+  background: linear-gradient(90deg,
+      var(--navy) 12%,
+      color-mix(in srgb, var(--navy) 88%, transparent) 48%,
+      transparent);
 }
 
 .virtual-run .inquiry-secret__control:focus-within {
