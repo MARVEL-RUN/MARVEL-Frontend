@@ -14,28 +14,6 @@ html.is-intro .site-header {
   pointer-events: none;
 }
 
-.fx-letterbox span {
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 70;
-  height: 14px;
-  background: #000;
-  transition: height 0.7s ease;
-}
-
-.fx-letterbox span:first-child {
-  top: 0;
-}
-
-.fx-letterbox span:last-child {
-  bottom: 0;
-}
-
-html.is-intro .fx-letterbox span {
-  height: 52px;
-}
-
 .fx-vignette {
   position: fixed;
   inset: 0;
@@ -636,16 +614,10 @@ html.is-intro .fx-letterbox span {
 
 @media (max-width: 720px) {
 
-  .fx-letterbox span,
-  html.is-intro .fx-letterbox span {
-    height: 0;
-  }
-
   .fx-grain,
   .fx-scan,
   .fx-dust,
-  .fx-vignette,
-  .fx-letterbox {
+  .fx-vignette {
     display: none;
   }
 

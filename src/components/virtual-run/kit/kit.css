@@ -1,0 +1,255 @@
+.virtual-run .vr-kit-page {
+  padding-bottom: 3rem;
+}
+
+.virtual-run .vr-kit {
+  margin-top: 0.5rem;
+}
+
+.virtual-run .vr-kit__bar {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--rule) 22%, transparent);
+}
+
+.virtual-run .vr-kit__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+}
+
+.virtual-run .vr-kit__themes button {
+  padding: 0.35rem 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--dim);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.virtual-run .vr-kit__themes button.is-on {
+  color: #fff;
+  border-bottom-color: var(--marvel);
+}
+
+.virtual-run .vr-kit__lead {
+  margin: 0.85rem 0 0;
+  color: var(--note);
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+}
+
+.virtual-run .vr-kit__layout {
+  display: grid;
+  gap: 2.5rem 3rem;
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .virtual-run .vr-kit__layout {
+    grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+    gap: 2rem 2.5rem;
+  }
+
+  .virtual-run .vr-kit__aside {
+    position: sticky;
+    top: 5.5rem;
+    max-width: 17rem;
+  }
+}
+
+.virtual-run .vr-kit__aside .vr-kit__shot--banner .vr-kit__img {
+  width: 100%;
+  max-width: 100%;
+  max-height: min(42vh, 360px);
+  margin-inline: 0;
+}
+
+.virtual-run .vr-kit__aside .vr-kit__shot--banner figcaption {
+  text-align: left;
+  font-size: 0.72rem;
+}
+
+.virtual-run .vr-kit__manifest {
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.22rem 0.65rem;
+  border-top: 1px solid color-mix(in srgb, var(--rule) 18%, transparent);
+  padding-top: 0.65rem;
+}
+
+@media (min-width: 960px) {
+  .virtual-run .vr-kit__manifest {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.virtual-run .vr-kit__manifest li {
+  position: relative;
+  padding-left: 0.65rem;
+  color: var(--label);
+  font-size: 0.72rem;
+  line-height: 1.32;
+}
+
+.virtual-run .vr-kit__manifest li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.48em;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--marvel);
+}
+
+.virtual-run .vr-kit__aside .vr-kit__fine {
+  margin: 0.65rem 0 0;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.virtual-run .vr-kit__fine {
+  margin: 1rem 0 0;
+  color: var(--note);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.virtual-run .vr-kit__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+  min-width: 0;
+}
+
+.virtual-run .vr-kit__block-title {
+  margin: 0 0 1rem;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.virtual-run .vr-kit__shot {
+  margin: 0;
+}
+
+.virtual-run .vr-kit__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(72vh, 820px);
+  object-fit: contain;
+}
+
+.virtual-run .vr-kit__shot--ribbon .vr-kit__img {
+  max-width: 220px;
+  margin-inline: auto;
+  max-height: min(68vh, 640px);
+}
+
+.virtual-run .vr-kit__shot--tile .vr-kit__img {
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+.virtual-run .vr-kit__shot--landscape .vr-kit__img {
+  max-width: min(100%, 520px);
+  max-height: 200px;
+  margin-inline: auto;
+}
+
+.virtual-run .vr-kit__shot--banner .vr-kit__img {
+  max-height: none;
+}
+
+.virtual-run .vr-kit__shot figcaption {
+  margin-top: 0.55rem;
+  color: var(--note);
+  font-size: 0.78rem;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.virtual-run .vr-kit__medal-board {
+  display: grid;
+  gap: 1.5rem 2rem;
+  align-items: start;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__medal-board {
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, 16rem);
+  }
+}
+
+.virtual-run .vr-kit__medal-ribbons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 1.5rem;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__medal-ribbons {
+    justify-content: flex-start;
+  }
+}
+
+.virtual-run .vr-kit__medal-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  align-items: center;
+  width: 100%;
+  max-width: 280px;
+  margin-inline: auto;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__medal-stack {
+    margin-inline: 0;
+    align-self: stretch;
+  }
+
+  .virtual-run .vr-kit__medal-stack .vr-kit__shot--tile .vr-kit__img {
+    max-width: 100%;
+  }
+
+  .virtual-run .vr-kit__medal-stack .vr-kit__shot--landscape .vr-kit__img {
+    max-width: 100%;
+    max-height: 160px;
+  }
+}
+
+.virtual-run .vr-kit__goods {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+
+.virtual-run .vr-kit__run {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-kit__run {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .virtual-run .vr-kit__run .vr-kit__shot--banner {
+    grid-column: 1 / -1;
+  }
+}
+
+.virtual-run .vr-kit-page .btn {
+  margin-top: 0;
+}

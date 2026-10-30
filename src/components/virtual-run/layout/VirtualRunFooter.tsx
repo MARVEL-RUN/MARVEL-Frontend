@@ -1,0 +1,103 @@
+"use client";
+
+import Image from "next/image";
+import { MAIN_ASSETS } from "@/lib/assets";
+import { EVENT } from "@/lib/event";
+import { LEGAL_DOCS, OFFICE } from "@/lib/legal";
+import { footerPartnerLogo, footerPartnerLogoClass } from "@/lib/sponsor-logos";
+import { useLegalModal } from "../../main/legal/LegalModal";
+import { VrLink } from "./VrLink";
+
+const OFFICE_FACTS = [
+  { label: "주소", value: OFFICE.address },
+  {
+    label: "대표번호",
+    value: <a href={`tel:${OFFICE.tel}`}>{OFFICE.tel}</a>,
+  },
+  {
+    label: "이메일",
+    value: <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>,
+  },
+  { label: "운영시간", value: OFFICE.hours },
+  { label: "대표자", value: OFFICE.ceo },
+  { label: "사업자번호", value: OFFICE.bizNo },
+  { label: "통신판매번호", value: OFFICE.mailOrderNo },
+] as const;
+
+export function VirtualRunFooter() {
+  const { open } = useLegalModal();
+
+  return (
+    <footer className="site-footer">
+      <div className="site-footer__inner">
+        <ul className="site-footer__hosts">
+          {EVENT.footerPartners.map((group) => (
+            <li key={group.role}>
+              <p className="site-footer__host-role">{group.role}</p>
+              <div className="site-footer__host-logos">
+                {group.items.map((item) => {
+                  const logo = footerPartnerLogo(item.key);
+                  return (
+                    <span
+                      key={item.key}
+                      className={footerPartnerLogoClass(item.key)}
+                    >
+                      <Image
+                        src={logo.src}
+                        alt={item.name}
+                        width={logo.width}
+                        height={logo.height}
+                        draggable={false}
+                      />
+                    </span>
+                  );
+                })}
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="site-footer__info">
+          <nav className="site-footer__nav" aria-label="약관">
+            {LEGAL_DOCS.map((item) => (
+              <a
+                key={item.id}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  open(item.id);
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
+            <VrLink href="/guide#faq">FAQ</VrLink>
+          </nav>
+
+          <p className="site-footer__office-name">{OFFICE.name}</p>
+          <dl
+            className="site-footer__facts"
+            {...{ "x-apple-data-detectors": "false" }}
+          >
+            {OFFICE_FACTS.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="site-footer__copy">{OFFICE.copyright}</p>
+        </div>
+      </div>
+
+      <VrLink href="/" className="site-footer__logo" aria-label="MARVEL RUN 버추얼런 홈">
+        <Image
+          src={MAIN_ASSETS.footerLogo}
+          alt=""
+          width={1236}
+          height={98}
+          draggable={false}
+        />
+      </VrLink>
+    </footer>
+  );
+}
