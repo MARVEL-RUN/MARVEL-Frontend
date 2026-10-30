@@ -7,6 +7,7 @@ import { MAIN_ASSETS } from "@/lib/assets";
 import { isVirtualRunHomePath, vrPath } from "@/lib/virtual-run/href";
 import { VIRTUAL_RUN_NAV } from "@/lib/virtual-run/nav";
 import { MOBILE_MQ } from "@/lib/viewport";
+import { VirtualRunTicketsCta } from "./VirtualRunTicketsCta";
 import { VrLink } from "./VrLink";
 
 function navActive(pathname: string, href: string, prefixed: boolean): boolean {
@@ -105,9 +106,7 @@ export function VirtualRunSiteHeader() {
             <VrLink href="/login" className="btn btn--ghost site-header__cta">
               <span>로그인</span>
             </VrLink>
-            <VrLink href="/tickets" className="btn btn--red site-header__cta">
-              <span>티켓 구매</span>
-            </VrLink>
+            <VirtualRunTicketsCta compact className="site-header__cta" />
           </div>
 
           <button
@@ -150,9 +149,7 @@ export function VirtualRunSiteHeader() {
           <VrLink href="/login" className="btn btn--ghost" onClick={() => setOpen(false)}>
             로그인
           </VrLink>
-          <VrLink href="/tickets" className="btn btn--red" onClick={() => setOpen(false)}>
-            티켓 구매
-          </VrLink>
+          <VirtualRunTicketsCta onNavigate={() => setOpen(false)} />
         </div>
       </div>
     </header>

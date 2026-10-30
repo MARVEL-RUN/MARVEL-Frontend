@@ -9,6 +9,7 @@ import {
   VIRTUAL_RUN_OVERVIEW_ROWS,
 } from "@/lib/virtual-run/event";
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
+import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
 import { HeroCountdown } from "./HeroCountdown";
 
@@ -150,9 +151,7 @@ export function VirtualRunHomePage() {
                 <VrLink href="/event" className="btn btn--ghost">
                   행사 안내
                 </VrLink>
-                <VrLink href="/tickets" className="btn btn--red">
-                  티켓 구매
-                </VrLink>
+                <VirtualRunTicketsCta />
               </div>
               <KeyVisualCopyright />
             </div>
