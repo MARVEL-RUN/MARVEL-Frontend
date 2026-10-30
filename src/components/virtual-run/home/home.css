@@ -39,6 +39,12 @@
 
 .virtual-run .vr-home .hero {
   --vr-home-stage-w: 62%;
+  /* 90rem=PC 초기(-3%/10%/76%), 22.5rem=모바일 튜닝(-20%/30%/98%) */
+  --vr-fig-right: clamp(-20%, calc(-3% - 17% * (90rem - 100vw) / 67.5rem), -3%);
+  --vr-fig-tx: clamp(10%, calc(10% + 20% * (90rem - 100vw) / 67.5rem), 30%);
+  --vr-fig-art-x: clamp(76%, calc(76% + 22% * (90rem - 100vw) / 67.5rem), 98%);
+  /* 72rem까지는 안 밀림, 그 아래부터 왼쪽 슬라이드 */
+  --vr-fig-slide: calc(min(0px, (100vw - 72rem) * 0.1));
   background:
     radial-gradient(ellipse 70% 95% at 68% 55%, #22a85c 0%, #0d5a30 28%, #042014 52%, transparent 74%),
     #000;
@@ -177,7 +183,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 62%;
+  width: var(--vr-home-stage-w);
   overflow: hidden;
   pointer-events: none;
   background: transparent;
@@ -230,14 +236,14 @@
 .virtual-run .vr-home__figure {
   position: absolute;
   z-index: 2;
-  right: -3%;
-  bottom: -28%;
-  width: calc(var(--vr-home-stage-w) + 20%);
-  max-width: 92%;
-  height: 98%;
+  right: var(--vr-fig-right);
+  bottom: -15.75rem;
+  width: 73.5rem;
+  height: 55.125rem;
+  max-width: none;
   overflow: visible;
   opacity: 0;
-  transform: scale(1.09) translateY(8%) translateX(10%);
+  transform: scale(1.09) translateX(calc(var(--vr-fig-tx) + var(--vr-fig-slide)));
   filter: blur(4px) brightness(1.12);
   transition:
     opacity 0.72s ease-out,
@@ -245,17 +251,44 @@
     filter 0.75s ease-out;
 }
 
+.virtual-run .vr-home__figure::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: var(--vr-fig-art-x);
+  bottom: 18%;
+  width: 62rem;
+  height: 42rem;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 100% 100% at 50% 52%,
+      #3ddc84 0%,
+      #22a85c 10%,
+      #0d5a30 32%,
+      rgba(4, 32, 20, 0.45) 52%,
+      rgba(4, 32, 20, 0.18) 72%,
+      transparent 92%);
+  filter: blur(36px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.75s ease-out;
+}
+
+.virtual-run .vr-home__figure.is-in::before {
+  opacity: 1;
+}
+
 .virtual-run .vr-home__figure.is-in {
   opacity: 1;
-  transform: scale(1.06) translateY(8%) translateX(10%);
-  filter: none;
+  transform: scale(1.06) translateX(calc(var(--vr-fig-tx) + var(--vr-fig-slide)));
+  filter:
+    drop-shadow(0 0 3.5rem color-mix(in srgb, var(--marvel) 52%, transparent)) drop-shadow(0 0 7rem color-mix(in srgb, var(--marvel) 28%, transparent)) drop-shadow(0 0 12rem color-mix(in srgb, var(--marvel) 14%, transparent));
 }
 
 .virtual-run .vr-home__figure-art {
   object-fit: contain;
-  object-position: 76% 100%;
+  object-position: var(--vr-fig-art-x) 100%;
   transform: scale(1.04);
-  transform-origin: 76% 100%;
+  transform-origin: var(--vr-fig-art-x) 100%;
 }
 
 .virtual-run .vr-home__glitch {
@@ -455,6 +488,54 @@
   }
 }
 
+.virtual-run .vr-home__countdown {
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.38rem;
+  width: min(32rem, 100%);
+  margin: 0;
+}
+
+.virtual-run .vr-home__countdown-unit {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.virtual-run .vr-home__countdown-value {
+  display: block;
+  color: #fff;
+  font-size: clamp(1.55rem, 4.6vw, 2.35rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.virtual-run .vr-home__countdown-label {
+  display: block;
+  margin-top: 0.4em;
+  color: var(--gold);
+  font-size: clamp(0.64rem, 1.7vw, 0.76rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.virtual-run .vr-home__countdown-sep {
+  flex: none;
+  align-self: center;
+  padding-bottom: 0.9rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: clamp(1.25rem, 3.4vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
 .virtual-run .vr-home__overview {
   padding-top: 3.5rem;
 }
@@ -466,14 +547,101 @@
 
   .virtual-run .vr-home .hero {
     --vr-home-stage-w: 100%;
+    background: #000;
   }
 
   .virtual-run .vr-home__stage {
+    left: 0;
+    right: 0;
     width: 100%;
   }
 
+  .virtual-run .vr-home__stage::before {
+    background: none;
+  }
+
   .virtual-run .vr-home .hero__shade {
-    background: linear-gradient(180deg, transparent 20%, #000 72%);
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 36%,
+        transparent 58%);
+  }
+
+  .virtual-run .vr-home .hero::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: auto 0 0;
+    height: 56%;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        transparent 14%,
+        rgba(0, 0, 0, 0.12) 24%,
+        rgba(0, 0, 0, 0.38) 34%,
+        rgba(0, 0, 0, 0.62) 44%,
+        rgba(0, 0, 0, 0.84) 52%,
+        #000 62%,
+        #000 100%);
+  }
+
+  .virtual-run .vr-home__banner {
+    height: 58%;
+    mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  }
+
+  .virtual-run .vr-home__banner::after {
+    opacity: 0.65;
+  }
+
+  .virtual-run .vr-home__banner-art {
+    object-position: 50% 14%;
+    transform: scale(1.08);
+    transform-origin: 50% 8%;
+  }
+
+  .virtual-run .vr-home__figure::before {
+    left: 50%;
+    bottom: 16%;
+    width: min(160vw, 38rem);
+    height: min(100vw, 26rem);
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse 100% 100% at 50% 50%,
+        #4ae892 0%,
+        #22a85c 12%,
+        #0d5a30 36%,
+        rgba(4, 32, 20, 0.5) 56%,
+        rgba(4, 32, 20, 0.2) 76%,
+        transparent 94%);
+    filter: blur(28px);
+  }
+
+  .virtual-run .vr-home__figure-art {
+    z-index: 1;
+  }
+
+  .virtual-run .vr-home__figure.is-in {
+    filter:
+      drop-shadow(0 0 3.25rem color-mix(in srgb, var(--marvel) 62%, transparent)) drop-shadow(0 0 6.5rem color-mix(in srgb, var(--marvel) 36%, transparent)) drop-shadow(0 0 11rem color-mix(in srgb, var(--marvel) 18%, transparent));
+  }
+
+  .virtual-run .vr-home__countdown {
+    width: 100%;
+    gap: 0.34rem;
+  }
+
+  .virtual-run .vr-home__countdown-value {
+    font-size: clamp(1.75rem, 7.8vw, 2.15rem);
+  }
+
+  .virtual-run .vr-home__countdown-label {
+    font-size: clamp(0.62rem, 2.8vw, 0.72rem);
+    letter-spacing: 0.12em;
+  }
+
+  .virtual-run .vr-home__countdown-sep {
+    padding-bottom: 0.82rem;
+    font-size: clamp(1.35rem, 5.6vw, 1.65rem);
   }
 
   .virtual-run .vr-home__figure {
