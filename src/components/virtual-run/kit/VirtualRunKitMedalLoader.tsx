@@ -58,8 +58,14 @@ function waitVideo(video: HTMLVideoElement) {
   });
 }
 
+function isKitLoadPreview() {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("kitLoadPreview") === "1";
+}
+
 export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef(false);
   const [phase, setPhase] = useState<"load" | "out" | "gone">("load");
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [clusterHold, setClusterHold] = useState(false);
@@ -70,6 +76,11 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
   }
 
   useEffect(() => {
+    previewRef.current = isKitLoadPreview();
+    if (previewRef.current) {
+      setClusterHold(true);
+      return;
+    }
     const hold = window.setTimeout(() => setClusterHold(true), 1080);
     return () => window.clearTimeout(hold);
   }, []);
@@ -77,6 +88,7 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
+    if (previewRef.current) return;
 
     let alive = true;
     let fade = 0;
@@ -133,8 +145,12 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
           aria-live="polite"
           aria-label="불러오는 중"
         >
-          <div className="vr-kit-load__stage" aria-hidden>
-            <div className={clusterHold ? "vr-kit-load__cluster is-hold" : "vr-kit-load__cluster"}>
+          <span className="vr-kit-load__flash" aria-hidden />
+          <div className="vr-kit-load__center">
+            <div
+              className={clusterHold ? "vr-kit-load__cluster is-hold" : "vr-kit-load__cluster"}
+              aria-hidden
+            >
               <span className="vr-kit-load__piece vr-kit-load__piece--avengers">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={VIRTUAL_RUN_ASSETS.combinedMedal.avengers} alt="" width={400} height={520} />
@@ -148,32 +164,33 @@ export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) 
                 <img src={VIRTUAL_RUN_ASSETS.combinedMedal.xMen} alt="" width={400} height={520} />
               </span>
             </div>
-            <span className="vr-kit-load__flash" />
+            <div className="vr-kit-load__brand">
+              <span className="vr-kit-load__logo">
+                <Image
+                  src={MAIN_ASSETS.introMarvel}
+                  alt=""
+                  width={219}
+                  height={99}
+                  className="media-load__box"
+                  priority
+                />
+                <Image
+                  src={MAIN_ASSETS.introRun}
+                  alt=""
+                  width={594}
+                  height={99}
+                  className="media-load__run"
+                  priority
+                />
+              </span>
+              <span className="vr-kit-load__bar" aria-hidden>
+                <span className="vr-kit-load__fill" style={{ width: `${pct}%` }} />
+              </span>
+              <span className="vr-kit-load__text" aria-hidden>
+                LOADING
+              </span>
+            </div>
           </div>
-          <span className="vr-kit-load__logo">
-            <Image
-              src={MAIN_ASSETS.introMarvel}
-              alt=""
-              width={219}
-              height={99}
-              className="media-load__box"
-              priority
-            />
-            <Image
-              src={MAIN_ASSETS.introRun}
-              alt=""
-              width={594}
-              height={99}
-              className="media-load__run"
-              priority
-            />
-          </span>
-          <span className="vr-kit-load__bar" aria-hidden>
-            <span className="vr-kit-load__fill" style={{ width: `${pct}%` }} />
-          </span>
-          <span className="vr-kit-load__text" aria-hidden>
-            LOADING
-          </span>
           <button type="button" className="vr-kit-load__skip" onClick={dismiss}>
             SKIP
           </button>
