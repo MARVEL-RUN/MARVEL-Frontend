@@ -9,6 +9,7 @@ import {
   type VirtualRunKitItemKind,
   type VirtualRunKitThemeId,
 } from "@/lib/virtual-run/kit";
+import { kitItemsInPageOrder } from "./kit-page-order";
 import { kitSectionId } from "./kit-section-id";
 import { VirtualRunKitManifestNav } from "./VirtualRunKitManifestNav";
 
@@ -103,6 +104,8 @@ export function VirtualRunKitGallery() {
     };
   }, [theme]);
 
+  const pageItems = useMemo(() => kitItemsInPageOrder(slots), [slots]);
+
   return (
     <div className="vr-kit">
       <div className="vr-kit__bar">
@@ -143,11 +146,11 @@ export function VirtualRunKitGallery() {
             </div>
           ) : null}
           <ul className="vr-kit__manifest vr-kit__manifest--desk" aria-label="키트 구성">
-            {theme.items.map((item) => (
+            {pageItems.map((item) => (
               <li key={item.kind}>{item.label}</li>
             ))}
           </ul>
-          <VirtualRunKitManifestNav key={themeId} items={theme.items} />
+          <VirtualRunKitManifestNav key={themeId} items={pageItems} />
           <p className="vr-kit__fine">회차·티켓에 따라 테마가 달라집니다.</p>
         </aside>
 

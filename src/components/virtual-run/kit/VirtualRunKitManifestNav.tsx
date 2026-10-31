@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import type { VirtualRunKitItem } from "@/lib/virtual-run/kit";
+import type { VirtualRunKitItem, VirtualRunKitItemKind } from "@/lib/virtual-run/kit";
 import { kitSectionId } from "./kit-section-id";
 
 function headerBottomPx() {
@@ -9,8 +9,23 @@ function headerBottomPx() {
   return bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom : 0;
 }
 
-function pinToKitSection(id: string, navEl: HTMLElement | null, smooth: boolean) {
-  const el = document.getElementById(id);
+function itemPinEl(item: VirtualRunKitItem): HTMLElement | null {
+  const root = document.getElementById(kitSectionId(item.kind));
+  if (!root) return null;
+  if (item.kind === "medal-back") {
+    const back = root.querySelectorAll(".vr-kit__shot")[1];
+    if (back instanceof HTMLElement) return back;
+  }
+  return root;
+}
+
+function itemRect(item: VirtualRunKitItem): DOMRect | null {
+  const el = itemPinEl(item);
+  return el ? el.getBoundingClientRect() : null;
+}
+
+function pinToItem(item: VirtualRunKitItem, navEl: HTMLElement | null, smooth: boolean) {
+  const el = itemPinEl(item);
   if (!el) return;
   const bar = document.querySelector(".site-header__bar");
   const headerH = bar instanceof HTMLElement ? bar.getBoundingClientRect().height : 0;
@@ -23,18 +38,15 @@ function pinToKitSection(id: string, navEl: HTMLElement | null, smooth: boolean)
   });
 }
 
-function resolveActiveSection(line: number) {
-  const anchors = document.querySelectorAll<HTMLElement>(".vr-kit .vr-kit__anchor[id]");
-  let current = "";
-  let bestTop = -Infinity;
-  for (const el of anchors) {
-    const top = el.getBoundingClientRect().top;
-    if (top <= line && top > bestTop) {
-      bestTop = top;
-      current = el.id;
-    }
+function resolveActiveKind(line: number, items: readonly VirtualRunKitItem[]) {
+  let kind: VirtualRunKitItemKind | "" = "";
+  for (const item of items) {
+    const rect = itemRect(item);
+    if (!rect) continue;
+    if (rect.top <= line) kind = item.kind;
+    else if (kind !== "") break;
   }
-  return current;
+  return kind || items[0]?.kind || "";
 }
 
 type Props = {
@@ -47,7 +59,7 @@ export function VirtualRunKitManifestNav({ items }: Props) {
   const trackRef = useRef<HTMLUListElement>(null);
   const jumping = useRef(false);
   const [stuck, setStuck] = useState(false);
-  const [active, setActive] = useState("");
+  const [activeKind, setActiveKind] = useState<VirtualRunKitItemKind | "">("");
 
   useEffect(() => {
     const sync = () => {
@@ -61,8 +73,8 @@ export function VirtualRunKitManifestNav({ items }: Props) {
       if (jumping.current) return;
 
       const line = headerBottom + nav.getBoundingClientRect().height + 4;
-      const current = resolveActiveSection(line);
-      setActive((prev) => (prev === current ? prev : current));
+      const current = resolveActiveKind(line, items);
+      setActiveKind((prev) => (prev === current ? prev : current));
     };
 
     sync();
@@ -75,25 +87,27 @@ export function VirtualRunKitManifestNav({ items }: Props) {
   }, [items]);
 
   useEffect(() => {
-    if (!active || !trackRef.current) return;
-    const link = trackRef.current.querySelector<HTMLAnchorElement>(`a[href="#${active}"]`);
+    if (!activeKind || !trackRef.current) return;
+    const link = trackRef.current.querySelector<HTMLAnchorElement>(
+      `a[data-kind="${activeKind}"]`,
+    );
     link?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [active]);
+  }, [activeKind]);
 
-  function go(event: MouseEvent<HTMLAnchorElement>, id: string) {
-    const target = document.getElementById(id);
+  function go(event: MouseEvent<HTMLAnchorElement>, item: VirtualRunKitItem) {
+    const target = itemPinEl(item);
     if (!target) return;
     event.preventDefault();
     jumping.current = true;
-    setActive(id);
-    pinToKitSection(id, navRef.current, true);
-    history.replaceState(null, "", `#${id}`);
+    setActiveKind(item.kind);
+    pinToItem(item, navRef.current, true);
+    history.replaceState(null, "", `#${kitSectionId(item.kind)}`);
     window.setTimeout(() => {
       jumping.current = false;
       const nav = navRef.current;
       if (!nav) return;
       const line = headerBottomPx() + nav.getBoundingClientRect().height + 4;
-      setActive(resolveActiveSection(line));
+      setActiveKind(resolveActiveKind(line, items));
     }, 1100);
   }
 
@@ -109,14 +123,15 @@ export function VirtualRunKitManifestNav({ items }: Props) {
         <ul className="vr-kit__manifest" ref={trackRef}>
           {items.map((item) => {
             const id = kitSectionId(item.kind);
-            const on = active === id;
+            const on = activeKind === item.kind;
             return (
               <li key={item.kind}>
                 <a
                   href={`#${id}`}
+                  data-kind={item.kind}
                   className={on ? "vr-kit__manifest-link is-on" : "vr-kit__manifest-link"}
                   aria-current={on ? "location" : undefined}
-                  onClick={(event) => go(event, id)}
+                  onClick={(event) => go(event, item)}
                 >
                   {item.label}
                 </a>
