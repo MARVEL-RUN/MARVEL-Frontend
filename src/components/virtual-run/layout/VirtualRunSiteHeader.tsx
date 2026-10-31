@@ -149,7 +149,9 @@ export function VirtualRunSiteHeader() {
           <VrLink href="/login" className="btn btn--ghost" onClick={() => setOpen(false)}>
             로그인
           </VrLink>
-          <VirtualRunTicketsCta onNavigate={() => setOpen(false)} />
+          <VrLink href="/tickets" className="btn btn--red" onClick={() => setOpen(false)}>
+            참가신청
+          </VrLink>
         </div>
       </div>
     </header>
