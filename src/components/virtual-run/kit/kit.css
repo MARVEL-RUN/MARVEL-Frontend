@@ -336,7 +336,13 @@
   letter-spacing: 0.03em;
 }
 
-.virtual-run .vr-kit-page .btn,
-.virtual-run .vr-kit-page .locked-cta {
+.virtual-run .vr-kit-page__cta {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.virtual-run .vr-kit-page__cta .locked-cta {
   margin-top: 0;
 }
