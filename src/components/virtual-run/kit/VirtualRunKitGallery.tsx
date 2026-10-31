@@ -9,6 +9,8 @@ import {
   type VirtualRunKitItemKind,
   type VirtualRunKitThemeId,
 } from "@/lib/virtual-run/kit";
+import { kitSectionId } from "./kit-section-id";
+import { VirtualRunKitManifestNav } from "./VirtualRunKitManifestNav";
 
 function shotVariant(item: VirtualRunKitItem): string {
   switch (item.layout) {
@@ -129,18 +131,23 @@ export function VirtualRunKitGallery() {
           {slots.packageFull || slots.carton ? (
             <div className="vr-kit__toc-visuals">
               {slots.packageFull ? (
-                <KitShot themeId={themeId} item={slots.packageFull} priority hideCaption />
+                <div id={kitSectionId("package-full")} className="vr-kit__anchor">
+                  <KitShot themeId={themeId} item={slots.packageFull} priority hideCaption />
+                </div>
               ) : null}
-              {slots.carton ? <KitShot themeId={themeId} item={slots.carton} hideCaption /> : null}
+              {slots.carton ? (
+                <div id={kitSectionId("carton-box")} className="vr-kit__anchor">
+                  <KitShot themeId={themeId} item={slots.carton} hideCaption />
+                </div>
+              ) : null}
             </div>
           ) : null}
-          <div className="vr-kit__manifest-track">
-            <ul className="vr-kit__manifest" aria-label="키트 구성">
-              {theme.items.map((item) => (
-                <li key={item.kind}>{item.label}</li>
-              ))}
-            </ul>
-          </div>
+          <ul className="vr-kit__manifest vr-kit__manifest--desk" aria-label="키트 구성">
+            {theme.items.map((item) => (
+              <li key={item.kind}>{item.label}</li>
+            ))}
+          </ul>
+          <VirtualRunKitManifestNav key={themeId} items={theme.items} />
           <p className="vr-kit__fine">회차·티켓에 따라 테마가 달라집니다.</p>
         </aside>
 
@@ -152,7 +159,10 @@ export function VirtualRunKitGallery() {
           <div className="vr-kit__board" aria-labelledby="vr-kit-goods-title">
             <div className="vr-kit__board-primary">
               {slots.medalFront && slots.medalBack ? (
-                <div className="vr-kit__board-medals">
+                <div
+                  id={kitSectionId("medal-front")}
+                  className="vr-kit__board-medals vr-kit__anchor"
+                >
                   <div className="vr-kit__medal-ribbons">
                     <KitShot themeId={themeId} item={slots.medalFront} />
                     <KitShot themeId={themeId} item={slots.medalBack} />
@@ -160,7 +170,10 @@ export function VirtualRunKitGallery() {
                 </div>
               ) : null}
               {slots.col1Tail ? (
-                <div className="vr-kit__board-slot vr-kit__board-slot--col-a">
+                <div
+                  id={kitSectionId(slots.col1Tail.kind)}
+                  className="vr-kit__board-slot vr-kit__board-slot--col-a vr-kit__anchor"
+                >
                   <KitShot themeId={themeId} item={slots.col1Tail} />
                 </div>
               ) : null}
@@ -168,14 +181,20 @@ export function VirtualRunKitGallery() {
             {slots.medalCase || slots.bib || slots.col2Foot ? (
               <div className="vr-kit__board-col-b">
                 {slots.medalCase ? (
-                  <div className="vr-kit__board-slot vr-kit__board-slot--head">
+                  <div
+                    id={kitSectionId("medal-case")}
+                    className="vr-kit__board-slot vr-kit__board-slot--head vr-kit__anchor"
+                  >
                     <KitShot themeId={themeId} item={slots.medalCase} />
                   </div>
                 ) : null}
                 {slots.bib ? (
                   <>
                     <div className="vr-kit__board-flex-gap" aria-hidden />
-                    <div className="vr-kit__board-slot vr-kit__board-slot--bib">
+                    <div
+                      id={kitSectionId("bib")}
+                      className="vr-kit__board-slot vr-kit__board-slot--bib vr-kit__anchor"
+                    >
                       <KitShot themeId={themeId} item={slots.bib} />
                     </div>
                     <div className="vr-kit__board-flex-gap" aria-hidden />
@@ -184,7 +203,10 @@ export function VirtualRunKitGallery() {
                   <div className="vr-kit__board-flex-gap" aria-hidden />
                 ) : null}
                 {slots.col2Foot ? (
-                  <div className="vr-kit__board-slot vr-kit__board-slot--foot">
+                  <div
+                    id={kitSectionId(slots.col2Foot.kind)}
+                    className="vr-kit__board-slot vr-kit__board-slot--foot vr-kit__anchor"
+                  >
                     <KitShot themeId={themeId} item={slots.col2Foot} />
                   </div>
                 ) : null}
@@ -193,7 +215,7 @@ export function VirtualRunKitGallery() {
           </div>
 
           {slots.finish ? (
-            <div className="vr-kit__finish">
+            <div id={kitSectionId("finish-line")} className="vr-kit__finish vr-kit__anchor">
               <KitShot themeId={themeId} item={slots.finish} />
             </div>
           ) : null}
