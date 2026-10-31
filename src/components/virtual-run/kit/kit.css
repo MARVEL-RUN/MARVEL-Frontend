@@ -346,3 +346,8 @@
 .virtual-run .vr-kit-page__cta .locked-cta {
   margin-top: 0;
 }
+
+.virtual-run .vr-kit-page__cta .locked-cta__img {
+  width: 8.75rem;
+  max-width: min(72vw, 280px);
+}
