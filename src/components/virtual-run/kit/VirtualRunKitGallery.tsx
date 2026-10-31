@@ -134,11 +134,13 @@ export function VirtualRunKitGallery() {
               {slots.carton ? <KitShot themeId={themeId} item={slots.carton} hideCaption /> : null}
             </div>
           ) : null}
-          <ul className="vr-kit__manifest" aria-label="키트 구성">
-            {theme.items.map((item) => (
-              <li key={item.kind}>{item.label}</li>
-            ))}
-          </ul>
+          <div className="vr-kit__manifest-track">
+            <ul className="vr-kit__manifest" aria-label="키트 구성">
+              {theme.items.map((item) => (
+                <li key={item.kind}>{item.label}</li>
+              ))}
+            </ul>
+          </div>
           <p className="vr-kit__fine">회차·티켓에 따라 테마가 달라집니다.</p>
         </aside>
 
