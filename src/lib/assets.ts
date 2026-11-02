@@ -18,7 +18,7 @@ export const MAIN_ASSETS = {
   sideBannerMobile: "/images/main/sidebanner-mobile.png",
   popupShuttleSurvey: "/images/main/popup/shuttle-survey-v3.jpg",
   popupExtraRegistration: "/images/main/popup/extra-registration-v3.jpg",
-  popupRecordInquiry: "/images/main/popup/record-inquiry.png",
+  popupRecordInquiry: "/images/main/popup/record-inquiry-v2.png",
   footerHost: "/images/main/footer/hosted.png",
   footerOrganizer: "/images/main/footer/organizer.png",
   footerMFriends: "/images/main/footer/m-friends.svg",
