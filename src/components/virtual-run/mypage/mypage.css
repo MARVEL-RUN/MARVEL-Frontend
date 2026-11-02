@@ -1,0 +1,253 @@
+.virtual-run .vr-mypage-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 35%, transparent);
+  background: color-mix(in srgb, var(--navy) 90%, #fff 10%);
+}
+
+.virtual-run .vr-mypage-hero__name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.virtual-run .vr-mypage-hero__bib {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--note);
+}
+
+.virtual-run .vr-mypage-hero__medal {
+  text-align: right;
+}
+
+.virtual-run .vr-mypage-hero__medal-count {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.virtual-run .vr-mypage-block {
+  padding: 1.15rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 32%, transparent);
+  background: color-mix(in srgb, var(--navy) 92%, #fff 8%);
+}
+
+.virtual-run .vr-mypage-block__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.virtual-run .vr-mypage-block__head h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.virtual-run .vr-mypage-block__meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  color: var(--note);
+}
+
+.virtual-run .vr-round-cards {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .virtual-run .vr-round-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.virtual-run .vr-round-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 28%, transparent);
+  background: color-mix(in srgb, var(--navy) 96%, #fff 4%);
+  border-top-width: 3px;
+}
+
+.virtual-run .vr-round-card--gold {
+  border-top-color: var(--gold);
+}
+
+.virtual-run .vr-round-card--red {
+  border-top-color: #e04b4b;
+}
+
+.virtual-run .vr-round-card--blue {
+  border-top-color: var(--cyan);
+}
+
+.virtual-run .vr-round-card__top span {
+  font-size: 0.72rem;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+}
+
+.virtual-run .vr-round-card__top strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.virtual-run .vr-round-card__state {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--marvel);
+}
+
+.virtual-run .vr-round-card__cta {
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.virtual-run .vr-reward-mini {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.virtual-run .vr-reward-mini li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.virtual-run .vr-reward-mini span {
+  color: var(--note);
+  font-size: 0.78rem;
+}
+
+.virtual-run .vr-reward-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.virtual-run .vr-reward-list__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 30%, transparent);
+  background: color-mix(in srgb, var(--navy) 92%, #fff 8%);
+}
+
+.virtual-run .vr-reward-list__status {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.virtual-run .vr-reward-list__status.is-sent {
+  color: var(--marvel);
+}
+
+.virtual-run .vr-reward-list__status.is-failed {
+  color: #e04b4b;
+}
+
+.virtual-run .vr-reward-list__status.is-queued {
+  color: var(--gold);
+}
+
+.virtual-run .vr-hashtag-copy {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.virtual-run .vr-hashtag-copy__text {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--note);
+  border: 1px dashed color-mix(in srgb, var(--rule) 40%, transparent);
+}
+
+.virtual-run .vr-hashtag-copy__btn {
+  justify-self: start;
+}
+
+.virtual-run .vr-cert-wizard__steps {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.virtual-run .vr-cert-wizard__steps li {
+  flex: 1;
+  text-align: center;
+  padding: 0.45rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  border: 1px solid color-mix(in srgb, var(--rule) 25%, transparent);
+}
+
+.virtual-run .vr-cert-wizard__steps li.is-current {
+  color: #fff;
+  border-color: var(--marvel);
+  background: color-mix(in srgb, var(--marvel) 35%, transparent);
+}
+
+.virtual-run .vr-cert-wizard__steps li.is-done {
+  color: var(--marvel);
+}
+
+.virtual-run .vr-cert-wizard__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.virtual-run .vr-cert-wizard__nav .btn--red:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.virtual-run .vr-session-bar__item--gold {
+  border-top: 3px solid var(--gold);
+}
+
+.virtual-run .vr-session-bar__item--red {
+  border-top: 3px solid #e04b4b;
+}
+
+.virtual-run .vr-session-bar__item--blue {
+  border-top: 3px solid var(--cyan);
+}
+
+.virtual-run .vr-session-bar__item.is-pending .vr-session-bar__state {
+  color: var(--gold);
+}
+
+.virtual-run .vr-session-bar__item.is-rejected .vr-session-bar__state {
+  color: #e04b4b;
+}

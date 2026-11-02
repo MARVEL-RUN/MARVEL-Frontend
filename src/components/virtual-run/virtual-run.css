@@ -1,4 +1,5 @@
 @import "./theme.css";
+@import "./mypage/mypage.css";
 
 .virtual-run.site {
   --vr-sec-pad: 2rem;
