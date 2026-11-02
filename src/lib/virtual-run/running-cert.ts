@@ -17,20 +17,6 @@ export const RUNNING_RECORD_TOOLS = [
 
 export type RunningRecordToolId = (typeof RUNNING_RECORD_TOOLS)[number]["id"];
 
-export type VirtualRunSessionRound = {
-  id: string;
-  label: string;
-  theme: string;
-  certified: boolean;
-};
-
-/** API 연동 전 — 미인증 회차만 셀렉트에 노출 */
-export const DEMO_SESSION_ROUNDS: VirtualRunSessionRound[] = [
-  { id: "1", label: "1회차", theme: "어벤저스", certified: true },
-  { id: "2", label: "2회차", theme: "엑스맨", certified: false },
-  { id: "3", label: "3회차", theme: "판타스틱4", certified: false },
-];
-
 const INSTAGRAM_PATH = /^https?:\/\/(www\.)?instagram\.com\/(p|reel)\/[\w-]+\/?(\?.*)?$/i;
 
 export function parseDurationParts(h: string, m: string, s: string): number | null {

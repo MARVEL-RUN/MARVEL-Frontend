@@ -41,6 +41,13 @@ export const VIRTUAL_RUN_TIMELINE: VirtualRunTimelineRow[] = [
     note: "",
   },
   {
+    from: "11/27",
+    to: "",
+    rt: "–",
+    program: "인증 가이드 · 마이페이지 인증 기능",
+    note: "키트 배송 전",
+  },
+  {
     from: "11/30",
     to: "",
     rt: "–",
