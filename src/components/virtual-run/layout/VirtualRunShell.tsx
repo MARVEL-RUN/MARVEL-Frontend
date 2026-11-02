@@ -5,6 +5,7 @@ import { CinematicFX } from "../../main/fx/CinematicFX";
 import { MainToastHost } from "../../main/feedback/MainFeedback";
 import { KeyboardInset } from "../../main/layout/KeyboardInset";
 import { LegalModalProvider } from "../../main/legal/LegalModal";
+import { VirtualRunParticipantProvider } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
 import "../virtual-run.css";
@@ -17,14 +18,16 @@ export function VirtualRunShell({ children }: { children: React.ReactNode }) {
 
   return (
     <LegalModalProvider>
-      <div className="virtual-run site">
-        <CinematicFX />
-        <KeyboardInset />
-        <VirtualRunSiteHeader />
-        {children}
-        <VirtualRunFooter />
-        <MainToastHost />
-      </div>
+      <VirtualRunParticipantProvider>
+        <div className="virtual-run site">
+          <CinematicFX />
+          <KeyboardInset />
+          <VirtualRunSiteHeader />
+          {children}
+          <VirtualRunFooter />
+          <MainToastHost />
+        </div>
+      </VirtualRunParticipantProvider>
     </LegalModalProvider>
   );
 }
