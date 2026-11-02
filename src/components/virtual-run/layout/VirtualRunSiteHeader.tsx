@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { isVirtualRunHomePath, vrPath } from "@/lib/virtual-run/href";
-import { VIRTUAL_RUN_NAV } from "@/lib/virtual-run/nav";
+import { visibleVirtualRunNav } from "@/lib/virtual-run/nav-visible";
+import { virtualRunOpenFlags } from "@/lib/virtual-run/open-schedule";
+import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
 import { MOBILE_MQ } from "@/lib/viewport";
 import { VirtualRunTicketsCta } from "./VirtualRunTicketsCta";
 import { VrLink } from "./VrLink";
@@ -22,6 +24,8 @@ export function VirtualRunSiteHeader() {
   const pathname = usePathname();
   const prefixed = pathname.startsWith("/virtual-run");
   const home = isVirtualRunHomePath(pathname);
+  const navItems = visibleVirtualRunNav(virtualRunOpenFlags());
+  const { isLoggedIn } = useVirtualRunParticipant();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileHomeSolid, setMobileHomeSolid] = useState(false);
@@ -86,7 +90,7 @@ export function VirtualRunSiteHeader() {
         </VrLink>
 
         <nav className="site-header__nav" aria-label="버추얼런 메뉴">
-          {VIRTUAL_RUN_NAV.map((item) => (
+          {navItems.map((item) => (
             <VrLink
               key={item.href}
               href={item.href}
@@ -103,9 +107,15 @@ export function VirtualRunSiteHeader() {
 
         <div className="site-header__tools">
           <div className="site-header__actions">
-            <VrLink href="/login" className="btn btn--ghost site-header__cta">
-              <span>로그인</span>
-            </VrLink>
+            {isLoggedIn ? (
+              <VrLink href="/mypage" className="btn btn--ghost site-header__cta">
+                <span>마이페이지</span>
+              </VrLink>
+            ) : (
+              <VrLink href="/login" className="btn btn--ghost site-header__cta">
+                <span>로그인</span>
+              </VrLink>
+            )}
             <VirtualRunTicketsCta compact className="site-header__cta" />
           </div>
 
@@ -130,7 +140,7 @@ export function VirtualRunSiteHeader() {
         hidden={!open}
       >
         <nav className="site-header__drawer-nav" aria-label="버추얼런 모바일 메뉴">
-          {VIRTUAL_RUN_NAV.map((item) => (
+          {navItems.map((item) => (
             <VrLink
               key={item.href}
               href={item.href}
