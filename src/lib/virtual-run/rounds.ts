@@ -12,18 +12,20 @@ export type VirtualRunRound = {
   order: number;
   label: string;
   theme: string;
+  code: string;
   /** §9-3 회차 카드 색 */
   accent: "gold" | "red" | "blue";
 };
 
 export const VIRTUAL_RUN_ROUNDS: VirtualRunRound[] = [
-  { id: "avengers", order: 1, label: "1회차", theme: "어벤져스", accent: "gold" },
-  { id: "x-men", order: 2, label: "2회차", theme: "엑스맨", accent: "red" },
+  { id: "avengers", order: 1, label: "1회차", theme: "어벤져스", code: "AVENGERS", accent: "gold" },
+  { id: "x-men", order: 2, label: "2회차", theme: "엑스맨", code: "X-MEN", accent: "red" },
   {
     id: "fantastic-four",
     order: 3,
     label: "3회차",
     theme: "판타스틱4",
+    code: "FANTASTIC 4",
     accent: "blue",
   },
 ];

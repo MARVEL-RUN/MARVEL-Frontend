@@ -6,11 +6,12 @@ import { demoInstantApproveRunning } from "@/lib/virtual-run/cert-demo";
 import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
 import { roundStatusForParticipant } from "@/lib/virtual-run/participant";
 import type { VirtualRunRoundId } from "@/lib/virtual-run/rounds";
-import { VIRTUAL_RUN_ROUNDS } from "@/lib/virtual-run/rounds";
+import { VIRTUAL_RUN_ROUNDS, virtualRunRoundById } from "@/lib/virtual-run/rounds";
 import {
   RUNNING_CERT_HASHTAGS,
   RUNNING_CERT_MIN_KM,
   RUNNING_CERT_PERIOD,
+  RUNNING_CERT_PERIOD_LABEL,
   RUNNING_RECORD_TOOLS,
   formatPaceMinPerKm,
   isInstagramPostUrl,
@@ -20,13 +21,26 @@ import {
   runningCertDateMax,
   type RunningRecordToolId,
 } from "@/lib/virtual-run/running-cert";
+import { VrLink } from "../../layout/VrLink";
 import { useVirtualRunParticipantOrDemo } from "../../participant/VirtualRunParticipantProvider";
 import { CertSubmitResult } from "../CertSubmitResult";
 import { HashtagCopy } from "../HashtagCopy";
-import { VrFileField } from "./VrFileField";
+import { VrFileField } from "../VrFileField";
+import { VrSteps } from "../VrSteps";
 
 type FieldErrors = Partial<Record<string, string>>;
 type Step = 1 | 2 | 3;
+
+const STEP_LABELS = ["러닝 기록", "증빙 사진", "인스타 인증"] as const;
+
+function Err({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return (
+    <p className="form-row__hint is-err" role="alert">
+      {msg}
+    </p>
+  );
+}
 
 export function RunningCertForm() {
   const { participant, update } = useVirtualRunParticipantOrDemo();
@@ -39,7 +53,7 @@ export function RunningCertForm() {
 
   const dateMax = runningCertDateMax();
   const [step, setStep] = useState<Step>(1);
-  const [roundId, setRoundId] = useState<VirtualRunRoundId>(openRounds[0]?.id ?? "x-men");
+  const [roundId, setRoundId] = useState<VirtualRunRoundId | "">(openRounds[0]?.id ?? "");
   const [runDate, setRunDate] = useState("");
   const [distance, setDistance] = useState("");
   const [durH, setDurH] = useState("0");
@@ -50,153 +64,185 @@ export function RunningCertForm() {
   const [promoOk, setPromoOk] = useState(false);
   const [pledgeOk, setPledgeOk] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [submitMode, setSubmitMode] = useState<"approved" | "pending" | null>(null);
+  const [result, setResult] = useState<{
+    mode: "approved" | "pending";
+    rows: { label: string; value: string }[];
+  } | null>(null);
 
-  const totalSeconds = useMemo(
-    () => parseDurationParts(durH, durM, durS),
-    [durH, durM, durS],
-  );
+  const activeRound = openRounds.some((r) => r.id === roundId) ? roundId : (openRounds[0]?.id ?? "");
+  const rejected = activeRound ? participant.rounds[activeRound] : undefined;
+
+  const totalSeconds = useMemo(() => parseDurationParts(durH, durM, durS), [durH, durM, durS]);
   const distanceKm = useMemo(() => parseDistanceKm(distance), [distance]);
   const pace = useMemo(() => {
     if (totalSeconds == null || distanceKm == null) return null;
     return formatPaceMinPerKm(totalSeconds, distanceKm);
   }, [totalSeconds, distanceKm]);
 
-  const step1Ok = useMemo(() => {
-    if (!roundId || !openRounds.some((r) => r.id === roundId)) return false;
-    if (!runDate || !isWithinCertPeriod(runDate)) return false;
-    const km = parseDistanceKm(distance);
-    if (km == null || km < RUNNING_CERT_MIN_KM) return false;
-    if (totalSeconds == null) return false;
-    if (!tool) return false;
-    return true;
-  }, [roundId, openRounds, runDate, distance, totalSeconds, tool]);
+  const step1Ok =
+    Boolean(activeRound) &&
+    Boolean(runDate) &&
+    isWithinCertPeriod(runDate) &&
+    distanceKm != null &&
+    distanceKm >= RUNNING_CERT_MIN_KM &&
+    totalSeconds != null &&
+    Boolean(tool);
 
   function validateRecord(): FieldErrors {
     const next: FieldErrors = {};
-    if (!roundId) next.roundId = "인증 가능한 회차가 없습니다.";
     if (!runDate) next.runDate = "달린 날짜를 선택해 주세요.";
     else if (!isWithinCertPeriod(runDate)) {
-      next.runDate = `인증 기간(${RUNNING_CERT_PERIOD.start} ~ ${RUNNING_CERT_PERIOD.end}) 내 날짜만 가능합니다.`;
+      next.runDate = `${RUNNING_CERT_PERIOD_LABEL} 사이 날짜만 선택할 수 있습니다.`;
     }
-    const km = parseDistanceKm(distance);
-    if (km == null) next.distance = "거리를 입력해 주세요.";
-    else if (km < RUNNING_CERT_MIN_KM) {
-      next.distance = `최소 ${RUNNING_CERT_MIN_KM.toFixed(2)}km 이상이어야 합니다.`;
+    if (distanceKm == null) next.distance = "거리를 입력해 주세요.";
+    else if (distanceKm < RUNNING_CERT_MIN_KM) {
+      next.distance = `${RUNNING_CERT_MIN_KM.toFixed(2)}km 이상부터 인증할 수 있습니다.`;
     }
     if (totalSeconds == null) next.duration = "기록 시간을 입력해 주세요.";
     if (!tool) next.tool = "기록 도구를 선택해 주세요.";
     return next;
   }
 
-  function validatePhotos(fd: FormData): FieldErrors {
-    const next: FieldErrors = {};
-    if (!fd.get("recordShot")) next.recordShot = "기록 스크린샷을 첨부해 주세요.";
-    return next;
-  }
-
-  function validateInsta(fd: FormData): FieldErrors {
-    const next: FieldErrors = {};
-    if (!fd.get("instaShot")) next.instaShot = "인스타 게시물 스크린샷을 첨부해 주세요.";
-    if (!instaUrl.trim()) next.instaUrl = "인스타 게시물 링크를 입력해 주세요.";
-    else if (!isInstagramPostUrl(instaUrl)) {
-      next.instaUrl = "instagram.com/p/ 또는 /reel/ 형식의 URL이어야 합니다.";
-    }
-    if (!pledgeOk) next.pledge = "허위 제출 서약에 동의해 주세요.";
-    return next;
-  }
-
-  function goStep2() {
-    const next = validateRecord();
+  function move(to: Step, check?: () => FieldErrors) {
+    const next = check?.() ?? {};
     setErrors(next);
-    if (Object.keys(next).length === 0) setStep(2);
+    if (Object.keys(next).length > 0) return;
+    setStep(to);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function goStep3() {
-    const form = formRef.current;
-    if (!form) return;
-    const next = validatePhotos(new FormData(form));
-    setErrors(next);
-    if (Object.keys(next).length === 0) setStep(3);
+  function validatePhotos(): FieldErrors {
+    const fd = new FormData(formRef.current!);
+    const file = fd.get("recordShot");
+    return file instanceof File && file.size > 0 ? {} : { recordShot: "기록 스크린샷을 첨부해 주세요." };
   }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!activeRound) return;
     const fd = new FormData(e.currentTarget);
-    const next = validateInsta(fd);
+    const next: FieldErrors = {};
+    const shot = fd.get("instaShot");
+    if (!(shot instanceof File && shot.size > 0)) next.instaShot = "게시물 스크린샷을 첨부해 주세요.";
+    if (!instaUrl.trim()) next.instaUrl = "게시물 링크를 입력해 주세요.";
+    else if (!isInstagramPostUrl(instaUrl)) {
+      next.instaUrl = "instagram.com/p/ 또는 /reel/ 로 시작하는 주소를 넣어 주세요.";
+    }
+    if (!pledgeOk) next.pledge = "허위 제출 서약에 동의해 주세요.";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    const km = parseDistanceKm(distance)!;
     const summary = {
       runDate,
-      distanceKm: km,
-      durationLabel: `${durH}:${durM.padStart(2, "0")}:${String(durS).padStart(2, "0")}`,
+      distanceKm: distanceKm!,
+      durationLabel: `${Number(durH) || 0}:${durM.padStart(2, "0")}:${(durS || "0").padStart(2, "0")}`,
       paceLabel: pace,
     };
+    const round = virtualRunRoundById(activeRound);
+    const rows = [
+      { label: "회차", value: `${round.label} · ${round.theme}` },
+      { label: "달린 날짜", value: summary.runDate },
+      { label: "거리", value: `${summary.distanceKm.toFixed(2)}km` },
+      { label: "기록", value: summary.durationLabel },
+      ...(pace ? [{ label: "평균 페이스", value: pace }] : []),
+    ];
     if (virtualRunDemoEnabled) {
-      update(demoInstantApproveRunning(participant, roundId, summary));
-      setSubmitMode("approved");
+      update(demoInstantApproveRunning(participant, activeRound, summary));
+      setResult({ mode: "approved", rows });
     } else {
-      setSubmitMode("pending");
+      const prev = participant.rounds[activeRound];
+      update({
+        ...participant,
+        rounds: {
+          ...participant.rounds,
+          [activeRound]: {
+            status: "pending",
+            resubmitCount: (prev?.resubmitCount ?? 0) + (prev?.status === "rejected" ? 1 : 0),
+            summary,
+          },
+        },
+      });
+      setResult({ mode: "pending", rows });
     }
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (openRounds.length === 0) {
-    return (
-      <article className="vr-panel vr-cert-empty">
-        <p>인증 가능한 회차가 없습니다. 티켓 구매·승인 상태를 확인해 주세요.</p>
-      </article>
-    );
+  function reset() {
+    setResult(null);
+    setStep(1);
+    setRoundId("");
+    setRunDate("");
+    setDistance("");
+    setDurH("0");
+    setDurM("");
+    setDurS("");
+    setTool("");
+    setInstaUrl("");
+    setPromoOk(false);
+    setPledgeOk(false);
+    setErrors({});
   }
 
-  if (submitMode) {
+  if (result) {
     return (
       <CertSubmitResult
-        mode={submitMode}
-        onAgain={() => {
-          setSubmitMode(null);
-          setStep(1);
-          setInstaUrl("");
-          setPledgeOk(false);
-        }}
-        againLabel="다른 회차 인증하기"
+        mode={result.mode}
+        subject="러닝 인증"
+        rows={result.rows}
+        approvedNote="완주 기프티콘을 등록된 휴대폰 번호로 보냈습니다."
+        onAgain={openRounds.length > 0 ? reset : undefined}
+        againLabel="다른 회차 인증"
       />
     );
   }
 
-  return (
-    <form ref={formRef} className="form vr-cert-form vr-cert-wizard" onSubmit={onSubmit} noValidate>
-      <ol className="vr-cert-wizard__steps" aria-label="러닝 인증 단계">
-        {[1, 2, 3].map((n) => (
-          <li key={n} className={step === n ? "is-current" : step > n ? "is-done" : ""}>
-            {n}단계
-          </li>
-        ))}
-      </ol>
+  if (openRounds.length === 0) {
+    const owned = participant.ownedRoundIds.length > 0;
+    return (
+      <section className="block wait">
+        <span className="kicker">{owned ? "ALL SUBMITTED" : "NO TICKET"}</span>
+        <h2>{owned ? "모든 회차를 제출했습니다" : "인증할 회차가 없습니다"}</h2>
+        <p className="sec__body">
+          {owned
+            ? "검수 중인 회차는 결과가 나오면 문자로 알려 드립니다."
+            : "티켓을 구매하면 해당 회차의 러닝 인증을 할 수 있습니다."}
+        </p>
+        <div className="flow__nav">
+          <VrLink href={owned ? "/mypage" : "/tickets"} className="btn btn--red">
+            {owned ? "마이페이지" : "티켓 구매"}
+          </VrLink>
+        </div>
+      </section>
+    );
+  }
 
-      {step === 1 ? (
-        <FormSec kicker="01 / RUN" title="러닝 기록" note="회차당 1회만 승인됩니다.">
+  return (
+    <form ref={formRef} className="form vr-cert-form" onSubmit={onSubmit} noValidate>
+      <VrSteps labels={STEP_LABELS} current={step} />
+
+      <div hidden={step !== 1}>
+        <FormSec kicker="01 / RUN" title="러닝 기록" note="기록 화면에 보이는 값 그대로 입력해 주세요.">
           <FormRow label="회차" required>
-            <select
-              name="roundId"
-              value={roundId}
-              onChange={(e) => setRoundId(e.target.value as VirtualRunRoundId)}
-              aria-invalid={Boolean(errors.roundId)}
-            >
+            <div className="seg vr-round-seg" role="radiogroup" aria-label="회차">
               {openRounds.map((r) => (
-                <option key={r.id} value={r.id}>
+                <button
+                  key={r.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={activeRound === r.id}
+                  className={`is-${r.accent}${activeRound === r.id ? " is-on" : ""}`}
+                  onClick={() => setRoundId(r.id)}
+                >
                   {r.label} · {r.theme}
-                </option>
+                </button>
               ))}
-            </select>
-            {errors.roundId ? (
-              <p className="form-row__hint is-err" role="alert">
-                {errors.roundId}
+            </div>
+            {rejected?.status === "rejected" ? (
+              <p className="form-row__hint is-err">
+                반려{rejected.rejectReason ? ` · ${rejected.rejectReason}` : ""} (재제출 {rejected.resubmitCount}/2)
               </p>
             ) : (
-              <p className="form-row__hint">구매·미인증 회차만 표시됩니다.</p>
+              <p className="form-row__hint">구매한 회차 중 아직 인증하지 않은 회차만 보입니다.</p>
             )}
           </FormRow>
 
@@ -211,214 +257,159 @@ export function RunningCertForm() {
               aria-invalid={Boolean(errors.runDate)}
             />
             {errors.runDate ? (
-              <p className="form-row__hint is-err" role="alert">
-                {errors.runDate}
-              </p>
+              <Err msg={errors.runDate} />
             ) : (
-              <p className="form-row__hint">미래 날짜는 선택할 수 없습니다.</p>
+              <p className="form-row__hint">{RUNNING_CERT_PERIOD_LABEL} · 오늘 이후 날짜는 선택할 수 없습니다.</p>
             )}
           </FormRow>
 
-          <div className="vr-cert-form__grid">
-            <FormRow label="거리 (km)" required>
+          <FormRow label="거리" required>
+            <div className="vr-unit">
               <input
-                type="number"
+                type="text"
                 name="distance"
                 inputMode="decimal"
-                step="0.01"
-                min={RUNNING_CERT_MIN_KM}
                 placeholder="5.00"
                 value={distance}
-                onChange={(e) => setDistance(e.target.value)}
+                onChange={(e) => setDistance(e.target.value.replace(/[^\d.,]/g, ""))}
                 aria-invalid={Boolean(errors.distance)}
               />
-              {errors.distance ? (
-                <p className="form-row__hint is-err" role="alert">
-                  {errors.distance}
-                </p>
-              ) : null}
-            </FormRow>
-
-            <FormRow label="기록 시간" required>
-              <div className="vr-cert-form__duration">
-                <label className="vr-cert-form__dur-part">
-                  <span className="vr-form-note">시</span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    max={23}
-                    value={durH}
-                    onChange={(e) => setDurH(e.target.value)}
-                    aria-label="시"
-                  />
-                </label>
-                <span className="vr-cert-form__dur-sep">:</span>
-                <label className="vr-cert-form__dur-part">
-                  <span className="vr-form-note">분</span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    max={59}
-                    value={durM}
-                    onChange={(e) => setDurM(e.target.value)}
-                    aria-label="분"
-                    required
-                  />
-                </label>
-                <span className="vr-cert-form__dur-sep">:</span>
-                <label className="vr-cert-form__dur-part">
-                  <span className="vr-form-note">초</span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    max={59}
-                    value={durS}
-                    onChange={(e) => setDurS(e.target.value)}
-                    aria-label="초"
-                  />
-                </label>
-              </div>
-              {errors.duration ? (
-                <p className="form-row__hint is-err" role="alert">
-                  {errors.duration}
-                </p>
-              ) : null}
-              {pace ? (
-                <p className="form-row__hint is-ok">평균 페이스 {pace}</p>
-              ) : (
-                <p className="form-row__hint">거리·시간 입력 시 페이스가 계산됩니다.</p>
-              )}
-            </FormRow>
-          </div>
-
-          <FormRow label="기록 도구" required>
-            <div className="vr-recording-tools" role="radiogroup" aria-label="기록 도구">
-              {RUNNING_RECORD_TOOLS.map((item) => (
-                <label key={item.id} className="vr-recording-tools__item">
-                  <input
-                    type="radio"
-                    name="recordTool"
-                    value={item.id}
-                    checked={tool === item.id}
-                    onChange={() => setTool(item.id)}
-                  />
-                  <span>{item.label}</span>
-                </label>
-              ))}
+              <span>km</span>
             </div>
-            {errors.tool ? (
-              <p className="form-row__hint is-err" role="alert">
-                {errors.tool}
-              </p>
-            ) : null}
+            <Err msg={errors.distance} />
           </FormRow>
 
-          <div className="vr-cert-wizard__nav">
-            <button type="button" className="btn btn--red" disabled={!step1Ok} onClick={goStep2}>
-              다음
-            </button>
-            {!step1Ok ? (
-              <p className="vr-form-note">5km 이상·필수 항목을 입력하면 다음 단계로 이동할 수 있습니다.</p>
-            ) : null}
-          </div>
-        </FormSec>
-      ) : null}
+          <FormRow label="기록 시간" required>
+            <div className="vr-duration">
+              {(
+                [
+                  ["시", durH, setDurH, 2],
+                  ["분", durM, setDurM, 2],
+                  ["초", durS, setDurS, 2],
+                ] as const
+              ).map(([unit, value, set, max], i) => (
+                <span key={unit} className="vr-duration__part">
+                  {i > 0 ? <span className="vr-duration__sep">:</span> : null}
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={max}
+                    placeholder="00"
+                    value={value}
+                    onChange={(e) => set(e.target.value.replace(/\D/g, ""))}
+                    aria-label={unit}
+                  />
+                  <small>{unit}</small>
+                </span>
+              ))}
+            </div>
+            {errors.duration ? (
+              <Err msg={errors.duration} />
+            ) : pace ? (
+              <p className="form-row__hint is-ok">평균 페이스 {pace}</p>
+            ) : (
+              <p className="form-row__hint">거리와 시간을 넣으면 페이스가 계산됩니다.</p>
+            )}
+          </FormRow>
 
-      {step === 2 ? (
+          <FormRow label="기록 도구" required>
+            <div className="seg" role="radiogroup" aria-label="기록 도구">
+              {RUNNING_RECORD_TOOLS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={tool === item.id}
+                  className={tool === item.id ? "is-on" : undefined}
+                  onClick={() => setTool(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <Err msg={errors.tool} />
+          </FormRow>
+        </FormSec>
+
+        <div className="flow__nav">
+          <button type="button" className="btn btn--red" disabled={!step1Ok} onClick={() => move(2, validateRecord)}>
+            다음
+          </button>
+          {!step1Ok ? (
+            <p className="flow__err form__note">{RUNNING_CERT_MIN_KM}km 이상 기록과 필수 항목을 모두 입력해 주세요.</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div hidden={step !== 2}>
         <FormSec kicker="02 / PROOF" title="증빙 사진">
-          <p className="form-sec__note">거리·시간·날짜가 한 화면에 보이나요?</p>
           <VrFileField
             name="recordShot"
             label="기록 스크린샷"
             required
-            hint="거리·시간·날짜가 한 화면에 보여야 합니다."
+            hint="거리·시간·날짜가 한 화면에 보여야 합니다. 트레드밀은 계기판 사진."
             error={errors.recordShot}
           />
+          <VrFileField name="proofShot" label="인증샷" hint="배번호나 피니시 라인이 보이면 좋습니다." />
+        </FormSec>
+        <div className="flow__nav">
+          <button type="button" className="btn btn--ghost" onClick={() => move(1)}>
+            이전
+          </button>
+          <button type="button" className="btn btn--red" onClick={() => move(3, validatePhotos)}>
+            다음
+          </button>
+        </div>
+      </div>
+
+      <div hidden={step !== 3}>
+        <FormSec kicker="03 / INSTAGRAM" title="인스타 인증" note="기록 화면과 인증샷을 아래 해시태그와 함께 게시해 주세요.">
+          <HashtagCopy tags={RUNNING_CERT_HASHTAGS} />
           <VrFileField
-            name="proofShot"
-            label="인증샷"
-            hint="배번호·피니시라인 등 (선택)"
+            name="instaShot"
+            label="게시물 스크린샷"
+            required
+            hint="해시태그가 보이는 화면"
+            error={errors.instaShot}
           />
-          <div className="vr-cert-wizard__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(1)}>
-              이전
-            </button>
-            <button type="button" className="btn btn--red" onClick={goStep3}>
-              다음
-            </button>
+          <FormRow label="게시물 링크" required>
+            <input
+              type="text"
+              inputMode="url"
+              name="instaUrl"
+              className="is-wide"
+              placeholder="https://www.instagram.com/p/..."
+              value={instaUrl}
+              onChange={(e) => setInstaUrl(e.target.value)}
+              aria-invalid={Boolean(errors.instaUrl)}
+            />
+            <Err msg={errors.instaUrl} />
+          </FormRow>
+          <div className="vr-agree">
+            <label className="guardian-consent-check">
+              <input type="checkbox" checked={pledgeOk} onChange={(e) => setPledgeOk(e.target.checked)} />
+              <span className="guardian-consent-check__label">
+                <em>[필수]</em> 허위 제출이 확인되면 리워드 회수에 동의합니다.
+              </span>
+            </label>
+            <label className="guardian-consent-check">
+              <input type="checkbox" checked={promoOk} onChange={(e) => setPromoOk(e.target.checked)} />
+              <span className="guardian-consent-check__label">
+                <em className="is-opt">[선택]</em> 공식 채널 리그램 등 홍보 활용에 동의합니다.
+              </span>
+            </label>
+            <Err msg={errors.pledge} />
           </div>
         </FormSec>
-      ) : null}
-
-      {step === 3 ? (
-        <>
-          <FormSec kicker="03 / SNS" title="인스타그램">
-            <HashtagCopy text={RUNNING_CERT_HASHTAGS} />
-            <VrFileField
-              name="instaShot"
-              label="인스타 게시물 스크린샷"
-              required
-              hint="필수 해시태그가 보이는 화면"
-              error={errors.instaShot}
-            />
-            <FormRow label="인스타 게시물 링크" required>
-              <input
-                type="url"
-                name="instaUrl"
-                className="is-wide"
-                placeholder="https://www.instagram.com/p/…"
-                value={instaUrl}
-                onChange={(e) => setInstaUrl(e.target.value)}
-                aria-invalid={Boolean(errors.instaUrl)}
-              />
-              {errors.instaUrl ? (
-                <p className="form-row__hint is-err" role="alert">
-                  {errors.instaUrl}
-                </p>
-              ) : null}
-            </FormRow>
-          </FormSec>
-
-          <FormSec kicker="04 / AGREE" title="동의">
-            <label className="vr-cert-check">
-              <input
-                type="checkbox"
-                name="promoOk"
-                checked={promoOk}
-                onChange={(e) => setPromoOk(e.target.checked)}
-              />
-              <span>홍보 활용 동의 (선택)</span>
-            </label>
-            <label className="vr-cert-check">
-              <input
-                type="checkbox"
-                name="pledgeOk"
-                checked={pledgeOk}
-                onChange={(e) => setPledgeOk(e.target.checked)}
-                aria-invalid={Boolean(errors.pledge)}
-              />
-              <span>허위 제출 서약 (필수)</span>
-            </label>
-            {errors.pledge ? (
-              <p className="form-row__hint is-err" role="alert">
-                {errors.pledge}
-              </p>
-            ) : null}
-          </FormSec>
-
-          <div className="vr-cert-wizard__nav">
-            <button type="button" className="btn btn--ghost" onClick={() => setStep(2)}>
-              이전
-            </button>
-            <button type="submit" className="btn btn--red">
-              러닝 인증 제출
-            </button>
-          </div>
-        </>
-      ) : null}
+        <div className="flow__nav">
+          <button type="button" className="btn btn--ghost" onClick={() => move(2)}>
+            이전
+          </button>
+          <button type="submit" className="btn btn--red">
+            제출하기
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

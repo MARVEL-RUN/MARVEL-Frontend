@@ -5,8 +5,6 @@
   --vr-sec-pad: 2rem;
   --vr-sec-pad-tight: 1.5rem;
   --vr-block-gap: 1.25rem;
-  --vr-form-gap: 1.1rem;
-  --vr-field-gap: 0.55rem;
   display: flex;
   flex-direction: column;
   min-height: 100svh;
@@ -45,8 +43,43 @@
   margin-bottom: 1rem;
 }
 
+.virtual-run .page > .guide-sec:last-child {
+  padding-bottom: 4.5rem;
+}
+
 .virtual-run .page__body {
+  padding: 2.5rem 0 5rem;
+}
+
+.virtual-run .vr-stack {
+  display: grid;
+  gap: 2.75rem;
+  min-width: 0;
+}
+
+.virtual-run .vr-stack > .block + .block {
+  margin-top: 0;
+}
+
+.virtual-run .vr-login {
+  max-width: 30rem;
+  margin-inline: auto;
+}
+
+.virtual-run .vr-login .flow__nav .btn {
+  flex: 1 1 100%;
+}
+
+.virtual-run .vr-text-btn {
   padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gold);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  cursor: pointer;
 }
 
 .virtual-run .vr-page-inner {
@@ -56,19 +89,9 @@
   padding-bottom: 2.5rem;
 }
 
-.virtual-run .vr-page-inner--auth {
-  max-width: 26rem;
-  margin-inline: auto;
-  width: 100%;
-}
-
 .virtual-run .vr-grid-2 {
   display: grid;
   gap: 1rem;
-}
-
-.virtual-run .vr-stack-top {
-  margin-top: var(--vr-block-gap);
 }
 
 .virtual-run .vr-stack-sm {
@@ -80,24 +103,6 @@
   color: var(--note);
   font-size: 0.92rem;
   line-height: 1.55;
-}
-
-.virtual-run .inquiry-secret__form--stack {
-  gap: var(--vr-form-gap);
-}
-
-.virtual-run .inquiry-secret__field {
-  gap: var(--vr-field-gap);
-}
-
-.virtual-run .inquiry-secret__form--stack > .btn {
-  margin-top: 0.25rem;
-  width: 100%;
-}
-
-.virtual-run .inquiry-secret__control {
-  min-height: 3.15rem;
-  padding: 0 0.5rem 0 1rem;
 }
 
 .virtual-run .vr-panel {
@@ -123,37 +128,6 @@
   margin-bottom: 0;
 }
 
-.virtual-run .vr-mypage-nav {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.virtual-run .vr-mypage-card {
-  display: block;
-  padding: 1rem 1.1rem;
-  border: 1px solid color-mix(in srgb, var(--rule) 35%, transparent);
-  background: color-mix(in srgb, var(--navy) 92%, #fff 8%);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.virtual-run .vr-mypage-card:hover {
-  border-color: var(--marvel);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--marvel) 45%, transparent);
-}
-
-.virtual-run .vr-mypage-card strong {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
-}
-
-.virtual-run .vr-mypage-card span {
-  font-size: 0.82rem;
-  color: var(--note);
-}
-
 .virtual-run .vr-form-note {
   margin: 0;
   color: var(--note);
@@ -161,32 +135,11 @@
   line-height: 1.5;
 }
 
-.virtual-run .vr-ticket-options {
-  display: grid;
-  gap: var(--vr-form-gap);
-}
-
-.virtual-run .vr-ticket-option {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem;
-  border: 1px solid color-mix(in srgb, var(--rule) 35%, transparent);
-  cursor: pointer;
-  background: color-mix(in srgb, var(--navy) 92%, #fff 8%);
-}
-
-.virtual-run .vr-ticket-option:has(input:checked) {
-  border-color: var(--marvel);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--marvel) 45%, transparent);
-}
-
-.virtual-run .vr-ticket-option input {
-  accent-color: var(--marvel);
-}
-
 .virtual-run .vr-inline-link {
-  color: var(--marvel);
+  color: var(--marvel-hi);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
 }
 
 @media (min-width: 768px) {
@@ -209,5 +162,16 @@
   .virtual-run .vr-page-inner {
     padding-bottom: 2rem;
   }
-}
 
+  .virtual-run .page__body {
+    padding: 1.75rem 0 3.5rem;
+  }
+
+  .virtual-run .page > .guide-sec:last-child {
+    padding-bottom: 3rem;
+  }
+
+  .virtual-run .vr-stack {
+    gap: 2.1rem;
+  }
+}

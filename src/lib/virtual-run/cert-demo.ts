@@ -1,6 +1,6 @@
 import type { VirtualRunParticipant, VirtualRunRunSummary } from "./participant";
 import { defaultParticipant } from "./participant";
-import type { VirtualRunRoundId } from "./rounds";
+import { virtualRunRoundById, type VirtualRunRoundId } from "./rounds";
 import { virtualRunDemoEnabled } from "./site";
 
 export function demoInstantApproveRunning(
@@ -15,9 +15,9 @@ export function demoInstantApproveRunning(
     rewards.unshift({
       id,
       kind: "gifticon",
-      label: `${summary.runDate} 완주 기프티콘`,
+      label: `${virtualRunRoundById(roundId).label} 완주 기프티콘`,
       status: "sent",
-      detail: "데모 즉시 발송",
+      detail: "러닝 인증 승인 즉시 발송",
     });
   }
   return {
@@ -40,9 +40,9 @@ export function demoInstantApproveKit(p: VirtualRunParticipant): VirtualRunParti
   rewards.unshift({
     id: `rw-kit-${Date.now()}`,
     kind: "sponsor",
-    label: "키트 인증 경품 (LEGO · 데모)",
+    label: "키트 인증 경품",
     status: "queued",
-    detail: "협업 확정 후 자동 발송",
+    detail: "협업사 확정 후 발송",
   });
   return {
     ...p,
@@ -61,8 +61,9 @@ export function demoInstantApproveSpot(
   rewards.unshift({
     id: `rw-spot-${spotId}-${Date.now()}`,
     kind: "coupon",
-    label: `${spotLabel} 쿠폰 (데모)`,
+    label: `${spotLabel} 쿠폰`,
     status: "sent",
+    detail: "협력사 쿠폰 코드 문자 발송",
   });
   return {
     ...p,

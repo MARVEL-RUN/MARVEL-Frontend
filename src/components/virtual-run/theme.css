@@ -9,9 +9,16 @@
   --dim: #b7b9c6;
   --marvel: #147a45;
   --marvel-deep: #002a16;
+  /* 어두운 배경 위 선·글자용 — --marvel 은 버튼 면 전용 */
+  --marvel-hi: #34c27a;
   --gold: #e0c36a;
   --cyan: #4ec8e0;
   --violet: #7a6bff;
+  --round-gold: #f2c53d;
+  --round-red: #e5484d;
+  --round-blue: #4d8dff;
+  --vr-surface: #07120d;
+  --vr-surface-hi: #0c1d15;
   background: var(--navy);
   color: #fff;
 }
@@ -31,10 +38,73 @@
       transparent);
 }
 
-.virtual-run .inquiry-secret__control:focus-within {
-  border-color: color-mix(in srgb, var(--marvel) 70%, transparent);
+/* 메인 남색 하드코딩 → 그린 블랙 */
+.virtual-run .kind-pick__item {
+  --tone: var(--marvel-hi);
+  background: var(--vr-surface);
+  text-align: left;
+  text-decoration: none;
 }
 
-.virtual-run .inquiry-secret__control.is-error {
-  border-color: color-mix(in srgb, var(--marvel) 85%, transparent);
+.virtual-run .kind-pick__item--cyan {
+  --tone: var(--cyan);
+}
+
+.virtual-run .kind-pick__item:hover,
+.virtual-run .kind-pick__item:focus-visible {
+  background: var(--vr-surface-hi);
+}
+
+.virtual-run .form-row input[type="text"],
+.virtual-run .form-row input[type="email"],
+.virtual-run .form-row input[type="tel"],
+.virtual-run .form-row input[type="password"],
+.virtual-run .form-row input[type="date"],
+.virtual-run .form-row__ctrl > select {
+  background: var(--vr-surface);
+}
+
+.virtual-run .form-row input[type="text"]:focus,
+.virtual-run .form-row input[type="email"]:focus,
+.virtual-run .form-row input[type="tel"]:focus,
+.virtual-run .form-row input[type="password"]:focus,
+.virtual-run .form-row input[type="date"]:focus,
+.virtual-run .form-row__ctrl > select:focus {
+  border-color: var(--marvel-hi);
+  background: var(--vr-surface);
+}
+
+.virtual-run .form-row input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px var(--vr-surface) inset;
+}
+
+.virtual-run .field input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px var(--navy) inset;
+}
+
+.virtual-run .field input:focus {
+  border-bottom-color: var(--marvel-hi);
+}
+
+.virtual-run .form-sec__index,
+.virtual-run .form-row__label em {
+  color: var(--marvel-hi);
+}
+
+.virtual-run .form-sec__note {
+  color: var(--note);
+}
+
+.virtual-run .form__err,
+.virtual-run .form-row__hint.is-err,
+.virtual-run .field__hint.is-err {
+  color: #ff6b6b;
+}
+
+.virtual-run .ticket h2 em {
+  color: var(--marvel-hi);
+}
+
+.virtual-run .ticket-notice__title {
+  color: var(--marvel-hi);
 }

@@ -10,6 +10,8 @@ import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
 import "../virtual-run.css";
 import "../home/home.css";
+import "../tickets/tickets.css";
+import "../guide/guide.css";
 
 export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {

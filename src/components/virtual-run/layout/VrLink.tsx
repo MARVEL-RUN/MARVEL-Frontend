@@ -9,7 +9,13 @@ type VrLinkProps = Omit<React.ComponentProps<typeof Link>, "href"> & {
 };
 
 export function VrLink({ href, ...rest }: VrLinkProps) {
+  const toHref = useVrPath();
+  return <Link href={toHref(href)} {...rest} />;
+}
+
+/** router.push 용 — `/virtual-run` 접두 여부 맞춤 */
+export function useVrPath(): (href: string) => string {
   const pathname = usePathname();
   const prefixed = isVirtualRunPrefixedPath(pathname);
-  return <Link href={vrPath(href, prefixed)} {...rest} />;
+  return (href: string) => vrPath(href, prefixed);
 }

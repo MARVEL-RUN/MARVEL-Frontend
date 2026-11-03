@@ -43,7 +43,7 @@ export type VirtualRunParticipant = {
   rewards: VirtualRunRewardRow[];
 };
 
-export const VR_PARTICIPANT_STORAGE_KEY = "marvel-run:vr-participant-v1";
+export const VR_PARTICIPANT_STORAGE_KEY = "marvel-run:vr-participant-v2";
 
 export function defaultParticipant(partial?: Partial<VirtualRunParticipant>): VirtualRunParticipant {
   const owned: VirtualRunRoundId[] = partial?.ownedRoundIds ?? [
@@ -83,9 +83,9 @@ export function defaultParticipant(partial?: Partial<VirtualRunParticipant>): Vi
       {
         id: "rw-demo-1",
         kind: "gifticon",
-        label: "완주 기프티콘 (데모)",
+        label: "1회차 완주 기프티콘",
         status: "sent",
-        detail: "승인 즉시 발송 예시",
+        detail: "러닝 인증 승인 즉시 발송",
       },
     ],
   };

@@ -1,5 +1,5 @@
-export const KIT_CERT_HASHTAGS =
-  "#MARVELRUN2026 #MARVELRUN #버추얼런 (기획 확정 시 수정)";
+/** 주최 확정 전 가안 */
+export const KIT_CERT_HASHTAGS = ["#MARVELRUN2026", "#마블버추얼런", "#마블런키트"] as const;
 
 export const KIT_CERT_MAX_PHOTOS = 3;
 

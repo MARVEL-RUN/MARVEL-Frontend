@@ -1,62 +1,85 @@
 "use client";
 
+import { mainToast } from "@/components/main/feedback/MainFeedback";
+import type { VirtualRunRewardRow } from "@/lib/virtual-run/participant";
+import {
+  REWARD_KIND_CODE,
+  REWARD_STATUS_LABEL,
+  REWARD_STATUS_TONE,
+  maskPhone,
+} from "@/lib/virtual-run/status";
 import { useVirtualRunParticipantOrDemo } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
-
-const STATUS_LABEL = {
-  sent: "발송 완료",
-  failed: "발송 실패",
-  queued: "발송 예정",
-} as const;
+import { VrLink } from "../layout/VrLink";
+import { VrMypageGate } from "./VrMypageGate";
+import { VrStatus } from "./VrStatus";
 
 export function VirtualRunRewardsPage() {
   const { participant, update } = useVirtualRunParticipantOrDemo();
 
-  function retryFailed() {
-    const next = {
+  function resend(row: VirtualRunRewardRow) {
+    update({
       ...participant,
-      rewards: participant.rewards.map((r) =>
-        r.status === "failed" ? { ...r, status: "sent" as const } : r,
-      ),
-    };
-    update(next);
+      rewards: participant.rewards.map((r) => (r.id === row.id ? { ...r, status: "sent" as const } : r)),
+    });
+    mainToast.success("다시 보냈습니다.");
   }
 
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="리워드 내역" en="REWARD">
-      <section className="guide-sec">
-        <div className="wrap wrap--narrow vr-page-inner">
-          <p className="vr-page-lead">기프티콘·쿠폰 발송 상태와 재요청(데모)을 확인합니다.</p>
-
+      <div className="page__body wrap wrap--narrow">
+        <VrMypageGate>
           {participant.rewards.length === 0 ? (
-            <article className="vr-panel">
-              <p>인증 승인 후 리워드가 표시됩니다.</p>
-            </article>
+            <section className="block wait">
+              <span className="kicker">REWARD</span>
+              <h2>아직 받은 리워드가 없습니다</h2>
+              <p className="sec__body">러닝·키트 인증이 승인되면 이곳에 발송 내역이 쌓입니다.</p>
+              <div className="flow__nav">
+                <VrLink href="/mypage/sessions" className="btn btn--red">
+                  러닝 인증하기
+                </VrLink>
+              </div>
+            </section>
           ) : (
-            <ul className="vr-reward-list">
-              {participant.rewards.map((row) => (
-                <li key={row.id} className="vr-reward-list__item">
-                  <div>
-                    <strong>{row.label}</strong>
-                    {row.detail ? <p className="vr-form-note">{row.detail}</p> : null}
-                  </div>
-                  <span className={`vr-reward-list__status is-${row.status}`}>
-                    {STATUS_LABEL[row.status]}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <section className="block">
+              <header className="form__head">
+                <h2>발송 내역</h2>
+                <p className="form__note">
+                  {maskPhone(participant.phone)} 번호로 보냅니다. 받지 못했다면 재발송을 눌러 주세요.
+                </p>
+              </header>
+              <ul className="vr-list">
+                {participant.rewards.map((row) => (
+                  <li key={row.id} className="vr-list__item">
+                    <span className="vr-list__code">{REWARD_KIND_CODE[row.kind]}</span>
+                    <div className="vr-list__body">
+                      <strong>{row.label}</strong>
+                      {row.detail ? <span>{row.detail}</span> : null}
+                    </div>
+                    <div className="vr-list__side">
+                      <VrStatus tone={REWARD_STATUS_TONE[row.status]}>{REWARD_STATUS_LABEL[row.status]}</VrStatus>
+                      {row.status === "failed" ? (
+                        <button type="button" className="vr-list__act" onClick={() => resend(row)}>
+                          재발송
+                        </button>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
-          <button type="button" className="btn btn--ghost vr-stack-top" onClick={retryFailed}>
-            실패 건 재발송 (데모)
-          </button>
-          <p className="vr-form-note">
-            승인 즉시 SMS 발송은 API 연동 후 동작합니다. 번호 변경·재요청 UI는 데모만
-            제공합니다.
-          </p>
-        </div>
-      </section>
+          <div className="ticket-notice">
+            <p className="ticket-notice__title">리워드 안내</p>
+            <ul className="ticket-notice__list">
+              <li>· 메달과 키트는 구매자 전원에게 배송됩니다.</li>
+              <li>· 기프티콘은 러닝 인증 승인 즉시 문자로 발송됩니다.</li>
+              <li>· 협업 경품은 협업사 확정 후 순차 발송되며, 준비 수량이 소진되면 조기 종료될 수 있습니다.</li>
+            </ul>
+          </div>
+        </VrMypageGate>
+      </div>
     </VirtualRunSubPage>
   );
 }

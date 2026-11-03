@@ -1,155 +1,196 @@
 "use client";
 
-import {
-  combinedMedalCount,
-  roundStatusForParticipant,
-} from "@/lib/virtual-run/participant";
-import {
-  VIRTUAL_RUN_ROUND_CERT_STATUS_LABEL,
-  VIRTUAL_RUN_ROUNDS,
-} from "@/lib/virtual-run/rounds";
+import { useRouter } from "next/navigation";
+import { combinedMedalCount, roundStatusForParticipant } from "@/lib/virtual-run/participant";
+import { VIRTUAL_RUN_ROUND_CERT_STATUS_LABEL, VIRTUAL_RUN_ROUNDS } from "@/lib/virtual-run/rounds";
 import { virtualRunSpotsEnabled } from "@/lib/virtual-run/site";
+import {
+  KIT_CERT_LABEL,
+  KIT_CERT_TONE,
+  KIT_SHIPPING_LABEL,
+  KIT_SHIPPING_TONE,
+  REWARD_KIND_CODE,
+  REWARD_STATUS_LABEL,
+  REWARD_STATUS_TONE,
+  VIRTUAL_RUN_ROUND_STATUS_TONE,
+  maskPhone,
+} from "@/lib/virtual-run/status";
 import { useVirtualRunParticipantOrDemo } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
-import { VrLink } from "../layout/VrLink";
-
-const KIT_SHIPPING_LABEL = {
-  preparing: "배송 준비",
-  shipping: "배송 중",
-  delivered: "배송 완료",
-} as const;
-
-const KIT_CERT_LABEL = {
-  none: "미제출",
-  pending: "검수 중",
-  approved: "승인",
-  rejected: "반려",
-} as const;
+import { VrLink, useVrPath } from "../layout/VrLink";
+import { VrMypageGate } from "./VrMypageGate";
+import { VrStatus } from "./VrStatus";
 
 export function VirtualRunMypageDashboard() {
-  const { participant } = useVirtualRunParticipantOrDemo();
+  const { participant, logout } = useVirtualRunParticipantOrDemo();
+  const router = useRouter();
+  const toHref = useVrPath();
   const medalDone = combinedMedalCount(participant);
 
+  function onLogout() {
+    logout();
+    router.push(toHref("/login"));
+  }
+
   return (
-    <VirtualRunSubPage kicker="MY PAGE" title="마이페이지" en="VERIFY · REWARD">
-      <section className="guide-sec">
-        <div className="wrap wrap--narrow vr-page-inner">
-          <header className="vr-mypage-hero">
-            <div>
-              <p className="vr-mypage-hero__name">{participant.name}</p>
-              <p className="vr-mypage-hero__bib">배번호 {participant.bib}</p>
-            </div>
-            <div className="vr-mypage-hero__medal" aria-label="결합 메달 진행">
-              <span className="vr-mypage-hero__medal-count">
-                {medalDone} / 3
-              </span>
-              <span className="vr-form-note">결합 메달</span>
-            </div>
-          </header>
+    <VirtualRunSubPage kicker="MY PAGE" title="참가 개요" en="VERIFY · REWARD">
+      <div className="page__body wrap wrap--narrow">
+        <VrMypageGate>
+          <div className="vr-stack">
+            <section className="vr-me">
+              <div className="vr-me__who">
+                <span className="kicker">RUNNER</span>
+                <h2>
+                  {participant.name}
+                  <small>님</small>
+                </h2>
+                <p className="vr-me__meta">
+                  배번호 <strong>{participant.bib}</strong>
+                  <span aria-hidden>·</span>
+                  {maskPhone(participant.phone)}
+                </p>
+              </div>
+              <div className="vr-me__medal" aria-label={`결합 메달 ${medalDone}/3`}>
+                <p className="vr-me__medal-label">결합 메달</p>
+                <p className="vr-me__medal-count">
+                  <strong>{medalDone}</strong> / 3
+                </p>
+                <ol className="vr-me__pips">
+                  {VIRTUAL_RUN_ROUNDS.map((r) => (
+                    <li
+                      key={r.id}
+                      className={`is-${r.accent}${participant.rounds[r.id]?.status === "approved" && participant.ownedRoundIds.includes(r.id) ? " is-on" : ""}`}
+                      title={`${r.label} ${r.theme}`}
+                    />
+                  ))}
+                </ol>
+              </div>
+            </section>
 
-          <article className="vr-mypage-block">
-            <div className="vr-mypage-block__head">
-              <h2>키트</h2>
-              <VrLink href="/mypage/kit" className="vr-inline-link">
-                키트 카드
-              </VrLink>
-            </div>
-            <p className="vr-mypage-block__meta">
-              {KIT_SHIPPING_LABEL[participant.kitShipping]}
-              {participant.trackingNo ? ` · 송장 ${participant.trackingNo}` : null}
-            </p>
-            <p className="vr-mypage-block__meta">
-              키트 인증 · {KIT_CERT_LABEL[participant.kitCert]}
-            </p>
-            {participant.kitCert !== "approved" ? (
-              <VrLink href="/mypage/kit" className="btn btn--red vr-stack-sm">
-                키트 인증하기
-              </VrLink>
-            ) : null}
-          </article>
+            <section className="block">
+              <header className="vr-block-head">
+                <h2>회차 인증</h2>
+                <VrLink href="/mypage/sessions" className="vr-more">
+                  인증하러 가기
+                </VrLink>
+              </header>
+              <ul className="vr-rounds">
+                {VIRTUAL_RUN_ROUNDS.map((round) => {
+                  const status = roundStatusForParticipant(participant, round.id);
+                  const summary = participant.rounds[round.id]?.summary;
+                  return (
+                    <li key={round.id} className={`vr-round is-${round.accent}${status === "locked" ? " is-off" : ""}`}>
+                      <span className="vr-round__no">{String(round.order).padStart(2, "0")}</span>
+                      <div className="vr-round__body">
+                        <span className="vr-round__code">{round.code}</span>
+                        <strong className="vr-round__title">
+                          {round.label} · {round.theme}
+                        </strong>
+                        <span className="vr-round__desc">
+                          {summary && status !== "locked"
+                            ? `${summary.runDate} · ${summary.distanceKm.toFixed(2)}km · ${summary.durationLabel}`
+                            : status === "locked"
+                              ? "이 회차 티켓이 없습니다."
+                              : "하루 안 5km 기록을 제출해 주세요."}
+                        </span>
+                      </div>
+                      <div className="vr-round__side">
+                        <VrStatus tone={VIRTUAL_RUN_ROUND_STATUS_TONE[status]}>
+                          {VIRTUAL_RUN_ROUND_CERT_STATUS_LABEL[status]}
+                        </VrStatus>
+                        {status === "ready" || status === "rejected" ? (
+                          <VrLink href="/mypage/sessions" className="vr-list__act">
+                            {status === "rejected" ? "다시 제출" : "인증하기"}
+                          </VrLink>
+                        ) : status === "approved" ? (
+                          <button type="button" className="vr-list__act" disabled title="인증 기간 종료 후 열립니다">
+                            완주증 준비 중
+                          </button>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
 
-          <article className="vr-mypage-block">
-            <div className="vr-mypage-block__head">
-              <h2>회차</h2>
-              <VrLink href="/mypage/sessions" className="vr-inline-link">
-                회차 카드
-              </VrLink>
-            </div>
-            <ul className="vr-round-cards">
-              {VIRTUAL_RUN_ROUNDS.map((round) => {
-                const status = roundStatusForParticipant(participant, round.id);
-                const progress = participant.rounds[round.id];
-                return (
-                  <li
-                    key={round.id}
-                    className={`vr-round-card vr-round-card--${round.accent}`}
-                  >
-                    <div className="vr-round-card__top">
-                      <span>{round.label}</span>
-                      <strong>{round.theme}</strong>
-                    </div>
-                    <p className="vr-round-card__state">
-                      {VIRTUAL_RUN_ROUND_CERT_STATUS_LABEL[status]}
-                    </p>
-                    {progress?.summary ? (
-                      <p className="vr-form-note">
-                        {progress.summary.runDate} · {progress.summary.distanceKm}km ·{" "}
-                        {progress.summary.durationLabel}
-                      </p>
-                    ) : null}
-                    {status === "ready" || status === "rejected" ? (
-                      <VrLink
-                        href="/mypage/sessions"
-                        className="btn btn--ghost vr-round-card__cta"
-                      >
-                        {status === "rejected" ? "다시 제출" : "러닝 인증하기"}
+            <section className="block">
+              <header className="vr-block-head">
+                <h2>키트</h2>
+                <VrLink href="/mypage/kit" className="vr-more">
+                  키트 카드
+                </VrLink>
+              </header>
+              <dl className="spec">
+                <div>
+                  <dt>배송</dt>
+                  <dd>
+                    <VrStatus tone={KIT_SHIPPING_TONE[participant.kitShipping]}>
+                      {KIT_SHIPPING_LABEL[participant.kitShipping]}
+                    </VrStatus>
+                    {participant.trackingNo ? <small className="vr-dd-sub">송장 {participant.trackingNo}</small> : null}
+                  </dd>
+                </div>
+                <div>
+                  <dt>키트 인증</dt>
+                  <dd>
+                    <VrStatus tone={KIT_CERT_TONE[participant.kitCert]}>{KIT_CERT_LABEL[participant.kitCert]}</VrStatus>
+                    {participant.kitCert === "none" || participant.kitCert === "rejected" ? (
+                      <VrLink href="/mypage/kit" className="vr-list__act">
+                        인증하기
                       </VrLink>
                     ) : null}
-                    {status === "approved" ? (
-                      <button type="button" className="btn btn--ghost vr-round-card__cta" disabled>
-                        완주증 다운로드 (데모)
-                      </button>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          </article>
+                  </dd>
+                </div>
+              </dl>
+            </section>
 
-          <article className="vr-mypage-block">
-            <div className="vr-mypage-block__head">
-              <h2>리워드</h2>
-              <VrLink href="/mypage/rewards" className="vr-inline-link">
-                전체 내역
-              </VrLink>
-            </div>
-            {participant.rewards.length === 0 ? (
-              <p className="vr-form-note">아직 발송 내역이 없습니다.</p>
-            ) : (
-              <ul className="vr-reward-mini">
-                {participant.rewards.slice(0, 3).map((row) => (
-                  <li key={row.id}>
-                    <strong>{row.label}</strong>
-                    <span>{row.status === "sent" ? "발송 완료" : row.status}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
-
-          {virtualRunSpotsEnabled ? (
-            <article className="vr-mypage-block">
-              <div className="vr-mypage-block__head">
-                <h2>거점 이벤트</h2>
-                <VrLink href="/mypage/spots" className="vr-inline-link">
-                  거점 인증
+            <section className="block">
+              <header className="vr-block-head">
+                <h2>리워드</h2>
+                <VrLink href="/mypage/rewards" className="vr-more">
+                  전체 내역
                 </VrLink>
-              </div>
-              <p className="vr-form-note">협업 거점 방문 인증 (선택)</p>
-            </article>
-          ) : null}
-        </div>
-      </section>
+              </header>
+              {participant.rewards.length === 0 ? (
+                <p className="vr-empty">인증이 승인되면 리워드 발송 내역이 표시됩니다.</p>
+              ) : (
+                <ul className="vr-list">
+                  {participant.rewards.slice(0, 3).map((row) => (
+                    <li key={row.id} className="vr-list__item">
+                      <span className="vr-list__code">{REWARD_KIND_CODE[row.kind]}</span>
+                      <div className="vr-list__body">
+                        <strong>{row.label}</strong>
+                      </div>
+                      <div className="vr-list__side">
+                        <VrStatus tone={REWARD_STATUS_TONE[row.status]}>{REWARD_STATUS_LABEL[row.status]}</VrStatus>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {virtualRunSpotsEnabled ? (
+              <section className="block">
+                <header className="vr-block-head">
+                  <h2>거점 이벤트</h2>
+                  <VrLink href="/mypage/spots" className="vr-more">
+                    거점 인증
+                  </VrLink>
+                </header>
+                <p className="vr-empty">협업 거점을 방문해 인증하면 거점 쿠폰을 드립니다.</p>
+              </section>
+            ) : null}
+
+            <div className="lookup-other">
+              <button type="button" className="lookup-other__btn" onClick={onLogout}>
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </VrMypageGate>
+      </div>
     </VirtualRunSubPage>
   );
 }
