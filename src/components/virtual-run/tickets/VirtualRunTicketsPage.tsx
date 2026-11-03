@@ -84,7 +84,7 @@ export function VirtualRunTicketsPage() {
   if (done) {
     return (
       <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
-        <div className="page__body wrap wrap--narrow">
+        <div className="page__body wrap">
           <section className="ticket ticket--done">
             <span className="kicker">PAYMENT COMPLETE</span>
             <h2>
@@ -127,7 +127,7 @@ export function VirtualRunTicketsPage() {
   if (!agreed) {
     return (
       <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
-        <div className="page__body wrap wrap--narrow">
+        <div className="page__body wrap">
           <ApplyTerms
             values={consents}
             onChange={setConsents}
@@ -150,7 +150,7 @@ export function VirtualRunTicketsPage() {
 
   return (
     <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         <form className="form" onSubmit={onPay} noValidate>
           <section className="block">
             <header className="form__head">
