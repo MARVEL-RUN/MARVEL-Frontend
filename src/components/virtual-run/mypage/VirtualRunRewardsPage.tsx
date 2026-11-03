@@ -27,7 +27,7 @@ export function VirtualRunRewardsPage() {
 
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="리워드 내역" en="REWARD">
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         <VrMypageGate>
           {participant.rewards.length === 0 ? (
             <section className="block wait">

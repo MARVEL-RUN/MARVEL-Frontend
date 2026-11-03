@@ -29,7 +29,7 @@ export function VirtualRunKitMypage() {
   if (result) {
     return (
       <VirtualRunSubPage kicker="MY PAGE" title="키트 카드" en="KIT · VERIFY">
-        <div className="page__body wrap wrap--narrow">
+        <div className="page__body wrap">
           <CertSubmitResult
             mode={result}
             subject="키트 인증"
@@ -43,7 +43,7 @@ export function VirtualRunKitMypage() {
 
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="키트 카드" en="KIT · VERIFY">
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         <VrMypageGate>
           <div className="vr-stack">
             <section className="block">

@@ -58,7 +58,7 @@ export function VirtualRunSpotsPage() {
 
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="거점 이벤트" en="SPOT">
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         <VrMypageGate>
           {result ? (
             <CertSubmitResult

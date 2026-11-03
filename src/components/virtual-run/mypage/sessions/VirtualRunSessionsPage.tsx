@@ -7,7 +7,7 @@ import { SessionRoundBar } from "./SessionRoundBar";
 export function VirtualRunSessionsPage() {
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="회차 인증" en="RUN · VERIFY">
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         <VrMypageGate>
           <div className="vr-stack">
             <header className="form__head">

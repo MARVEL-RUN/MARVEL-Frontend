@@ -34,7 +34,7 @@ export function VirtualRunMypageDashboard() {
 
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="참가 개요" en="VERIFY · REWARD">
-      <div className="page__body wrap wrap--narrow">
+      <div className="page__body wrap">
         <VrMypageGate>
           <div className="vr-stack">
             <section className="vr-me">
