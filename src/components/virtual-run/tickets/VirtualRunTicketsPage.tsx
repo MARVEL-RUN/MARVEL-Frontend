@@ -2,7 +2,9 @@
 
 import { Check } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import { ApplyTerms } from "@/components/main/register/ApplyTerms";
 import { AddressField, FormRow, FormSec, PhoneField } from "@/components/main/register/ApplyUi";
+import { EMPTY_CONSENTS, type Consents } from "@/lib/register";
 import { demoTicketPurchase } from "@/lib/virtual-run/cert-demo";
 import { readParticipant } from "@/lib/virtual-run/participant-client";
 import type { VirtualRunRoundId } from "@/lib/virtual-run/rounds";
@@ -35,6 +37,8 @@ const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 export function VirtualRunTicketsPage() {
   const { update } = useVirtualRunParticipant();
+  const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
+  const [agreed, setAgreed] = useState(false);
   const [kind, setKind] = useState<TicketKind>("single");
   const [singleRound, setSingleRound] = useState<VirtualRunRoundId>("avengers");
   const [name, setName] = useState("");
@@ -115,6 +119,30 @@ export function VirtualRunTicketsPage() {
               </VrLink>
             </div>
           </section>
+        </div>
+      </VirtualRunSubPage>
+    );
+  }
+
+  if (!agreed) {
+    return (
+      <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
+        <div className="page__body wrap wrap--narrow">
+          <ApplyTerms
+            values={consents}
+            onChange={setConsents}
+            onPick={() => {
+              setAgreed(true);
+              window.scrollTo({ top: 0 });
+            }}
+            allowedKinds={["individual"]}
+            actionLabels={{ individual: "동의하고 티켓 선택" }}
+          />
+          <div className="lookup-other">
+            <VrLink href="/login" className="lookup-other__btn">
+              이미 티켓이 있으신가요
+            </VrLink>
+          </div>
         </div>
       </VirtualRunSubPage>
     );
@@ -233,6 +261,16 @@ export function VirtualRunTicketsPage() {
           ) : null}
 
           <div className="flow__nav">
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => {
+                setAgreed(false);
+                window.scrollTo({ top: 0 });
+              }}
+            >
+              이전
+            </button>
             <button type="submit" className="btn btn--red">
               {won(ticket.price)} 결제하기
             </button>
