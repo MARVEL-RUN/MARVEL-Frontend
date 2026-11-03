@@ -19,6 +19,11 @@
   margin-top: auto;
 }
 
+.virtual-run .vr-scramble {
+  display: inline-block;
+  white-space: nowrap;
+}
+
 .virtual-run .guide-sec {
   padding: var(--vr-sec-pad) 0;
 }

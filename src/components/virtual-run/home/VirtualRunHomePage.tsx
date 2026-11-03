@@ -13,7 +13,7 @@ import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
 import { HeroCountdown } from "./HeroCountdown";
 import { HomeCursors } from "./HomeCursors";
-import { ScrambleText } from "./ScrambleText";
+import { ScrambleText } from "../fx/ScrambleText";
 
 const TICKER = [
   "버추얼런",

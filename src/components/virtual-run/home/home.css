@@ -168,11 +168,6 @@
   animation-play-state: paused;
 }
 
-.virtual-run .vr-scramble {
-  display: inline-block;
-  white-space: nowrap;
-}
-
 /* 띠 높이 전체가 hover 영역 */
 .virtual-run .vr-ticker .vr-scramble {
   padding-block: 1.15rem;

@@ -7,9 +7,11 @@ type Props = {
   text: string;
   className?: string;
   duration?: number;
+  /** 주면 마운트 후 이만큼 뒤에 한 번 재생 */
+  delay?: number;
 };
 
-export function ScrambleText({ text, className, duration = 620 }: Props) {
+export function ScrambleText({ text, className, duration = 620, delay }: Props) {
   const [shown, setShown] = useState(text);
   const elRef = useRef<HTMLSpanElement>(null);
   const timerRef = useRef<number | null>(null);
@@ -26,7 +28,7 @@ export function ScrambleText({ text, className, duration = 620 }: Props) {
     if (timerRef.current !== null) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = elRef.current;
-    if (el) el.style.width = `${el.offsetWidth}px`;
+    if (el?.offsetWidth) el.style.width = `${el.offsetWidth}px`;
     const chars = Array.from(text);
     const start = performance.now();
     timerRef.current = window.setInterval(() => {
@@ -38,6 +40,12 @@ export function ScrambleText({ text, className, duration = 620 }: Props) {
       }
     }, SCRAMBLE_FRAME_MS);
   }, [duration, stop, text]);
+
+  useEffect(() => {
+    if (delay === undefined) return;
+    const id = window.setTimeout(run, delay);
+    return () => window.clearTimeout(id);
+  }, [delay, run]);
 
   useEffect(() => stop, [stop]);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties, useEffect, useLayoutEffect, useRef } from "react";
-import { scrambleNodes } from "./scramble";
+import { scrambleNodes } from "../fx/scramble";
 
 const COLORS = ["var(--marvel-hi)", "var(--round-gold)", "var(--round-red)", "var(--round-blue)"];
 const STAGGER_MS = 170;
