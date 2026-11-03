@@ -1,0 +1,125 @@
+.virtual-run .vr-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.virtual-run .vr-flow--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.virtual-run .vr-flow li {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  padding: 1.15rem 1.1rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--vr-surface);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+.virtual-run .vr-flow__no {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: var(--marvel-hi);
+  font-size: 2rem;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  transform: skewX(-10deg);
+  transform-origin: left bottom;
+}
+
+.virtual-run .vr-flow__code {
+  color: var(--marvel-hi);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.virtual-run .vr-flow strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.virtual-run .vr-flow p {
+  margin: 0.2rem 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.virtual-run .guide-sec .kind-pick {
+  margin-top: 0;
+}
+
+.virtual-run .guide-sec .ticket-notice {
+  margin-top: 1.25rem;
+}
+
+.virtual-run .guide-sec .vr-hashtag {
+  margin-top: 1.25rem;
+}
+
+.virtual-run .vr-fields > div {
+  grid-template-columns: 9.5rem 1fr;
+}
+
+.virtual-run .vr-fields dd {
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.virtual-run .vr-req {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.55rem;
+  padding: 0.08rem 0.45rem;
+  border: 1px solid var(--marvel-hi);
+  color: var(--marvel-hi);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  vertical-align: 0.1em;
+}
+
+.virtual-run .vr-req.is-opt {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--note);
+}
+
+@media (max-width: 900px) {
+  .virtual-run .vr-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .virtual-run .vr-flow,
+  .virtual-run .vr-flow--3 {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .virtual-run .vr-flow li {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.85rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .virtual-run .vr-flow__no {
+    grid-row: span 3;
+    margin: 0;
+    font-size: 1.6rem;
+  }
+
+  .virtual-run .vr-fields > div {
+    grid-template-columns: 6.5rem 1fr;
+  }
+}

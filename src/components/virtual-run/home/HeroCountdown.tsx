@@ -28,7 +28,7 @@ export function HeroCountdown() {
   ] as const;
 
   return (
-    <div className="vr-home__countdown" role="timer" aria-live="polite">
+    <div className="vr-home__countdown" role="timer" aria-live="polite" data-vr-pick="TIMER">
       {units.map(([n, u], i) => (
         <Fragment key={u}>
           {i > 0 ? (
@@ -37,7 +37,9 @@ export function HeroCountdown() {
             </span>
           ) : null}
           <span className="vr-home__countdown-unit">
-            <span className="vr-home__countdown-value">{n}</span>
+            <span className="vr-home__countdown-value" suppressHydrationWarning>
+              {n}
+            </span>
             <span className="vr-home__countdown-label">{u}</span>
           </span>
         </Fragment>

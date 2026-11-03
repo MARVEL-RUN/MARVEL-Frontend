@@ -49,6 +49,7 @@ export function ApplyTerms({
   allowedKinds = ["individual", "group"],
   heading = APPLY_TERMS_TITLE,
   lead = APPLY_TERMS_LEAD,
+  actionLabels,
   className,
 }: {
   values: Consents;
@@ -57,6 +58,7 @@ export function ApplyTerms({
   allowedKinds?: ApplyKind[];
   heading?: string;
   lead?: string;
+  actionLabels?: Partial<Record<ApplyKind, string>>;
   className?: string;
 }) {
   const showIndividual = allowedKinds.includes("individual");
@@ -157,7 +159,7 @@ export function ApplyTerms({
         >
           {showIndividual ? (
             <button type="button" className="btn btn--red" onClick={() => pick("individual")}>
-              개인신청
+              {actionLabels?.individual ?? "개인신청"}
             </button>
           ) : null}
           {showGroup ? (
@@ -166,7 +168,7 @@ export function ApplyTerms({
               className={showIndividual ? "btn btn--ghost" : "btn btn--red"}
               onClick={() => pick("group")}
             >
-              단체신청
+              {actionLabels?.group ?? "단체신청"}
             </button>
           ) : null}
         </div>

@@ -1,0 +1,114 @@
+.virtual-run .guide-tabs {
+  border-block: 1px solid color-mix(in srgb, var(--marvel-hi) 18%, transparent);
+}
+
+.virtual-run .guide-tabs__btn {
+  color: var(--dim);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.virtual-run .guide-tabs__btn:hover {
+  color: #fff;
+}
+
+.virtual-run .guide-tabs__btn.is-on {
+  background: var(--marvel-hi);
+  color: var(--marvel-deep);
+}
+
+.virtual-run .vr-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 2.6rem;
+}
+
+.virtual-run .vr-overview__title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.85rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.virtual-run .vr-overview__title::before {
+  content: "";
+  width: 0.3rem;
+  height: 1em;
+  background: var(--marvel-hi);
+  transform: skewX(-12deg);
+}
+
+.virtual-run .vr-event-sec .spec {
+  border-top-color: var(--marvel-hi);
+}
+
+.virtual-run .vr-event-sec .spec dt {
+  color: var(--marvel-hi);
+  font-weight: 700;
+}
+
+.virtual-run .vr-event-sec .spec__hosts-logo {
+  opacity: 0.92;
+}
+
+.virtual-run .vr-time-table th {
+  border-bottom-color: var(--marvel-hi);
+}
+
+.virtual-run .vr-time-table th:first-child {
+  width: 10rem;
+}
+
+.virtual-run .vr-time-table .time-table__clock {
+  display: inline-flex;
+  gap: 0.4em;
+}
+
+/* 메인 표는 2열이 RT라 회색·줄바꿈 없음 */
+.virtual-run .vr-time-table td:nth-child(2) {
+  color: #fff;
+  white-space: normal;
+}
+
+.virtual-run .vr-time-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.virtual-run .vr-time-table tbody tr:hover {
+  background: color-mix(in srgb, var(--marvel-hi) 6%, transparent);
+}
+
+.virtual-run .vr-time-table .time-table__gate {
+  color: var(--marvel-hi);
+}
+
+.virtual-run .vr-time-table .time-table__note {
+  color: var(--note);
+  font-size: 0.84rem;
+}
+
+.virtual-run .vr-time-table__sub {
+  display: none;
+}
+
+/* 메인 표가 비고 열을 숨기는 조건과 같게 */
+@media (max-width: 720px),
+(orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .virtual-run .vr-time-table__sub {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--note);
+    font-size: 0.78rem;
+  }
+
+  .virtual-run .vr-time-table th:first-child {
+    width: 5.5rem;
+  }
+
+  .virtual-run .vr-time-table td:nth-child(2) {
+    word-break: keep-all;
+  }
+}

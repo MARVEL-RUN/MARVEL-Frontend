@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { VirtualRunGuidePage } from "@/components/virtual-run/guide/VirtualRunGuidePage";
+import { VirtualRunGuideHubPage } from "@/components/virtual-run/guide/VirtualRunGuideHubPage";
 
 export const metadata: Metadata = { title: "인증 가이드" };
 
 export default function Page() {
-  return <VirtualRunGuidePage />;
+  return <VirtualRunGuideHubPage />;
 }

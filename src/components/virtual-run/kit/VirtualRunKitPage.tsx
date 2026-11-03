@@ -1,5 +1,5 @@
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
-import { VrLink } from "../layout/VrLink";
+import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VirtualRunKitGallery } from "./VirtualRunKitGallery";
 import { VirtualRunKitMedalLoader } from "./VirtualRunKitMedalLoader";
 import "./kit.css";
@@ -15,9 +15,9 @@ export function VirtualRunKitPage() {
               수 있습니다.
             </p>
             <VirtualRunKitGallery />
-            <VrLink href="/tickets" className="btn btn--red">
-              티켓 구매
-            </VrLink>
+            <div className="vr-kit-page__cta">
+              <VirtualRunTicketsCta />
+            </div>
           </div>
         </section>
       </VirtualRunSubPage>

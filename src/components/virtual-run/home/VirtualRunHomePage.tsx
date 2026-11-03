@@ -9,8 +9,11 @@ import {
   VIRTUAL_RUN_OVERVIEW_ROWS,
 } from "@/lib/virtual-run/event";
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
+import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
 import { HeroCountdown } from "./HeroCountdown";
+import { HomeCursors } from "./HomeCursors";
+import { ScrambleText } from "../fx/ScrambleText";
 
 const TICKER = [
   "버추얼런",
@@ -134,31 +137,33 @@ export function VirtualRunHomePage() {
             height={514}
             priority
             className="hero__logo"
+            data-vr-pick="LOGO"
           />
           <p className="hero__lead vr-home__plan">
-            <span>{VIRTUAL_RUN_EVENT.planLabel}</span>
+            <span data-vr-pick="TEXT">{VIRTUAL_RUN_EVENT.planLabel}</span>
           </p>
           <p className="hero__meta">
-            {VIRTUAL_RUN_EVENT.schedule}
-            <span aria-hidden> · </span>
-            {VIRTUAL_RUN_EVENT.location}
+            <span className="vr-home__meta-text" data-vr-pick="TEXT">
+              {VIRTUAL_RUN_EVENT.schedule}
+              <span aria-hidden> · </span>
+              {VIRTUAL_RUN_EVENT.location}
+            </span>
           </p>
           <div className="hero__actions">
             <div className="hero__guide">
               <HeroCountdown />
-              <div className="hero__cta-row vr-home__cta">
+              <div className="hero__cta-row vr-home__cta" data-vr-pick="BUTTON">
                 <VrLink href="/event" className="btn btn--ghost">
                   행사 안내
                 </VrLink>
-                <VrLink href="/tickets" className="btn btn--red">
-                  티켓 구매
-                </VrLink>
+                <VirtualRunTicketsCta />
               </div>
               <KeyVisualCopyright />
             </div>
           </div>
         </div>
       </section>
+      <HomeCursors startDelay={HERO_GLITCH_MS} />
 
       <div className="vr-ticker" aria-hidden>
         <div className="vr-ticker__track">
@@ -169,7 +174,7 @@ export function VirtualRunHomePage() {
                   key={`${copy}-${bit}`}
                   className={/[가-힣]/.test(bit) ? "is-ko" : undefined}
                 >
-                  {bit}
+                  <ScrambleText text={bit} />
                 </li>
               ))}
             </ul>
