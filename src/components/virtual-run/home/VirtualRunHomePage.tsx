@@ -143,7 +143,6 @@ export function VirtualRunHomePage() {
           </p>
           <p className="hero__meta">
             <CursorText
-              mode="glow"
               radius={110}
               text={`${VIRTUAL_RUN_EVENT.schedule} · ${VIRTUAL_RUN_EVENT.location}`}
             />
@@ -184,7 +183,7 @@ export function VirtualRunHomePage() {
         <div className="wrap reveal">
           <p className="kicker">OVERVIEW</p>
           <h2 className="sec__title">
-            <CursorText mode="repel" text={VIRTUAL_RUN_EVENT.title} />
+            {VIRTUAL_RUN_EVENT.title}
           </h2>
           <dl className="spec">
             {VIRTUAL_RUN_OVERVIEW_ROWS.map((row) => (

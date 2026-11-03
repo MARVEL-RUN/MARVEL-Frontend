@@ -202,14 +202,6 @@
 .virtual-run .vr-ctext__char {
   display: inline-block;
   will-change: transform;
-}
-
-.virtual-run .vr-ctext--repel .vr-ctext__char {
-  transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(var(--rot, 0deg));
-  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.25);
-}
-
-.virtual-run .vr-ctext--glow .vr-ctext__char {
   color: color-mix(in srgb, var(--marvel-hi) calc(var(--p, 0) * 100%), currentColor);
   text-shadow: 0 0 calc(var(--p, 0) * 14px) color-mix(in srgb, var(--marvel-hi) 70%, transparent);
   transform: translateY(calc(var(--p, 0) * -0.22em)) scale(calc(1 + var(--p, 0) * 0.45));
