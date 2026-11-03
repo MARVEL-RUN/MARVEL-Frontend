@@ -20,7 +20,7 @@ export function vrNavChildActive(
   const child = vrPath(hrefPath(childHref), prefixed);
   const parent = vrPath(hrefPath(parentHref), prefixed);
   if (child === parent) {
-    return pathname === parent || pathname === `${parent}/`;
+    return !hash && (pathname === parent || pathname === `${parent}/`);
   }
   return pathname === child || pathname.startsWith(`${child}/`);
 }

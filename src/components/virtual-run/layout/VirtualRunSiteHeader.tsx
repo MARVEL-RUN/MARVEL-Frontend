@@ -64,10 +64,25 @@ export function VirtualRunSiteHeader() {
   }, [open]);
 
   useEffect(() => {
-    const jump = () => setHash(window.location.hash);
-    jump();
+    const jump = () => {
+      const next = window.location.hash;
+      setHash(next);
+      const id = decodeURIComponent(next.replace(/^#/, ""));
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) pinToHeader(target);
+    };
+    setHash(window.location.hash);
+    const timer = window.setTimeout(jump, 80);
+    // 첫 로드는 이미지·폰트로 위쪽 높이가 늦게 잡혀서 load 뒤 한 번 더
+    const late = document.readyState !== "complete";
+    if (late) window.addEventListener("load", jump, { once: true });
     window.addEventListener("hashchange", jump);
-    return () => window.removeEventListener("hashchange", jump);
+    return () => {
+      window.clearTimeout(timer);
+      if (late) window.removeEventListener("load", jump);
+      window.removeEventListener("hashchange", jump);
+    };
   }, [pathname]);
 
   function closeDrop(href: string) {
