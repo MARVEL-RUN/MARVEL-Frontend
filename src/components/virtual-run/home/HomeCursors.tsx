@@ -25,8 +25,6 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const sign = () => (Math.random() < 0.5 ? -1 : 1);
 const clamp = (v: number, a: number, b: number) => (a > b ? (a + b) / 2 : Math.min(b, Math.max(a, v)));
 
-let played = false;
-
 const pickTargets = () =>
   Array.from(document.querySelectorAll<HTMLElement>("[data-vr-pick]")).filter(
     (el) => el.getClientRects().length > 0,
@@ -44,12 +42,12 @@ export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
   const layerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (played || window.matchMedia("(prefers-reduced-motion: reduce)").matches) placeAll();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) placeAll();
   }, []);
 
   useEffect(() => {
     const layer = layerRef.current;
-    if (!layer || played) return;
+    if (!layer) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const cursorEls = Array.from(layer.querySelectorAll<HTMLElement>(".vr-cursor"));
@@ -123,7 +121,6 @@ export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
           nextAt = now + STAGGER_MS;
         } else if (!queue.length && cursors.every((c) => !c.grab)) {
           leaving = now;
-          played = true;
           layer.classList.remove("is-on");
           for (const c of cursors) {
             c.tx = c.x + sign() * rand(80, 160);
