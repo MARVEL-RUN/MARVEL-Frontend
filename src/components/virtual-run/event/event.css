@@ -16,6 +16,31 @@
   color: var(--marvel-deep);
 }
 
+.virtual-run .vr-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 2.6rem;
+}
+
+.virtual-run .vr-overview__title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.85rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.virtual-run .vr-overview__title::before {
+  content: "";
+  width: 0.3rem;
+  height: 1em;
+  background: var(--marvel-hi);
+  transform: skewX(-12deg);
+}
+
 .virtual-run .vr-event-sec .spec {
   border-top-color: var(--marvel-hi);
 }
