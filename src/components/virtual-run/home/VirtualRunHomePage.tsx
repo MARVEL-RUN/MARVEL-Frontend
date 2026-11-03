@@ -11,7 +11,9 @@ import {
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
+import { CursorText } from "./CursorText";
 import { HeroCountdown } from "./HeroCountdown";
+import { ScrambleText } from "./ScrambleText";
 
 const TICKER = [
   "버추얼런",
@@ -137,12 +139,14 @@ export function VirtualRunHomePage() {
             className="hero__logo"
           />
           <p className="hero__lead vr-home__plan">
-            <span>{VIRTUAL_RUN_EVENT.planLabel}</span>
+            <ScrambleText text={VIRTUAL_RUN_EVENT.planLabel} autoplayDelay={HERO_GLITCH_MS} duration={900} />
           </p>
           <p className="hero__meta">
-            {VIRTUAL_RUN_EVENT.schedule}
-            <span aria-hidden> · </span>
-            {VIRTUAL_RUN_EVENT.location}
+            <CursorText
+              mode="glow"
+              radius={110}
+              text={`${VIRTUAL_RUN_EVENT.schedule} · ${VIRTUAL_RUN_EVENT.location}`}
+            />
           </p>
           <div className="hero__actions">
             <div className="hero__guide">
@@ -168,7 +172,7 @@ export function VirtualRunHomePage() {
                   key={`${copy}-${bit}`}
                   className={/[가-힣]/.test(bit) ? "is-ko" : undefined}
                 >
-                  {bit}
+                  <ScrambleText text={bit} />
                 </li>
               ))}
             </ul>
@@ -180,7 +184,7 @@ export function VirtualRunHomePage() {
         <div className="wrap reveal">
           <p className="kicker">OVERVIEW</p>
           <h2 className="sec__title">
-            {VIRTUAL_RUN_EVENT.title}
+            <CursorText mode="repel" text={VIRTUAL_RUN_EVENT.title} />
           </h2>
           <dl className="spec">
             {VIRTUAL_RUN_OVERVIEW_ROWS.map((row) => (
