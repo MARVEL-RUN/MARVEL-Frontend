@@ -76,18 +76,3 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
     ],
   },
 ];
-
-export type VirtualRunSectionLink = VirtualRunNavChild & { desc?: string };
-
-/** @deprecated 허브 카드 — SECTION_NAV.mypage 와 동기 */
-export const VIRTUAL_RUN_MYPAGE_NAV: VirtualRunSectionLink[] = [
-  { href: "/mypage/kit", label: "키트 카드", desc: "배송 상태 · 키트 인증" },
-  { href: "/mypage/sessions", label: "회차 카드", desc: "러닝 인증 · 완주증", openFlag: "certSubmit" },
-  { href: "/mypage/rewards", label: "리워드 내역", desc: "발송 내역 · 재요청" },
-  {
-    href: "/mypage/spots",
-    label: "거점 이벤트",
-    desc: "협업 확정 시 노출",
-    spotsOnly: true,
-  },
-];
