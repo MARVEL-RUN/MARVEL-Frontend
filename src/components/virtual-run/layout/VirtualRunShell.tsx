@@ -12,6 +12,7 @@ import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
 import "../virtual-run.css";
 import "../home/home.css";
+import "../event/event.css";
 import "../tickets/tickets.css";
 import "../guide/guide.css";
 

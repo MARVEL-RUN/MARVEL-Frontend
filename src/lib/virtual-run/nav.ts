@@ -39,7 +39,7 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
     openFlag: "publicInfo",
     children: [
       { href: "/event", label: "행사 개요" },
-      { href: "/event/schedule", label: "운영 일정" },
+      { href: "/event#schedule", label: "운영 일정" },
       { href: "/kit", label: "기념품" },
     ],
   },

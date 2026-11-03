@@ -5,13 +5,12 @@ import {
 
 export function VirtualRunTimeline() {
   return (
-    <div className="time-table-wrap">
+    <div className="time-table-wrap vr-time-table">
       <table className="time-table">
         <thead>
           <tr>
-            <th>시간</th>
-            <th className="time-table__rt">RT</th>
-            <th>프로그램</th>
+            <th>날짜</th>
+            <th>일정</th>
             <th className="time-table__note">비고</th>
           </tr>
         </thead>
@@ -29,8 +28,10 @@ export function VirtualRunTimeline() {
                   ) : null}
                 </span>
               </td>
-              <td className="time-table__rt">{row.rt}</td>
-              <td>{row.program}</td>
+              <td>
+                {row.key ? <span className="time-table__gate">{row.program}</span> : row.program}
+                {row.note ? <small className="vr-time-table__sub">{row.note}</small> : null}
+              </td>
               <td className="time-table__note">{row.note}</td>
             </tr>
           ))}
