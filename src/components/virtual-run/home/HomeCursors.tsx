@@ -1,77 +1,84 @@
 "use client";
 
-import { type CSSProperties, useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef } from "react";
+import { scrambleNodes } from "./scramble";
 
 const COLORS = ["var(--marvel-hi)", "var(--round-gold)", "var(--round-red)", "var(--round-blue)"];
-const STAGGER_MS = 200;
-const HOLD_MS = 220;
+const STAGGER_MS = 170;
+const CLICK_MS = 150;
+const HOLD_MS = 240;
+const NO_SCRAMBLE = new Set(["LOGO", "TIMER", "MENU"]);
 
-type Point = { x: number; y: number };
-
+type Rect = { x: number; y: number; w: number; h: number };
 type Grab = {
   el: HTMLElement;
-  fx: number;
-  fy: number;
-  attached: boolean;
+  carry: boolean;
+  /** 0 이동 중, 1 클릭, 2 그리기·옮기기 */
+  step: 0 | 1 | 2;
+  at: number;
   holdUntil: number;
 };
-
-type Cursor = Point & { tx: number; ty: number; grab: Grab | null };
+type Cursor = { x: number; y: number; tx: number; ty: number; grab: Grab | null };
+type Loose = { dx: number; dy: number; fx: number; fy: number };
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const sign = () => (Math.random() < 0.5 ? -1 : 1);
+const clamp = (v: number, a: number, b: number) => (a > b ? (a + b) / 2 : Math.min(b, Math.max(a, v)));
+
+let played = false;
+
+const pickTargets = () =>
+  Array.from(document.querySelectorAll<HTMLElement>("[data-vr-pick]")).filter(
+    (el) => el.getClientRects().length > 0,
+  );
+
+const placeAll = () => {
+  document.querySelectorAll<HTMLElement>("[data-vr-pick]").forEach((el) => {
+    el.dataset.placed = "";
+    el.style.removeProperty("clip-path");
+    el.style.removeProperty("translate");
+  });
+};
 
 export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
   const layerRef = useRef<HTMLDivElement>(null);
 
+  useLayoutEffect(() => {
+    if (played || window.matchMedia("(prefers-reduced-motion: reduce)").matches) placeAll();
+  }, []);
+
   useEffect(() => {
     const layer = layerRef.current;
-    if (!layer) return;
+    if (!layer || played) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const cursorEls = Array.from(layer.querySelectorAll<HTMLElement>(".vr-cursor"));
     const boxEls = Array.from(layer.querySelectorAll<HTMLElement>(".vr-pick-box"));
     const tagEls = boxEls.map((b) => b.querySelector<HTMLElement>(".vr-pick-box__tag"));
-    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-vr-pick]")).filter(
-      (el) => el.getClientRects().length > 0,
-    );
-    if (!targets.length) return;
+    const targets = pickTargets();
+    const stops: (() => void)[] = [];
+    const loose = new Map<HTMLElement, Loose>();
 
     // html zoom을 쓰면 브라우저마다 rect 단위가 달라서 레이어 실측으로 환산
-    const frameOf = () => {
-      const r = layer.getBoundingClientRect();
-      return { left: r.left, top: r.top, s: r.width / (layer.offsetWidth || 1) };
-    };
-
-    const offsets = new Map<HTMLElement, Point>();
-    const setOffset = (el: HTMLElement, p: Point | null) => {
-      if (!p || (Math.abs(p.x) < 0.5 && Math.abs(p.y) < 0.5)) {
-        offsets.delete(el);
-        el.style.removeProperty("translate");
-        return;
-      }
-      offsets.set(el, p);
-      el.style.translate = `${p.x.toFixed(1)}px ${p.y.toFixed(1)}px`;
-    };
-
-    const homeOf = (el: HTMLElement) => {
-      const f = frameOf();
+    const rectOf = (el: HTMLElement): Rect => {
+      const f = layer.getBoundingClientRect();
+      const s = f.width / (layer.offsetWidth || 1);
       const r = el.getBoundingClientRect();
-      const o = offsets.get(el) ?? { x: 0, y: 0 };
-      return {
-        x: (r.left - f.left) / f.s - o.x,
-        y: (r.top - f.top) / f.s - o.y,
-        w: r.width / f.s,
-        h: r.height / f.s,
-      };
+      return { x: (r.left - f.left) / s, y: (r.top - f.top) / s, w: r.width / s, h: r.height / s };
     };
 
     const W = layer.offsetWidth;
     const H = layer.offsetHeight;
-    const reach = Math.min(1, Math.max(0.4, W / 1100));
+    const reach = clamp(W / 1100, 0.4, 1);
 
     for (const el of targets) {
-      setOffset(el, { x: sign() * rand(36, 90) * reach, y: sign() * rand(16, 44) * reach });
+      delete el.dataset.placed;
+      if (el.closest(".site-header")) continue;
+      const r = rectOf(el);
+      const dx = clamp(sign() * rand(70, 200) * reach, 12 - r.x, W - 12 - r.x - r.w);
+      const dy = clamp(sign() * rand(30, 110) * reach, 70 - r.y, H - 12 - r.y - r.h);
+      loose.set(el, { dx, dy, fx: rand(0.25, 0.75), fy: rand(0.3, 0.7) });
+      el.style.translate = `${dx.toFixed(1)}px ${dy.toFixed(1)}px`;
     }
 
     const cursors: Cursor[] = COLORS.map(() => {
@@ -87,6 +94,19 @@ export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
     let last = performance.now();
     let frame = 0;
 
+    const reveal = (g: Grab, i: number, r: Rect) => {
+      g.el.dataset.placed = "";
+      boxEls[i].classList.add("is-on");
+      const tag = tagEls[i];
+      if (tag) tag.textContent = `${g.el.dataset.vrPick} ${Math.round(r.w)}×${Math.round(r.h)}`;
+      if (!NO_SCRAMBLE.has(g.el.dataset.vrPick ?? "")) stops.push(scrambleNodes(g.el));
+    };
+
+    const release = (c: Cursor, i: number) => {
+      boxEls[i].classList.remove("is-on");
+      c.grab = null;
+    };
+
     const tick = (now: number) => {
       const dt = Math.min(48, now - last);
       last = now;
@@ -97,14 +117,13 @@ export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
           layer.classList.add("is-on");
         }
         const free = cursors.find((c) => !c.grab);
-        const el = queue.shift();
-        if (free && el) {
-          free.grab = { el, fx: rand(0.2, 0.8), fy: rand(0.35, 0.75), attached: false, holdUntil: 0 };
+        if (free && queue.length) {
+          const el = queue.shift()!;
+          free.grab = { el, carry: loose.has(el), step: 0, at: now, holdUntil: 0 };
           nextAt = now + STAGGER_MS;
-        } else if (el) {
-          queue.unshift(el);
-        } else if (cursors.every((c) => !c.grab)) {
+        } else if (!queue.length && cursors.every((c) => !c.grab)) {
           leaving = now;
+          played = true;
           layer.classList.remove("is-on");
           for (const c of cursors) {
             c.tx = c.x + sign() * rand(80, 160);
@@ -115,48 +134,83 @@ export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
 
       cursors.forEach((c, i) => {
         const g = c.grab;
+        const lo = g ? loose.get(g.el) : undefined;
+
         if (g) {
-          const home = homeOf(g.el);
-          const ax = home.x + home.w * g.fx;
-          const ay = home.y + home.h * g.fy;
-          if (!g.attached) {
-            const o = offsets.get(g.el) ?? { x: 0, y: 0 };
-            c.tx = ax + o.x;
-            c.ty = ay + o.y;
+          const r = rectOf(g.el);
+          if (g.step === 0) {
+            c.tx = lo ? r.x + r.w * lo.fx : r.x;
+            c.ty = lo ? r.y + r.h * lo.fy : r.y;
             if (Math.hypot(c.tx - c.x, c.ty - c.y) < 2) {
-              g.attached = true;
-              boxEls[i].classList.add("is-on");
-              const tag = tagEls[i];
-              if (tag) tag.textContent = `${g.el.dataset.vrPick} ${Math.round(home.w)}×${Math.round(home.h)}`;
+              c.x = c.tx;
+              c.y = c.ty;
+              g.step = 1;
+              g.at = now;
+              cursorEls[i].classList.add("is-down");
+              reveal(g, i, r);
+            }
+          } else if (g.step === 1) {
+            if (now - g.at >= (g.carry ? CLICK_MS : 0)) {
+              g.step = 2;
+              if (!g.carry) cursorEls[i].classList.remove("is-down");
+            }
+          } else if (lo) {
+            c.tx = r.x - lo.dx + r.w * lo.fx;
+            c.ty = r.y - lo.dy + r.h * lo.fy;
+            if (Math.hypot(lo.dx, lo.dy) < 0.6 || Math.hypot(c.tx - c.x, c.ty - c.y) < 0.4) {
+              if (!g.holdUntil) {
+                g.holdUntil = now + HOLD_MS;
+                lo.dx = 0;
+                lo.dy = 0;
+                g.el.style.removeProperty("translate");
+                cursorEls[i].classList.remove("is-down");
+              } else if (now >= g.holdUntil) release(c, i);
             }
           } else {
-            c.tx = ax;
-            c.ty = ay;
-            setOffset(g.el, { x: c.x - ax, y: c.y - ay });
+            c.tx = r.x + r.w;
+            c.ty = r.y + r.h;
             if (Math.hypot(c.tx - c.x, c.ty - c.y) < 1.5) {
-              if (!g.holdUntil) g.holdUntil = now + HOLD_MS;
-              else if (now >= g.holdUntil) {
-                setOffset(g.el, null);
-                boxEls[i].classList.remove("is-on");
-                c.grab = null;
-              }
+              if (!g.holdUntil) {
+                g.holdUntil = now + HOLD_MS;
+                g.el.style.removeProperty("clip-path");
+              } else if (now >= g.holdUntil) release(c, i);
             }
           }
         }
 
-        const k = 1 - Math.pow(1 - (c.grab ? 0.16 : 0.05), dt / 16.7);
+        const speed = !g ? 0.05 : g.step === 0 ? 0.16 : g.carry ? 0.1 : 0.13;
+        const k = 1 - Math.pow(1 - speed, dt / 16.7);
+        const px = c.x;
+        const py = c.y;
         c.x += (c.tx - c.x) * k;
         c.y += (c.ty - c.y) * k;
         cursorEls[i].style.transform = `translate(${c.x.toFixed(1)}px, ${c.y.toFixed(1)}px)`;
 
-        if (c.grab?.attached) {
-          const f = frameOf();
-          const r = c.grab.el.getBoundingClientRect();
-          const box = boxEls[i].style;
-          box.transform = `translate(${((r.left - f.left) / f.s).toFixed(1)}px, ${((r.top - f.top) / f.s).toFixed(1)}px)`;
-          box.width = `${(r.width / f.s).toFixed(1)}px`;
-          box.height = `${(r.height / f.s).toFixed(1)}px`;
+        if (!g || g.step === 0) return;
+        const box = boxEls[i].style;
+
+        if (lo) {
+          if (g.step === 2 && !g.holdUntil) {
+            lo.dx += c.x - px;
+            lo.dy += c.y - py;
+            g.el.style.translate = `${lo.dx.toFixed(1)}px ${lo.dy.toFixed(1)}px`;
+          }
+          const r = rectOf(g.el);
+          box.transform = `translate(${r.x.toFixed(1)}px, ${r.y.toFixed(1)}px)`;
+          box.width = `${r.w.toFixed(1)}px`;
+          box.height = `${r.h.toFixed(1)}px`;
+          return;
         }
+
+        const r = rectOf(g.el);
+        const bw = g.holdUntil ? r.w : Math.min(r.w, Math.max(0, c.x - r.x));
+        const bh = g.holdUntil ? r.h : Math.min(r.h, Math.max(0, c.y - r.y));
+        if (!g.holdUntil) {
+          g.el.style.clipPath = `inset(0 ${(r.w - bw).toFixed(1)}px ${(r.h - bh).toFixed(1)}px 0)`;
+        }
+        box.transform = `translate(${r.x.toFixed(1)}px, ${r.y.toFixed(1)}px)`;
+        box.width = `${bw.toFixed(1)}px`;
+        box.height = `${bh.toFixed(1)}px`;
       });
 
       if (leaving && now - leaving > 900) {
@@ -170,7 +224,8 @@ export function HomeCursors({ startDelay = 0 }: { startDelay?: number }) {
 
     return () => {
       if (frame) cancelAnimationFrame(frame);
-      for (const el of targets) el.style.removeProperty("translate");
+      for (const stop of stops) stop();
+      placeAll();
     };
   }, [startDelay]);
 

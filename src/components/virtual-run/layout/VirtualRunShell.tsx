@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { isVirtualRunHomePath } from "@/lib/virtual-run/href";
 import { CinematicFX } from "../../main/fx/CinematicFX";
 import { MainToastHost } from "../../main/feedback/MainFeedback";
 import { KeyboardInset } from "../../main/layout/KeyboardInset";
@@ -14,6 +16,8 @@ import "../tickets/tickets.css";
 import "../guide/guide.css";
 
 export function VirtualRunShell({ children }: { children: React.ReactNode }) {
+  const home = isVirtualRunHomePath(usePathname());
+
   useEffect(() => {
     document.documentElement.classList.add("is-main", "is-live");
   }, []);
@@ -21,7 +25,7 @@ export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   return (
     <LegalModalProvider>
       <VirtualRunParticipantProvider>
-        <div className="virtual-run site">
+        <div className={home ? "virtual-run site is-vr-build" : "virtual-run site"}>
           <CinematicFX />
           <KeyboardInset />
           <VirtualRunSiteHeader />

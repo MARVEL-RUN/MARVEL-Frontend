@@ -183,6 +183,13 @@
   display: inline-block;
 }
 
+/* 커서가 박스를 그리며 하나씩 드러냄. 서버 렌더부터 숨겨야 깜빡이지 않음 */
+@media (prefers-reduced-motion: no-preference) {
+  .virtual-run.is-vr-build [data-vr-pick]:not([data-placed]) {
+    visibility: hidden;
+  }
+}
+
 .virtual-run .vr-cursors {
   position: fixed;
   inset: 0;
@@ -211,6 +218,12 @@
   stroke-width: 1.2;
   stroke-linejoin: round;
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 55%, transparent));
+  transform-origin: 2px 2px;
+  transition: scale 0.12s ease-out;
+}
+
+.virtual-run .vr-cursor.is-down svg {
+  scale: 0.8;
 }
 
 .virtual-run .vr-pick-box {

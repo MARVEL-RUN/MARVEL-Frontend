@@ -1,26 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SCRAMBLE_FRAME_MS, scrambleFrame } from "./scramble";
 
 type Props = {
   text: string;
   className?: string;
-  autoplayDelay?: number;
   duration?: number;
 };
 
-const LATIN = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*/<>";
-const HANGUL = "마블런버추얼어벤져스엑스맨판타스틱완주인증회차";
-const FRAME_MS = 42;
-
-const pick = (set: string) => set[Math.floor(Math.random() * set.length)];
-
-function noise(ch: string) {
-  if (ch === " " || /[·.,:()\-–]/.test(ch)) return ch;
-  return /[가-힣]/.test(ch) ? pick(HANGUL) : pick(LATIN);
-}
-
-export function ScrambleText({ text, className, autoplayDelay, duration = 620 }: Props) {
+export function ScrambleText({ text, className, duration = 620 }: Props) {
   const [shown, setShown] = useState(text);
   const elRef = useRef<HTMLSpanElement>(null);
   const timerRef = useRef<number | null>(null);
@@ -42,23 +31,15 @@ export function ScrambleText({ text, className, autoplayDelay, duration = 620 }:
     const start = performance.now();
     timerRef.current = window.setInterval(() => {
       const t = Math.min(1, (performance.now() - start) / duration);
-      const settled = Math.floor(t * chars.length);
-      setShown(chars.map((ch, i) => (i < settled ? ch : noise(ch))).join(""));
+      setShown(scrambleFrame(chars, t));
       if (t >= 1) {
         stop();
         setShown(text);
       }
-    }, FRAME_MS);
+    }, SCRAMBLE_FRAME_MS);
   }, [duration, stop, text]);
 
-  useEffect(() => {
-    if (autoplayDelay === undefined) return stop;
-    const id = window.setTimeout(run, autoplayDelay);
-    return () => {
-      window.clearTimeout(id);
-      stop();
-    };
-  }, [autoplayDelay, run, stop]);
+  useEffect(() => stop, [stop]);
 
   return (
     <span
