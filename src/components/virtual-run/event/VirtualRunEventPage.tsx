@@ -1,6 +1,6 @@
 import { OverviewTable } from "./OverviewTable";
-import { VirtualRunTimeline } from "./VirtualRunTimeline";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
+import { VrLink } from "../layout/VrLink";
 
 export function VirtualRunEventPage() {
   return (
@@ -24,14 +24,13 @@ export function VirtualRunEventPage() {
             </article>
           </div>
           <OverviewTable />
-        </div>
-      </section>
-
-      <section className="guide-sec" id="timeline">
-        <hr className="guide-rule" />
-        <div className="wrap vr-page-inner">
-          <h2>타임라인</h2>
-          <VirtualRunTimeline />
+          <p className="vr-form-note vr-stack-sm">
+            일정표는{" "}
+            <VrLink href="/event/schedule" className="vr-inline-link">
+              운영 일정
+            </VrLink>
+            에서 확인할 수 있습니다.
+          </p>
         </div>
       </section>
     </VirtualRunSubPage>
