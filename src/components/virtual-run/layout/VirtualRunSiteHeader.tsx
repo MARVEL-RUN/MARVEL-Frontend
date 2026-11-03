@@ -112,6 +112,7 @@ export function VirtualRunSiteHeader() {
           href="/"
           className="site-header__brand"
           aria-label="MARVEL RUN 버추얼런 홈"
+          data-vr-pick="LOGO"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
         >
@@ -126,7 +127,7 @@ export function VirtualRunSiteHeader() {
           />
         </VrLink>
 
-        <nav className="site-header__nav" aria-label="버추얼런 메뉴">
+        <nav className="site-header__nav" aria-label="버추얼런 메뉴" data-vr-pick="NAV">
           {navItems.map((item) => {
             const active = vrNavItemActive(pathname, prefixed, item, hash);
             const kids = isVirtualRunNavGroup(item) ? item.children : undefined;
@@ -188,7 +189,7 @@ export function VirtualRunSiteHeader() {
         </nav>
 
         <div className="site-header__tools">
-          <div className="site-header__actions">
+          <div className="site-header__actions" data-vr-pick="BUTTON">
             {isLoggedIn ? (
               <VrLink href="/mypage" className="btn btn--ghost site-header__cta">
                 <span>마이페이지</span>
@@ -207,6 +208,7 @@ export function VirtualRunSiteHeader() {
             aria-expanded={open}
             aria-controls="vr-mobile-nav"
             aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+            data-vr-pick="MENU"
             onClick={() => setOpen((v) => !v)}
           >
             <span />

@@ -11,8 +11,8 @@ import {
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
-import { CursorText } from "./CursorText";
 import { HeroCountdown } from "./HeroCountdown";
+import { HomeCursors } from "./HomeCursors";
 import { ScrambleText } from "./ScrambleText";
 
 const TICKER = [
@@ -137,20 +137,22 @@ export function VirtualRunHomePage() {
             height={514}
             priority
             className="hero__logo"
+            data-vr-pick="LOGO"
           />
           <p className="hero__lead vr-home__plan">
-            <ScrambleText text={VIRTUAL_RUN_EVENT.planLabel} autoplayDelay={HERO_GLITCH_MS} duration={900} />
+            <span data-vr-pick="TEXT">{VIRTUAL_RUN_EVENT.planLabel}</span>
           </p>
           <p className="hero__meta">
-            <CursorText
-              radius={110}
-              text={`${VIRTUAL_RUN_EVENT.schedule} · ${VIRTUAL_RUN_EVENT.location}`}
-            />
+            <span className="vr-home__meta-text" data-vr-pick="TEXT">
+              {VIRTUAL_RUN_EVENT.schedule}
+              <span aria-hidden> · </span>
+              {VIRTUAL_RUN_EVENT.location}
+            </span>
           </p>
           <div className="hero__actions">
             <div className="hero__guide">
               <HeroCountdown />
-              <div className="hero__cta-row vr-home__cta">
+              <div className="hero__cta-row vr-home__cta" data-vr-pick="BUTTON">
                 <VrLink href="/event" className="btn btn--ghost">
                   행사 안내
                 </VrLink>
@@ -161,6 +163,7 @@ export function VirtualRunHomePage() {
           </div>
         </div>
       </section>
+      <HomeCursors startDelay={HERO_GLITCH_MS} />
 
       <div className="vr-ticker" aria-hidden>
         <div className="vr-ticker__track">

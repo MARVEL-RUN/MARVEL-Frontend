@@ -28,7 +28,7 @@ export function HeroCountdown() {
   ] as const;
 
   return (
-    <div className="vr-home__countdown" role="timer" aria-live="polite">
+    <div className="vr-home__countdown" role="timer" aria-live="polite" data-vr-pick="TIMER">
       {units.map(([n, u], i) => (
         <Fragment key={u}>
           {i > 0 ? (
