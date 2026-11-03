@@ -187,7 +187,13 @@ export function Header() {
             const pick = "pickChild" in item && item.pickChild;
             const linkClass = active ? "site-header__link is-active" : "site-header__link";
             const link = pick ? (
-              <button type="button" className={linkClass} aria-haspopup="true">
+              <button
+                type="button"
+                className={linkClass}
+                aria-haspopup="true"
+                /* 클릭 포커스가 남으면 focus-within으로 드롭·딤이 고정됨 */
+                onMouseDown={(e) => e.preventDefault()}
+              >
                 {item.label}
               </button>
             ) : (
