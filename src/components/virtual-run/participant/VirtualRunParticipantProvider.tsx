@@ -21,6 +21,7 @@ import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
 type Ctx = {
   participant: VirtualRunParticipant | null;
   isLoggedIn: boolean;
+  ready: boolean;
   login: (patch: Partial<VirtualRunParticipant>) => void;
   logout: () => void;
   update: (next: VirtualRunParticipant) => void;
@@ -67,6 +68,7 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
     () => ({
       participant: hydrated ? participant : null,
       isLoggedIn: Boolean(participant),
+      ready: hydrated,
       login,
       logout,
       update,
@@ -90,16 +92,14 @@ export function useVirtualRunParticipant(): Ctx {
   return ctx;
 }
 
+/** SSR·하이드레이션 전에는 localStorage 없이 기본값만 */
 export function useVirtualRunParticipantOrDemo(): Ctx & {
   participant: VirtualRunParticipant;
 } {
   const ctx = useVirtualRunParticipant();
-  const p =
-    ctx.participant ??
-    (virtualRunDemoEnabled ? ensureDemoParticipant() : defaultParticipant());
   return {
     ...ctx,
-    participant: p,
+    participant: ctx.participant ?? defaultParticipant(),
     isLoggedIn: ctx.isLoggedIn || virtualRunDemoEnabled,
   };
 }
