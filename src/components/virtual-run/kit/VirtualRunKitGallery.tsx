@@ -69,8 +69,7 @@ export function VirtualRunKitGallery() {
   const finish = theme.items.find((item) => item.kind === "finish-line");
   const slide = souvenir[index] ?? souvenir[0];
   const overview = view === "overview" || !slide;
-  const souvenirScene =
-    themeId === "fantastic-four" ? VIRTUAL_RUN_ASSETS.kitSouvenir["fantastic-four"] : null;
+  const souvenirScene = VIRTUAL_RUN_ASSETS.kitSouvenir[themeId];
 
   useEffect(() => {
     if (view !== "detail" || souvenir.length < 2) return;
@@ -122,6 +121,7 @@ export function VirtualRunKitGallery() {
         {overview && souvenirScene ? (
           <div className="vr-kit-hero__bg-frame">
             <Image
+              key={souvenirScene}
               src={souvenirScene}
               alt=""
               fill

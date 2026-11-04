@@ -10,6 +10,8 @@ export const VIRTUAL_RUN_ASSETS = {
     fantasticFour: "/images/virtual-run/combined-medal/fantastic-four-front.png",
   },
   kitSouvenir: {
+    avengers: "/images/virtual-run/kit/avengers/souvenir.png",
+    "x-men": "/images/virtual-run/kit/x-men/souvenir.png",
     "fantastic-four": "/images/virtual-run/kit/fantastic-four/souvenir.png",
   },
 } as const;
