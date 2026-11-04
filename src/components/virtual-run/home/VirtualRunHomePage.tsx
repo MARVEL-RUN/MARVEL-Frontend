@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
+import { VR_HOME_CURSOR_FX } from "@/lib/virtual-run/home-fx";
 import {
   VIRTUAL_RUN_EVENT,
   VIRTUAL_RUN_OVERVIEW_ROWS,
@@ -172,7 +173,7 @@ export function VirtualRunHomePage() {
           </div>
         </div>
       </section>
-      <HomeCursors startDelay={HERO_GLITCH_MS} />
+      {VR_HOME_CURSOR_FX ? <HomeCursors startDelay={HERO_GLITCH_MS} /> : null}
 
       <div className="vr-ticker" aria-hidden>
         <div className="vr-ticker__track">

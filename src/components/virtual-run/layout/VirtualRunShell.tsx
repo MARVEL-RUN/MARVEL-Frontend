@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { VR_HOME_CURSOR_FX } from "@/lib/virtual-run/home-fx";
 import { isVirtualRunHomePath } from "@/lib/virtual-run/href";
 import { CinematicFX } from "../../main/fx/CinematicFX";
 import { MainToastHost } from "../../main/feedback/MainFeedback";
@@ -26,7 +27,11 @@ export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   return (
     <LegalModalProvider>
       <VirtualRunParticipantProvider>
-        <div className={home ? "virtual-run site is-vr-build" : "virtual-run site"}>
+        <div
+          className={
+            home && VR_HOME_CURSOR_FX ? "virtual-run site is-vr-build" : "virtual-run site"
+          }
+        >
           <CinematicFX />
           <KeyboardInset />
           <VirtualRunSiteHeader />
