@@ -87,6 +87,64 @@
   letter-spacing: -0.02em;
 }
 
+/* 메인 완료창과 같은 열린 가운데 — 박스 없음 */
+.virtual-run .vr-pay-done {
+  padding-block: 1.5rem 2.5rem;
+}
+
+.virtual-run .vr-pay-done .kicker {
+  margin-bottom: 1rem;
+}
+
+.virtual-run .vr-pay-done h2 {
+  margin-bottom: 1.15rem;
+  font-size: clamp(1.65rem, 4.2vw, 2.35rem);
+}
+
+.virtual-run .vr-pay-done__product {
+  margin: 0 auto 0.35rem;
+  max-width: 26rem;
+  color: var(--silver);
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.virtual-run .vr-pay-done__amount {
+  margin: 0 auto 1.35rem;
+  color: var(--gold);
+  font-size: clamp(1.85rem, 4.5vw, 2.45rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  transform: skewX(-6deg);
+}
+
+.virtual-run .vr-pay-done__order {
+  gap: 0.4rem 0.7rem;
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 1rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--vr-surface) 88%, transparent);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.virtual-run .vr-pay-done .form__note {
+  margin: 0 auto;
+  max-width: 22rem;
+  color: var(--note);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.virtual-run .vr-pay-done .flow__nav {
+  margin-top: 1.75rem;
+}
+
 @media (max-width: 720px) {
   .virtual-run .vr-pick .kind-pick__item {
     min-height: 0;
@@ -102,5 +160,9 @@
 
   .virtual-run .vr-sum__total strong {
     font-size: 1.4rem;
+  }
+
+  .virtual-run .vr-pay-done {
+    padding-block: 1rem 2rem;
   }
 }

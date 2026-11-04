@@ -2,17 +2,24 @@
 
 import { Check } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { ApplyTerms } from "@/components/main/register/ApplyTerms";
 import { AddressField, FormRow, FormSec, PhoneField } from "@/components/main/register/ApplyUi";
+import { SheetModal } from "@/components/main/SheetModal";
+import { hasTossClientKey } from "@/lib/main/config";
+import type { PaymentOrder } from "@/lib/payment/session";
 import { EMPTY_CONSENTS, type Consents } from "@/lib/register";
-import { demoTicketPurchase } from "@/lib/virtual-run/cert-demo";
-import { readParticipant } from "@/lib/virtual-run/participant-client";
+import { isMobileView } from "@/lib/viewport";
 import type { VirtualRunRoundId } from "@/lib/virtual-run/rounds";
 import { VIRTUAL_RUN_ROUNDS, virtualRunRoundById } from "@/lib/virtual-run/rounds";
 import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
-import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
+import {
+  createVirtualRunOrderId,
+  saveVirtualRunTicketPending,
+} from "@/lib/virtual-run/ticket-payment";
+import { useVrPath, VrLink } from "../layout/VrLink";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
-import { VrLink } from "../layout/VrLink";
 
 type TicketKind = "single" | "package";
 
@@ -36,7 +43,8 @@ const TICKETS: Record<TicketKind, { no: string; code: string; title: string; pri
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 export function VirtualRunTicketsPage() {
-  const { update } = useVirtualRunParticipant();
+  const router = useRouter();
+  const toHref = useVrPath();
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
   const [agreed, setAgreed] = useState(false);
   const [kind, setKind] = useState<TicketKind>("single");
@@ -45,7 +53,9 @@ export function VirtualRunTicketsPage() {
   const [phone, setPhone] = useState("");
   const [addr, setAddr] = useState({ zonecode: "", address: "", addressDetail: "" });
   const [error, setError] = useState("");
-  const [done, setDone] = useState<{ bib: string; roundIds: VirtualRunRoundId[]; kind: TicketKind } | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
+  const [payOrder, setPayOrder] = useState<PaymentOrder | null>(null);
+  const [payName, setPayName] = useState("");
 
   const roundIds = useMemo((): VirtualRunRoundId[] => {
     if (kind === "package") return VIRTUAL_RUN_ROUNDS.map((r) => r.id);
@@ -70,58 +80,37 @@ export function VirtualRunTicketsPage() {
       );
       return;
     }
-    setError("");
-    const shipping = {
-      name: name.trim() || "김마블",
-      phone: digits.length >= 10 ? digits : "01000000000",
-    };
-    const next = demoTicketPurchase(readParticipant(), roundIds, shipping);
-    update(next);
-    setDone({ bib: next.bib, roundIds, kind });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+    if (!hasTossClientKey) {
+      setError(
+        "결제 연동 설정(NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.",
+      );
+      return;
+    }
 
-  if (done) {
-    return (
-      <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
-        <div className="page__body wrap">
-          <section className="ticket ticket--done">
-            <span className="kicker">PAYMENT COMPLETE</span>
-            <h2>
-              결제가 <em>완료</em>되었습니다
-            </h2>
-            <p className="ticket__meta">배번호와 마이페이지 링크를 문자로 보내드립니다.</p>
-            <p className="ticket__no">BIB {done.bib}</p>
-            <dl className="spec">
-              <div>
-                <dt>티켓</dt>
-                <dd>{TICKETS[done.kind].title}</dd>
-              </div>
-              <div>
-                <dt>회차</dt>
-                <dd>{roundText(done.roundIds)}</dd>
-              </div>
-              <div>
-                <dt>결제 금액</dt>
-                <dd>{won(TICKETS[done.kind].price)}</dd>
-              </div>
-              <div>
-                <dt>키트 배송</dt>
-                <dd>11월 30일부터 순차 배송</dd>
-              </div>
-            </dl>
-            <div className="flow__nav">
-              <VrLink href="/guide" className="btn btn--ghost">
-                인증 가이드
-              </VrLink>
-              <VrLink href="/mypage" className="btn btn--red">
-                마이페이지
-              </VrLink>
-            </div>
-          </section>
-        </div>
-      </VirtualRunSubPage>
-    );
+    setError("");
+    const customerName = name.trim() || "김마블";
+    const phoneDigits = digits.length >= 10 ? digits : "01000000000";
+    const roundLabel = roundText(roundIds);
+    const registration: PaymentOrder = {
+      orderId: createVirtualRunOrderId(),
+      orderName: `버추얼런 ${ticket.title} (${roundLabel})`,
+      paymentAmount: ticket.price,
+    };
+    saveVirtualRunTicketPending({
+      registration,
+      customerName,
+      phone: phoneDigits,
+      kind,
+      roundIds,
+      savedAt: Date.now(),
+    });
+    if (isMobileView()) {
+      router.push(toHref("/payment"));
+      return;
+    }
+    setPayOrder(registration);
+    setPayName(customerName);
+    setPayOpen(true);
   }
 
   if (!agreed) {
@@ -283,6 +272,22 @@ export function VirtualRunTicketsPage() {
           </VrLink>
         </div>
       </div>
+
+      {payOpen && payOrder ? (
+        <SheetModal
+          kicker="PAY"
+          title="결제하기"
+          onClose={() => setPayOpen(false)}
+        >
+          <PaymentWidget
+            registration={payOrder}
+            customerName={payName}
+            successPath={toHref("/payment/success")}
+            failPath={toHref("/payment/fail")}
+            onError={setError}
+          />
+        </SheetModal>
+      ) : null}
     </VirtualRunSubPage>
   );
 }
