@@ -8,6 +8,7 @@ import {
   VIRTUAL_RUN_EVENT,
   VIRTUAL_RUN_OVERVIEW_ROWS,
 } from "@/lib/virtual-run/event";
+import { MOBILE_MQ } from "@/lib/viewport";
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
@@ -118,14 +119,22 @@ export function VirtualRunHomePage() {
           className={figureIn ? "vr-home__figure is-in" : "vr-home__figure"}
           aria-hidden
         >
-          <Image
-            src={VIRTUAL_RUN_ASSETS.heroFigure}
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 720px) 50vw, 38vw"
-            className="vr-home__figure-art"
-          />
+          <picture className="vr-home__figure-picture">
+            <source
+              media={MOBILE_MQ}
+              srcSet={VIRTUAL_RUN_ASSETS.heroFigureMobile}
+              type="image/png"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element -- picture로 모바일/PC 분기 */}
+            <img
+              src={VIRTUAL_RUN_ASSETS.heroFigure}
+              alt=""
+              width={3039}
+              height={3459}
+              draggable={false}
+              className="vr-home__figure-art"
+            />
+          </picture>
         </div>
         <span className="hero__slash" aria-hidden />
 
