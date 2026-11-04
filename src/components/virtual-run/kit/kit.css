@@ -61,6 +61,10 @@
   object-position: center;
 }
 
+.virtual-run .vr-kit-hero__bg-frame.is-dim .vr-kit-hero__bg {
+  opacity: 0.22;
+}
+
 .virtual-run .vr-kit-card--scene .vr-kit-hero__copy,
 .virtual-run .vr-kit-card--scene .vr-kit-more {
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
@@ -71,11 +75,21 @@
   z-index: 1;
 }
 
+.virtual-run .vr-kit-card {
+  --vr-kit-scene-h: 20rem;
+}
+
+.virtual-run .vr-kit-hero,
+.virtual-run .vr-kit-detail {
+  box-sizing: border-box;
+  min-height: var(--vr-kit-scene-h);
+  max-height: var(--vr-kit-scene-h);
+}
+
 .virtual-run .vr-kit-hero {
   display: grid;
   align-content: space-between;
   gap: 1.1rem 1.5rem;
-  min-height: 20rem;
 }
 
 .virtual-run .vr-kit-hero__kicker {
@@ -131,10 +145,13 @@
 
 .virtual-run .vr-kit-detail {
   position: relative;
+  z-index: 1;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   justify-items: center;
-  gap: 0.7rem;
-  min-height: 28rem;
+  align-content: stretch;
+  gap: 0.35rem;
+  overflow: hidden;
   padding: 0.2rem 3.2rem 0.15rem;
 }
 
@@ -151,11 +168,15 @@
   align-items: center;
   justify-content: center;
   width: min(100%, 34rem);
-  min-height: 16rem;
+  min-height: 0;
+  height: 100%;
 }
 
 .virtual-run .vr-kit-detail__stage .vr-kit-visual__img {
-  height: min(48vh, 420px);
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
 }
 
 .virtual-run .vr-kit-detail__note {
@@ -299,12 +320,15 @@
     padding: 2rem 2rem 1.5rem;
   }
 
+  .virtual-run .vr-kit-card {
+    --vr-kit-scene-h: 24.5rem;
+  }
+
   .virtual-run .vr-kit-hero {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 1.5rem;
-    min-height: 24.5rem;
   }
 
   .virtual-run .vr-kit-hero__copy {
@@ -344,8 +368,23 @@
     padding: 1.25rem 0.95rem 1rem;
   }
 
-  .virtual-run .vr-kit-hero {
-    min-height: 14rem;
+  .virtual-run .vr-kit-card {
+    --vr-kit-scene-h: 14rem;
+  }
+
+  .virtual-run .vr-kit-more {
+    gap: 0.35rem;
+    font-size: 0.78rem;
+  }
+
+  .virtual-run .vr-kit-more__icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .virtual-run .vr-kit-more__icon svg {
+    width: 12px;
+    height: 12px;
   }
 
   .virtual-run .vr-kit-hero__bg-frame {
@@ -357,12 +396,16 @@
   }
 
   .virtual-run .vr-kit-detail {
-    min-height: 0;
-    padding-inline: 2.4rem;
+    gap: 0.25rem;
+    padding-inline: 1.6rem;
   }
 
-  .virtual-run .vr-kit-detail__stage .vr-kit-visual__img {
-    height: min(42vh, 320px);
+  .virtual-run .vr-kit-detail__title {
+    font-size: 1rem;
+  }
+
+  .virtual-run .vr-kit-detail__note {
+    display: none;
   }
 
   .virtual-run .vr-kit-detail__foot {

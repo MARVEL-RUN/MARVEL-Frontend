@@ -114,11 +114,11 @@ export function VirtualRunKitGallery() {
       </div>
 
       <section
-        className={overview && souvenirScene ? "vr-kit-card vr-kit-card--scene" : "vr-kit-card"}
+        className={souvenirScene ? "vr-kit-card vr-kit-card--scene" : "vr-kit-card"}
         aria-label="공식 기념품"
       >
-        {overview && souvenirScene ? (
-          <div className="vr-kit-hero__bg-frame">
+        {souvenirScene ? (
+          <div className={overview ? "vr-kit-hero__bg-frame" : "vr-kit-hero__bg-frame is-dim"}>
             <Image
               key={souvenirScene}
               src={souvenirScene}
