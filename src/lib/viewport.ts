@@ -3,6 +3,9 @@ export const MOBILE_MAX = 720;
 /* main.css @media도 이 문자열과 같게 */
 export const MOBILE_MQ = `(max-width: ${MOBILE_MAX}px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px)`;
 
+/* 세로 짧은 화면 — home.css 피겨·모바일 히어로 이미지와 같게 */
+export const SHORT_PORTRAIT_MQ = `(max-width: ${MOBILE_MAX}px) and (min-aspect-ratio: 9 / 16)`;
+
 export function isMobileView() {
   return window.matchMedia(MOBILE_MQ).matches;
 }

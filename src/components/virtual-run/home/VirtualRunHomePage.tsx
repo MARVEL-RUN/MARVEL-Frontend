@@ -8,7 +8,7 @@ import {
   VIRTUAL_RUN_EVENT,
   VIRTUAL_RUN_OVERVIEW_ROWS,
 } from "@/lib/virtual-run/event";
-import { MOBILE_MQ } from "@/lib/viewport";
+import { SHORT_PORTRAIT_MQ } from "@/lib/viewport";
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
@@ -121,11 +121,11 @@ export function VirtualRunHomePage() {
         >
           <picture className="vr-home__figure-picture">
             <source
-              media={MOBILE_MQ}
+              media={SHORT_PORTRAIT_MQ}
               srcSet={VIRTUAL_RUN_ASSETS.heroFigureMobile}
               type="image/png"
             />
-            {/* eslint-disable-next-line @next/next/no-img-element -- picture로 모바일/PC 분기 */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- 세로 짧을 때만 모바일 히어로 */}
             <img
               src={VIRTUAL_RUN_ASSETS.heroFigure}
               alt=""
