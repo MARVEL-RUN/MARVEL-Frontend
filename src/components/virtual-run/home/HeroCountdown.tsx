@@ -3,10 +3,11 @@
 import { Fragment, useEffect, useState } from "react";
 import { countdownSlotsTo } from "@/lib/register-schedule";
 import { VIRTUAL_RUN_EVENT } from "@/lib/virtual-run/event";
+import { ScrambleText } from "../fx/ScrambleText";
 
 const targetMs = Date.parse(VIRTUAL_RUN_EVENT.countdownTarget);
 
-export function HeroCountdown() {
+export function HeroCountdown({ reveal = false }: { reveal?: boolean }) {
   const [slots, setSlots] = useState(() => countdownSlotsTo(targetMs));
 
   useEffect(() => {
@@ -38,9 +39,11 @@ export function HeroCountdown() {
           ) : null}
           <span className="vr-home__countdown-unit">
             <span className="vr-home__countdown-value" suppressHydrationWarning>
-              {n}
+              <ScrambleText text={n} delay={reveal ? 30 : undefined} duration={480} hover={false} />
             </span>
-            <span className="vr-home__countdown-label">{u}</span>
+            <span className="vr-home__countdown-label">
+              <ScrambleText text={u} delay={reveal ? 70 + i * 50 : undefined} hover={false} />
+            </span>
           </span>
         </Fragment>
       ))}

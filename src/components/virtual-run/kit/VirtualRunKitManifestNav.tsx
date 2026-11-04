@@ -24,6 +24,14 @@ function itemRect(item: VirtualRunKitItem): DOMRect | null {
   return el ? el.getBoundingClientRect() : null;
 }
 
+function revealLink(link: HTMLElement, scroller: HTMLElement) {
+  const linkBox = link.getBoundingClientRect();
+  const box = scroller.getBoundingClientRect();
+  if (linkBox.left >= box.left && linkBox.right <= box.right) return;
+  const left = linkBox.left - box.left + scroller.scrollLeft - (box.width - linkBox.width) / 2;
+  scroller.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+}
+
 function pinToItem(item: VirtualRunKitItem, navEl: HTMLElement | null, smooth: boolean) {
   const el = itemPinEl(item);
   if (!el) return;
@@ -91,7 +99,8 @@ export function VirtualRunKitManifestNav({ items }: Props) {
     const link = trackRef.current.querySelector<HTMLAnchorElement>(
       `a[data-kind="${activeKind}"]`,
     );
-    link?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    const scroller = navRef.current;
+    if (link && scroller) revealLink(link, scroller);
   }, [activeKind]);
 
   function go(event: MouseEvent<HTMLAnchorElement>, item: VirtualRunKitItem) {

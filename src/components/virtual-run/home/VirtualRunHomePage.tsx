@@ -4,10 +4,12 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { COMING_SOON_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
+import { VR_HOME_CURSOR_FX } from "@/lib/virtual-run/home-fx";
 import {
   VIRTUAL_RUN_EVENT,
   VIRTUAL_RUN_OVERVIEW_ROWS,
 } from "@/lib/virtual-run/event";
+import { MOBILE_WIDTH_MQ } from "@/lib/viewport";
 import { KeyVisualCopyright } from "../../main/layout/KeyVisualCopyright";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
@@ -118,18 +120,26 @@ export function VirtualRunHomePage() {
           className={figureIn ? "vr-home__figure is-in" : "vr-home__figure"}
           aria-hidden
         >
-          <Image
-            src={VIRTUAL_RUN_ASSETS.heroFigure}
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 720px) 50vw, 38vw"
-            className="vr-home__figure-art"
-          />
+          <picture className="vr-home__figure-picture">
+            <source
+              media={MOBILE_WIDTH_MQ}
+              srcSet={VIRTUAL_RUN_ASSETS.heroFigureMobile}
+              type="image/webp"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element -- picture로 모바일/PC 분기 */}
+            <img
+              src={VIRTUAL_RUN_ASSETS.heroFigure}
+              alt=""
+              width={3039}
+              height={3459}
+              draggable={false}
+              className="vr-home__figure-art"
+            />
+          </picture>
         </div>
         <span className="hero__slash" aria-hidden />
 
-        <div className="hero__copy">
+        <div className={glitchOn ? "hero__copy is-held" : "hero__copy"}>
           <Image
             src={COMING_SOON_ASSETS.logo}
             alt={VIRTUAL_RUN_EVENT.title}
@@ -140,21 +150,25 @@ export function VirtualRunHomePage() {
             data-vr-pick="LOGO"
           />
           <p className="hero__lead vr-home__plan">
-            <span data-vr-pick="TEXT">{VIRTUAL_RUN_EVENT.planLabel}</span>
+            <span data-vr-pick="TEXT">
+              <ScrambleText text={VIRTUAL_RUN_EVENT.planLabel} delay={glitchOn ? undefined : 40} hover={false} />
+            </span>
           </p>
           <p className="hero__meta">
             <span className="vr-home__meta-text" data-vr-pick="TEXT">
-              {VIRTUAL_RUN_EVENT.schedule}
-              <span aria-hidden> · </span>
-              {VIRTUAL_RUN_EVENT.location}
+              <ScrambleText
+                text={`${VIRTUAL_RUN_EVENT.schedule} · ${VIRTUAL_RUN_EVENT.location}`}
+                delay={glitchOn ? undefined : 110}
+                hover={false}
+              />
             </span>
           </p>
           <div className="hero__actions">
             <div className="hero__guide">
-              <HeroCountdown />
+              <HeroCountdown reveal={!glitchOn} />
               <div className="hero__cta-row vr-home__cta" data-vr-pick="BUTTON">
                 <VrLink href="/event" className="btn btn--ghost">
-                  행사 안내
+                  <ScrambleText text="행사 안내" delay={glitchOn ? undefined : 180} hover={false} />
                 </VrLink>
                 <VirtualRunTicketsCta />
               </div>
@@ -163,7 +177,7 @@ export function VirtualRunHomePage() {
           </div>
         </div>
       </section>
-      <HomeCursors startDelay={HERO_GLITCH_MS} />
+      {VR_HOME_CURSOR_FX ? <HomeCursors startDelay={HERO_GLITCH_MS} /> : null}
 
       <div className="vr-ticker" aria-hidden>
         <div className="vr-ticker__track">

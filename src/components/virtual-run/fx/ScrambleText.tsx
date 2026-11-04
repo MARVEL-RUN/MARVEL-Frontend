@@ -9,12 +9,16 @@ type Props = {
   duration?: number;
   /** 주면 마운트 후 이만큼 뒤에 한 번 재생 */
   delay?: number;
+  /** false면 호버로는 재생하지 않음 */
+  hover?: boolean;
 };
 
-export function ScrambleText({ text, className, duration = 620, delay }: Props) {
+export function ScrambleText({ text, className, duration = 620, delay, hover = true }: Props) {
   const [shown, setShown] = useState(text);
   const elRef = useRef<HTMLSpanElement>(null);
   const timerRef = useRef<number | null>(null);
+  const textRef = useRef(text);
+  textRef.current = text;
 
   const stop = useCallback(() => {
     if (timerRef.current !== null) {
@@ -29,17 +33,17 @@ export function ScrambleText({ text, className, duration = 620, delay }: Props) 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = elRef.current;
     if (el?.offsetWidth) el.style.width = `${el.offsetWidth}px`;
-    const chars = Array.from(text);
+    const chars = Array.from(textRef.current);
     const start = performance.now();
     timerRef.current = window.setInterval(() => {
       const t = Math.min(1, (performance.now() - start) / duration);
       setShown(scrambleFrame(chars, t));
       if (t >= 1) {
         stop();
-        setShown(text);
+        setShown(textRef.current);
       }
     }, SCRAMBLE_FRAME_MS);
-  }, [duration, stop, text]);
+  }, [duration, stop]);
 
   useEffect(() => {
     if (delay === undefined) return;
@@ -47,13 +51,18 @@ export function ScrambleText({ text, className, duration = 620, delay }: Props) 
     return () => window.clearTimeout(id);
   }, [delay, run]);
 
+  useEffect(() => {
+    if (timerRef.current !== null) return;
+    setShown(text);
+  }, [text]);
+
   useEffect(() => stop, [stop]);
 
   return (
     <span
       ref={elRef}
       className={`vr-scramble${className ? ` ${className}` : ""}`}
-      onPointerEnter={run}
+      onPointerEnter={hover ? run : undefined}
     >
       {shown}
     </span>
