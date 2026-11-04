@@ -18,8 +18,11 @@ function isOpenAt(iso: string, now = new Date()): boolean {
   return now.getTime() >= new Date(iso).getTime();
 }
 
+/** 일단 전체 공개. 일정 재적용 시 false 로 두고 아래 스케줄 분기 사용 */
+const VIRTUAL_RUN_NAV_FORCE_OPEN = true;
+
 export function virtualRunOpenFlags(now = new Date()): VirtualRunOpenFlags {
-  if (virtualRunDemoEnabled) {
+  if (VIRTUAL_RUN_NAV_FORCE_OPEN || virtualRunDemoEnabled) {
     return {
       publicInfo: true,
       tickets: true,
