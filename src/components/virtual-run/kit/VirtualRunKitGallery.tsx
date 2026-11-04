@@ -66,7 +66,6 @@ export function VirtualRunKitGallery() {
   const souvenir = useMemo(() => pickItems(theme.items, SOUVENIR_KINDS), [theme]);
   const medalFront = theme.items.find((item) => item.kind === "medal-front");
   const medalBack = theme.items.find((item) => item.kind === "medal-back");
-  const finish = theme.items.find((item) => item.kind === "finish-line");
   const slide = souvenir[index] ?? souvenir[0];
   const overview = view === "overview" || !slide;
   const souvenirScene = VIRTUAL_RUN_ASSETS.kitSouvenir[themeId];
@@ -140,7 +139,6 @@ export function VirtualRunKitGallery() {
                 <br />
                 INFO
               </h2>
-              <p className="vr-kit-hero__en">{theme.lead}</p>
             </div>
             {souvenir.length > 0 ? (
               <button type="button" className="vr-kit-more" onClick={() => setView("detail")}>
@@ -158,7 +156,6 @@ export function VirtualRunKitGallery() {
             aria-label={`${theme.label} 기념품`}
           >
             <h2 className="vr-kit-detail__title">{slide.label}</h2>
-            <p className="vr-kit-detail__en">{theme.lead}</p>
             {souvenir.length > 1 ? (
               <button
                 type="button"
@@ -205,7 +202,7 @@ export function VirtualRunKitGallery() {
         )}
       </section>
 
-      {medalFront || medalBack || finish ? (
+      {medalFront || medalBack ? (
         <section className="vr-kit-card vr-kit-finish" aria-label="완주 패키지">
           <header className="vr-kit-finish__head">
             <h2 className="vr-kit-finish__title">완주 패키지</h2>
@@ -227,12 +224,6 @@ export function VirtualRunKitGallery() {
                   </figure>
                 ) : null}
               </div>
-            ) : null}
-            {finish ? (
-              <figure className="vr-kit-finish__side">
-                <KitVisual themeId={themeId} item={finish} />
-                <figcaption>{finish.label}</figcaption>
-              </figure>
             ) : null}
           </div>
         </section>

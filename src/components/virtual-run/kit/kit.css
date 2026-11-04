@@ -94,13 +94,6 @@
   line-height: 1.05;
 }
 
-.virtual-run .vr-kit-hero__en {
-  margin: 0.95rem 0 0;
-  color: var(--dim);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-}
-
 .virtual-run .vr-kit-visual__img {
   display: block;
   width: auto;
@@ -151,13 +144,6 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   text-align: center;
-}
-
-.virtual-run .vr-kit-detail__en {
-  margin: -0.35rem 0 0.2rem;
-  color: var(--dim);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
 }
 
 .virtual-run .vr-kit-detail__stage {
@@ -286,12 +272,6 @@
   text-align: center;
 }
 
-.virtual-run .vr-kit-finish__side .vr-kit-visual__img {
-  width: 100%;
-  height: auto;
-  max-height: 280px;
-}
-
 .virtual-run .vr-kit-page__cta {
   position: relative;
   z-index: 2;
@@ -335,10 +315,6 @@
   .virtual-run .vr-kit-hero__bg-frame {
     inset: 0 3.5rem;
   }
-
-  .virtual-run .vr-kit-finish__body {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  }
 }
 
 @media (max-width: 720px) {
@@ -366,6 +342,10 @@
   .virtual-run .vr-kit-card {
     border-radius: 1.25rem;
     padding: 1.25rem 0.95rem 1rem;
+  }
+
+  .virtual-run .vr-kit-hero {
+    min-height: 14rem;
   }
 
   .virtual-run .vr-kit-hero__bg-frame {
