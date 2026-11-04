@@ -747,29 +747,64 @@
     transform-origin: 50% 8%;
   }
 
-  .virtual-run .vr-home__figure::before {
+  /* 피겨: 얼굴을 화면 중앙(50svh)에. 짧은 화면은 카피(≈24rem) 위로 올림.
+     svh·vw 만 써서 주소창 변화에 안 흔들림 */
+  .virtual-run .vr-home .hero {
+    --vr-fig-m-w: 170vw;
+    --vr-fig-m-face-x: 28%;
+    --vr-fig-m-face-y: 9.2%;
+    --vr-fig-m-face-top: max(calc(var(--header-h) + 5rem), min(50svh, calc(100svh - 24rem)));
+    padding-bottom: 0.55rem;
+  }
+
+  .virtual-run .vr-home__figure {
+    inset: auto;
+    top: var(--vr-fig-m-face-top);
     left: 50%;
-    bottom: 16%;
-    width: min(160vw, 38rem);
-    height: min(100vw, 26rem);
-    transform: translateX(-50%);
+    width: var(--vr-fig-m-w);
+    height: auto;
+    aspect-ratio: 1080 / 1229;
+    margin: 0;
+    transform: translate(calc(-1 * var(--vr-fig-m-face-x)), calc(-1 * var(--vr-fig-m-face-y)));
+    filter: none;
+    transition: opacity 0.6s ease-out;
+  }
+
+  .virtual-run .vr-home__figure.is-in {
+    transform: translate(calc(-1 * var(--vr-fig-m-face-x)), calc(-1 * var(--vr-fig-m-face-y)));
+    filter: none;
+  }
+
+  .virtual-run .vr-home__figure::before {
+    left: var(--vr-fig-m-face-x);
+    top: var(--vr-fig-m-face-y);
+    bottom: auto;
+    width: 90%;
+    height: 60%;
+    transform: translate(-50%, -28%);
     background: radial-gradient(ellipse 100% 100% at 50% 50%,
         #4ae892 0%,
-        #22a85c 12%,
-        #0d5a30 36%,
-        rgba(4, 32, 20, 0.5) 56%,
-        rgba(4, 32, 20, 0.2) 76%,
-        transparent 94%);
-    filter: blur(28px);
+        #22a85c 10%,
+        #0d5a30 30%,
+        rgba(4, 32, 20, 0.45) 50%,
+        rgba(4, 32, 20, 0.15) 72%,
+        transparent 90%);
+    filter: none;
   }
 
   .virtual-run .vr-home__figure-art {
     z-index: 1;
+    object-position: 50% 50%;
+    transform: none;
+    transform-origin: 50% 50%;
   }
 
-  .virtual-run .vr-home__figure.is-in {
-    filter:
-      drop-shadow(0 0 3.25rem color-mix(in srgb, var(--marvel) 62%, transparent)) drop-shadow(0 0 6.5rem color-mix(in srgb, var(--marvel) 36%, transparent)) drop-shadow(0 0 11rem color-mix(in srgb, var(--marvel) 18%, transparent));
+  .virtual-run .vr-home .hero__logo {
+    width: min(15rem, 66vw);
+  }
+
+  .virtual-run .vr-home .hero__guide .kv-copy {
+    margin-bottom: 0.7rem;
   }
 
   .virtual-run .vr-home__countdown {
@@ -799,33 +834,6 @@
   .virtual-run .side-banner--virtual-run .side-banner__copy {
     max-width: min(14rem, 48%);
     padding: 1rem 0;
-  }
-}
-
-/* 세로 짧을 때만 — SHORT_PORTRAIT_MQ 와 동일 */
-@media (max-width: 720px) and (min-aspect-ratio: 9 / 16) {
-  .virtual-run .vr-home__figure {
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    bottom: -4%;
-    width: min(148vw, 36rem);
-    height: min(168vw, 41rem);
-    transform: translateY(22%) scale(1.04);
-  }
-
-  .virtual-run .vr-home__figure::before {
-    bottom: 22%;
-  }
-
-  .virtual-run .vr-home__figure-art {
-    object-position: 50% 100%;
-    transform: none;
-    transform-origin: 50% 100%;
-  }
-
-  .virtual-run .vr-home__figure.is-in {
-    transform: translateY(9%) scale(1);
   }
 }
 
