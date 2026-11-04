@@ -139,7 +139,7 @@ export function VirtualRunHomePage() {
         </div>
         <span className="hero__slash" aria-hidden />
 
-        <div className="hero__copy">
+        <div className={glitchOn ? "hero__copy is-held" : "hero__copy"}>
           <Image
             src={COMING_SOON_ASSETS.logo}
             alt={VIRTUAL_RUN_EVENT.title}
@@ -150,21 +150,25 @@ export function VirtualRunHomePage() {
             data-vr-pick="LOGO"
           />
           <p className="hero__lead vr-home__plan">
-            <span data-vr-pick="TEXT">{VIRTUAL_RUN_EVENT.planLabel}</span>
+            <span data-vr-pick="TEXT">
+              <ScrambleText text={VIRTUAL_RUN_EVENT.planLabel} delay={glitchOn ? undefined : 40} hover={false} />
+            </span>
           </p>
           <p className="hero__meta">
             <span className="vr-home__meta-text" data-vr-pick="TEXT">
-              {VIRTUAL_RUN_EVENT.schedule}
-              <span aria-hidden> · </span>
-              {VIRTUAL_RUN_EVENT.location}
+              <ScrambleText
+                text={`${VIRTUAL_RUN_EVENT.schedule} · ${VIRTUAL_RUN_EVENT.location}`}
+                delay={glitchOn ? undefined : 110}
+                hover={false}
+              />
             </span>
           </p>
           <div className="hero__actions">
             <div className="hero__guide">
-              <HeroCountdown />
+              <HeroCountdown reveal={!glitchOn} />
               <div className="hero__cta-row vr-home__cta" data-vr-pick="BUTTON">
                 <VrLink href="/event" className="btn btn--ghost">
-                  행사 안내
+                  <ScrambleText text="행사 안내" delay={glitchOn ? undefined : 180} hover={false} />
                 </VrLink>
                 <VirtualRunTicketsCta />
               </div>

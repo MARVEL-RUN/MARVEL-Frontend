@@ -53,6 +53,17 @@
 
 .virtual-run .vr-home .hero__copy {
   z-index: 3;
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+}
+
+/* 글리치 중에는 카피를 빼 두고, 끝난 뒤 올라오며 등장 */
+.virtual-run .vr-home .hero__copy.is-held {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(0.7rem);
+  transition: none;
 }
 
 .virtual-run .fx-scan {
@@ -312,6 +323,11 @@
     filter: none;
     transition: none;
   }
+
+  .virtual-run .vr-home .hero__copy {
+    transform: none;
+    transition: none;
+  }
 }
 
 .virtual-run .vr-home__stage {
@@ -439,9 +455,9 @@
 }
 
 .virtual-run .vr-home__glitch {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 40;
+  z-index: 4;
   pointer-events: none;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.06);
