@@ -257,6 +257,48 @@
   outline-offset: 3px;
 }
 
+.virtual-run .vr-kit-top {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #07081c;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.virtual-run .vr-kit-top:hover {
+  background: var(--marvel);
+}
+
+.virtual-run .vr-kit-top:focus-visible {
+  outline: 2px solid var(--marvel-hi);
+  outline-offset: 3px;
+}
+
+.virtual-run .vr-kit-top span {
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0.42rem 0.58rem;
+  border-color: transparent transparent currentColor;
+}
+
+body:has(.site-header__drawer.is-open) .virtual-run .vr-kit-top {
+  display: none;
+}
+
 @media (max-width: 720px) {
   .virtual-run .vr-kit-page {
     padding-bottom: 2.25rem;
@@ -288,5 +330,16 @@
 
   .virtual-run .vr-kit-page__cta .locked-cta__img {
     width: 6.8rem;
+  }
+
+  .virtual-run .vr-kit-top {
+    width: 2.35rem;
+    height: 2.35rem;
+    right: max(0.85rem, env(safe-area-inset-right, 0px));
+    bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .virtual-run .vr-kit-top span {
+    border-width: 0 0.34rem 0.46rem;
   }
 }
