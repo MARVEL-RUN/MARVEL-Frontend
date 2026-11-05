@@ -251,10 +251,12 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
               {resolved.map((line, index) => (
                 <li key={line.id} className={`is-${line.pkg.accent}`}>
                   <img src={line.pkg.image} alt="" width={72} height={72} />
-                  <div className="vr-pkg-lines__head">
-                    <strong>
-                      {index + 1}. {line.pkg.name}
-                    </strong>
+                  <div className="vr-pkg-lines__body">
+                    <div className="vr-pkg-lines__head">
+                      <strong>
+                        {index + 1}. {line.pkg.name}
+                      </strong>
+                    </div>
                     <label className={`vr-recipients__same${line.sameAs ? " is-on" : ""}`}>
                       <input
                         type="checkbox"
@@ -271,32 +273,32 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
                       />
                       신청자와 동일
                     </label>
+                    {line.sameAs ? (
+                      <p className="vr-pkg-lines__same">
+                        {filterNoSpaceName(buyerName) || "신청자"} · {phone || "신청자 휴대폰"}
+                      </p>
+                    ) : (
+                      <>
+                        <FormRow label="이름" required>
+                          <input
+                            type="text"
+                            value={line.name}
+                            onChange={(e) =>
+                              patchLine(line.id, { name: filterNoSpaceName(e.target.value) })
+                            }
+                            placeholder="참가 이름"
+                          />
+                        </FormRow>
+                        <FormRow label="휴대폰 번호" required>
+                          <PhoneField
+                            value={line.phone}
+                            onChange={(next) => patchLine(line.id, { phone: next })}
+                            placeholder="010-0000-0000"
+                          />
+                        </FormRow>
+                      </>
+                    )}
                   </div>
-                  {line.sameAs ? (
-                    <p className="vr-pkg-lines__same">
-                      {filterNoSpaceName(buyerName) || "신청자"} · {phone || "신청자 휴대폰"}
-                    </p>
-                  ) : (
-                    <>
-                      <FormRow label="이름" required>
-                        <input
-                          type="text"
-                          value={line.name}
-                          onChange={(e) =>
-                            patchLine(line.id, { name: filterNoSpaceName(e.target.value) })
-                          }
-                          placeholder="참가 이름"
-                        />
-                      </FormRow>
-                      <FormRow label="휴대폰 번호" required>
-                        <PhoneField
-                          value={line.phone}
-                          onChange={(next) => patchLine(line.id, { phone: next })}
-                          placeholder="010-0000-0000"
-                        />
-                      </FormRow>
-                    </>
-                  )}
                 </li>
               ))}
             </ul>

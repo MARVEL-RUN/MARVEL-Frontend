@@ -499,13 +499,18 @@
   width: 4.5rem;
   height: 4.5rem;
   object-fit: cover;
-  grid-row: 1 / -1;
   align-self: start;
   background: #061018;
 }
 
+.virtual-run .vr-pkg-lines__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
 .virtual-run .vr-pkg-lines__same {
-  grid-column: 2;
   margin: 0;
   color: var(--silver);
   font-size: 0.84rem;
@@ -568,8 +573,8 @@
   background: var(--tone, #fff);
 }
 
-.virtual-run .vr-pkg-lines .form-row {
-  grid-column: 2;
+.virtual-run .vr-pkg-lines__body .form-row {
+  margin-top: 0.45rem;
 }
 
 @media (max-width: 860px) {
