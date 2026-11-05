@@ -14,163 +14,59 @@
   gap: 1.15rem;
 }
 
-.virtual-run .vr-kit__themes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.35rem;
-  margin-bottom: 0.35rem;
-}
-
-.virtual-run .vr-kit__themes button {
-  padding: 0.35rem 0;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--dim);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-}
-
-.virtual-run .vr-kit__themes button.is-on {
-  color: #fff;
-  border-bottom-color: var(--marvel-hi);
-}
-
 .virtual-run .vr-kit-lineup {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 .virtual-run .vr-kit-lineup button {
+  position: relative;
   display: block;
   width: 100%;
   padding: 0;
   border: 0;
   border-radius: 1rem;
   overflow: hidden;
-  background: color-mix(in srgb, #fff 5.5%, var(--vr-surface));
-  color: inherit;
+  background: transparent;
+  color: #fff;
   font: inherit;
   cursor: pointer;
 }
 
-.virtual-run .vr-kit-lineup__shot {
-  position: relative;
+.virtual-run .vr-kit-lineup__img {
   display: block;
-  aspect-ratio: 1.18 / 1;
+  width: 100%;
+  height: auto;
 }
 
-.virtual-run .vr-kit-lineup__shot img {
-  object-fit: cover;
-  object-position: center 42%;
+.virtual-run .vr-kit-lineup__name {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: 0.85rem 0.5rem 2.2rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.62) 0%, transparent 100%);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .virtual-run .vr-kit-lineup button.is-on {
   box-shadow: 0 0 0 2px var(--marvel-hi);
 }
 
-.virtual-run .vr-kit-card {
-  background: color-mix(in srgb, #fff 5.5%, var(--vr-surface));
-  border-radius: 1.75rem;
-  padding: 1.7rem 1.35rem 1.25rem;
-}
-
-.virtual-run .vr-kit-card--scene {
-  position: relative;
-  overflow: hidden;
-}
-
-.virtual-run .vr-kit-hero__bg-frame {
-  position: absolute;
-  z-index: 0;
-  inset: 0 2.75rem;
-  pointer-events: none;
-}
-
-.virtual-run .vr-kit-hero__bg {
-  object-fit: contain;
-  object-position: right center;
-}
-
-.virtual-run .vr-kit-card--scene:has(.vr-kit-hero) {
-  --vr-kit-scene-h: 34rem;
-}
-
-.virtual-run .vr-kit-card--scene:has(.vr-kit-hero) .vr-kit-hero__bg-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.18) 46%, transparent 72%);
-}
-
-.virtual-run .vr-kit-hero__bg-frame.is-dim .vr-kit-hero__bg {
-  opacity: 0.10;
-  object-position: center;
-}
-
-.virtual-run .vr-kit-card--scene .vr-kit-hero__copy,
-.virtual-run .vr-kit-card--scene .vr-kit-more {
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
-}
-
-.virtual-run .vr-kit-card--scene .vr-kit-hero {
-  position: relative;
-  z-index: 1;
-}
-
-.virtual-run .vr-kit-card {
-  --vr-kit-scene-h: 20rem;
-}
-
-.virtual-run .vr-kit-hero,
-.virtual-run .vr-kit-detail {
-  box-sizing: border-box;
-  min-height: var(--vr-kit-scene-h);
-  max-height: var(--vr-kit-scene-h);
-}
-
-.virtual-run .vr-kit-hero {
-  display: grid;
-  align-content: space-between;
-  gap: 1.1rem 1.5rem;
-}
-
-.virtual-run .vr-kit-hero__kicker {
-  margin: 0 0 0.85rem;
-  color: var(--note);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.virtual-run .vr-kit-hero__title {
-  margin: 0;
-  font-size: clamp(1.45rem, 2.2vw, 1.85rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-}
-
-.virtual-run .vr-kit-visual__img {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  height: 128px;
-  object-fit: contain;
+.virtual-run .vr-kit-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .virtual-run .vr-kit-more {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  justify-self: end;
-  margin-left: auto;
   padding: 0;
   border: 0;
   background: transparent;
@@ -194,13 +90,11 @@
 
 .virtual-run .vr-kit-detail {
   position: relative;
-  z-index: 1;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(16rem, 28rem) auto auto;
   justify-items: center;
-  align-content: stretch;
   gap: 0.35rem;
-  overflow: hidden;
+  min-width: 0;
   padding: 0.2rem 3.2rem 0.15rem;
 }
 
@@ -221,11 +115,13 @@
   height: 100%;
 }
 
-.virtual-run .vr-kit-detail__stage .vr-kit-visual__img {
+.virtual-run .vr-kit-visual__img {
+  display: block;
   width: auto;
   max-width: 100%;
   height: 100%;
   max-height: 100%;
+  object-fit: contain;
 }
 
 .virtual-run .vr-kit-detail__note {
@@ -289,57 +185,7 @@
 
 .virtual-run .vr-kit-detail__foot .vr-kit-more {
   grid-column: 3;
-}
-
-.virtual-run .vr-kit-finish__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.1rem;
-}
-
-.virtual-run .vr-kit-finish__title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.virtual-run .vr-kit-finish__note {
-  margin: 0;
-  color: var(--note);
-  font-size: 0.75rem;
-  line-height: 1.45;
-  text-align: right;
-}
-
-.virtual-run .vr-kit-finish__body {
-  display: grid;
-  gap: 1.25rem;
-  align-items: center;
-}
-
-.virtual-run .vr-kit-finish__medals {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.35rem 0.75rem;
-  justify-items: center;
-}
-
-.virtual-run .vr-kit-finish figure {
-  margin: 0;
-}
-
-.virtual-run .vr-kit-finish__medals .vr-kit-visual__img {
-  height: min(46vh, 380px);
-}
-
-.virtual-run .vr-kit-finish figcaption {
-  margin-top: 0.45rem;
-  color: var(--note);
-  font-size: 0.78rem;
-  text-align: center;
+  justify-self: end;
 }
 
 .virtual-run .vr-kit-page__cta {
@@ -348,7 +194,7 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: -2.4rem;
+  margin-top: 0.4rem;
 }
 
 .virtual-run .vr-kit-page__cta .locked-cta__img {
@@ -359,36 +205,9 @@
 .virtual-run .vr-kit-more:focus-visible,
 .virtual-run .vr-kit-arrow:focus-visible,
 .virtual-run .vr-kit-dots button:focus-visible,
-.virtual-run .vr-kit__themes button:focus-visible,
 .virtual-run .vr-kit-lineup button:focus-visible {
   outline: 2px solid var(--marvel-hi);
   outline-offset: 3px;
-}
-
-@media (min-width: 860px) {
-  .virtual-run .vr-kit-card {
-    padding: 2rem 2rem 1.5rem;
-  }
-
-  .virtual-run .vr-kit-card {
-    --vr-kit-scene-h: 24.5rem;
-  }
-
-  .virtual-run .vr-kit-hero {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1.5rem;
-  }
-
-  .virtual-run .vr-kit-hero__copy {
-    align-self: start;
-    padding-top: 0.35rem;
-  }
-
-  .virtual-run .vr-kit-hero__bg-frame {
-    inset: 0 3.5rem;
-  }
 }
 
 @media (max-width: 720px) {
@@ -396,30 +215,17 @@
     padding-bottom: 2.25rem;
   }
 
-  .virtual-run .vr-kit__themes {
-    flex-wrap: nowrap;
-    gap: 0.35rem 1rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
+  .virtual-run .vr-kit-lineup {
+    gap: 0.4rem;
   }
 
-  .virtual-run .vr-kit__themes::-webkit-scrollbar {
-    display: none;
+  .virtual-run .vr-kit-lineup button {
+    border-radius: 0.7rem;
   }
 
-  .virtual-run .vr-kit__themes button {
-    flex-shrink: 0;
-    font-size: 0.92rem;
-  }
-
-  .virtual-run .vr-kit-card {
-    border-radius: 1.25rem;
-    padding: 1.25rem 0.95rem 1rem;
-  }
-
-  .virtual-run .vr-kit-card {
-    --vr-kit-scene-h: 14rem;
+  .virtual-run .vr-kit-lineup__name {
+    padding: 0.4rem 0.2rem 1.2rem;
+    font-size: 0.72rem;
   }
 
   .virtual-run .vr-kit-more {
@@ -437,35 +243,8 @@
     height: 12px;
   }
 
-  .virtual-run .vr-kit-lineup {
-    gap: 0.45rem;
-  }
-
-  .virtual-run .vr-kit-lineup button {
-    border-radius: 0.7rem;
-  }
-
-  .virtual-run .vr-kit-card--scene:has(.vr-kit-hero) {
-    --vr-kit-scene-h: 28rem;
-  }
-
-  .virtual-run .vr-kit-hero__bg {
-    object-position: center top;
-  }
-
-  .virtual-run .vr-kit-card--scene:has(.vr-kit-hero) .vr-kit-hero__bg-frame::after {
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.16) 36%, transparent 58%);
-  }
-
-  .virtual-run .vr-kit-hero__bg-frame {
-    inset: 0 1.15rem;
-  }
-
-  .virtual-run .vr-kit-visual__img {
-    height: 104px;
-  }
-
   .virtual-run .vr-kit-detail {
+    grid-template-rows: auto minmax(12rem, 20rem) auto auto;
     gap: 0.25rem;
     padding-inline: 1.6rem;
   }
@@ -482,20 +261,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
-  }
-
-  .virtual-run .vr-kit-finish__head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .virtual-run .vr-kit-finish__note {
-    text-align: left;
-  }
-
-  .virtual-run .vr-kit-finish__medals .vr-kit-visual__img {
-    height: min(38vh, 280px);
   }
 
   .virtual-run .vr-kit-page__cta .locked-cta__img {

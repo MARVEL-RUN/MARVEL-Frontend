@@ -52,7 +52,7 @@ function KitVisual({
       height={1200}
       className="vr-kit-visual__img"
       priority={priority}
-      sizes="(max-width: 720px) 46vw, 280px"
+      sizes="(max-width: 720px) 80vw, 520px"
     />
   );
 }
@@ -64,11 +64,8 @@ export function VirtualRunKitGallery() {
   const theme = VIRTUAL_RUN_KIT_THEMES.find((entry) => entry.id === themeId) ?? VIRTUAL_RUN_KIT_THEMES[0];
 
   const souvenir = useMemo(() => pickItems(theme.items, SOUVENIR_KINDS), [theme]);
-  const medalFront = theme.items.find((item) => item.kind === "medal-front");
-  const medalBack = theme.items.find((item) => item.kind === "medal-back");
   const slide = souvenir[index] ?? souvenir[0];
   const overview = view === "overview" || !slide;
-  const souvenirScene = VIRTUAL_RUN_ASSETS.kitSouvenir[themeId];
 
   useEffect(() => {
     if (view !== "detail" || souvenir.length < 2) return;
@@ -98,7 +95,7 @@ export function VirtualRunKitGallery() {
 
   return (
     <div className="vr-kit">
-      <div className="vr-kit__themes" role="tablist" aria-label="테마별 기념품">
+      <div className="vr-kit-lineup" role="tablist" aria-label="테마별 기념품">
         {VIRTUAL_RUN_KIT_THEMES.map((entry) => (
           <button
             key={entry.id}
@@ -108,148 +105,81 @@ export function VirtualRunKitGallery() {
             className={entry.id === themeId ? "is-on" : undefined}
             onClick={() => selectTheme(entry.id)}
           >
-            {entry.label}
+            <Image
+              src={VIRTUAL_RUN_ASSETS.kitSouvenir[entry.id]}
+              alt=""
+              width={1400}
+              height={1750}
+              className="vr-kit-lineup__img"
+              sizes="(max-width: 720px) 32vw, 360px"
+            />
+            <span className="vr-kit-lineup__name">{entry.label}</span>
           </button>
         ))}
       </div>
 
-      <ul className="vr-kit-lineup" aria-label="테마별 기념품">
-        {VIRTUAL_RUN_KIT_THEMES.map((entry) => (
-          <li key={entry.id}>
-            <button
-              type="button"
-              className={entry.id === themeId ? "is-on" : undefined}
-              aria-pressed={entry.id === themeId}
-              onClick={() => selectTheme(entry.id)}
-            >
-              <span className="vr-kit-lineup__shot">
-                <Image
-                  src={VIRTUAL_RUN_ASSETS.kitSouvenir[entry.id]}
-                  alt={`${entry.label} 기념품`}
-                  fill
-                  sizes="(max-width: 720px) 30vw, 280px"
-                />
+      {overview ? (
+        souvenir.length > 0 ? (
+          <div className="vr-kit-actions">
+            <button type="button" className="vr-kit-more" onClick={() => setView("detail")}>
+              자세히 보기
+              <span className="vr-kit-more__icon" aria-hidden="true">
+                <ArrowRight size={16} strokeWidth={2.4} />
               </span>
             </button>
-          </li>
-        ))}
-      </ul>
-
-      <section
-        className={souvenirScene ? "vr-kit-card vr-kit-card--scene" : "vr-kit-card"}
-        aria-label="공식 기념품"
-      >
-        {souvenirScene ? (
-          <div className={overview ? "vr-kit-hero__bg-frame" : "vr-kit-hero__bg-frame is-dim"}>
-            <Image
-              key={souvenirScene}
-              src={souvenirScene}
-              alt=""
-              fill
-              priority
-              sizes="(max-width: 720px) 92vw, 960px"
-              className="vr-kit-hero__bg"
-            />
           </div>
-        ) : null}
-        {overview ? (
-          <div className="vr-kit-hero">
-            <div className="vr-kit-hero__copy">
-              <p className="vr-kit-hero__kicker">{theme.label} 공식 기념품</p>
-              <h2 className="vr-kit-hero__title">
-                SOUVENIR
-                <br />
-                INFO
-              </h2>
+        ) : null
+      ) : (
+        <div
+          className="vr-kit-detail"
+          aria-roledescription="carousel"
+          aria-label={`${theme.label} 기념품`}
+        >
+          <h2 className="vr-kit-detail__title">{slide.label}</h2>
+          {souvenir.length > 1 ? (
+            <button
+              type="button"
+              className="vr-kit-arrow vr-kit-arrow--prev"
+              aria-label="이전 기념품"
+              onClick={() => step(-1)}
+            >
+              <ChevronLeft size={28} strokeWidth={1.75} />
+            </button>
+          ) : null}
+          <div className="vr-kit-detail__stage">
+            <KitVisual themeId={themeId} item={slide} priority />
+          </div>
+          {souvenir.length > 1 ? (
+            <button
+              type="button"
+              className="vr-kit-arrow vr-kit-arrow--next"
+              aria-label="다음 기념품"
+              onClick={() => step(1)}
+            >
+              <ChevronRight size={28} strokeWidth={1.75} />
+            </button>
+          ) : null}
+          <p className="vr-kit-detail__note">이미지는 이해를 돕기 위한 예시로 실물과 다를 수 있습니다.</p>
+          <div className="vr-kit-detail__foot">
+            <div className="vr-kit-dots" role="tablist" aria-label="기념품 순서">
+              {souvenir.map((item, dotIndex) => (
+                <button
+                  key={item.kind}
+                  type="button"
+                  role="tab"
+                  aria-label={item.label}
+                  aria-selected={dotIndex === index}
+                  className={dotIndex === index ? "is-on" : undefined}
+                  onClick={() => setIndex(dotIndex)}
+                />
+              ))}
             </div>
-            {souvenir.length > 0 ? (
-              <button type="button" className="vr-kit-more" onClick={() => setView("detail")}>
-                자세히 보기
-                <span className="vr-kit-more__icon" aria-hidden="true">
-                  <ArrowRight size={16} strokeWidth={2.4} />
-                </span>
-              </button>
-            ) : null}
+            <button type="button" className="vr-kit-more" onClick={() => setView("overview")}>
+              전체 보기
+            </button>
           </div>
-        ) : (
-          <div
-            className="vr-kit-detail"
-            aria-roledescription="carousel"
-            aria-label={`${theme.label} 기념품`}
-          >
-            <h2 className="vr-kit-detail__title">{slide.label}</h2>
-            {souvenir.length > 1 ? (
-              <button
-                type="button"
-                className="vr-kit-arrow vr-kit-arrow--prev"
-                aria-label="이전 기념품"
-                onClick={() => step(-1)}
-              >
-                <ChevronLeft size={28} strokeWidth={1.75} />
-              </button>
-            ) : null}
-            <div className="vr-kit-detail__stage">
-              <KitVisual themeId={themeId} item={slide} priority />
-            </div>
-            {souvenir.length > 1 ? (
-              <button
-                type="button"
-                className="vr-kit-arrow vr-kit-arrow--next"
-                aria-label="다음 기념품"
-                onClick={() => step(1)}
-              >
-                <ChevronRight size={28} strokeWidth={1.75} />
-              </button>
-            ) : null}
-            <p className="vr-kit-detail__note">이미지는 이해를 돕기 위한 예시로 실물과 다를 수 있습니다.</p>
-            <div className="vr-kit-detail__foot">
-              <div className="vr-kit-dots" role="tablist" aria-label="기념품 순서">
-                {souvenir.map((item, dotIndex) => (
-                  <button
-                    key={item.kind}
-                    type="button"
-                    role="tab"
-                    aria-label={item.label}
-                    aria-selected={dotIndex === index}
-                    className={dotIndex === index ? "is-on" : undefined}
-                    onClick={() => setIndex(dotIndex)}
-                  />
-                ))}
-              </div>
-              <button type="button" className="vr-kit-more" onClick={() => setView("overview")}>
-                전체 보기
-              </button>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {medalFront || medalBack ? (
-        <section className="vr-kit-card vr-kit-finish" aria-label="완주 패키지">
-          <header className="vr-kit-finish__head">
-            <h2 className="vr-kit-finish__title">완주 패키지</h2>
-            <p className="vr-kit-finish__note">회차·티켓에 따라 테마가 달라집니다.</p>
-          </header>
-          <div className="vr-kit-finish__body">
-            {medalFront || medalBack ? (
-              <div className="vr-kit-finish__medals">
-                {medalFront ? (
-                  <figure>
-                    <KitVisual themeId={themeId} item={medalFront} />
-                    <figcaption>앞</figcaption>
-                  </figure>
-                ) : null}
-                {medalBack ? (
-                  <figure>
-                    <KitVisual themeId={themeId} item={medalBack} />
-                    <figcaption>뒤</figcaption>
-                  </figure>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        </section>
-      ) : null}
+        </div>
+      )}
     </div>
   );
 }
