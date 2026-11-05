@@ -273,6 +273,7 @@ export function VirtualRunRegistrationEdit() {
         ...session,
         access: { ...session.access, name, birth: body.birth, phNum },
         categoryName: receipt.eventCategoryName?.trim() || session.categoryName,
+        eventCategoryId: receipt.eventCategoryId?.trim() || session.eventCategoryId,
       });
       if (participant) {
         update({

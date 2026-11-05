@@ -55,6 +55,7 @@ export function VirtualRunLoginPage() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
     const invalid = loginFormError(name, birth, phone, password);
     if (invalid) {
       setError(invalid);
@@ -72,7 +73,6 @@ export function VirtualRunLoginPage() {
       password: password.trim(),
     };
     setBusy(true);
-    setError("");
     try {
       const found = await lookupIndividualRegistrations(VIRTUAL_RUN_EVENT_ID, body);
       const rows = Array.isArray(found) ? found : [];
@@ -86,6 +86,7 @@ export function VirtualRunLoginPage() {
         access: body,
         registrationId: receipt.registrationId?.trim() || "",
         categoryName: receipt.eventCategoryName?.trim() || "",
+        eventCategoryId: receipt.eventCategoryId?.trim() || "",
       });
       update(
         participantFromLookup({
@@ -121,7 +122,6 @@ export function VirtualRunLoginPage() {
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              disabled={busy}
             />
           </label>
 
@@ -132,7 +132,6 @@ export function VirtualRunLoginPage() {
               autoComplete="bday"
               value={birth}
               onChange={setBirth}
-              disabled={busy}
             />
           </label>
 
@@ -144,7 +143,6 @@ export function VirtualRunLoginPage() {
               value={phone}
               onChange={setPhone}
               autoComplete="tel"
-              disabled={busy}
             />
           </label>
 
@@ -155,7 +153,6 @@ export function VirtualRunLoginPage() {
               onChange={setPassword}
               placeholder="신청 시 설정한 비밀번호 (6자 이상)"
               autoComplete="current-password"
-              disabled={busy}
             />
           </div>
 

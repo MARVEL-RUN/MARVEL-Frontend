@@ -7,6 +7,7 @@ export type VirtualRunLoginSession = {
   access: IndividualRegistrationLookupRequest;
   registrationId: string;
   categoryName: string;
+  eventCategoryId?: string;
 };
 
 export function readLoginSession(): VirtualRunLoginSession | null {

@@ -86,7 +86,7 @@ export function defaultParticipant(partial?: Partial<VirtualRunParticipant>): Vi
   };
 }
 
-/** 신청 조회로 연 로그인. 배번·차수는 조회 응답에 없으므로 비운다 */
+/** 신청 조회로 연 로그인. 배번은 조회에 없다. 보유 회차는 신청 옵션으로 채운다 */
 export function participantFromLookup(input: {
   name: string;
   phone: string;
