@@ -714,7 +714,7 @@
   display: grid;
   grid-template-columns: minmax(11rem, 18rem) minmax(0, 1fr);
   gap: 0.85rem;
-  align-items: start;
+  align-items: stretch;
   margin-top: 0.4rem;
 }
 
@@ -731,14 +731,21 @@
 }
 
 .virtual-run .vr-home__trailer-frame {
+  position: relative;
+  height: 0;
+  min-height: 100%;
+  overflow: hidden;
   background: #000;
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
 }
 
 .virtual-run .vr-home__trailer-video {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
   background: #000;
 }
 
@@ -757,7 +764,17 @@
   }
 
   .virtual-run .vr-home__trailer-frame {
+    position: static;
     width: 100%;
+    height: auto;
+    min-height: 0;
+  }
+
+  .virtual-run .vr-home__trailer-video {
+    position: static;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
   }
 
   .virtual-run.site {
