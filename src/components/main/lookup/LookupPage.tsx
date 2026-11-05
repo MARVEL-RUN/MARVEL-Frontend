@@ -315,16 +315,25 @@ function ReceiptContactSpec({ receipt }: { receipt: RegistrationReceipt }) {
 }
 
 function ReceiptPaymentSpec({ receipt }: { receipt: RegistrationReceipt }) {
+  const pending = receipt.pendingUpgrade;
   return (
     <>
       <div>
         <dt>결제금액</dt>
-        <dd>{formatWon(receipt.totalAmount)}</dd>
+        <dd>{formatWon(pending ? receipt.paidAmount : receipt.totalAmount)}</dd>
       </div>
       <div>
         <dt>납부금액</dt>
         <dd>{formatWon(receipt.paidAmount)}</dd>
       </div>
+      {pending ? (
+        <div>
+          <dt>패키지 상향</dt>
+          <dd>
+            {pending.targetCategoryName || "패키지"} · 차액 {formatWon(pending.amount)}
+          </dd>
+        </div>
+      ) : null}
     </>
   );
 }
@@ -619,9 +628,9 @@ function IndividualReceiptCard({
   const phone = receipt.phNum ? formatPhone(receipt.phNum) : "";
   const gender = genderLabel(receipt.gender);
   const address = receiptAddress(receipt);
-  const registrationLabel = registrationStatusLabel(
-    receipt.registrationStatus ?? undefined,
-  );
+  const registrationLabel = receipt.pendingUpgrade
+    ? "참가 확정"
+    : registrationStatusLabel(receipt.registrationStatus ?? undefined);
   const guardianName = receipt.guardianName?.trim() ?? "";
   const guardianPhone = receipt.guardianPhNum
     ? formatPhone(receipt.guardianPhNum)
@@ -723,7 +732,7 @@ function IndividualReceiptCard({
         busy={Boolean(busy)}
         passwordBusy={passwordBusy}
         onPay={externalPayment ? undefined : onPay}
-        onEdit={externalPayment ? undefined : onEdit}
+        onEdit={externalPayment || receipt.pendingUpgrade ? undefined : onEdit}
         onStartGroup={onStartGroup}
         startGroupEdit={startGroupEdit}
         onPassword={onPassword}

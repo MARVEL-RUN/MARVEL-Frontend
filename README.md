@@ -49,6 +49,7 @@ location / {
 | `NEXT_PUBLIC_API_BASE_URL` | 공개 신청·결제·게시판 API |
 | `NEXT_PUBLIC_API_BASE_URL_ADMIN` | 관리자 API |
 | `NEXT_PUBLIC_EVENT_ID` | 공개 접수·조회·문의 대회 ID |
+| `NEXT_PUBLIC_VIRTUAL_RUN_EVENT_ID` | 버추얼런 티켓·조회·수정 대회 ID |
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 결제위젯 (로컬·운영 빌드) |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | 오시는길 지도 |
 | `NEXT_PUBLIC_BGM` | `off` 끄기, `on` 기본 음원 |
@@ -70,6 +71,7 @@ location / {
 |----------|------|
 | `TEST_FRONTEND_EVENT_ID` | 테스트 대회 ID (`test-marvelrun`) |
 | `PROD_FRONTEND_EVENT_ID` | 운영 대회 ID (`marvelrun2026`) |
+| `TEST_FRONTEND_VIRTUAL_RUN_EVENT_ID` | 테스트 버추얼런 대회 ID. 운영은 대회가 생긴 뒤에 추가 |
 
 | Secret | 용도 |
 |--------|------|

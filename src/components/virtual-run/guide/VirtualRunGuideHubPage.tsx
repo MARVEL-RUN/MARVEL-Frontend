@@ -12,7 +12,7 @@ const KINDS = [
     no: "01",
     code: "RUNNING",
     title: "러닝 인증",
-    desc: "회차마다 하루 안 5km · 승인 즉시 기프티콘",
+    desc: "회차마다 하루 안 5km · 조건 충족 시 추첨 대상",
     tone: "",
   },
   {

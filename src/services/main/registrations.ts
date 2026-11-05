@@ -131,6 +131,35 @@ export function organizationLookupParticipants(
   });
 }
 
+function asPendingUpgrade(value: unknown): RegistrationReceipt["pendingUpgrade"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  const upgradeId = asText(row.upgradeId);
+  if (!upgradeId) return null;
+  const entries = Array.isArray(row.addedEntries) ? row.addedEntries : [];
+  return {
+    upgradeId,
+    targetCategoryId: asText(row.targetCategoryId),
+    targetCategoryName: asText(row.targetCategoryName),
+    amount: typeof row.amount === "number" ? row.amount : Number(row.amount) || 0,
+    requestedAt: asText(row.requestedAt),
+    addedEntries: entries.flatMap((item) => {
+      if (!item || typeof item !== "object") return [];
+      const entry = item as Record<string, unknown>;
+      return [
+        {
+          eventCategoryId: asText(entry.eventCategoryId),
+          eventCategoryName: firstText(entry.eventCategoryName, entry.categoryName),
+          name: asText(entry.name),
+          phNum: firstText(entry.phNum, entry.phoneNumber),
+          birth: asText(entry.birth),
+          gender: asText(entry.gender),
+        },
+      ];
+    }),
+  };
+}
+
 function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
   const row = asRecord(raw);
   if (!row) return { totalAmount: 0, paidAmount: 0 };
@@ -168,6 +197,7 @@ function normalizeRegistrationReceipt(raw: unknown): RegistrationReceipt {
     guardianConsent:
       typeof receipt.guardianConsent === "boolean" ? receipt.guardianConsent : null,
     externalPayment: receipt.externalPayment === true,
+    pendingUpgrade: asPendingUpgrade(row.pendingUpgrade),
     userPolicy: parseUserPolicy(row.userPolicy),
     organizationPolicy: parseOrganizationPolicy(row.organizationPolicy),
     registrations: mergedRegistrations,

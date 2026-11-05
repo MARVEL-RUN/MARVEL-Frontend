@@ -166,3 +166,22 @@ export function groupOptionsFee(
     return sum + (category ? categoryFeeAmount(category, p.birth) : 0);
   }, 0);
 }
+
+/** 단독 구매 가능한 단품·패키지. 옵션 상품은 빼 둔다 */
+export function purchasableProductCategories(categories: RegistrationCategory[]) {
+  return sortedCategories(categories).filter(
+    (category) =>
+      category.isActive !== false &&
+      (category.productType === "SINGLE" || category.productType === "PACKAGE"),
+  );
+}
+
+/** 패키지 입력 칸. 단품 판매를 멈춰도 하위 종목은 포함한다 */
+export function packageChildCategories(
+  categories: RegistrationCategory[],
+  packageCategoryId: string,
+) {
+  return sortedCategories(categories).filter(
+    (category) => category.parentCategoryId === packageCategoryId,
+  );
+}

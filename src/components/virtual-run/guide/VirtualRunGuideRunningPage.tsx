@@ -33,7 +33,7 @@ export function VirtualRunGuideRunningPage() {
           <div className="ticket-notice">
             <p className="ticket-notice__title">검수로 넘어가면</p>
             <ul className="ticket-notice__list">
-              <li>· 기준에 맞으면 제출 즉시 승인되고 기프티콘이 발송됩니다.</li>
+              <li>· 기준에 맞으면 제출 즉시 승인되며, 키트 인증까지 충족하면 완주 리워드 추첨 대상이 됩니다.</li>
               <li>· 기준을 벗어나거나 판독이 어려우면 운영진이 확인해 48시간 안에 결과를 알려 드립니다.</li>
               <li>· 반려되면 사유를 확인한 뒤 회차당 2번까지 다시 제출할 수 있습니다.</li>
             </ul>

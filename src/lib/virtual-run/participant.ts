@@ -32,6 +32,8 @@ export type VirtualRunParticipant = {
   name: string;
   bib: string;
   phone: string;
+  /** 신청 조회 응답의 종목명. 차수는 조회에 아직 없다 */
+  categoryName?: string;
   ownedRoundIds: VirtualRunRoundId[];
   kitShipping: KitShippingStatus;
   trackingNo?: string;
@@ -79,16 +81,37 @@ export function defaultParticipant(partial?: Partial<VirtualRunParticipant>): Vi
       "fantastic-four": baseRound("ready"),
     },
     spots: partial?.spots ?? {},
-    rewards: partial?.rewards ?? [
-      {
-        id: "rw-demo-1",
-        kind: "gifticon",
-        label: "1회차 완주 기프티콘",
-        status: "sent",
-        detail: "러닝 인증 승인 즉시 발송",
-      },
-    ],
+    rewards: partial?.rewards ?? [],
+    categoryName: partial?.categoryName,
   };
+}
+
+/** 신청 조회로 연 로그인. 배번은 조회에 없다. 보유 회차는 신청 옵션으로 채운다 */
+export function participantFromLookup(input: {
+  name: string;
+  phone: string;
+  categoryName?: string | null;
+}): VirtualRunParticipant {
+  const ready = { status: "ready" as const, resubmitCount: 0 };
+  const next = defaultParticipant({
+    name: input.name,
+    phone: input.phone,
+    bib: "",
+    categoryName: input.categoryName?.trim() || undefined,
+    ownedRoundIds: [],
+    kitShipping: "preparing",
+    kitCert: "none",
+    kitResubmitCount: 0,
+    spots: {},
+    rewards: [],
+    rounds: {
+      avengers: ready,
+      "x-men": ready,
+      "fantastic-four": ready,
+    },
+  });
+  delete next.trackingNo;
+  return next;
 }
 
 export function roundStatusForParticipant(

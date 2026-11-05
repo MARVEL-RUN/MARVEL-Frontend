@@ -9,14 +9,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRegistrationOptions } from "@/components/main/register/useRegistrationOptions";
+import { VIRTUAL_RUN_EVENT_ID } from "@/lib/main/config";
+import { readLoginSession } from "@/lib/virtual-run/login-session";
+import { logoutParticipantSession } from "@/services/main/participant-auth";
+import { ownedRoundIdsForCategory } from "@/lib/virtual-run/owned-rounds";
 import {
   clearParticipant,
-  ensureDemoParticipant,
   readParticipant,
   writeParticipant,
 } from "@/lib/virtual-run/participant-client";
 import { defaultParticipant, type VirtualRunParticipant } from "@/lib/virtual-run/participant";
-import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
+import type { VirtualRunRoundId } from "@/lib/virtual-run/rounds";
 
 type Ctx = {
   participant: VirtualRunParticipant | null;
@@ -30,22 +34,39 @@ type Ctx = {
 
 const VirtualRunParticipantContext = createContext<Ctx | null>(null);
 
+function sameRoundIds(a: VirtualRunRoundId[], b: VirtualRunRoundId[]) {
+  return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
 export function VirtualRunParticipantProvider({ children }: { children: ReactNode }) {
   const [participant, setParticipant] = useState<VirtualRunParticipant | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const options = useRegistrationOptions(VIRTUAL_RUN_EVENT_ID);
 
   const refresh = useCallback(() => {
-    setParticipant(readParticipant());
+    setParticipant(readLoginSession() ? readParticipant() : null);
   }, []);
 
   useEffect(() => {
-    let p = readParticipant();
-    if (!p && virtualRunDemoEnabled) {
-      p = ensureDemoParticipant();
-    }
-    setParticipant(p);
+    setParticipant(readLoginSession() ? readParticipant() : null);
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || !participant || options.loading || !options.categories.length) return;
+    const session = readLoginSession();
+    const eventCategoryId =
+      session?.eventCategoryId?.trim() ||
+      options.categories.find((item) => item.categoryName === participant.categoryName?.trim())
+        ?.categoryId ||
+      "";
+    if (!eventCategoryId) return;
+    const owned = ownedRoundIdsForCategory(options.categories, eventCategoryId);
+    if (!owned.length || sameRoundIds(participant.ownedRoundIds, owned)) return;
+    const next = { ...participant, ownedRoundIds: owned };
+    writeParticipant(next);
+    setParticipant(next);
+  }, [hydrated, participant, options.loading, options.categories]);
 
   const login = useCallback((patch: Partial<VirtualRunParticipant>) => {
     const base = readParticipant() ?? defaultParticipant();
@@ -55,6 +76,7 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
   }, []);
 
   const logout = useCallback(() => {
+    void logoutParticipantSession();
     clearParticipant();
     setParticipant(null);
   }, []);
@@ -100,6 +122,5 @@ export function useVirtualRunParticipantOrDemo(): Ctx & {
   return {
     ...ctx,
     participant: ctx.participant ?? defaultParticipant(),
-    isLoggedIn: ctx.isLoggedIn || virtualRunDemoEnabled,
   };
 }

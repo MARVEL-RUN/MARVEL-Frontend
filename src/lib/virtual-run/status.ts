@@ -22,6 +22,12 @@ export const KIT_SHIPPING_LABEL: Record<KitShippingStatus, string> = {
   delivered: "배송 완료",
 };
 
+export const KIT_SHIPPING_HINT: Record<KitShippingStatus, string> = {
+  preparing: "11월 30일부터 순차 배송합니다.",
+  shipping: "배송이 시작되었습니다. 자세한 안내는 문자를 확인해 주세요.",
+  delivered: "키트를 받으셨다면 아래 인증을 진행해 주세요.",
+};
+
 export const KIT_SHIPPING_TONE: Record<KitShippingStatus, VirtualRunStatusTone> = {
   preparing: "wait",
   shipping: "progress",

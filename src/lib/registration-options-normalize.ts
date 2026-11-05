@@ -1,5 +1,7 @@
 import { normalizePriceOption } from "@/lib/discount-link/normalize";
 import type {
+  EventFormat,
+  ProductType,
   RegistrationCategory,
   RegistrationOptionsResponse,
   RegistrationStartGroup,
@@ -45,6 +47,18 @@ function normalizeStartGroup(raw: unknown): RegistrationStartGroup | null {
   };
 }
 
+function productTypeOf(value: unknown): ProductType | null {
+  const text = asText(value);
+  if (text === "SINGLE" || text === "PACKAGE" || text === "OPTION") return text;
+  return null;
+}
+
+function eventFormatOf(value: unknown): EventFormat | undefined {
+  const text = asText(value);
+  if (text === "OFFLINE" || text === "VIRTUAL") return text;
+  return undefined;
+}
+
 function normalizeCategory(raw: unknown): RegistrationCategory | null {
   const row = asRecord(raw);
   if (!row) return null;
@@ -74,6 +88,8 @@ function normalizeCategory(raw: unknown): RegistrationCategory | null {
     categoryName: asText(row.categoryName),
     isActive: row.isActive !== false,
     amount: typeof row.amount === "number" ? row.amount : 0,
+    productType: productTypeOf(row.productType),
+    parentCategoryId: asText(row.parentCategoryId) || null,
     souvenirs,
     ...(startGroups.length ? { startGroups } : {}),
     ...(serviceDiscountOptions.length
@@ -105,9 +121,13 @@ export function normalizeRegistrationOptions(
     data.registrationReason === null
       ? null
       : normalizeReason(data.registrationReason) ?? undefined;
+  const eventFormat = eventFormatOf(data.eventFormat);
   return {
     categories,
     ...(registrationAllowed !== undefined ? { registrationAllowed } : {}),
     ...(registrationReason !== undefined ? { registrationReason } : {}),
+    ...(eventFormat ? { eventFormat } : {}),
+    addressRequired: data.addressRequired === true,
+    organizationRegistrationEnabled: data.organizationRegistrationEnabled !== false,
   };
 }
