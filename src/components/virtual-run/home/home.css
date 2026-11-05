@@ -699,8 +699,25 @@
   line-height: 1;
 }
 
-.virtual-run .vr-home__overview {
+.virtual-run .vr-home__trailer {
   padding-top: 3.5rem;
+}
+
+.virtual-run .vr-home__trailer-frame {
+  margin-top: 0.4rem;
+  background: #000;
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+}
+
+.virtual-run .vr-home__trailer-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.virtual-run .vr-home__overview {
+  padding-top: 1.25rem;
 }
 
 @media (max-width: 720px) {

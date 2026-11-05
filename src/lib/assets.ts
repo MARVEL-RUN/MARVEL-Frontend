@@ -94,4 +94,6 @@ export const MAIN_ASSETS = {
   discountRunable: "/images/main/discount/runable-logo.png",
   discountKream: "/images/main/discount/kream-logo.png",
   directionsParking: "/images/main/directions/parking.png",
+  doomsdayTrailer:
+    "https://kma-dev-bucket.s3.ap-northeast-2.amazonaws.com/temp/1.+AvengersDoomsd_2m.mp4",
 } as const;

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { COMING_SOON_ASSETS } from "@/lib/assets";
+import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import { VR_HOME_CURSOR_FX } from "@/lib/virtual-run/home-fx";
 import {
@@ -195,6 +195,27 @@ export function VirtualRunHomePage() {
           ))}
         </div>
       </div>
+
+      <section className="sec guide-sec vr-home__trailer" id="trailer">
+        <div className="wrap reveal">
+          <p className="kicker">TRAILER</p>
+          <h2 className="sec__title">
+            [어벤져스: 둠스데이]
+            <br />
+            <em>&apos;둠의 심판&apos; 예고편</em>
+          </h2>
+          <div className="vr-home__trailer-frame">
+            <video
+              className="vr-home__trailer-video"
+              src={MAIN_ASSETS.doomsdayTrailer}
+              controls
+              playsInline
+              preload="metadata"
+              aria-label="어벤져스: 둠스데이 둠의 심판 예고편"
+            />
+          </div>
+        </div>
+      </section>
 
       <section className="sec guide-sec vr-home__overview" id="overview">
         <div className="wrap reveal">

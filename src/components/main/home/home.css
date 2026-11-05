@@ -445,6 +445,19 @@ html.is-live .hero__actions {
   letter-spacing: 0.16em;
 }
 
+.trailer__frame {
+  margin-top: 1.6rem;
+  background: #000;
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+}
+
+.trailer__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
 .courses {
   background:
     radial-gradient(rgba(255, 255, 255, 0.05) 0.8px, transparent 1px) 0 0 / 6px 6px,
