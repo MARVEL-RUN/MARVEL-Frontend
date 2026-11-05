@@ -165,6 +165,42 @@
   background: #fff;
 }
 
+.virtual-run .vr-kit-reel {
+  display: grid;
+  min-width: 0;
+}
+
+.virtual-run .vr-kit-reel__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-block: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.virtual-run .vr-kit-reel__frame {
+  width: 100%;
+  line-height: 0;
+  background: #000;
+}
+
+.virtual-run .vr-kit-reel__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.virtual-run .vr-kit-reel__video::-webkit-media-controls {
+  display: none !important;
+}
+
+@media (min-width: 721px) {
+  .virtual-run .vr-kit-reel__frame {
+    width: min(22.5rem, 100%);
+  }
+}
+
 .virtual-run .vr-kit-page__cta {
   position: relative;
   z-index: 2;

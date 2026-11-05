@@ -1,6 +1,7 @@
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VirtualRunKitGallery } from "./VirtualRunKitGallery";
+import { VirtualRunKitReel } from "./VirtualRunKitReel";
 import { VirtualRunKitVideoLoader } from "./VirtualRunKitVideoLoader";
 import "./kit.css";
 
@@ -18,6 +19,7 @@ export function VirtualRunKitPage() {
             <div className="vr-kit-page__cta">
               <VirtualRunTicketsCta />
             </div>
+            <VirtualRunKitReel />
           </div>
         </section>
       </VirtualRunSubPage>
