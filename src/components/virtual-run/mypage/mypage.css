@@ -1,6 +1,6 @@
 .virtual-run .vr-round.is-gold,
 .virtual-run .vr-round-tile.is-gold,
-.virtual-run .vr-me__pips .is-gold,
+.virtual-run .vr-me__slots .is-gold,
 .virtual-run .vr-round-seg .is-gold {
   --tone: var(--round-gold);
   --tone-ink: #14110a;
@@ -8,7 +8,7 @@
 
 .virtual-run .vr-round.is-red,
 .virtual-run .vr-round-tile.is-red,
-.virtual-run .vr-me__pips .is-red,
+.virtual-run .vr-me__slots .is-red,
 .virtual-run .vr-round-seg .is-red {
   --tone: var(--round-red);
   --tone-ink: #fff;
@@ -16,7 +16,7 @@
 
 .virtual-run .vr-round.is-blue,
 .virtual-run .vr-round-tile.is-blue,
-.virtual-run .vr-me__pips .is-blue,
+.virtual-run .vr-me__slots .is-blue,
 .virtual-run .vr-round-seg .is-blue {
   --tone: var(--round-blue);
   --tone-ink: #fff;
@@ -135,17 +135,115 @@
   word-break: keep-all;
 }
 
+.virtual-run .vr-dash-split {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.35fr) minmax(0, 4fr);
+  align-items: start;
+  gap: 1.35rem;
+}
+
+.virtual-run .vr-dash-split > .vr-me {
+  position: sticky;
+  top: 5.5rem;
+  align-self: start;
+}
+
+.virtual-run .vr-dash-split__main {
+  min-width: 0;
+}
+
 .virtual-run .vr-me {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 1.5rem;
-  padding: 1.6rem 1.6rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: linear-gradient(115deg,
-      color-mix(in srgb, var(--marvel) 30%, var(--vr-surface)) 0%,
-      var(--vr-surface) 65%);
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.virtual-run .vr-dash-split > .vr-me {
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 1.25rem;
+  padding: 0;
+}
+
+.virtual-run .vr-dash-split .vr-me__medal {
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.virtual-run .vr-dash-split > .vr-me .vr-me__slots {
+  grid-template-columns: 1fr;
+}
+
+.virtual-run .vr-dash-split > .vr-me .vr-me__slots li {
+  padding: 0.38rem 0.55rem;
+  text-align: left;
+}
+
+.virtual-run .vr-dash-split .vr-me h2 {
+  font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+}
+
+.virtual-run .vr-me__facts {
+  margin: 0;
+  padding-top: 0.15rem;
+}
+
+.virtual-run .vr-me__facts > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.virtual-run .vr-me__facts dt {
+  color: var(--note);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.virtual-run .vr-me__facts dd {
+  margin: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.virtual-run .vr-me__facts dd strong {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.virtual-run .vr-me__fact-sub {
+  color: var(--silver);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.virtual-run .vr-me__cta-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.15rem 0 0.1rem;
+}
+
+.virtual-run .vr-me__cta-wrap .lookup-other__btn {
+  text-decoration: none;
+}
+
+.virtual-run .vr-me__cta-done {
+  margin: 0;
+  padding: 0.55rem 0.2rem;
+  color: var(--note);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .virtual-run .vr-me .kicker {
@@ -183,54 +281,120 @@
   letter-spacing: 0.06em;
 }
 
+.virtual-run .vr-me__edit {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  margin-right: 0.85rem;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.virtual-run .vr-me__edit:hover,
+.virtual-run .vr-me__edit:focus-visible {
+  text-decoration: underline;
+}
+
 .virtual-run .vr-me__medal {
-  text-align: right;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.virtual-run .vr-me__medal-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .virtual-run .vr-me__medal-label {
   margin: 0;
-  color: var(--gold);
+  color: var(--note);
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
 }
 
-.virtual-run .vr-me__medal-count {
-  margin: 0.25rem 0 0.6rem;
-  color: var(--silver);
-  font-size: 1.05rem;
+.virtual-run .vr-me__medal.is-done .vr-me__medal-label {
+  color: var(--marvel-hi);
+}
+
+.virtual-run .vr-me__medal-progress {
+  color: var(--note);
+  font-size: 0.72rem;
   font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-.virtual-run .vr-me__medal-count strong {
-  display: inline-block;
+.virtual-run .vr-me__medal-progress strong {
+  margin-right: 0.08rem;
   color: #fff;
-  font-size: 2.6rem;
-  font-style: italic;
+  font-size: 0.95rem;
   font-weight: 900;
-  line-height: 1;
-  transform: skewX(-10deg);
 }
 
-.virtual-run .vr-me__pips {
-  display: flex;
-  justify-content: flex-end;
+.virtual-run .vr-me__medal-bar {
+  height: 0.42rem;
+  margin-top: -0.15rem;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  transform: skewX(-16deg);
+}
+
+.virtual-run .vr-me__medal-bar > span {
+  display: block;
+  height: 100%;
+  width: var(--medal-fill, 0%);
+  background: var(--marvel-hi);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--marvel-hi) 55%, transparent);
+}
+
+.virtual-run .vr-me__slots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.35rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.virtual-run .vr-me__pips li {
-  width: 1.65rem;
-  height: 0.4rem;
-  background: rgba(255, 255, 255, 0.14);
-  transform: skewX(-20deg);
+.virtual-run .vr-me__slots li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.38rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
 }
 
-.virtual-run .vr-me__pips li.is-on {
-  background: var(--tone);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--tone) 60%, transparent);
+.virtual-run .vr-me__slot-status {
+  color: var(--note);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.virtual-run .vr-me__slots li.is-on {
+  border-color: color-mix(in srgb, var(--tone) 75%, transparent);
+  background: color-mix(in srgb, var(--tone) 20%, transparent);
+  color: #fff;
+  box-shadow: inset 0 -2px 0 var(--tone);
+}
+
+.virtual-run .vr-me__slots li.is-on .vr-me__slot-status {
+  color: var(--tone);
 }
 
 .virtual-run .vr-rounds,
@@ -405,11 +569,74 @@
   letter-spacing: 0.04em;
 }
 
+.virtual-run .vr-ship-hero__hint {
+  margin: 0 0 1.15rem;
+  color: var(--note);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.virtual-run .vr-ship-trackno {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--vr-surface) 88%, #000);
+}
+
+.virtual-run .vr-ship-trackno__label {
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.virtual-run .vr-ship-trackno__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.virtual-run .vr-ship-trackno__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+.virtual-run .vr-ship-trackno__copy:hover {
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+}
+
+.virtual-run .vr-ship-trackno__empty {
+  margin: 0 0 1.25rem;
+  color: var(--note);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .virtual-run .vr-track {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.35rem;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.15rem;
 }
 
 .virtual-run .vr-track li,
@@ -773,30 +1000,43 @@
   margin-top: 1.5rem;
 }
 
+@media (max-width: 960px) {
+  .virtual-run .vr-dash-split {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .virtual-run .vr-dash-split > .vr-me {
+    position: static;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 1.5rem;
+    padding: 0;
+  }
+
+  .virtual-run .vr-dash-split .vr-me__medal {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .virtual-run .vr-dash-split .vr-me h2 {
+    font-size: clamp(1.6rem, 4vw, 2.1rem);
+  }
+}
+
 @media (max-width: 720px) {
-  .virtual-run .vr-me {
+  .virtual-run .vr-me,
+  .virtual-run .vr-dash-split > .vr-me {
     grid-template-columns: 1fr;
     align-items: start;
     gap: 1.1rem;
-    padding: 1.3rem 1.15rem 1.2rem;
+    padding: 0;
   }
 
-  .virtual-run .vr-me__medal {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.75rem;
+  .virtual-run .vr-me__medal,
+  .virtual-run .vr-dash-split .vr-me__medal {
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
-    text-align: left;
-  }
-
-  .virtual-run .vr-me__medal-count {
-    margin: 0;
-  }
-
-  .virtual-run .vr-me__medal-count strong {
-    font-size: 1.9rem;
   }
 
   .virtual-run .vr-round {

@@ -192,6 +192,7 @@ export function lookupPaymentPolicyAllowed(receipt: RegistrationReceipt) {
 }
 
 export function lookupShowPaymentButton(receipt: RegistrationReceipt) {
+  if (receipt.pendingUpgrade) return false;
   if (!lookupPaymentPolicyAllowed(receipt)) return false;
   const action = statusKey(receipt.paymentAction);
   if (action === "PAYMENT_CLOSED") return false;

@@ -87,7 +87,169 @@
   letter-spacing: -0.02em;
 }
 
+/* 메인 완료창과 같은 열린 가운데 — 박스 없음 */
+.virtual-run .vr-pay-done {
+  padding-block: 1.5rem 2.5rem;
+}
+
+.virtual-run .vr-pay-done .kicker {
+  margin-bottom: 1rem;
+}
+
+.virtual-run .vr-pay-done h2 {
+  margin-bottom: 1.15rem;
+  font-size: clamp(1.65rem, 4.2vw, 2.35rem);
+}
+
+.virtual-run .vr-pay-done__product {
+  margin: 0 auto 0.35rem;
+  max-width: 26rem;
+  color: var(--silver);
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.virtual-run .vr-pay-done__amount {
+  margin: 0 auto 1.35rem;
+  color: var(--gold);
+  font-size: clamp(1.85rem, 4.5vw, 2.45rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  transform: skewX(-6deg);
+}
+
+.virtual-run .vr-pay-done__order {
+  gap: 0.4rem 0.7rem;
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 1rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--vr-surface) 88%, transparent);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.virtual-run .vr-pay-done .form__note {
+  margin: 0 auto;
+  max-width: 22rem;
+  color: var(--note);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.virtual-run .vr-pay-done .flow__nav {
+  margin-top: 1.75rem;
+}
+
+.virtual-run .vr-ticket-stage {
+  min-height: calc(100svh - 14rem);
+}
+
+.virtual-run .vr-recipients {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.virtual-run .vr-recipients > li {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.virtual-run .vr-recipients > li.is-gold {
+  --tone: var(--round-gold);
+}
+
+.virtual-run .vr-recipients > li.is-red {
+  --tone: var(--round-red);
+}
+
+.virtual-run .vr-recipients > li.is-blue {
+  --tone: var(--round-blue);
+}
+
+.virtual-run .vr-recipients__all {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  width: 100%;
+}
+
+.virtual-run .vr-recipients__all p {
+  margin: 0;
+  color: var(--silver);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.virtual-run .vr-recipients__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem 1rem;
+  width: 100%;
+}
+
+.virtual-run .vr-recipients__head strong {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #fff;
+  font-size: 0.92rem;
+}
+
+.virtual-run .vr-recipients__head strong::before {
+  content: "";
+  width: 3px;
+  height: 0.95rem;
+  flex-shrink: 0;
+  background: var(--tone, #fff);
+}
+
+.virtual-run .vr-recipients__same,
+.virtual-run .vr-recipients__check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.virtual-run .vr-recipients__same input {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  accent-color: var(--marvel-hi);
+}
+
+.virtual-run .vr-recipients__same.is-on {
+  border-color: var(--marvel-hi);
+  background: color-mix(in srgb, var(--marvel-hi) 18%, transparent);
+  color: var(--marvel-hi);
+}
+
 @media (max-width: 720px) {
+  .virtual-run .vr-recipients__all {
+    grid-template-columns: 1fr;
+  }
+
   .virtual-run .vr-pick .kind-pick__item {
     min-height: 0;
   }
@@ -102,5 +264,9 @@
 
   .virtual-run .vr-sum__total strong {
     font-size: 1.4rem;
+  }
+
+  .virtual-run .vr-pay-done {
+    padding-block: 1rem 2rem;
   }
 }

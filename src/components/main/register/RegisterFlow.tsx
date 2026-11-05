@@ -123,15 +123,37 @@ export function RegisterFlow({
 }) {
   const [kind, setKind] = useState<ApplyKind | "">("");
   const [consents, setConsents] = useState<Consents>(EMPTY_CONSENTS);
-  const allowedKinds = discount?.options
-    ? applyKindsFromDiscount(discount.options.applicationType)
-    : undefined;
+  const registrationOptions = useRegistrationOptions();
+  const allowedKinds = (
+    discount?.options
+      ? applyKindsFromDiscount(discount.options.applicationType)
+      : (["individual", "group"] as ApplyKind[])
+  ).filter(
+    (item) =>
+      item !== "group" ||
+      registrationOptions.loading ||
+      registrationOptions.organizationRegistrationEnabled,
+  );
   const kindListener = useRef(onKindChange);
   kindListener.current = onKindChange;
 
   useEffect(() => {
     kindListener.current?.(kind);
   }, [kind]);
+
+  useEffect(() => {
+    if (
+      kind === "group" &&
+      !registrationOptions.loading &&
+      !registrationOptions.organizationRegistrationEnabled
+    ) {
+      setKind("");
+    }
+  }, [
+    kind,
+    registrationOptions.loading,
+    registrationOptions.organizationRegistrationEnabled,
+  ]);
 
   function pickKind(next: ApplyKind) {
     setKind(next);

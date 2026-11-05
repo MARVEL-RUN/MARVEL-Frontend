@@ -67,7 +67,7 @@ export function KitCertForm({ onDone }: { onDone: (mode: "approved" | "pending")
         <FormSec
           kicker="01 / KIT"
           title="키트 사진"
-          note={`배번호 ${participant.bib}이 선명하게 보이도록 찍어 주세요.`}
+          note={`배번호 ${participant.bib.trim() || "-"}가 선명하게 보이도록 찍어 주세요.`}
         >
           {Array.from({ length: KIT_CERT_MAX_PHOTOS }, (_, i) => (
             <VrFileField

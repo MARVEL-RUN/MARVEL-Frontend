@@ -31,10 +31,7 @@ type ApiErrorBody = {
   code?: string;
 };
 
-export async function mainFetch<T>(
-  endpoint: string,
-  init: RequestInit = {},
-): Promise<T> {
+async function mainRequest(endpoint: string, init: RequestInit) {
   if (!MAIN_API_BASE) {
     throw new MainHttpError(0, "API 주소가 설정되지 않았습니다.");
   }
@@ -54,7 +51,6 @@ export async function mainFetch<T>(
     headers,
   });
   const text = await response.text().catch(() => "");
-
   if (!response.ok) {
     let message = text || `HTTP ${response.status}`;
     let code: string | undefined;
@@ -67,12 +63,31 @@ export async function mainFetch<T>(
     }
     throw new MainHttpError(response.status, message, code);
   }
+  return { response, text };
+}
 
-  if (response.status === 204 || !text) return undefined as T;
-
+function parseBody<T>(status: number, text: string): T {
+  if (status === 204 || !text) return undefined as T;
   try {
     return JSON.parse(text) as T;
   } catch {
     return text as T;
   }
+}
+
+export async function mainFetch<T>(
+  endpoint: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const { response, text } = await mainRequest(endpoint, init);
+  return parseBody<T>(response.status, text);
+}
+
+/** 로그인·재발급처럼 본문과 응답 헤더가 같이 필요할 때 */
+export async function mainFetchDetailed<T>(
+  endpoint: string,
+  init: RequestInit = {},
+): Promise<{ data: T; headers: Headers }> {
+  const { response, text } = await mainRequest(endpoint, init);
+  return { data: parseBody<T>(response.status, text), headers: response.headers };
 }

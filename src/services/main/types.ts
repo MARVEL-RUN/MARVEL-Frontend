@@ -25,6 +25,10 @@ export type RegistrationCategoryPricing = {
   serviceDiscountOptions?: RegistrationPriceOption[];
 };
 
+export type ProductType = "SINGLE" | "PACKAGE" | "OPTION";
+
+export type EventFormat = "OFFLINE" | "VIRTUAL";
+
 export type RegistrationCategory = {
   order: number;
   categoryId: string;
@@ -35,6 +39,47 @@ export type RegistrationCategory = {
   souvenirs: RegistrationSouvenir[];
   startGroups?: RegistrationStartGroup[];
   pricing?: RegistrationCategoryPricing;
+  /** null이면 참가 항목이 없는 기존 종목 */
+  productType?: ProductType | null;
+  /** 이 종목을 하위 종목으로 포함하는 패키지 종목 */
+  parentCategoryId?: string | null;
+};
+
+export type RegistrationEntryInput = {
+  eventCategoryId: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+};
+
+export type PendingUpgradeEntry = {
+  eventCategoryId: string;
+  eventCategoryName: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: string;
+};
+
+/** 조회 응답. 상향 결제 재개는 이 값이 있을 때만 한다 */
+export type PendingPackageUpgrade = {
+  upgradeId: string;
+  targetCategoryId: string;
+  targetCategoryName: string;
+  amount: number;
+  addedEntries: PendingUpgradeEntry[];
+  requestedAt: string;
+};
+
+export type PackageUpgradeOrder = {
+  upgradeId: string;
+  targetCategoryId: string;
+  targetCategoryName: string;
+  paymentId: string;
+  orderId: string;
+  orderName: string;
+  amount: number;
 };
 
 export type RegistrationPolicyReason = {
@@ -46,6 +91,9 @@ export type RegistrationOptionsResponse = {
   categories: RegistrationCategory[];
   registrationAllowed?: boolean;
   registrationReason?: RegistrationPolicyReason | null;
+  eventFormat?: EventFormat;
+  addressRequired?: boolean;
+  organizationRegistrationEnabled?: boolean;
 };
 
 export type StartGroupInput = {
@@ -90,6 +138,8 @@ export type RegistrationCreateRequest = {
   termsMarketingAgreed: boolean;
   termsMarketingChannelAgreed: boolean;
   email?: string;
+  /** 패키지 하위 종목별 받는 사람. 단품·기존 종목은 보내지 않는다 */
+  entries?: RegistrationEntryInput[];
 } & StartGroupInput;
 
 export type RegistrationCreateResponse = {
@@ -282,6 +332,7 @@ export type RegistrationReceipt = {
   startGroupId?: string | null;
   startGroupCode?: string | null;
   startGroupUnselected?: boolean;
+  pendingUpgrade?: PendingPackageUpgrade | null;
 };
 
 export type RegistrationSouvenirSelection = {

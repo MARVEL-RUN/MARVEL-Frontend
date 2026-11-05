@@ -12,9 +12,18 @@ type Props = {
   registration: PaymentOrder;
   customerName: string;
   onError?: (message: string) => void;
+  /** 미지정 시 메인 `/payment/success` · `/payment/fail` */
+  successPath?: string;
+  failPath?: string;
 };
 
-export function PaymentWidget({ registration, customerName, onError }: Props) {
+export function PaymentWidget({
+  registration,
+  customerName,
+  onError,
+  successPath,
+  failPath,
+}: Props) {
   const base = useAppBasePath();
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -85,11 +94,14 @@ export function PaymentWidget({ registration, customerName, onError }: Props) {
     setBusy(true);
     try {
       const origin = window.location.origin;
+      const success =
+        successPath ?? withAppBase(base, "/payment/success");
+      const fail = failPath ?? withAppBase(base, "/payment/fail");
       await widgets.requestPayment({
         orderId: registration.orderId,
         orderName: registration.orderName,
-        successUrl: `${origin}${withAppBase(base, "/payment/success")}`,
-        failUrl: `${origin}${withAppBase(base, "/payment/fail")}`,
+        successUrl: `${origin}${success}`,
+        failUrl: `${origin}${fail}`,
         customerName,
       });
     } catch (err) {

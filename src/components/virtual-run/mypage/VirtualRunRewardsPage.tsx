@@ -33,7 +33,9 @@ export function VirtualRunRewardsPage() {
             <section className="block wait">
               <span className="kicker">REWARD</span>
               <h2>아직 받은 리워드가 없습니다</h2>
-              <p className="sec__body">러닝·키트 인증이 승인되면 이곳에 발송 내역이 쌓입니다.</p>
+              <p className="sec__body">
+                조건 충족 시 추첨 대상이 되며, 당첨자 배송 내역이 이곳에 표시됩니다.
+              </p>
               <div className="flow__nav">
                 <VrLink href="/mypage/sessions" className="btn btn--red">
                   러닝 인증하기
@@ -74,8 +76,9 @@ export function VirtualRunRewardsPage() {
             <p className="ticket-notice__title">리워드 안내</p>
             <ul className="ticket-notice__list">
               <li>· 메달과 키트는 구매자 전원에게 배송됩니다.</li>
-              <li>· 기프티콘은 러닝 인증 승인 즉시 문자로 발송됩니다.</li>
-              <li>· 협업 경품은 협업사 확정 후 순차 발송되며, 준비 수량이 소진되면 조기 종료될 수 있습니다.</li>
+              <li>· 키트 인증 충족자 중 추첨 → 당첨자에게 리워드 배송</li>
+              <li>· 러닝·키트 인증을 모두 충족한 참가자 중 추첨 → 당첨자에게 리워드 배송</li>
+              <li>· 조건 충족은 추첨 대상이며, 추첨 단위·중복 당첨 등은 추후 공지합니다.</li>
             </ul>
           </div>
         </VrMypageGate>

@@ -8,6 +8,7 @@ import { SideBanner } from "@/components/main/layout/SideBanner";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { useAppHref } from "@/lib/main/useAppBasePath";
 import { formatFee } from "@/lib/register";
+import { pickReceiptUrl } from "@/lib/payment/receipt";
 import {
   clearPendingPayment,
   markLookupRefreshAfterPayment,
@@ -17,27 +18,6 @@ import { confirmPayment } from "@/services/main/payments";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 import { SheetModal } from "@/components/main/SheetModal";
 import { isMobileView } from "@/lib/viewport";
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
-}
-
-function pickReceiptUrl(data: PaymentConfirmResponse | null) {
-  const root = asRecord(data);
-  if (!root) return "";
-  const payload = asRecord(root.data) ?? root;
-  const direct = payload.receiptUrl;
-  if (typeof direct === "string" && direct.trim()) return direct.trim();
-  const receipt = payload.receipt;
-  if (typeof receipt === "string" && receipt.trim()) return receipt.trim();
-  const nested = asRecord(receipt);
-  if (nested && typeof nested.url === "string" && nested.url.trim()) {
-    return nested.url.trim();
-  }
-  return "";
-}
 
 type Phase = "loading" | "done" | "error";
 
