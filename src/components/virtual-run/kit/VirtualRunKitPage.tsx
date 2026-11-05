@@ -1,12 +1,12 @@
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VirtualRunKitGallery } from "./VirtualRunKitGallery";
-import { VirtualRunKitMedalLoader } from "./VirtualRunKitMedalLoader";
+import { VirtualRunKitVideoLoader } from "./VirtualRunKitVideoLoader";
 import "./kit.css";
 
 export function VirtualRunKitPage() {
   return (
-    <VirtualRunKitMedalLoader>
+    <VirtualRunKitVideoLoader>
       <VirtualRunSubPage kicker="KIT" title="기념품" en="RACE KIT">
         <section className="guide-sec">
           <div className="wrap vr-kit-page vr-page-inner">
@@ -21,6 +21,6 @@ export function VirtualRunKitPage() {
           </div>
         </section>
       </VirtualRunSubPage>
-    </VirtualRunKitMedalLoader>
+    </VirtualRunKitVideoLoader>
   );
 }

@@ -9,6 +9,7 @@ import { MainToastHost } from "../../main/feedback/MainFeedback";
 import { KeyboardInset } from "../../main/layout/KeyboardInset";
 import { LegalModalProvider } from "../../main/legal/LegalModal";
 import { VirtualRunParticipantProvider } from "../participant/VirtualRunParticipantProvider";
+import { VirtualRunKitMedalLoader } from "../kit/VirtualRunKitMedalLoader";
 import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
 import "../virtual-run.css";
@@ -32,6 +33,7 @@ export function VirtualRunShell({ children }: { children: React.ReactNode }) {
             home && VR_HOME_CURSOR_FX ? "virtual-run site is-vr-build" : "virtual-run site"
           }
         >
+          {home ? <VirtualRunKitMedalLoader /> : null}
           <CinematicFX />
           <KeyboardInset />
           <VirtualRunSiteHeader />
