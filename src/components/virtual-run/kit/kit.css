@@ -31,13 +31,14 @@
 
 .virtual-run .vr-kit-lineup button {
   position: relative;
+  isolation: isolate;
   display: block;
   width: 100%;
   padding: 0;
   border: 0;
   border-radius: 1rem;
   overflow: hidden;
-  background: transparent;
+  background: #030806;
   color: #fff;
   font: inherit;
   cursor: pointer;
@@ -47,10 +48,33 @@
   display: block;
   width: 100%;
   height: auto;
+  filter: saturate(0.68) contrast(0.86) brightness(0.8);
+  transition: filter 0.25s ease;
+}
+
+.virtual-run .vr-kit-lineup button.is-on .vr-kit-lineup__img {
+  filter: none;
+}
+
+.virtual-run .vr-kit-lineup button.is-on::after {
+  content: none;
+}
+
+/* 원본 가장자리가 밝아서 페이지 배경 쪽으로 눌러 둠 */
+.virtual-run .vr-kit-lineup button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 8, 6, 0.18), transparent 28%, transparent 72%, rgba(3, 8, 6, 0.28)),
+    radial-gradient(ellipse at center, transparent 28%, rgba(3, 8, 6, 0.72) 100%);
 }
 
 .virtual-run .vr-kit-lineup__name {
   position: absolute;
+  z-index: 2;
   top: 0;
   right: 0;
   left: 0;
