@@ -13,13 +13,16 @@ type Tab = { readonly href: string; readonly label: string };
 export function GuideTabs({
   items = GUIDE_TABS,
   label = "대회안내 바로가기",
+  hideAt,
 }: {
   items?: readonly Tab[];
   label?: string;
+  hideAt?: string;
 }) {
   const slotRef = useRef<HTMLDivElement>(null);
   const jumping = useRef(false);
   const [stuck, setStuck] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState("");
 
   useEffect(() => {
@@ -30,6 +33,12 @@ export function GuideTabs({
       const headerBottom =
         bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom : 0;
       setStuck(slot.getBoundingClientRect().top <= headerBottom + 0.5);
+
+      if (hideAt) {
+        const end = document.getElementById(hideAt);
+        const top = end?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+        setHidden(top <= window.innerHeight);
+      }
 
       if (jumping.current) return;
       const tabs = document.querySelector(".guide-tabs");
@@ -53,7 +62,7 @@ export function GuideTabs({
       window.removeEventListener("scroll", sync);
       window.removeEventListener("resize", sync);
     };
-  }, [items]);
+  }, [hideAt, items]);
 
   function go(event: MouseEvent<HTMLAnchorElement>, href: string) {
     const id = sectionId(href);
@@ -72,8 +81,11 @@ export function GuideTabs({
   return (
     <div className="guide-tabs-slot" ref={slotRef}>
       <nav
-        className={stuck ? "guide-tabs is-stuck" : "guide-tabs"}
+        className={["guide-tabs", stuck ? "is-stuck" : "", hidden ? "is-hidden" : ""]
+          .filter(Boolean)
+          .join(" ")}
         aria-label={label}
+        aria-hidden={hidden || undefined}
       >
         <div className="guide-tabs__inner">
           {items.map((item) => {

@@ -115,7 +115,7 @@ export function VirtualRunKitGallery() {
         ))}
       </div>
 
-      <GuideTabs items={tabs} label="기념품 바로가기" />
+      <GuideTabs items={tabs} label="기념품 바로가기" hideAt="kit-reel" />
 
       <KitPane id="medal" order={1} code="MEDAL" title="피니셔 메달" note="선택한 테마에 따라 지급됩니다.">
         <div className="vr-kit-pane__pair vr-kit-pane__pair--medal">

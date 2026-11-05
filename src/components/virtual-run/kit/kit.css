@@ -82,6 +82,11 @@
   display: none;
 }
 
+.virtual-run .vr-kit .guide-tabs.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .virtual-run .vr-kit-pane {
   display: flex;
   flex-direction: column;

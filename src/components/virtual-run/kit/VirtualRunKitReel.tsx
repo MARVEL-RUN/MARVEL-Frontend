@@ -14,7 +14,7 @@ export function VirtualRunKitReel() {
   }, []);
 
   return (
-    <div className="vr-kit-reel">
+    <div className="vr-kit-reel" id="kit-reel">
       <div className="vr-kit-reel__stage">
         <div className="vr-kit-reel__frame">
           <video
