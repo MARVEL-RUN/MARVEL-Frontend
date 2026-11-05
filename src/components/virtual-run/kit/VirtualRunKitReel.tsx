@@ -36,6 +36,12 @@ export function VirtualRunKitReel() {
           />
         </div>
       </div>
+      <div className="vr-kit-reel__copy">
+        <p>어벤져스, 엑스맨, 판타스틱4</p>
+        <p>세 팀의 히어로들이 모여 닥터둠에 대항하는 대서사</p>
+        <p className="vr-kit-reel__copy-hi">가장 특별한 메달 3종을 공개합니다.</p>
+        <p className="vr-kit-reel__copy-note">※ 메달 3종을 소장하면 하나로 결합할 수 있습니다.</p>
+      </div>
     </div>
   );
 }

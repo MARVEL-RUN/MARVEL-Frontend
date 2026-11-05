@@ -296,7 +296,9 @@
 
 .virtual-run .vr-kit-reel {
   display: grid;
+  gap: 1.35rem;
   min-width: 0;
+  margin-top: 3.25rem;
 }
 
 .virtual-run .vr-kit-reel__stage {
@@ -328,6 +330,49 @@
   .virtual-run .vr-kit-reel__frame {
     width: min(22.5rem, 100%);
   }
+
+  .virtual-run .vr-kit-reel__copy {
+    width: min(22.5rem, 100%);
+  }
+}
+
+.virtual-run .vr-kit-reel__copy {
+  box-sizing: border-box;
+  width: 100%;
+  margin-inline: auto;
+  padding: 1.35rem 1.1rem 1.4rem;
+  border: 1px solid color-mix(in srgb, var(--marvel-hi) 48%, transparent);
+  background: color-mix(in srgb, #000 72%, transparent);
+  text-align: center;
+}
+
+.virtual-run .vr-kit-reel__copy p {
+  margin: 0;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.virtual-run .vr-kit-reel__copy p + p {
+  margin-top: 0.35rem;
+}
+
+.virtual-run .vr-kit-reel__copy-hi {
+  margin-top: 0.55rem !important;
+  color: var(--marvel-hi);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.virtual-run .vr-kit-reel__copy-note {
+  margin-top: 0.75rem !important;
+  color: var(--note);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.55;
 }
 
 .virtual-run .vr-kit-page__cta {
@@ -412,6 +457,14 @@ body:has(.site-header__drawer.is-open) .virtual-run .vr-kit-top {
     padding: 0 0 0.35rem;
     border-top: 0;
     background: none;
+  }
+
+  .virtual-run .vr-kit-pane#finish-line {
+    padding-bottom: 0.25rem;
+  }
+
+  .virtual-run .vr-kit-reel {
+    margin-top: 2.75rem;
   }
 
   .virtual-run .vr-kit-pane h2 {
