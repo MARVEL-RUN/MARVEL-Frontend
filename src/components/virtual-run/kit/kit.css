@@ -124,6 +124,11 @@
   height: auto;
 }
 
+.virtual-run .vr-kit-pane__pair--medal img {
+  aspect-ratio: 1900 / 1522;
+  object-fit: contain;
+}
+
 .virtual-run .vr-kit-pane__pair figcaption {
   color: var(--note);
   font-size: 0.78rem;

@@ -91,7 +91,7 @@ export function VirtualRunKitGallery() {
       </div>
 
       <KitPane order={1} code="MEDAL" title="피니셔 메달" note="선택한 테마에 따라 지급됩니다.">
-        <div className="vr-kit-pane__pair">
+        <div className="vr-kit-pane__pair vr-kit-pane__pair--medal">
           <figure>
             <Image
               src={VIRTUAL_RUN_ASSETS.kitMedal[theme.id]}
