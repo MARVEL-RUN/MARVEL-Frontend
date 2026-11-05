@@ -20,7 +20,7 @@ import {
   lookupModifyAllowed,
   policyReasonMessage,
 } from "@/lib/main/registrationActionPolicy";
-import { findCategory, shirtSouvenir, souvenirSizes } from "@/lib/registration-options";
+import { findCategory, shirtSouvenir } from "@/lib/registration-options";
 import { needsGuardian, type Gender } from "@/lib/register";
 import { readLoginSession, writeLoginSession } from "@/lib/virtual-run/login-session";
 import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
@@ -153,7 +153,7 @@ export function VirtualRunRegistrationEdit() {
 
   const category = findCategory(options.categories, receipt?.eventCategoryId || "");
   const souvenir = shirtSouvenir(category);
-  const sizes = souvenir ? souvenirSizes(souvenir, draft ? birthDigits(draft.birth) : "") : [];
+  const sizes = (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
   const guardianOn = draft ? needsGuardian(draft.birth) : false;
   const canModify = receipt ? lookupModifyAllowed(receipt) : false;
   const blockedNote = receipt ? policyReasonMessage(receipt.userPolicy?.modifyReason) : "";
