@@ -80,7 +80,7 @@ export function VirtualRunGuideHubPage() {
           <h2>공통 규칙</h2>
           <GuideSpec rows={VIRTUAL_RUN_GUIDE_COMMON} />
           <div className="flow__nav">
-            <VrLink href="/guide/faq" className="btn btn--ghost">
+            <VrLink href="/faq" className="btn btn--ghost">
               자주 묻는 질문
             </VrLink>
             <VrLink href="/mypage/sessions" className="btn btn--red">

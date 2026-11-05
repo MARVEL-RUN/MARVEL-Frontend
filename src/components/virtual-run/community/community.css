@@ -1,0 +1,9 @@
+.virtual-run .faq__tab.is-on {
+  background: var(--marvel-hi);
+  color: var(--marvel-deep);
+}
+
+.virtual-run .board-switch__btn.is-on {
+  background: var(--marvel-hi);
+  color: var(--marvel-deep);
+}

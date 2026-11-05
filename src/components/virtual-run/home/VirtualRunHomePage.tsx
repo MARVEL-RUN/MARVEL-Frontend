@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { COMING_SOON_ASSETS } from "@/lib/assets";
+import { COMING_SOON_ASSETS, MAIN_ASSETS } from "@/lib/assets";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import { VR_HOME_CURSOR_FX } from "@/lib/virtual-run/home-fx";
 import {
@@ -15,6 +15,8 @@ import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
 import { HeroCountdown } from "./HeroCountdown";
 import { HomeCursors } from "./HomeCursors";
+import { VirtualRunHomeBoard } from "./VirtualRunHomeBoard";
+import { VirtualRunHomeOrigin } from "./VirtualRunHomeOrigin";
 import { ScrambleText } from "../fx/ScrambleText";
 
 const TICKER = [
@@ -196,11 +198,47 @@ export function VirtualRunHomePage() {
         </div>
       </div>
 
+      <VirtualRunHomeOrigin />
+
+      <section className="sec guide-sec vr-home__trailer" id="trailer">
+        <div className="wrap reveal">
+          <p className="kicker">TRAILER</p>
+          <h2 className="sec__title">
+            <ScrambleText text="[어벤져스: 둠스데이]" inView hover={false} />{" "}
+            <em>
+              <ScrambleText text="'둠의 심판' 예고편" inView hover={false} />
+            </em>
+          </h2>
+          <div className="vr-home__trailer-stage">
+            <figure className="vr-home__poster">
+              <Image
+                src={VIRTUAL_RUN_ASSETS.doomsdayPoster}
+                alt="어벤져스: 둠스데이, 12월 16일 극장 대개봉"
+                width={1978}
+                height={2835}
+              />
+            </figure>
+            <div className="vr-home__trailer-frame">
+              <video
+                className="vr-home__trailer-video"
+                src={MAIN_ASSETS.doomsdayTrailer}
+                autoPlay
+                muted
+                controls
+                playsInline
+                preload="auto"
+                aria-label="어벤져스: 둠스데이 둠의 심판 예고편"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="sec guide-sec vr-home__overview" id="overview">
         <div className="wrap reveal">
           <p className="kicker">OVERVIEW</p>
           <h2 className="sec__title">
-            {VIRTUAL_RUN_EVENT.title}
+            <ScrambleText text={VIRTUAL_RUN_EVENT.title} inView hover={false} />
           </h2>
           <dl className="spec">
             {VIRTUAL_RUN_OVERVIEW_ROWS.map((row) => (
@@ -212,6 +250,8 @@ export function VirtualRunHomePage() {
           </dl>
         </div>
       </section>
+
+      <VirtualRunHomeBoard />
     </main>
   );
 }

@@ -1,3 +1,7 @@
+import {
+  VIRTUAL_RUN_BOARD_HREF,
+  VIRTUAL_RUN_BOARD_SECTIONS,
+} from "./community";
 import type { VirtualRunOpenFlags } from "./open-schedule";
 
 export type VirtualRunNavChild = {
@@ -40,16 +44,9 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
     children: [
       { href: "/event", label: "행사 개요" },
       { href: "/event#schedule", label: "운영 일정" },
-      { href: "/kit", label: "기념품" },
     ],
   },
-  {
-    href: "/tickets",
-    label: "티켓·참가",
-    pickChild: true,
-    openFlag: "tickets",
-    children: [{ href: "/tickets", label: "티켓 구매" }],
-  },
+  { href: "/kit", label: "기념품", openFlag: "publicInfo" },
   {
     href: "/guide",
     label: "인증 가이드",
@@ -59,8 +56,14 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
       { href: "/guide", label: "가이드 홈" },
       { href: "/guide/running", label: "러닝 인증" },
       { href: "/guide/kit", label: "키트 인증" },
-      { href: "/guide/faq", label: "FAQ" },
     ],
+  },
+  {
+    href: VIRTUAL_RUN_BOARD_HREF,
+    label: "커뮤니티",
+    pickChild: true,
+    openFlag: "publicInfo",
+    children: [...VIRTUAL_RUN_BOARD_SECTIONS],
   },
   {
     href: "/mypage",
@@ -68,9 +71,9 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
     pickChild: true,
     openFlag: "mypageLogin",
     children: [
-      { href: "/mypage", label: "참가 개요" },
-      { href: "/mypage/kit", label: "키트 카드" },
+      { href: "/mypage", label: "마이페이지" },
       { href: "/mypage/sessions", label: "회차 인증", openFlag: "certSubmit" },
+      { href: "/mypage/kit", label: "키트 카드" },
       { href: "/mypage/rewards", label: "리워드 내역" },
       { href: "/mypage/spots", label: "거점 이벤트", spotsOnly: true },
     ],

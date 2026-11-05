@@ -61,7 +61,7 @@ function waitVideo(video: HTMLVideoElement) {
   });
 }
 
-export function VirtualRunKitMedalLoader({ children }: { children: ReactNode }) {
+export function VirtualRunKitMedalLoader({ children }: { children?: ReactNode }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<"load" | "out" | "gone">("load");
   const [progress, setProgress] = useState({ done: 0, total: 0 });

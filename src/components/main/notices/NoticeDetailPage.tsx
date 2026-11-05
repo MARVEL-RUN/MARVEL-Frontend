@@ -13,7 +13,16 @@ import { useEffect, useState } from "react";
 import { NoticeBody } from "./NoticeBody";
 import { fileNameFromUrl, formatNoticeDate, toDateTimeAttr } from "./order";
 
-export function NoticeDetailPage() {
+type NoticeDetailPageProps = {
+  eventId?: string;
+  toHref?: (path: string) => string;
+};
+
+export function NoticeDetailPage({
+  eventId,
+  toHref,
+}: NoticeDetailPageProps = {}) {
+  const href = (path: string) => (toHref ? toHref(path) : path);
   const id = useSearchParams().get("id") ?? "";
   const [post, setPost] = useState<PublicNoticeDetail | null | undefined>(
     undefined,
@@ -38,6 +47,7 @@ export function NoticeDetailPage() {
       .catch(() => setPost(null));
 
     void listPublicNotices({
+      eventId: eventId || undefined,
       page: 0,
       size: 50,
       sort: "LATEST",
@@ -56,7 +66,7 @@ export function NoticeDetailPage() {
         setPrev(null);
         setNext(null);
       });
-  }, [id]);
+  }, [eventId, id]);
 
   return (
     <main className="page page--post">
@@ -69,7 +79,7 @@ export function NoticeDetailPage() {
           <div className="post">
             <p className="board__empty">글을 찾을 수 없습니다.</p>
             <div className="post__foot">
-              <Link href="/notices" className="btn btn--ghost">
+              <Link href={href("/notices")} className="btn btn--ghost">
                 목록
               </Link>
             </div>
@@ -113,11 +123,11 @@ export function NoticeDetailPage() {
               </section>
             ) : null}
             <nav className="post__nav" aria-label="이전·다음 글">
-              <NavRow label="다음글" item={next} />
-              <NavRow label="이전글" item={prev} />
+              <NavRow label="다음글" item={next} toHref={href} />
+              <NavRow label="이전글" item={prev} toHref={href} />
             </nav>
             <div className="post__foot">
-              <Link href="/notices" className="btn btn--ghost">
+              <Link href={href("/notices")} className="btn btn--ghost">
                 목록
               </Link>
             </div>
@@ -131,9 +141,11 @@ export function NoticeDetailPage() {
 function NavRow({
   label,
   item,
+  toHref,
 }: {
   label: string;
   item: NoticeRow | null;
+  toHref: (path: string) => string;
 }) {
   if (!item) {
     return (
@@ -145,7 +157,7 @@ function NavRow({
   }
 
   return (
-    <Link href={`/notices/view?id=${item.id}`} className="post__nav-row">
+    <Link href={toHref(`/notices/view?id=${item.id}`)} className="post__nav-row">
       <span>{label}</span>
       <strong>{item.title}</strong>
     </Link>

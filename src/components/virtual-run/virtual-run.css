@@ -66,15 +66,6 @@
   margin-top: 0;
 }
 
-.virtual-run .vr-login {
-  max-width: 30rem;
-  margin-inline: auto;
-}
-
-.virtual-run .vr-login .flow__nav .btn {
-  flex: 1 1 100%;
-}
-
 .virtual-run .vr-text-btn {
   padding: 0;
   border: 0;

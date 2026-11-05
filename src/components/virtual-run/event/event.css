@@ -59,7 +59,7 @@
 }
 
 .virtual-run .vr-time-table th:first-child {
-  width: 10rem;
+  width: 15rem;
 }
 
 .virtual-run .vr-time-table .time-table__clock {
@@ -97,6 +97,11 @@
 /* 메인 표가 비고 열을 숨기는 조건과 같게 */
 @media (max-width: 720px),
 (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .virtual-run .vr-event-sec .spec dd {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
   .virtual-run .vr-time-table__sub {
     display: block;
     margin-top: 0.2rem;

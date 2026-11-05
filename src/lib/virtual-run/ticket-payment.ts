@@ -3,7 +3,7 @@ import type { VirtualRunRoundId } from "@/lib/virtual-run/rounds";
 
 const STORAGE_KEY = "marvel-run:vr-ticket-pending";
 
-export type VirtualRunTicketKind = "single" | "package";
+export type VirtualRunTicketKind = "single" | "package" | "mixed";
 
 export type VirtualRunTicketPending = {
   registration: PaymentOrder;

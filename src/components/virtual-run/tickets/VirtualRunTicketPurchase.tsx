@@ -1,5 +1,6 @@
 "use client";
 
+/** 신청 API는 상품 1건만 받는다. 티켓 화면은 VirtualRunPackageForm. */
 import { Check } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -39,7 +40,7 @@ import {
 } from "@/lib/virtual-run/purchase";
 import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
 import { createRegistration } from "@/services/main/registrations";
-import { useVrPath, VrLink } from "../layout/VrLink";
+import { useVrPath } from "../layout/VrLink";
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
@@ -558,12 +559,6 @@ export function VirtualRunTicketPurchase({
           </button>
         </div>
       </form>
-
-      <div className="lookup-other">
-        <VrLink href="/login" className="lookup-other__btn">
-          이미 티켓이 있으신가요
-        </VrLink>
-      </div>
 
       {payOpen && payOrder ? (
         <SheetModal kicker="PAY" title="결제하기" onClose={() => setPayOpen(false)}>

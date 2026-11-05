@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   combinedMedalCount,
   roundStatusForParticipant,
@@ -24,7 +23,7 @@ import {
 } from "@/lib/virtual-run/status";
 import { useVirtualRunParticipantOrDemo } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
-import { VrLink, useVrPath } from "../layout/VrLink";
+import { VrLink } from "../layout/VrLink";
 import { VrMypageGate } from "./VrMypageGate";
 import { VrStatus } from "./VrStatus";
 
@@ -34,17 +33,15 @@ function ticketLabel(p: VirtualRunParticipant) {
   if (p.categoryName?.trim()) return p.categoryName.trim();
   const owned = VIRTUAL_RUN_ROUNDS.filter((r) => p.ownedRoundIds.includes(r.id));
   if (owned.length === 0) return "티켓 없음";
-  if (owned.length >= VIRTUAL_RUN_ROUNDS.length) return "3회차 패키지";
-  if (owned.length === 1) {
-    const r = owned[0];
-    return `1회차 · ${r.theme}`;
-  }
-  return owned.map((r) => r.theme).join(" · ");
+  if (owned.length >= VIRTUAL_RUN_ROUNDS.length) return "어셈블 패키지";
+  if (owned.length === 1) return `${owned[0].theme} 패키지`;
+  return owned.map((r) => `${r.theme} 패키지`).join(" · ");
 }
 
 function isThreeRoundPackage(p: VirtualRunParticipant, label: string) {
   if (p.ownedRoundIds.length >= VIRTUAL_RUN_ROUNDS.length) return true;
-  return /패키지|3종|3회차/.test(label);
+  if (p.ownedRoundIds.length > 0) return false;
+  return /어셈블|3종|3회차/.test(label);
 }
 
 function nextAction(p: VirtualRunParticipant): { href: string; label: string } | null {
@@ -70,21 +67,14 @@ function nextAction(p: VirtualRunParticipant): { href: string; label: string } |
 }
 
 export function VirtualRunMypageDashboard() {
-  const { participant, logout } = useVirtualRunParticipantOrDemo();
-  const router = useRouter();
-  const toHref = useVrPath();
+  const { participant } = useVirtualRunParticipantOrDemo();
   const medalDone = combinedMedalCount(participant);
   const ticket = ticketLabel(participant);
   const action = nextAction(participant);
   const packageRounds = isThreeRoundPackage(participant, ticket);
 
-  function onLogout() {
-    logout();
-    router.push(toHref("/login"));
-  }
-
   return (
-    <VirtualRunSubPage kicker="MY PAGE" title="참가 개요" en="VERIFY · REWARD">
+    <VirtualRunSubPage kicker="MY PAGE" title="마이페이지" en="VERIFY · REWARD">
       <div className="page__body wrap">
         <VrMypageGate>
           <div className="vr-stack">
@@ -293,12 +283,6 @@ export function VirtualRunMypageDashboard() {
                   </section>
                 ) : null}
               </div>
-            </div>
-
-            <div className="lookup-other">
-              <button type="button" className="lookup-other__btn" onClick={onLogout}>
-                로그아웃
-              </button>
             </div>
           </div>
         </VrMypageGate>

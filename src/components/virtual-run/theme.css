@@ -108,3 +108,20 @@
 .virtual-run .ticket-notice__title {
   color: var(--marvel-hi);
 }
+
+.virtual-run .vr-home__hl,
+.virtual-run .vr-kit-reel__copy-mark {
+  display: inline;
+  padding: 0.06em 0.26em 0.14em;
+  color: #f6fffb;
+  background: linear-gradient(
+    102deg,
+    color-mix(in srgb, #5dffa8 28%, transparent) 0%,
+    color-mix(in srgb, #63ffac 78%, var(--marvel-hi) 22%) 20%,
+    color-mix(in srgb, #63ffac 74%, var(--marvel-hi) 26%) 80%,
+    color-mix(in srgb, #5dffa8 24%, transparent) 100%
+  );
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--marvel-hi) 22%, transparent);
+}

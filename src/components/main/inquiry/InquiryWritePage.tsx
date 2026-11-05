@@ -28,7 +28,18 @@ function pickCreatedId(res: unknown): string | null {
   return null;
 }
 
-export function InquiryWritePage() {
+type InquiryWritePageProps = {
+  eventId?: string;
+  toHref?: (path: string) => string;
+  Banner?: typeof SideBanner;
+};
+
+export function InquiryWritePage({
+  eventId = DEFAULT_EVENT_ID,
+  toHref,
+  Banner = SideBanner,
+}: InquiryWritePageProps = {}) {
+  const href = (path: string) => (toHref ? toHref(path) : path);
   const router = useRouter();
   const editId = useSearchParams().get("id") ?? "";
   const editing = Boolean(editId);
@@ -54,7 +65,7 @@ export function InquiryWritePage() {
       return;
     }
     if (!isInquiryUnlocked(editId)) {
-      router.replace(`/inquiry/view?id=${editId}`);
+      router.replace(href(`/inquiry/view?id=${editId}`));
       return;
     }
     const savedPassword = getInquiryPassword(editId);
@@ -62,7 +73,7 @@ export function InquiryWritePage() {
       .then((detail) => {
         const q = detail.questionDetail;
         if (detail.answerDetail?.content) {
-          router.replace(`/inquiry/view?id=${editId}`);
+          router.replace(href(`/inquiry/view?id=${editId}`));
           return;
         }
         setName(q.author);
@@ -78,12 +89,14 @@ export function InquiryWritePage() {
       });
   }, [editId, router]);
 
-  const cancelHref = editing ? `/inquiry/view?id=${editId}` : "/inquiry";
+  const cancelHref = href(
+    editing ? `/inquiry/view?id=${editId}` : "/inquiry",
+  );
 
   if (!ready) {
     return (
       <main className="page">
-        <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
+        <Banner kicker="INQUIRY" title="문의사항" en="CONTACT" />
         <div className="page__body wrap">
           <p className="board__empty">불러오는 중...</p>
         </div>
@@ -94,11 +107,11 @@ export function InquiryWritePage() {
   if (missing) {
     return (
       <main className="page">
-        <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
+        <Banner kicker="INQUIRY" title="문의사항" en="CONTACT" />
         <div className="page__body wrap">
           <p className="board__empty">글을 찾을 수 없습니다.</p>
           <div className="post__foot">
-            <Link href="/inquiry" className="btn btn--ghost">
+            <Link href={href("/inquiry")} className="btn btn--ghost">
               목록
             </Link>
           </div>
@@ -109,7 +122,7 @@ export function InquiryWritePage() {
 
   return (
     <main className="page">
-      <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
+      <Banner kicker="INQUIRY" title="문의사항" en="CONTACT" />
       <div className="page__body wrap">
         <form
           className="board-write"
@@ -151,11 +164,11 @@ export function InquiryWritePage() {
                 });
                 unlockInquiry(editId, savedPassword);
                 mainToast.success("문의가 수정되었습니다.");
-                router.replace(`/inquiry/view?id=${editId}`);
+                router.replace(href(`/inquiry/view?id=${editId}`));
                 return;
               }
 
-              const created = await createPublicQuestion(DEFAULT_EVENT_ID, {
+              const created = await createPublicQuestion(eventId, {
                 post: {
                   title: title.trim(),
                   content: body.trim(),
@@ -167,7 +180,7 @@ export function InquiryWritePage() {
               const id = pickCreatedId(created);
               if (id) unlockInquiry(id, password.trim());
               mainToast.success("문의가 등록되었습니다.");
-              router.replace("/inquiry");
+              router.replace(href("/inquiry"));
             } catch (error) {
               showAlert(
                 error instanceof Error
@@ -184,7 +197,7 @@ export function InquiryWritePage() {
         >
           <div className="board-write__head">
             <h2>{editing ? "글수정" : "글쓰기"}</h2>
-            <Link href="/inquiry" className="btn btn--ghost">
+            <Link href={href("/inquiry")} className="btn btn--ghost">
               목록
             </Link>
           </div>
@@ -284,7 +297,7 @@ export function InquiryWritePage() {
           )}
 
           <div className="board-write__actions">
-            <Link href="/inquiry" className="btn btn--ghost">
+            <Link href={href("/inquiry")} className="btn btn--ghost">
               목록
             </Link>
             <div className="board-write__actions-end">

@@ -9,6 +9,7 @@ import { MainToastHost } from "../../main/feedback/MainFeedback";
 import { KeyboardInset } from "../../main/layout/KeyboardInset";
 import { LegalModalProvider } from "../../main/legal/LegalModal";
 import { VirtualRunParticipantProvider } from "../participant/VirtualRunParticipantProvider";
+import { VirtualRunKitMedalLoader } from "../kit/VirtualRunKitMedalLoader";
 import { VirtualRunFooter } from "./VirtualRunFooter";
 import { VirtualRunSiteHeader } from "./VirtualRunSiteHeader";
 import "../virtual-run.css";
@@ -16,6 +17,10 @@ import "../home/home.css";
 import "../event/event.css";
 import "../tickets/tickets.css";
 import "../guide/guide.css";
+import "../community/community.css";
+
+/** 홈 메달 로딩. 다시 켤 때 true */
+const VR_HOME_MEDAL_LOAD = false;
 
 export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   const home = isVirtualRunHomePath(usePathname());
@@ -32,6 +37,7 @@ export function VirtualRunShell({ children }: { children: React.ReactNode }) {
             home && VR_HOME_CURSOR_FX ? "virtual-run site is-vr-build" : "virtual-run site"
           }
         >
+          {home && VR_HOME_MEDAL_LOAD ? <VirtualRunKitMedalLoader /> : null}
           <CinematicFX />
           <KeyboardInset />
           <VirtualRunSiteHeader />

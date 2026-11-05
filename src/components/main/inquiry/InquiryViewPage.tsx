@@ -30,7 +30,16 @@ type ViewState = {
   answer: PublicAnswerDetail | null;
 };
 
-export function InquiryViewPage() {
+type InquiryViewPageProps = {
+  eventId?: string;
+  toHref?: (path: string) => string;
+};
+
+export function InquiryViewPage({
+  eventId = DEFAULT_EVENT_ID,
+  toHref,
+}: InquiryViewPageProps = {}) {
+  const href = (path: string) => (toHref ? toHref(path) : path);
   const router = useRouter();
   const id = useSearchParams().get("id") ?? "";
   const [view, setView] = useState<ViewState | null | undefined>(undefined);
@@ -66,7 +75,7 @@ export function InquiryViewPage() {
     setReady(true);
 
     void listPublicQuestions({
-      eventId: DEFAULT_EVENT_ID,
+      eventId,
       page: 0,
       size: 50,
       sort: "LATEST",
@@ -109,7 +118,7 @@ export function InquiryViewPage() {
     const targetId = item.questionHeader.id;
     if (!item.questionHeader.secret) {
       unlockInquiry(targetId, "");
-      router.push(`/inquiry/view?id=${targetId}`);
+      router.push(href(`/inquiry/view?id=${targetId}`));
       return;
     }
     setPendingId(targetId);
@@ -134,7 +143,7 @@ export function InquiryViewPage() {
           <div className="post">
             <p className="board__empty">글을 찾을 수 없습니다.</p>
             <div className="post__foot">
-              <Link href="/inquiry" className="btn btn--ghost">
+              <Link href={href("/inquiry")} className="btn btn--ghost">
                 목록
               </Link>
             </div>
@@ -143,7 +152,7 @@ export function InquiryViewPage() {
           <div className="post post--loading">
             <p className="board__empty">비밀글입니다. 비밀번호를 입력해 주세요.</p>
             <div className="post__foot">
-              <Link href="/inquiry" className="btn btn--ghost">
+              <Link href={href("/inquiry")} className="btn btn--ghost">
                 목록
               </Link>
             </div>
@@ -194,15 +203,15 @@ export function InquiryViewPage() {
               />
             </nav>
             <div className="post__foot">
-              <Link href="/inquiry" className="btn btn--ghost">
+              <Link href={href("/inquiry")} className="btn btn--ghost">
                 목록
               </Link>
               {!answered ? (
-                <Link href={`/inquiry/write?id=${post.id}`} className="btn btn--ghost">
+                <Link href={href(`/inquiry/write?id=${post.id}`)} className="btn btn--ghost">
                   수정
                 </Link>
               ) : null}
-              <Link href="/inquiry/write" className="btn btn--red">
+              <Link href={href("/inquiry/write")} className="btn btn--red">
                 글쓰기
               </Link>
             </div>
@@ -220,7 +229,7 @@ export function InquiryViewPage() {
             return;
           }
           setGateOpen(false);
-          router.push("/inquiry");
+          router.push(href("/inquiry"));
         }}
         onConfirm={(password) => {
           if (!unlockTargetId || unlocking) return;
@@ -232,7 +241,7 @@ export function InquiryViewPage() {
               if (pendingId) {
                 const nextId = pendingId;
                 setPendingId(null);
-                router.push(`/inquiry/view?id=${nextId}`);
+                router.push(href(`/inquiry/view?id=${nextId}`));
                 return;
               }
               setView(data);
