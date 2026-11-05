@@ -44,13 +44,6 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
   },
   { href: "/kit", label: "기념품", openFlag: "publicInfo" },
   {
-    href: "/tickets",
-    label: "티켓·참가",
-    pickChild: true,
-    openFlag: "tickets",
-    children: [{ href: "/tickets", label: "티켓 구매" }],
-  },
-  {
     href: "/guide",
     label: "인증 가이드",
     pickChild: true,
