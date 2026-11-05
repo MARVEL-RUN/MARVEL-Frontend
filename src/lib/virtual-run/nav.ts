@@ -71,9 +71,9 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
     pickChild: true,
     openFlag: "mypageLogin",
     children: [
-      { href: "/mypage", label: "참가 개요" },
-      { href: "/mypage/kit", label: "키트 카드" },
+      { href: "/mypage", label: "마이페이지" },
       { href: "/mypage/sessions", label: "회차 인증", openFlag: "certSubmit" },
+      { href: "/mypage/kit", label: "키트 카드" },
       { href: "/mypage/rewards", label: "리워드 내역" },
       { href: "/mypage/spots", label: "거점 이벤트", spotsOnly: true },
     ],

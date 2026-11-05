@@ -74,7 +74,7 @@ export function VirtualRunMypageDashboard() {
   const packageRounds = isThreeRoundPackage(participant, ticket);
 
   return (
-    <VirtualRunSubPage kicker="MY PAGE" title="참가 개요" en="VERIFY · REWARD">
+    <VirtualRunSubPage kicker="MY PAGE" title="마이페이지" en="VERIFY · REWARD">
       <div className="page__body wrap">
         <VrMypageGate>
           <div className="vr-stack">
