@@ -19,6 +19,7 @@ import {
   adminOrganizationDetailHref,
 } from "@/lib/admin/eventLinks";
 import { APPLICATION_PASSWORD_MIN, formatPhone } from "@/lib/register";
+import { genderLabel } from "@/lib/registration-gender";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
@@ -149,7 +150,7 @@ function DrawerGuide({
   );
 }
 
-function StatusLabel({ status }: { status: string }) {
+function StatusLabel({ status, label }: { status: string; label?: string }) {
   const tone = registrationStatusBadge(status);
   return (
     <span className="admin-drawer__status">
@@ -157,7 +158,7 @@ function StatusLabel({ status }: { status: string }) {
         className={`admin-apps-list__status-dot admin-apps-list__status-dot--${tone}`}
         aria-hidden
       />
-      {registrationStatusLabel(status)}
+      {label || registrationStatusLabel(status)}
     </span>
   );
 }
@@ -813,7 +814,7 @@ export function ApplicationDetailDrawer({
           </div>
           <div className="admin-drawer__hero-status">
             <span className="admin-drawer__hero-kind">신청상태</span>
-            <StatusLabel status={row.status} />
+            <StatusLabel status={row.status} label={row.packageUpgrade ? "상향 대기" : undefined} />
           </div>
         </header>
 
@@ -903,6 +904,40 @@ export function ApplicationDetailDrawer({
                 </DrawerGuide>
               ) : null}
               <DetailSection title="신청 정보" fields={sections.applyFields} />
+              {row.packageUpgrade ? (
+                <DetailSection
+                  title="진행 중인 상향"
+                  fields={[
+                    { label: "대상 패키지", value: dash(row.packageUpgrade.targetCategoryName) },
+                    {
+                      label: "차액",
+                      value: `${row.packageUpgrade.amount.toLocaleString("ko-KR")}원`,
+                    },
+                    {
+                      label: "요청 시각",
+                      value: dash(row.packageUpgrade.requestedAt),
+                    },
+                  ]}
+                />
+              ) : null}
+              {row.entries?.length ? (
+                <section className="admin-drawer__section">
+                  <h2 className="admin-drawer__section-title">참가 항목</h2>
+                  <ul className="admin-drawer__fields">
+                    {row.entries.map((entry, index) => (
+                      <li key={`${entry.eventCategoryId}-${entry.name}-${index}`}>
+                        {[entry.eventCategoryName, entry.name].filter(Boolean).join(" · ") || "-"}
+                        {" · "}
+                        {displayPhone(entry.phNum)}
+                        {" · "}
+                        {genderLabel(entry.gender)}
+                        {" · 배번 "}
+                        {entry.bibNo || "-"}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
               {isGroup ? (
                 <DetailSection title="단체" fields={sections.groupFields} />
               ) : null}

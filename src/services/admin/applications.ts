@@ -99,6 +99,26 @@ export type AdminApplicationRow = {
   startGroupCode?: string;
   startGroupUnselected?: boolean;
   referenceFilterLabel?: string;
+  entries?: AdminRegistrationEntry[];
+  packageUpgrade?: AdminPackageUpgradeSummary | null;
+};
+
+export type AdminRegistrationEntry = {
+  eventCategoryId: string;
+  eventCategoryName: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: string;
+  bibNo: string;
+};
+
+export type AdminPackageUpgradeSummary = {
+  upgradeId: string;
+  targetCategoryId: string;
+  targetCategoryName: string;
+  amount: number;
+  requestedAt: string;
 };
 
 export type AdminSelectedSouvenir = {
@@ -179,6 +199,8 @@ type RegistrationDetail = {
   startGroupCode?: unknown;
   startGroupUnselected?: unknown;
   referenceFilter?: unknown;
+  entries?: unknown;
+  packageUpgrade?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -229,6 +251,43 @@ function asSelectedSouvenirList(value: unknown): AdminSelectedSouvenir[] {
     if (!souvenirId) return [];
     return [{ souvenirId, selectedSize: asText(row.selectedSize) || null }];
   });
+}
+
+function asRegistrationEntries(value: unknown): AdminRegistrationEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as Record<string, unknown>;
+    const name = asText(row.name);
+    const eventCategoryId = asText(row.eventCategoryId);
+    const eventCategoryName = firstText(row.eventCategoryName, row.categoryName);
+    if (!name && !eventCategoryId && !eventCategoryName) return [];
+    return [
+      {
+        eventCategoryId,
+        eventCategoryName,
+        name,
+        phNum: firstText(row.phNum, row.phoneNumber),
+        birth: asText(row.birth),
+        gender: asText(row.gender),
+        bibNo: firstText(row.bibNo, row.bibNumber, row.bib),
+      },
+    ];
+  });
+}
+
+function asPackageUpgrade(value: unknown): AdminPackageUpgradeSummary | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  const upgradeId = asText(row.upgradeId);
+  if (!upgradeId) return null;
+  return {
+    upgradeId,
+    targetCategoryId: asText(row.targetCategoryId),
+    targetCategoryName: asText(row.targetCategoryName),
+    amount: asAmount(row.amount, 0),
+    requestedAt: asText(row.requestedAt),
+  };
 }
 
 function asAmount(value: unknown, fallback: number): number {
@@ -477,6 +536,9 @@ export function applyRegistrationDetail(
     })(),
     referenceFilterLabel:
       referenceFilterDisplay(data.referenceFilter) || row.referenceFilterLabel,
+    entries: data.entries === undefined ? row.entries : asRegistrationEntries(data.entries),
+    packageUpgrade:
+      data.packageUpgrade === undefined ? row.packageUpgrade : asPackageUpgrade(data.packageUpgrade),
   };
 }
 

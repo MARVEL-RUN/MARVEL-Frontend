@@ -8,6 +8,7 @@ import { MainHttpError } from "@/lib/main/fetch";
 import { applicationPasswordError } from "@/lib/register";
 import { writeLoginSession } from "@/lib/virtual-run/login-session";
 import { participantFromLookup } from "@/lib/virtual-run/participant";
+import { loginParticipant } from "@/services/main/participant-auth";
 import { lookupIndividualRegistrations } from "@/services/main/registrations";
 import type {
   IndividualRegistrationLookupRequest,
@@ -74,6 +75,7 @@ export function VirtualRunLoginPage() {
     };
     setBusy(true);
     try {
+      const authed = await loginParticipant(VIRTUAL_RUN_EVENT_ID, body);
       const found = await lookupIndividualRegistrations(VIRTUAL_RUN_EVENT_ID, body);
       const rows = Array.isArray(found) ? found : [];
       const receipt = pickReceipt(rows);
@@ -81,12 +83,14 @@ export function VirtualRunLoginPage() {
         setError("이름·생년월일·전화번호·비밀번호를 다시 확인해 주세요.");
         return;
       }
-      const displayName = receipt.name?.trim() || body.name;
+      const displayName = receipt.name?.trim() || authed.name || body.name;
       writeLoginSession({
         access: body,
-        registrationId: receipt.registrationId?.trim() || "",
+        registrationId: authed.registrationId || receipt.registrationId?.trim() || "",
         categoryName: receipt.eventCategoryName?.trim() || "",
         eventCategoryId: receipt.eventCategoryId?.trim() || "",
+        eventId: authed.eventId,
+        tokens: authed.tokens,
       });
       update(
         participantFromLookup({

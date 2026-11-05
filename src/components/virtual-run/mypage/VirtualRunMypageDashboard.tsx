@@ -104,6 +104,11 @@ export function VirtualRunMypageDashboard() {
                   <VrLink href="/mypage/edit" className="vr-me__edit">
                     신청 정보 수정
                   </VrLink>
+                  {packageRounds ? null : (
+                    <VrLink href="/mypage/upgrade" className="vr-me__edit">
+                      패키지 상향
+                    </VrLink>
+                  )}
                 </div>
 
                 <dl className="vr-me__facts">

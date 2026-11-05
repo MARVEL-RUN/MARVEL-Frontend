@@ -325,6 +325,18 @@ export function VirtualRunRegistrationEdit() {
                 </VrLink>
               </div>
             </section>
+          ) : receipt.pendingUpgrade ? (
+            <section className="block wait">
+              <h2>패키지 상향이 진행 중입니다</h2>
+              <p className="sec__body">
+                상향을 결제하거나 취소한 뒤에 신청 정보를 수정할 수 있습니다.
+              </p>
+              <div className="flow__nav">
+                <VrLink href="/mypage/upgrade" className="btn btn--red">
+                  상향 이어하기
+                </VrLink>
+              </div>
+            </section>
           ) : (
             <form className="form" onSubmit={(e) => void onSubmit(e)} noValidate>
               <FormSec

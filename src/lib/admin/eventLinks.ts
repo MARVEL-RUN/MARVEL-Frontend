@@ -1,4 +1,5 @@
 const APPS = "/admin/applications";
+const UPGRADES = "/admin/upgrades";
 const CAPS = "/admin/capacities";
 const MEMBERS = "/admin/members";
 const INQUIRY = "/admin/boards/inquiry";
@@ -24,6 +25,10 @@ export function adminApplicationsHrefFromEvent(event: EventRef, query?: string) 
 }
 
 /** 대회 API eventId로 정원 상세 진입 */
+export function adminUpgradesHrefFromEvent(event: EventRef) {
+  return `${UPGRADES}/list?eventId=${encodeURIComponent(event.eventId)}`;
+}
+
 export function adminCapacitiesHrefFromEvent(event: EventRef) {
   return adminCapacitiesHref(event.eventId);
 }

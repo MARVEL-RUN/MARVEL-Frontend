@@ -57,6 +57,16 @@ function personFields(label: string, person: VirtualRunPersonDraft) {
   };
 }
 
+export function toPackageUpgradeEntries(
+  recipients: VirtualRunRecipientDraft[],
+): RegistrationEntryInput[] {
+  if (!recipients.length) throw new Error("추가할 참가자가 없습니다.");
+  return recipients.map((recipient, index) => {
+    const fields = personFields(recipient.name.trim() || `참가자 ${index + 1}`, recipient);
+    return { eventCategoryId: recipient.eventCategoryId, ...fields };
+  });
+}
+
 export function toVirtualRunCreateRequest(input: {
   category: RegistrationCategory;
   buyer: VirtualRunBuyerDraft;

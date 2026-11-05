@@ -15,7 +15,9 @@ import {
   clearVirtualRunTicketPending,
   readVirtualRunTicketPending,
 } from "@/lib/virtual-run/ticket-payment";
+import { syncVirtualRunSessionFromLookup } from "@/lib/virtual-run/sync-session";
 import { confirmPayment } from "@/services/main/payments";
+import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
 import type { PaymentConfirmResponse } from "@/services/main/types";
 
 type Phase = "loading" | "done" | "error";
@@ -33,6 +35,7 @@ function authFromParams(params: { get: (key: string) => string | null }) {
 
 export function VirtualRunPaymentSuccessPage() {
   const params = useSearchParams();
+  const { update } = useVirtualRunParticipant();
   const [phase, setPhase] = useState<Phase>(() =>
     authFromParams(params) ? "loading" : "error",
   );
@@ -75,6 +78,8 @@ export function VirtualRunPaymentSuccessPage() {
         const data = await confirmPayment(auth);
         if (cancelled) return;
         clearVirtualRunTicketPending();
+        const synced = await syncVirtualRunSessionFromLookup().catch(() => null);
+        if (synced?.participant) update(synced.participant);
         setResult(data);
         setConfirmPending(false);
         setPhase("done");
@@ -90,7 +95,7 @@ export function VirtualRunPaymentSuccessPage() {
     return () => {
       cancelled = true;
     };
-  }, [params]);
+  }, [params, update]);
 
   const paid =
     typeof result?.paidAmount === "number"

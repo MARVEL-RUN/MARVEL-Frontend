@@ -53,6 +53,35 @@ export type RegistrationEntryInput = {
   gender: "M" | "F";
 };
 
+export type PendingUpgradeEntry = {
+  eventCategoryId: string;
+  eventCategoryName: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: string;
+};
+
+/** 조회 응답. 상향 결제 재개는 이 값이 있을 때만 한다 */
+export type PendingPackageUpgrade = {
+  upgradeId: string;
+  targetCategoryId: string;
+  targetCategoryName: string;
+  amount: number;
+  addedEntries: PendingUpgradeEntry[];
+  requestedAt: string;
+};
+
+export type PackageUpgradeOrder = {
+  upgradeId: string;
+  targetCategoryId: string;
+  targetCategoryName: string;
+  paymentId: string;
+  orderId: string;
+  orderName: string;
+  amount: number;
+};
+
 export type RegistrationPolicyReason = {
   code: string;
   message: string;
@@ -303,6 +332,7 @@ export type RegistrationReceipt = {
   startGroupId?: string | null;
   startGroupCode?: string | null;
   startGroupUnselected?: boolean;
+  pendingUpgrade?: PendingPackageUpgrade | null;
 };
 
 export type RegistrationSouvenirSelection = {

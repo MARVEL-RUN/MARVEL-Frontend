@@ -11,7 +11,8 @@ import {
 } from "react";
 import { useRegistrationOptions } from "@/components/main/register/useRegistrationOptions";
 import { VIRTUAL_RUN_EVENT_ID } from "@/lib/main/config";
-import { clearLoginSession, readLoginSession } from "@/lib/virtual-run/login-session";
+import { readLoginSession } from "@/lib/virtual-run/login-session";
+import { logoutParticipantSession } from "@/services/main/participant-auth";
 import { ownedRoundIdsForCategory } from "@/lib/virtual-run/owned-rounds";
 import {
   clearParticipant,
@@ -75,7 +76,7 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
   }, []);
 
   const logout = useCallback(() => {
-    clearLoginSession();
+    void logoutParticipantSession();
     clearParticipant();
     setParticipant(null);
   }, []);
