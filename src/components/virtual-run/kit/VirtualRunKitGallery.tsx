@@ -113,6 +113,28 @@ export function VirtualRunKitGallery() {
         ))}
       </div>
 
+      <ul className="vr-kit-lineup" aria-label="테마별 기념품">
+        {VIRTUAL_RUN_KIT_THEMES.map((entry) => (
+          <li key={entry.id}>
+            <button
+              type="button"
+              className={entry.id === themeId ? "is-on" : undefined}
+              aria-pressed={entry.id === themeId}
+              onClick={() => selectTheme(entry.id)}
+            >
+              <span className="vr-kit-lineup__shot">
+                <Image
+                  src={VIRTUAL_RUN_ASSETS.kitSouvenir[entry.id]}
+                  alt={`${entry.label} 기념품`}
+                  fill
+                  sizes="(max-width: 720px) 30vw, 280px"
+                />
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
       <section
         className={souvenirScene ? "vr-kit-card vr-kit-card--scene" : "vr-kit-card"}
         aria-label="공식 기념품"

@@ -38,6 +38,43 @@
   border-bottom-color: var(--marvel-hi);
 }
 
+.virtual-run .vr-kit-lineup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.virtual-run .vr-kit-lineup button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: color-mix(in srgb, #fff 5.5%, var(--vr-surface));
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.virtual-run .vr-kit-lineup__shot {
+  position: relative;
+  display: block;
+  aspect-ratio: 1.18 / 1;
+}
+
+.virtual-run .vr-kit-lineup__shot img {
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.virtual-run .vr-kit-lineup button.is-on {
+  box-shadow: 0 0 0 2px var(--marvel-hi);
+}
+
 .virtual-run .vr-kit-card {
   background: color-mix(in srgb, #fff 5.5%, var(--vr-surface));
   border-radius: 1.75rem;
@@ -58,11 +95,23 @@
 
 .virtual-run .vr-kit-hero__bg {
   object-fit: contain;
-  object-position: center;
+  object-position: right center;
+}
+
+.virtual-run .vr-kit-card--scene:has(.vr-kit-hero) {
+  --vr-kit-scene-h: 34rem;
+}
+
+.virtual-run .vr-kit-card--scene:has(.vr-kit-hero) .vr-kit-hero__bg-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.18) 46%, transparent 72%);
 }
 
 .virtual-run .vr-kit-hero__bg-frame.is-dim .vr-kit-hero__bg {
   opacity: 0.10;
+  object-position: center;
 }
 
 .virtual-run .vr-kit-card--scene .vr-kit-hero__copy,
@@ -310,7 +359,8 @@
 .virtual-run .vr-kit-more:focus-visible,
 .virtual-run .vr-kit-arrow:focus-visible,
 .virtual-run .vr-kit-dots button:focus-visible,
-.virtual-run .vr-kit__themes button:focus-visible {
+.virtual-run .vr-kit__themes button:focus-visible,
+.virtual-run .vr-kit-lineup button:focus-visible {
   outline: 2px solid var(--marvel-hi);
   outline-offset: 3px;
 }
@@ -385,6 +435,26 @@
   .virtual-run .vr-kit-more__icon svg {
     width: 12px;
     height: 12px;
+  }
+
+  .virtual-run .vr-kit-lineup {
+    gap: 0.45rem;
+  }
+
+  .virtual-run .vr-kit-lineup button {
+    border-radius: 0.7rem;
+  }
+
+  .virtual-run .vr-kit-card--scene:has(.vr-kit-hero) {
+    --vr-kit-scene-h: 28rem;
+  }
+
+  .virtual-run .vr-kit-hero__bg {
+    object-position: center top;
+  }
+
+  .virtual-run .vr-kit-card--scene:has(.vr-kit-hero) .vr-kit-hero__bg-frame::after {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.16) 36%, transparent 58%);
   }
 
   .virtual-run .vr-kit-hero__bg-frame {

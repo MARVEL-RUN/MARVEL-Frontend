@@ -12,9 +12,9 @@ export const VIRTUAL_RUN_ASSETS = {
   kitLoad: "/media/virtual-run/kit-load.mp4",
   doomsdayPoster: "/images/virtual-run/doomsday-poster.jpg",
   kitSouvenir: {
-    avengers: "/images/virtual-run/kit/avengers/souvenir.png",
-    "x-men": "/images/virtual-run/kit/x-men/souvenir.png",
-    "fantastic-four": "/images/virtual-run/kit/fantastic-four/souvenir.png",
+    avengers: "/images/virtual-run/kit/avengers/souvenir.jpg",
+    "x-men": "/images/virtual-run/kit/x-men/souvenir.jpg",
+    "fantastic-four": "/images/virtual-run/kit/fantastic-four/souvenir.jpg",
   },
   packages: {
     avengers: "/images/virtual-run/packages/avengers.png",
