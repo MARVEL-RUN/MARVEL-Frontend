@@ -69,5 +69,5 @@ export const VIRTUAL_RUN_OVERVIEW_ROWS: VirtualRunOverviewRow[] = [
     value: "회차별 5K 인증 완료 시 디지털 완주증 발급",
     note: "메달·실물 리워드는 마이페이지에서 확인할 수 있습니다.",
   },
-  { label: "로그인", value: "회원가입 없이 배번호 + 휴대폰 문자 인증" },
+  { label: "로그인", value: "회원가입 없이 신청 정보(이름·생년월일·전화번호·비밀번호)" },
 ];

@@ -9,14 +9,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { clearLoginSession, readLoginSession } from "@/lib/virtual-run/login-session";
 import {
   clearParticipant,
-  ensureDemoParticipant,
   readParticipant,
   writeParticipant,
 } from "@/lib/virtual-run/participant-client";
 import { defaultParticipant, type VirtualRunParticipant } from "@/lib/virtual-run/participant";
-import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
 
 type Ctx = {
   participant: VirtualRunParticipant | null;
@@ -35,15 +34,11 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
   const [hydrated, setHydrated] = useState(false);
 
   const refresh = useCallback(() => {
-    setParticipant(readParticipant());
+    setParticipant(readLoginSession() ? readParticipant() : null);
   }, []);
 
   useEffect(() => {
-    let p = readParticipant();
-    if (virtualRunDemoEnabled) {
-      p = ensureDemoParticipant();
-    }
-    setParticipant(p);
+    setParticipant(readLoginSession() ? readParticipant() : null);
     setHydrated(true);
   }, []);
 
@@ -55,6 +50,7 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
   }, []);
 
   const logout = useCallback(() => {
+    clearLoginSession();
     clearParticipant();
     setParticipant(null);
   }, []);
@@ -100,6 +96,5 @@ export function useVirtualRunParticipantOrDemo(): Ctx & {
   return {
     ...ctx,
     participant: ctx.participant ?? defaultParticipant(),
-    isLoggedIn: ctx.isLoggedIn || virtualRunDemoEnabled,
   };
 }

@@ -1,13 +1,13 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
 import { ApplyTerms } from "@/components/main/register/ApplyTerms";
 import { AddressField, FormRow, FormSec, PhoneField } from "@/components/main/register/ApplyUi";
 import { SheetModal } from "@/components/main/SheetModal";
-import { hasTossClientKey } from "@/lib/main/config";
+import { hasMainApi, hasTossClientKey, VIRTUAL_RUN_EVENT_ID } from "@/lib/main/config";
 import type { PaymentOrder } from "@/lib/payment/session";
 import { EMPTY_CONSENTS, type Consents } from "@/lib/register";
 import { isMobileView } from "@/lib/viewport";
@@ -20,6 +20,7 @@ import {
 } from "@/lib/virtual-run/ticket-payment";
 import { useVrPath, VrLink } from "../layout/VrLink";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
+import { VirtualRunTicketPurchase } from "./VirtualRunTicketPurchase";
 
 type TicketKind = "single" | "package";
 
@@ -56,6 +57,10 @@ export function VirtualRunTicketsPage() {
   const [payOpen, setPayOpen] = useState(false);
   const [payOrder, setPayOrder] = useState<PaymentOrder | null>(null);
   const [payName, setPayName] = useState("");
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, [agreed]);
 
   const roundIds = useMemo((): VirtualRunRoundId[] => {
     if (kind === "package") return VIRTUAL_RUN_ROUNDS.map((r) => r.id);
@@ -122,7 +127,6 @@ export function VirtualRunTicketsPage() {
             onChange={setConsents}
             onPick={() => {
               setAgreed(true);
-              window.scrollTo({ top: 0 });
             }}
             allowedKinds={["individual"]}
             actionLabels={{ individual: "동의하고 티켓 선택" }}
@@ -137,9 +141,24 @@ export function VirtualRunTicketsPage() {
     );
   }
 
+  if (hasMainApi && VIRTUAL_RUN_EVENT_ID) {
+    return (
+      <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
+        <div className="page__body wrap vr-ticket-stage">
+          <VirtualRunTicketPurchase
+            consents={consents}
+            onBack={() => {
+              setAgreed(false);
+            }}
+          />
+        </div>
+      </VirtualRunSubPage>
+    );
+  }
+
   return (
     <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
-      <div className="page__body wrap">
+      <div className="page__body wrap vr-ticket-stage">
         <form className="form" onSubmit={onPay} noValidate>
           <section className="block">
             <header className="form__head">

@@ -281,6 +281,21 @@
   letter-spacing: 0.06em;
 }
 
+.virtual-run .vr-me__edit {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.virtual-run .vr-me__edit:hover,
+.virtual-run .vr-me__edit:focus-visible {
+  text-decoration: underline;
+}
+
 .virtual-run .vr-me__medal {
   display: grid;
   gap: 0.5rem;
@@ -553,11 +568,74 @@
   letter-spacing: 0.04em;
 }
 
+.virtual-run .vr-ship-hero__hint {
+  margin: 0 0 1.15rem;
+  color: var(--note);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.virtual-run .vr-ship-trackno {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--vr-surface) 88%, #000);
+}
+
+.virtual-run .vr-ship-trackno__label {
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.virtual-run .vr-ship-trackno__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.virtual-run .vr-ship-trackno__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+.virtual-run .vr-ship-trackno__copy:hover {
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+}
+
+.virtual-run .vr-ship-trackno__empty {
+  margin: 0 0 1.25rem;
+  color: var(--note);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .virtual-run .vr-track {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.35rem;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.15rem;
 }
 
 .virtual-run .vr-track li,

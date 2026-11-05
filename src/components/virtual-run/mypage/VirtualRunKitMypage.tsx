@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { KIT_CERT_NOTICES } from "@/lib/virtual-run/kit-cert";
 import type { KitShippingStatus } from "@/lib/virtual-run/participant";
@@ -7,6 +8,7 @@ import { VIRTUAL_RUN_ROUNDS } from "@/lib/virtual-run/rounds";
 import {
   KIT_CERT_LABEL,
   KIT_CERT_TONE,
+  KIT_SHIPPING_HINT,
   KIT_SHIPPING_LABEL,
   KIT_SHIPPING_TONE,
 } from "@/lib/virtual-run/status";
@@ -23,8 +25,21 @@ const SHIPPING_STEPS: KitShippingStatus[] = ["preparing", "shipping", "delivered
 export function VirtualRunKitMypage() {
   const { participant } = useVirtualRunParticipantOrDemo();
   const [result, setResult] = useState<"approved" | "pending" | null>(null);
+  const [copied, setCopied] = useState(false);
   const shipIdx = SHIPPING_STEPS.indexOf(participant.kitShipping);
   const kits = VIRTUAL_RUN_ROUNDS.filter((r) => participant.ownedRoundIds.includes(r.id));
+  const trackingNo = participant.trackingNo?.trim() || undefined;
+
+  async function copyTrackingNo() {
+    if (!trackingNo) return;
+    try {
+      await navigator.clipboard.writeText(trackingNo);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   if (result) {
     return (
@@ -33,7 +48,7 @@ export function VirtualRunKitMypage() {
           <CertSubmitResult
             mode={result}
             subject="키트 인증"
-            rows={[{ label: "배번호", value: participant.bib }]}
+            rows={[{ label: "배번호", value: participant.bib.trim() || "-" }]}
             approvedNote="키트 인증 충족 시 추첨 대상이 되며, 당첨자에게 리워드가 배송됩니다."
           />
         </div>
@@ -53,6 +68,9 @@ export function VirtualRunKitMypage() {
                   {KIT_SHIPPING_LABEL[participant.kitShipping]}
                 </VrStatus>
               </header>
+
+              <p className="vr-ship-hero__hint">{KIT_SHIPPING_HINT[participant.kitShipping]}</p>
+
               <ol className="vr-track" aria-label="배송 단계">
                 {SHIPPING_STEPS.map((s, i) => (
                   <li key={s} className={i < shipIdx ? "is-done" : i === shipIdx ? "is-on" : undefined}>
@@ -60,6 +78,26 @@ export function VirtualRunKitMypage() {
                   </li>
                 ))}
               </ol>
+
+              {trackingNo ? (
+                <div className="vr-ship-trackno">
+                  <span className="vr-ship-trackno__label">송장번호</span>
+                  <code className="vr-ship-trackno__value">{trackingNo}</code>
+                  <button
+                    type="button"
+                    className="vr-ship-trackno__copy"
+                    onClick={copyTrackingNo}
+                    aria-label="송장번호 복사"
+                    aria-live="polite"
+                  >
+                    {copied ? <Check size={14} aria-hidden /> : <Copy size={14} aria-hidden />}
+                    {copied ? "복사됨" : "복사"}
+                  </button>
+                </div>
+              ) : (
+                <p className="vr-ship-trackno__empty">배송이 시작되면 문자로 알려 드립니다.</p>
+              )}
+
               <dl className="spec">
                 <div>
                   <dt>받는 분</dt>
@@ -68,10 +106,6 @@ export function VirtualRunKitMypage() {
                 <div>
                   <dt>구성</dt>
                   <dd>{kits.length > 0 ? kits.map((r) => `${r.label} ${r.theme}`).join(" · ") : "-"}</dd>
-                </div>
-                <div>
-                  <dt>송장번호</dt>
-                  <dd>{participant.trackingNo ?? "배송이 시작되면 문자로 알려 드립니다."}</dd>
                 </div>
               </dl>
             </section>

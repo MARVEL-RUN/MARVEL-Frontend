@@ -74,7 +74,7 @@ export const VIRTUAL_RUN_FAQS: VirtualRunFaq[] = [
   {
     category: "ticket",
     q: "회원가입이 필요한가요?",
-    a: "필요 없습니다. 결제 후 문자로 받은 배번호와 휴대폰 번호로 마이페이지에 로그인합니다.",
+    a: "필요 없습니다. 티켓 신청 때 입력한 이름, 생년월일, 전화번호, 비밀번호로 마이페이지에 로그인합니다.",
   },
   {
     category: "ticket",

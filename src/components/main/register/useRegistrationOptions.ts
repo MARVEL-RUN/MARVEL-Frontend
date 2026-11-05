@@ -6,11 +6,12 @@ import { MainHttpError, isServerDownError } from "@/lib/main/fetch";
 import { sortedCategories } from "@/lib/registration-options";
 import { fetchRegistrationOptions } from "@/services/main/registration-options";
 import type {
+  EventFormat,
   RegistrationCategory,
   RegistrationPolicyReason,
 } from "@/services/main/types";
 
-export function useRegistrationOptions() {
+export function useRegistrationOptions(eventId = DEFAULT_EVENT_ID) {
   const [categories, setCategories] = useState<RegistrationCategory[]>([]);
   const [registrationAllowed, setRegistrationAllowed] = useState<boolean | undefined>(
     undefined,
@@ -18,6 +19,10 @@ export function useRegistrationOptions() {
   const [registrationReason, setRegistrationReason] = useState<
     RegistrationPolicyReason | null | undefined
   >(undefined);
+  const [eventFormat, setEventFormat] = useState<EventFormat | undefined>(undefined);
+  const [addressRequired, setAddressRequired] = useState(false);
+  const [organizationRegistrationEnabled, setOrganizationRegistrationEnabled] =
+    useState(true);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [down, setDown] = useState(false);
@@ -38,7 +43,7 @@ export function useRegistrationOptions() {
     let cancelled = false;
     setLoading(true);
 
-    fetchRegistrationOptions(DEFAULT_EVENT_ID)
+    fetchRegistrationOptions(eventId)
       .then((data) => {
         if (cancelled) return;
         setCategories(sortedCategories(data.categories ?? []));
@@ -52,6 +57,9 @@ export function useRegistrationOptions() {
             ? null
             : data.registrationReason ?? undefined,
         );
+        setEventFormat(data.eventFormat);
+        setAddressRequired(data.addressRequired === true);
+        setOrganizationRegistrationEnabled(data.organizationRegistrationEnabled !== false);
         setErrorMessage("");
         setDown(false);
       })
@@ -60,6 +68,9 @@ export function useRegistrationOptions() {
         setCategories([]);
         setRegistrationAllowed(undefined);
         setRegistrationReason(undefined);
+        setEventFormat(undefined);
+        setAddressRequired(false);
+        setOrganizationRegistrationEnabled(true);
         setDown(isServerDownError(err));
         setErrorMessage(
           err instanceof MainHttpError
@@ -74,7 +85,7 @@ export function useRegistrationOptions() {
     return () => {
       cancelled = true;
     };
-  }, [tick]);
+  }, [tick, eventId]);
 
   const registrationOpen =
     registrationAllowed === undefined ? true : registrationAllowed;
@@ -84,6 +95,9 @@ export function useRegistrationOptions() {
     registrationAllowed,
     registrationReason,
     registrationOpen,
+    eventFormat,
+    addressRequired,
+    organizationRegistrationEnabled,
     loading,
     errorMessage,
     down,

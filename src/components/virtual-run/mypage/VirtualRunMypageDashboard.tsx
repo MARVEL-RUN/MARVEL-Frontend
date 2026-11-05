@@ -9,7 +9,6 @@ import {
 import {
   VIRTUAL_RUN_ROUND_CERT_STATUS_LABEL,
   VIRTUAL_RUN_ROUNDS,
-  virtualRunRoundById,
 } from "@/lib/virtual-run/rounds";
 import { virtualRunSpotsEnabled } from "@/lib/virtual-run/site";
 import {
@@ -29,7 +28,10 @@ import { VrLink, useVrPath } from "../layout/VrLink";
 import { VrMypageGate } from "./VrMypageGate";
 import { VrStatus } from "./VrStatus";
 
+const PACKAGE_ROUND_LINE = VIRTUAL_RUN_ROUNDS.map((round) => round.theme).join(" · ");
+
 function ticketLabel(p: VirtualRunParticipant) {
+  if (p.categoryName?.trim()) return p.categoryName.trim();
   const owned = VIRTUAL_RUN_ROUNDS.filter((r) => p.ownedRoundIds.includes(r.id));
   if (owned.length === 0) return "티켓 없음";
   if (owned.length >= VIRTUAL_RUN_ROUNDS.length) return "3회차 패키지";
@@ -38,6 +40,11 @@ function ticketLabel(p: VirtualRunParticipant) {
     return `1회차 · ${r.theme}`;
   }
   return owned.map((r) => r.theme).join(" · ");
+}
+
+function isThreeRoundPackage(p: VirtualRunParticipant, label: string) {
+  if (p.ownedRoundIds.length >= VIRTUAL_RUN_ROUNDS.length) return true;
+  return /패키지|3종|3회차/.test(label);
 }
 
 function nextAction(p: VirtualRunParticipant): { href: string; label: string } | null {
@@ -69,9 +76,7 @@ export function VirtualRunMypageDashboard() {
   const medalDone = combinedMedalCount(participant);
   const ticket = ticketLabel(participant);
   const action = nextAction(participant);
-  const ownedThemes = participant.ownedRoundIds
-    .map((id) => virtualRunRoundById(id).theme)
-    .join(" · ");
+  const packageRounds = isThreeRoundPackage(participant, ticket);
 
   function onLogout() {
     logout();
@@ -92,10 +97,13 @@ export function VirtualRunMypageDashboard() {
                     <small>님</small>
                   </h2>
                   <p className="vr-me__meta">
-                    배번호 <strong>{participant.bib}</strong>
+                    배번호 <strong>{participant.bib.trim() || "-"}</strong>
                     <span aria-hidden>·</span>
                     {maskPhone(participant.phone)}
                   </p>
+                  <VrLink href="/mypage/edit" className="vr-me__edit">
+                    신청 정보 수정
+                  </VrLink>
                 </div>
 
                 <dl className="vr-me__facts">
@@ -103,8 +111,8 @@ export function VirtualRunMypageDashboard() {
                     <dt>보유 티켓</dt>
                     <dd>
                       <strong>{ticket}</strong>
-                      {participant.ownedRoundIds.length >= VIRTUAL_RUN_ROUNDS.length ? (
-                        <span className="vr-me__fact-sub">{ownedThemes}</span>
+                      {packageRounds ? (
+                        <span className="vr-me__fact-sub">{PACKAGE_ROUND_LINE}</span>
                       ) : null}
                     </dd>
                   </div>

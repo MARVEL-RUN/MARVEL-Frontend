@@ -8,6 +8,10 @@ export const TOSS_CLIENT_KEY =
 export const DEFAULT_EVENT_ID =
   process.env.NEXT_PUBLIC_EVENT_ID?.trim() ?? "";
 
+/** 버추얼런 대회. 없으면 티켓 화면은 데모 상품을 쓴다 */
+export const VIRTUAL_RUN_EVENT_ID =
+  process.env.NEXT_PUBLIC_VIRTUAL_RUN_EVENT_ID?.trim() ?? "";
+
 export const hasMainApi = MAIN_API_BASE.length > 0;
 export const hasTossClientKey = TOSS_CLIENT_KEY.length > 0;
 
