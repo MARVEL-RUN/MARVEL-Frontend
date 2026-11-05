@@ -15,7 +15,18 @@ import { noticeDateParts, toDateTimeAttr } from "./order";
 
 const PAGE_SIZE = 20;
 
-export function NoticesPage() {
+type NoticesPageProps = {
+  eventId?: string;
+  toHref?: (path: string) => string;
+  Banner?: typeof SideBanner;
+};
+
+export function NoticesPage({
+  eventId,
+  toHref,
+  Banner = SideBanner,
+}: NoticesPageProps = {}) {
+  const href = (path: string) => (toHref ? toHref(path) : path);
   const [items, setItems] = useState<NoticeRow[]>([]);
   const [total, setTotal] = useState(0);
   const [pageCount, setPageCount] = useState(1);
@@ -33,6 +44,7 @@ export function NoticesPage() {
     void (async () => {
       try {
         const result = await listPublicNotices({
+          eventId: eventId || undefined,
           target: "ALL",
           keyword: applied.trim() || undefined,
           page: page - 1,
@@ -65,11 +77,11 @@ export function NoticesPage() {
     return () => {
       cancelled = true;
     };
-  }, [applied, sort, page]);
+  }, [applied, eventId, sort, page]);
 
   return (
     <main className="page">
-      <SideBanner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
+      <Banner kicker="DISPATCH" title="공지사항" en="OFFICIAL BULLETIN" />
       <div className="page__body wrap">
         <BoardSearch
           query={query}
@@ -110,7 +122,7 @@ export function NoticesPage() {
               return (
                 <Link
                   key={n.id}
-                  href={`/notices/view?id=${n.id}`}
+                  href={href(`/notices/view?id=${n.id}`)}
                   className={n.pinned ? "board__row is-pin" : "board__row"}
                 >
                   <span className={`board__no is-${noticeCategoryTone(n.category)}`}>

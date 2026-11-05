@@ -24,7 +24,18 @@ import {
 
 const PAGE_SIZE = 20;
 
-export function InquiryPage() {
+type InquiryPageProps = {
+  eventId?: string;
+  toHref?: (path: string) => string;
+  Banner?: typeof SideBanner;
+};
+
+export function InquiryPage({
+  eventId = DEFAULT_EVENT_ID,
+  toHref,
+  Banner = SideBanner,
+}: InquiryPageProps = {}) {
+  const href = (path: string) => (toHref ? toHref(path) : path);
   const router = useRouter();
   const [items, setItems] = useState<PublicQuestionListItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -47,7 +58,7 @@ export function InquiryPage() {
       try {
         // API OLDEST가 LATEST와 동일하게 내려와서, 과거순은 끝 페이지를 뒤집어 맞춤
         const first = await listPublicQuestions({
-          eventId: DEFAULT_EVENT_ID,
+          eventId,
           target: "ALL",
           keyword: applied.trim() || undefined,
           page: page - 1,
@@ -62,7 +73,7 @@ export function InquiryPage() {
           apiPage === page - 1
             ? first
             : await listPublicQuestions({
-              eventId: DEFAULT_EVENT_ID,
+              eventId,
               target: "ALL",
               keyword: applied.trim() || undefined,
               page: apiPage,
@@ -91,13 +102,13 @@ export function InquiryPage() {
     return () => {
       cancelled = true;
     };
-  }, [applied, sort, page]);
+  }, [applied, eventId, sort, page]);
 
   function openPost(item: PublicQuestionListItem) {
     const id = item.questionHeader.id;
     if (!item.questionHeader.secret) {
       unlockInquiry(id, "");
-      router.push(`/inquiry/view?id=${id}`);
+      router.push(href(`/inquiry/view?id=${id}`));
       return;
     }
     setPendingId(id);
@@ -105,7 +116,7 @@ export function InquiryPage() {
 
   return (
     <main className="page">
-      <SideBanner kicker="INQUIRY" title="문의사항" en="CONTACT" />
+      <Banner kicker="INQUIRY" title="문의사항" en="CONTACT" />
       <div className="page__body wrap">
         <BoardSearch
           query={query}
@@ -126,7 +137,7 @@ export function InquiryPage() {
             setPage(1);
           }}
         >
-          <Link href="/inquiry/write" className="btn btn--red">
+          <Link href={href("/inquiry/write")} className="btn btn--red">
             글쓰기
           </Link>
         </BoardSearch>
@@ -223,7 +234,7 @@ export function InquiryPage() {
               unlockInquiry(pendingId, password);
               const id = pendingId;
               setPendingId(null);
-              router.push(`/inquiry/view?id=${id}`);
+              router.push(href(`/inquiry/view?id=${id}`));
             })
             .catch((err) => {
               const message =
