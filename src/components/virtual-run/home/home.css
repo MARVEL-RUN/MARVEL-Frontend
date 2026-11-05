@@ -755,6 +755,11 @@
 }
 
 @media (max-width: 720px) {
+  .virtual-run .vr-home__overview .spec dd {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
   .virtual-run .vr-home__trailer-stage {
     grid-template-columns: 1fr;
     justify-items: center;
