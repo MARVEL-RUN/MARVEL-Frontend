@@ -18,11 +18,24 @@ const SECTION_KINDS: { kind: VirtualRunKitItemKind; code: string }[] = [
   { kind: "socks", code: "SOCKS" },
   { kind: "sticker", code: "STICKER" },
   { kind: "sticker-pack", code: "STICKER" },
+  { kind: "finish-line", code: "FINISH" },
   { kind: "package", code: "PACKAGE" },
 ];
 
 function itemOf(items: readonly VirtualRunKitItem[], kind: VirtualRunKitItemKind) {
   return items.find((entry) => entry.kind === kind);
+}
+
+function figureClass(kind: VirtualRunKitItemKind) {
+  if (kind === "keycap-keyring") return "vr-kit-pane__figure vr-kit-pane__figure--sideways";
+  if (kind === "finish-line") return "vr-kit-pane__figure vr-kit-pane__figure--wide";
+  return "vr-kit-pane__figure";
+}
+
+function imageSize(kind: VirtualRunKitItemKind) {
+  if (kind === "keycap-keyring") return { width: 311, height: 2082 };
+  if (kind === "finish-line") return { width: 3304, height: 1107 };
+  return { width: 1200, height: 1200 };
 }
 
 function sectionsFor(items: readonly VirtualRunKitItem[]) {
@@ -150,22 +163,16 @@ export function VirtualRunKitGallery() {
 
       {sections.map((section, index) => (
         <KitPane key={section.kind} order={index + 3} code={section.code} title={section.item.label}>
-          <figure
-            className={
-              section.kind === "keycap-keyring"
-                ? "vr-kit-pane__figure vr-kit-pane__figure--sideways"
-                : "vr-kit-pane__figure"
-            }
-          >
+          <figure className={figureClass(section.kind)}>
             <Image
               src={virtualRunKitImage(theme.id, section.item.file)}
               alt={section.item.label}
-              width={section.kind === "keycap-keyring" ? 311 : 1200}
-              height={section.kind === "keycap-keyring" ? 2082 : 1200}
+              width={imageSize(section.kind).width}
+              height={imageSize(section.kind).height}
               sizes={
-                section.kind === "keycap-keyring"
-                  ? "(max-width: 720px) 92vw, 900px"
-                  : "(max-width: 720px) 70vw, 420px"
+                section.kind === "finish-line" || section.kind === "keycap-keyring"
+                  ? "(max-width: 720px) 92vw, 800px"
+                  : "(max-width: 720px) 70vw, 380px"
               }
             />
           </figure>

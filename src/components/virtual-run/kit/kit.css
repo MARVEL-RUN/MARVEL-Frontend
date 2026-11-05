@@ -129,6 +129,10 @@
   object-fit: contain;
 }
 
+.virtual-run .vr-kit-pane__pair:not(.vr-kit-pane__pair--medal) img {
+  width: 88%;
+}
+
 .virtual-run .vr-kit-pane__pair figcaption {
   color: var(--note);
   font-size: 0.78rem;
@@ -145,14 +149,24 @@
 
 .virtual-run .vr-kit-pane__figure img {
   display: block;
-  width: min(100%, 26rem);
+  width: min(100%, 23rem);
   height: auto;
+}
+
+.virtual-run .vr-kit-pane__figure--wide {
+  width: min(100%, 50rem);
+  margin-inline: auto;
+}
+
+.virtual-run .vr-kit-pane__figure--wide img {
+  width: 100%;
 }
 
 .virtual-run .vr-kit-pane__figure--sideways {
   position: relative;
   container-type: inline-size;
-  width: 100%;
+  width: min(100%, 50rem);
+  margin-inline: auto;
   aspect-ratio: 2082 / 311;
 }
 
