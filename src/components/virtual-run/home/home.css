@@ -699,6 +699,55 @@
   line-height: 1;
 }
 
+.virtual-run .vr-home__origin {
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+}
+
+.virtual-run .vr-home__origin .wrap {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  gap: 2.75rem;
+}
+
+.virtual-run .vr-home__origin .sec__title {
+  margin-bottom: 1.1rem;
+  font-size: clamp(1.62rem, 2.85vw, 2.55rem);
+  line-height: 1.08;
+}
+
+@media (min-width: 721px) {
+  .virtual-run .vr-home__origin .sec__title {
+    white-space: nowrap;
+  }
+}
+
+.virtual-run .vr-home__origin-stats li {
+  background: var(--vr-surface);
+}
+
+.virtual-run .vr-home__origin-accent {
+  color: var(--marvel-hi);
+}
+
+.virtual-run .vr-home__hl {
+  display: inline;
+  padding: 0.05em 0.22em 0.12em;
+  color: #fff;
+  background: linear-gradient(
+    102deg,
+    color-mix(in srgb, var(--marvel-hi) 6%, transparent) 0%,
+    color-mix(in srgb, var(--marvel-hi) 38%, transparent) 22%,
+    color-mix(in srgb, var(--marvel-hi) 34%, transparent) 78%,
+    color-mix(in srgb, var(--marvel-hi) 8%, transparent) 100%
+  );
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.virtual-run .vr-home__origin-stats strong span {
+  color: var(--marvel-hi);
+}
+
 .virtual-run .vr-home__trailer {
   padding-top: 3.5rem;
   padding-bottom: 5rem;
@@ -752,6 +801,39 @@
 
 .virtual-run .vr-home__overview {
   padding-top: 0;
+}
+
+.virtual-run .vr-home__board.board-sec {
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.04) 0.8px, transparent 1px) 0 0 / 6px 6px,
+    linear-gradient(180deg, var(--navy), #031008);
+}
+
+.virtual-run .vr-home__board .sec__title em {
+  color: var(--marvel-hi);
+}
+
+.virtual-run .vr-home__board .board-switch__btn.is-on {
+  background: var(--marvel-hi);
+  color: var(--marvel-deep);
+}
+
+.virtual-run .vr-home__board .board-switch__btn.is-on:hover {
+  filter: brightness(1.05);
+}
+
+.virtual-run .vr-home__board-more {
+  margin: 1.75rem 0 0;
+  text-align: right;
+}
+
+.virtual-run .vr-home__board-more a {
+  color: var(--marvel-hi);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 
 @media (max-width: 720px) {

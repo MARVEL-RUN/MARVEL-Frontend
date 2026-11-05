@@ -15,6 +15,8 @@ import { VirtualRunTicketsCta } from "../layout/VirtualRunTicketsCta";
 import { VrLink } from "../layout/VrLink";
 import { HeroCountdown } from "./HeroCountdown";
 import { HomeCursors } from "./HomeCursors";
+import { VirtualRunHomeBoard } from "./VirtualRunHomeBoard";
+import { VirtualRunHomeOrigin } from "./VirtualRunHomeOrigin";
 import { ScrambleText } from "../fx/ScrambleText";
 
 const TICKER = [
@@ -196,6 +198,8 @@ export function VirtualRunHomePage() {
         </div>
       </div>
 
+      <VirtualRunHomeOrigin />
+
       <section className="sec guide-sec vr-home__trailer" id="trailer">
         <div className="wrap reveal">
           <p className="kicker">TRAILER</p>
@@ -246,6 +250,8 @@ export function VirtualRunHomePage() {
           </dl>
         </div>
       </section>
+
+      <VirtualRunHomeBoard />
     </main>
   );
 }
