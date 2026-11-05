@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import {
   VIRTUAL_RUN_KIT_THEMES,
@@ -59,16 +59,14 @@ function KitVisual({
 
 export function VirtualRunKitGallery() {
   const [themeId, setThemeId] = useState<VirtualRunKitThemeId>("avengers");
-  const [view, setView] = useState<"overview" | "detail">("overview");
   const [index, setIndex] = useState(0);
   const theme = VIRTUAL_RUN_KIT_THEMES.find((entry) => entry.id === themeId) ?? VIRTUAL_RUN_KIT_THEMES[0];
 
   const souvenir = useMemo(() => pickItems(theme.items, SOUVENIR_KINDS), [theme]);
   const slide = souvenir[index] ?? souvenir[0];
-  const overview = view === "overview" || !slide;
 
   useEffect(() => {
-    if (view !== "detail" || souvenir.length < 2) return;
+    if (souvenir.length < 2) return;
     function onKey(event: KeyboardEvent) {
       const target = event.target;
       if (target instanceof HTMLElement && target.closest("input, textarea, select")) return;
@@ -80,11 +78,10 @@ export function VirtualRunKitGallery() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [view, souvenir.length]);
+  }, [souvenir.length]);
 
   function selectTheme(next: VirtualRunKitThemeId) {
     setThemeId(next);
-    setView("overview");
     setIndex(0);
   }
 
@@ -118,49 +115,47 @@ export function VirtualRunKitGallery() {
         ))}
       </div>
 
-      {overview ? (
-        souvenir.length > 0 ? (
-          <div className="vr-kit-actions">
-            <button type="button" className="vr-kit-more" onClick={() => setView("detail")}>
-              자세히 보기
-              <span className="vr-kit-more__icon" aria-hidden="true">
-                <ArrowRight size={16} strokeWidth={2.4} />
-              </span>
-            </button>
-          </div>
-        ) : null
-      ) : (
-        <div
-          className="vr-kit-detail"
-          aria-roledescription="carousel"
-          aria-label={`${theme.label} 기념품`}
-        >
-          <h2 className="vr-kit-detail__title">{slide.label}</h2>
-          {souvenir.length > 1 ? (
-            <button
-              type="button"
-              className="vr-kit-arrow vr-kit-arrow--prev"
-              aria-label="이전 기념품"
-              onClick={() => step(-1)}
-            >
-              <ChevronLeft size={28} strokeWidth={1.75} />
-            </button>
-          ) : null}
-          <div className="vr-kit-detail__stage">
-            <KitVisual themeId={themeId} item={slide} priority />
-          </div>
-          {souvenir.length > 1 ? (
-            <button
-              type="button"
-              className="vr-kit-arrow vr-kit-arrow--next"
-              aria-label="다음 기념품"
-              onClick={() => step(1)}
-            >
-              <ChevronRight size={28} strokeWidth={1.75} />
-            </button>
-          ) : null}
-          <p className="vr-kit-detail__note">이미지는 이해를 돕기 위한 예시로 실물과 다를 수 있습니다.</p>
-          <div className="vr-kit-detail__foot">
+      {slide ? (
+        <div className="vr-kit-split">
+          <figure className="vr-kit-medal">
+            <Image
+              src={VIRTUAL_RUN_ASSETS.kitMedal[theme.id]}
+              alt={`${theme.label} 피니셔 메달`}
+              width={1900}
+              height={1522}
+              sizes="(max-width: 720px) 92vw, 520px"
+            />
+          </figure>
+          <div
+            className="vr-kit-detail"
+            aria-roledescription="carousel"
+            aria-label={`${theme.label} 기념품`}
+          >
+            <h2 className="vr-kit-detail__title">{slide.label}</h2>
+            {souvenir.length > 1 ? (
+              <button
+                type="button"
+                className="vr-kit-arrow vr-kit-arrow--prev"
+                aria-label="이전 기념품"
+                onClick={() => step(-1)}
+              >
+                <ChevronLeft size={28} strokeWidth={1.75} />
+              </button>
+            ) : null}
+            <div className="vr-kit-detail__stage">
+              <KitVisual themeId={themeId} item={slide} priority />
+            </div>
+            {souvenir.length > 1 ? (
+              <button
+                type="button"
+                className="vr-kit-arrow vr-kit-arrow--next"
+                aria-label="다음 기념품"
+                onClick={() => step(1)}
+              >
+                <ChevronRight size={28} strokeWidth={1.75} />
+              </button>
+            ) : null}
+            <p className="vr-kit-detail__note">이미지는 이해를 돕기 위한 예시로 실물과 다를 수 있습니다.</p>
             <div className="vr-kit-dots" role="tablist" aria-label="기념품 순서">
               {souvenir.map((item, dotIndex) => (
                 <button
@@ -174,12 +169,9 @@ export function VirtualRunKitGallery() {
                 />
               ))}
             </div>
-            <button type="button" className="vr-kit-more" onClick={() => setView("overview")}>
-              전체 보기
-            </button>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
