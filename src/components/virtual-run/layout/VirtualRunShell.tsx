@@ -18,6 +18,9 @@ import "../event/event.css";
 import "../tickets/tickets.css";
 import "../guide/guide.css";
 
+/** 홈 메달 로딩. 다시 켤 때 true */
+const VR_HOME_MEDAL_LOAD = false;
+
 export function VirtualRunShell({ children }: { children: React.ReactNode }) {
   const home = isVirtualRunHomePath(usePathname());
 
@@ -33,7 +36,7 @@ export function VirtualRunShell({ children }: { children: React.ReactNode }) {
             home && VR_HOME_CURSOR_FX ? "virtual-run site is-vr-build" : "virtual-run site"
           }
         >
-          {home ? <VirtualRunKitMedalLoader /> : null}
+          {home && VR_HOME_MEDAL_LOAD ? <VirtualRunKitMedalLoader /> : null}
           <CinematicFX />
           <KeyboardInset />
           <VirtualRunSiteHeader />
