@@ -200,7 +200,10 @@ export function VirtualRunHomePage() {
         <div className="wrap reveal">
           <p className="kicker">TRAILER</p>
           <h2 className="sec__title">
-            [어벤져스: 둠스데이] <em>&apos;둠의 심판&apos; 예고편</em>
+            <ScrambleText text="[어벤져스: 둠스데이]" inView hover={false} />{" "}
+            <em>
+              <ScrambleText text="'둠의 심판' 예고편" inView hover={false} />
+            </em>
           </h2>
           <div className="vr-home__trailer-stage">
             <figure className="vr-home__poster">
