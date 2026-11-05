@@ -17,6 +17,19 @@ export const VIRTUAL_RUN_OG_TITLE = "2026 마블 버추얼런 MARVEL VIRTUAL RUN
 export const VIRTUAL_RUN_OG_DESCRIPTION =
   "전국 어디서나 달리는 마블 버추얼런";
 
+export type VirtualRunOriginStat = {
+  value: string;
+  unit?: string;
+  label: string;
+};
+
+export const VIRTUAL_RUN_ORIGIN_STATS: VirtualRunOriginStat[] = [
+  { value: "5K", label: "DISTANCE" },
+  { value: "70", unit: "DAYS", label: "SCHEDULE" },
+  { value: "ONLINE", label: "ANYWHERE" },
+  { value: "3", unit: "TEAMS", label: "THEMES" },
+];
+
 export const VIRTUAL_RUN_EVENT_TABS = [
   { href: "#overview", label: "행사 개요" },
   { href: "#schedule", label: "운영 일정" },

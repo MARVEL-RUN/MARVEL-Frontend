@@ -161,16 +161,12 @@
   inset: 0 5%;
   z-index: 0;
   background:
-    radial-gradient(
-      ellipse 92% 78% at 50% 44%,
+    radial-gradient(ellipse 92% 78% at 50% 44%,
       color-mix(in srgb, var(--marvel-hi) 6%, transparent),
-      transparent 72%
-    ),
-    repeating-linear-gradient(
-      -58deg,
+      transparent 72%),
+    repeating-linear-gradient(-58deg,
       transparent 0 18px,
-      color-mix(in srgb, var(--marvel-hi) 3%, transparent) 18px 19px
-    );
+      color-mix(in srgb, var(--marvel-hi) 3%, transparent) 18px 19px);
   opacity: 0.55;
   pointer-events: none;
   mask-image: radial-gradient(ellipse 88% 82% at 50% 46%, #000 35%, transparent 78%);
@@ -204,7 +200,7 @@
     0 18px 36px rgba(0, 0, 0, 0.35);
 }
 
-.virtual-run .vr-kit-pane__stage > :not(.vr-kit-pane__ghost) {
+.virtual-run .vr-kit-pane__stage> :not(.vr-kit-pane__ghost) {
   position: relative;
   z-index: 1;
 }
@@ -373,13 +369,11 @@
   display: inline;
   padding: 0.05em 0.28em 0.14em;
   color: #fff;
-  background: linear-gradient(
-    102deg,
-    color-mix(in srgb, var(--marvel-hi) 6%, transparent) 0%,
-    color-mix(in srgb, var(--marvel-hi) 38%, transparent) 22%,
-    color-mix(in srgb, var(--marvel-hi) 34%, transparent) 78%,
-    color-mix(in srgb, var(--marvel-hi) 8%, transparent) 100%
-  );
+  background: linear-gradient(102deg,
+      color-mix(in srgb, var(--marvel-hi) 6%, transparent) 0%,
+      color-mix(in srgb, var(--marvel-hi) 38%, transparent) 22%,
+      color-mix(in srgb, var(--marvel-hi) 34%, transparent) 78%,
+      color-mix(in srgb, var(--marvel-hi) 8%, transparent) 100%);
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
