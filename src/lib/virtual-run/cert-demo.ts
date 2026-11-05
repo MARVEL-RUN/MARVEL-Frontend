@@ -1,6 +1,6 @@
 import type { VirtualRunParticipant, VirtualRunRunSummary } from "./participant";
 import { defaultParticipant } from "./participant";
-import { virtualRunRoundById, type VirtualRunRoundId } from "./rounds";
+import type { VirtualRunRoundId } from "./rounds";
 import { virtualRunDemoEnabled } from "./site";
 
 export function demoInstantApproveRunning(
@@ -9,20 +9,8 @@ export function demoInstantApproveRunning(
   summary: VirtualRunRunSummary,
 ): VirtualRunParticipant {
   if (!virtualRunDemoEnabled) return p;
-  const rewards = [...p.rewards];
-  const id = `rw-run-${roundId}-${Date.now()}`;
-  if (!rewards.some((r) => r.id === id)) {
-    rewards.unshift({
-      id,
-      kind: "gifticon",
-      label: `${virtualRunRoundById(roundId).label} 완주 기프티콘`,
-      status: "sent",
-      detail: "러닝 인증 승인 즉시 발송",
-    });
-  }
   return {
     ...p,
-    rewards,
     rounds: {
       ...p.rounds,
       [roundId]: {

@@ -40,7 +40,7 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
 
   useEffect(() => {
     let p = readParticipant();
-    if (!p && virtualRunDemoEnabled) {
+    if (virtualRunDemoEnabled) {
       p = ensureDemoParticipant();
     }
     setParticipant(p);

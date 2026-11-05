@@ -189,7 +189,7 @@ export function RunningCertForm() {
         mode={result.mode}
         subject="러닝 인증"
         rows={result.rows}
-        approvedNote="완주 기프티콘을 등록된 휴대폰 번호로 보냈습니다."
+        approvedNote="러닝·키트 인증을 모두 충족하면 추첨 대상이 되며, 당첨자에게 리워드가 배송됩니다."
         onAgain={openRounds.length > 0 ? reset : undefined}
         againLabel="다른 회차 인증"
       />

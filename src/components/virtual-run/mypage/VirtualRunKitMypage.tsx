@@ -34,7 +34,7 @@ export function VirtualRunKitMypage() {
             mode={result}
             subject="키트 인증"
             rows={[{ label: "배번호", value: participant.bib }]}
-            approvedNote="키트 인증 경품은 협업사 확정 후 순차 발송합니다."
+            approvedNote="키트 인증 충족 시 추첨 대상이 되며, 당첨자에게 리워드가 배송됩니다."
           />
         </div>
       </VirtualRunSubPage>
@@ -84,7 +84,7 @@ export function VirtualRunKitMypage() {
 
               {participant.kitCert === "approved" ? (
                 <div className="apply-hint">
-                  <p>키트 인증이 승인되었습니다. 경품 발송 현황은 리워드 내역에서 확인할 수 있습니다.</p>
+                  <p>키트 인증이 승인되었습니다. 추첨 당첨 시 배송 내역은 리워드에서 확인할 수 있습니다.</p>
                   <div className="flow__nav">
                     <VrLink href="/mypage/rewards" className="btn btn--ghost-gold">
                       리워드 내역

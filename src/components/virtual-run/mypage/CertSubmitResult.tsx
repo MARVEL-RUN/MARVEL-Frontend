@@ -20,7 +20,7 @@ export function CertSubmitResult({ mode, subject, rows, approvedNote, onAgain, a
       </h2>
       <p className="ticket__meta">
         {approved
-          ? (approvedNote ?? "리워드는 등록된 휴대폰 번호로 발송됩니다.")
+          ? (approvedNote ?? "조건 충족 시 추첨 대상이 되며, 당첨자에게 리워드가 배송됩니다.")
           : "운영진 검수 후 48시간 안에 결과를 문자로 알려 드립니다."}
       </p>
       {rows?.length ? (

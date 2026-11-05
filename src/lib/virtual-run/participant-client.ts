@@ -27,7 +27,19 @@ export function clearParticipant(): void {
 
 export function ensureDemoParticipant(): VirtualRunParticipant {
   const existing = readParticipant();
-  if (existing) return existing;
+  if (existing) {
+    const rewards = existing.rewards.filter((r) => r.kind !== "gifticon");
+    const next = {
+      ...existing,
+      name: "김마블",
+      rewards,
+    };
+    const same =
+      existing.name === next.name && existing.rewards.length === rewards.length;
+    if (same) return existing;
+    writeParticipant(next);
+    return next;
+  }
   const seeded = defaultParticipant();
   writeParticipant(seeded);
   return seeded;

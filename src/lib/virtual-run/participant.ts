@@ -79,15 +79,7 @@ export function defaultParticipant(partial?: Partial<VirtualRunParticipant>): Vi
       "fantastic-four": baseRound("ready"),
     },
     spots: partial?.spots ?? {},
-    rewards: partial?.rewards ?? [
-      {
-        id: "rw-demo-1",
-        kind: "gifticon",
-        label: "1회차 완주 기프티콘",
-        status: "sent",
-        detail: "러닝 인증 승인 즉시 발송",
-      },
-    ],
+    rewards: partial?.rewards ?? [],
   };
 }
 
