@@ -10,7 +10,6 @@ import { vrNavChildActive, vrNavItemActive } from "@/lib/virtual-run/nav-active"
 import { visibleVirtualRunNav } from "@/lib/virtual-run/nav-visible";
 import { isVirtualRunNavGroup } from "@/lib/virtual-run/nav";
 import { virtualRunOpenFlags } from "@/lib/virtual-run/open-schedule";
-import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
 import { MOBILE_MQ } from "@/lib/viewport";
 import { VirtualRunTicketsCta } from "./VirtualRunTicketsCta";
 import { VrLink } from "./VrLink";
@@ -20,7 +19,6 @@ export function VirtualRunSiteHeader() {
   const prefixed = pathname.startsWith("/virtual-run");
   const home = isVirtualRunHomePath(pathname);
   const navItems = visibleVirtualRunNav(virtualRunOpenFlags());
-  const { isLoggedIn } = useVirtualRunParticipant();
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -211,15 +209,6 @@ export function VirtualRunSiteHeader() {
 
         <div className="site-header__tools">
           <div className="site-header__actions" data-vr-pick="BUTTON">
-            {isLoggedIn ? (
-              <VrLink href="/mypage" className="btn btn--ghost site-header__cta">
-                <span>마이페이지</span>
-              </VrLink>
-            ) : (
-              <VrLink href="/login" className="btn btn--ghost site-header__cta">
-                <span>로그인</span>
-              </VrLink>
-            )}
             <VirtualRunTicketsCta compact className="site-header__cta" />
           </div>
 
@@ -312,15 +301,6 @@ export function VirtualRunSiteHeader() {
           })}
         </nav>
         <div className="site-header__drawer-actions">
-          {isLoggedIn ? (
-            <VrLink href="/mypage" className="btn btn--ghost" onClick={() => setOpen(false)}>
-              마이페이지
-            </VrLink>
-          ) : (
-            <VrLink href="/login" className="btn btn--ghost" onClick={() => setOpen(false)}>
-              로그인
-            </VrLink>
-          )}
           <VrLink href="/tickets" className="btn btn--red" onClick={() => setOpen(false)}>
             티켓 구매
           </VrLink>

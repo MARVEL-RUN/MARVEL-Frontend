@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ApplyTerms } from "@/components/main/register/ApplyTerms";
 import { EMPTY_CONSENTS, type Consents } from "@/lib/register";
-import { VrLink } from "../layout/VrLink";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VirtualRunPackageForm } from "./VirtualRunPackageForm";
 
@@ -28,11 +27,6 @@ export function VirtualRunTicketsPage() {
             allowedKinds={["individual"]}
             actionLabels={{ individual: "동의하고 패키지 선택" }}
           />
-          <div className="lookup-other">
-            <VrLink href="/login" className="lookup-other__btn">
-              이미 티켓이 있으신가요
-            </VrLink>
-          </div>
         </div>
       </VirtualRunSubPage>
     );

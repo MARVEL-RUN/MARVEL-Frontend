@@ -26,7 +26,7 @@ import {
   createVirtualRunOrderId,
   saveVirtualRunTicketPending,
 } from "@/lib/virtual-run/ticket-payment";
-import { useVrPath, VrLink } from "../layout/VrLink";
+import { useVrPath } from "../layout/VrLink";
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const QTY_CAP = 20;
@@ -343,12 +343,6 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
           </button>
         </div>
       </form>
-
-      <div className="lookup-other">
-        <VrLink href="/login" className="lookup-other__btn">
-          이미 티켓이 있으신가요
-        </VrLink>
-      </div>
 
       {payOpen && payOrder ? (
         <SheetModal kicker="PAY" title="결제하기" onClose={() => setPayOpen(false)}>

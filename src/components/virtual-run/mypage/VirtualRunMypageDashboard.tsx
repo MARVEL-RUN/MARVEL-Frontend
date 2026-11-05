@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   combinedMedalCount,
   roundStatusForParticipant,
@@ -24,7 +23,7 @@ import {
 } from "@/lib/virtual-run/status";
 import { useVirtualRunParticipantOrDemo } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
-import { VrLink, useVrPath } from "../layout/VrLink";
+import { VrLink } from "../layout/VrLink";
 import { VrMypageGate } from "./VrMypageGate";
 import { VrStatus } from "./VrStatus";
 
@@ -68,18 +67,11 @@ function nextAction(p: VirtualRunParticipant): { href: string; label: string } |
 }
 
 export function VirtualRunMypageDashboard() {
-  const { participant, logout } = useVirtualRunParticipantOrDemo();
-  const router = useRouter();
-  const toHref = useVrPath();
+  const { participant } = useVirtualRunParticipantOrDemo();
   const medalDone = combinedMedalCount(participant);
   const ticket = ticketLabel(participant);
   const action = nextAction(participant);
   const packageRounds = isThreeRoundPackage(participant, ticket);
-
-  function onLogout() {
-    logout();
-    router.push(toHref("/login"));
-  }
 
   return (
     <VirtualRunSubPage kicker="MY PAGE" title="참가 개요" en="VERIFY · REWARD">
@@ -291,12 +283,6 @@ export function VirtualRunMypageDashboard() {
                   </section>
                 ) : null}
               </div>
-            </div>
-
-            <div className="lookup-other">
-              <button type="button" className="lookup-other__btn" onClick={onLogout}>
-                로그아웃
-              </button>
             </div>
           </div>
         </VrMypageGate>
