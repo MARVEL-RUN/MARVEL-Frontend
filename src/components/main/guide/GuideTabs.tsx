@@ -13,11 +13,11 @@ type Tab = { readonly href: string; readonly label: string };
 export function GuideTabs({
   items = GUIDE_TABS,
   label = "대회안내 바로가기",
-  hideAt,
+  hideAfter,
 }: {
   items?: readonly Tab[];
   label?: string;
-  hideAt?: string;
+  hideAfter?: string;
 }) {
   const slotRef = useRef<HTMLDivElement>(null);
   const jumping = useRef(false);
@@ -34,18 +34,19 @@ export function GuideTabs({
         bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom : 0;
       setStuck(slot.getBoundingClientRect().top <= headerBottom + 0.5);
 
-      if (hideAt) {
-        const end = document.getElementById(hideAt);
-        const top = end?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
-        setHidden(top <= window.innerHeight);
-      }
-
-      if (jumping.current) return;
       const tabs = document.querySelector(".guide-tabs");
       const line =
         headerBottom +
         (tabs instanceof HTMLElement ? tabs.getBoundingClientRect().height : 0) +
         4;
+
+      if (hideAfter) {
+        const end = document.getElementById(hideAfter);
+        const bottom = end?.getBoundingClientRect().bottom ?? Number.POSITIVE_INFINITY;
+        setHidden(bottom <= line);
+      }
+
+      if (jumping.current) return;
       let current = "";
       for (const item of items) {
         const id = sectionId(item.href);
@@ -62,7 +63,7 @@ export function GuideTabs({
       window.removeEventListener("scroll", sync);
       window.removeEventListener("resize", sync);
     };
-  }, [hideAt, items]);
+  }, [hideAfter, items]);
 
   function go(event: MouseEvent<HTMLAnchorElement>, href: string) {
     const id = sectionId(href);
