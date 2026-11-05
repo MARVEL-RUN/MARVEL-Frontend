@@ -70,7 +70,9 @@ export function VirtualRunFooter() {
                 {item.label}
               </a>
             ))}
-            <VrLink href="/guide/faq">FAQ</VrLink>
+            <VrLink href="/faq">FAQ</VrLink>
+            <VrLink href="/notices">공지사항</VrLink>
+            <VrLink href="/inquiry">문의사항</VrLink>
           </nav>
 
           <p className="site-footer__office-name">{OFFICE.name}</p>

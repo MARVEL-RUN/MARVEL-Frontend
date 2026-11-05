@@ -133,7 +133,7 @@ export function VirtualRunHomeBoard() {
           {tab === "notices" ? (
             <VrLink href="/notices">공지사항 전체 보기</VrLink>
           ) : (
-            <VrLink href="/guide/faq">FAQ 전체 보기</VrLink>
+            <VrLink href="/faq">FAQ 전체 보기</VrLink>
           )}
         </p>
       </div>

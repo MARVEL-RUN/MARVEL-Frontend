@@ -1,3 +1,7 @@
+import {
+  VIRTUAL_RUN_BOARD_HREF,
+  VIRTUAL_RUN_BOARD_SECTIONS,
+} from "./community";
 import type { VirtualRunOpenFlags } from "./open-schedule";
 
 export type VirtualRunNavChild = {
@@ -52,8 +56,14 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
       { href: "/guide", label: "가이드 홈" },
       { href: "/guide/running", label: "러닝 인증" },
       { href: "/guide/kit", label: "키트 인증" },
-      { href: "/guide/faq", label: "FAQ" },
     ],
+  },
+  {
+    href: VIRTUAL_RUN_BOARD_HREF,
+    label: "커뮤니티",
+    pickChild: true,
+    openFlag: "publicInfo",
+    children: [...VIRTUAL_RUN_BOARD_SECTIONS],
   },
   {
     href: "/mypage",

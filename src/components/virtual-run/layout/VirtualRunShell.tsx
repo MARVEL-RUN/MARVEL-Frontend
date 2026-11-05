@@ -17,6 +17,7 @@ import "../home/home.css";
 import "../event/event.css";
 import "../tickets/tickets.css";
 import "../guide/guide.css";
+import "../community/community.css";
 
 /** 홈 메달 로딩. 다시 켤 때 true */
 const VR_HOME_MEDAL_LOAD = false;
