@@ -138,7 +138,8 @@
   letter-spacing: 0.16em;
 }
 
-.virtual-run .vr-kit-pane h2 {
+.virtual-run .vr-kit-pane h2,
+.virtual-run .vr-kit-reel__head h2 {
   margin: 0;
   color: #fff;
   font-size: 1.15rem;
@@ -296,9 +297,20 @@
 
 .virtual-run .vr-kit-reel {
   display: grid;
-  gap: 1.35rem;
+  gap: 1.15rem;
   min-width: 0;
-  margin-top: 3.25rem;
+  margin-top: 4.5rem;
+}
+
+.virtual-run .vr-kit-reel__head {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 -0.55rem;
+  padding: 0;
+}
+
+.virtual-run .vr-kit-reel__head .vr-kit-pane__index {
+  margin: 0;
 }
 
 .virtual-run .vr-kit-reel__stage {
@@ -332,14 +344,11 @@
   }
 }
 
-.virtual-run .vr-kit-reel__copy.ticket-notice {
-  margin-top: 0;
-  background: color-mix(in srgb, var(--vr-surface) 88%, transparent);
-  border-top: 2px solid color-mix(in srgb, var(--marvel-hi) 22%, transparent);
-}
-
-.virtual-run .vr-kit-reel__copy .vr-kit-pane__index {
-  margin-bottom: 0.55rem;
+.virtual-run .vr-kit-reel__copy {
+  margin: 0;
+  padding: 0;
+  background: none;
+  clip-path: none;
 }
 
 .virtual-run .vr-kit-reel__copy-lead {
@@ -352,30 +361,36 @@
 }
 
 .virtual-run .vr-kit-reel__copy-hi {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
   margin: 0.85rem 0 0;
-  color: #fff;
   font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.45;
+  line-height: 1.55;
   word-break: keep-all;
 }
 
-.virtual-run .vr-kit-reel__copy-hi::before {
-  content: "";
-  flex-shrink: 0;
-  width: 0.3rem;
-  height: 1em;
-  background: var(--marvel-hi);
-  transform: skewX(-12deg);
+.virtual-run .vr-kit-reel__copy-mark {
+  display: inline;
+  padding: 0.05em 0.28em 0.14em;
+  color: #fff;
+  background: linear-gradient(
+    102deg,
+    color-mix(in srgb, var(--marvel-hi) 6%, transparent) 0%,
+    color-mix(in srgb, var(--marvel-hi) 38%, transparent) 22%,
+    color-mix(in srgb, var(--marvel-hi) 34%, transparent) 78%,
+    color-mix(in srgb, var(--marvel-hi) 8%, transparent) 100%
+  );
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
-.virtual-run .vr-kit-reel__copy .ticket-notice__tail {
-  margin-top: 0.95rem;
+.virtual-run .vr-kit-reel__copy-note {
+  margin: 0.85rem 0 0;
+  color: var(--note);
   font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.55;
+  word-break: keep-all;
 }
 
 .virtual-run .vr-kit-page__cta {
@@ -462,15 +477,12 @@ body:has(.site-header__drawer.is-open) .virtual-run .vr-kit-top {
     background: none;
   }
 
-  .virtual-run .vr-kit-pane#finish-line {
-    padding-bottom: 0.25rem;
-  }
-
   .virtual-run .vr-kit-reel {
-    margin-top: 2.75rem;
+    margin-top: 3.5rem;
   }
 
-  .virtual-run .vr-kit-pane h2 {
+  .virtual-run .vr-kit-pane h2,
+  .virtual-run .vr-kit-reel__head h2 {
     font-size: 1.05rem;
   }
 

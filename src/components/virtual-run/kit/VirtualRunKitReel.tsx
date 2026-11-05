@@ -15,6 +15,12 @@ export function VirtualRunKitReel() {
 
   return (
     <div className="vr-kit-reel" id="kit-reel">
+      <header className="vr-kit-reel__head">
+        <p className="vr-kit-pane__index" id="kit-reel-title">
+          ASSEMBLE / MEDAL
+        </p>
+        <h2>어셈블 메달</h2>
+      </header>
       <div className="vr-kit-reel__stage">
         <div className="vr-kit-reel__frame">
           <video
@@ -36,17 +42,16 @@ export function VirtualRunKitReel() {
           />
         </div>
       </div>
-      <aside className="vr-kit-reel__copy ticket-notice" aria-labelledby="kit-reel-copy-title">
-        <p className="vr-kit-pane__index" id="kit-reel-copy-title">
-          SPECIAL / MEDAL
-        </p>
+      <aside className="vr-kit-reel__copy" aria-labelledby="kit-reel-title">
         <p className="vr-kit-reel__copy-lead">
           어벤져스, 엑스맨, 판타스틱4
           <br />
           세 팀의 히어로들이 모여 닥터둠에 대항하는 대서사
         </p>
-        <p className="vr-kit-reel__copy-hi">가장 특별한 메달 3종을 공개합니다.</p>
-        <p className="ticket-notice__tail">※ 메달 3종을 소장하면 하나로 결합할 수 있습니다.</p>
+        <p className="vr-kit-reel__copy-hi">
+          <span className="vr-kit-reel__copy-mark">가장 특별한 메달 3종을 공개합니다.</span>
+        </p>
+        <p className="vr-kit-reel__copy-note">※ 메달 3종을 소장하면 하나로 결합할 수 있습니다.</p>
       </aside>
     </div>
   );
