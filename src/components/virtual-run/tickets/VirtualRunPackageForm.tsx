@@ -1,6 +1,5 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PaymentWidget } from "@/components/main/payment/PaymentWidget";
@@ -190,7 +189,6 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
                 item={VR_ASSEMBLE_PACKAGE}
                 count={countOf(lines, VR_ASSEMBLE_PACKAGE.id)}
                 onChange={(delta) => setQty(VR_ASSEMBLE_PACKAGE.id, delta)}
-                caption="3종 테마 통합"
               />
             </section>
           </div>
@@ -343,18 +341,15 @@ function PackageCard({
   item,
   count,
   onChange,
-  caption,
 }: {
   item: VrPackage;
   count: number;
   onChange: (delta: number) => void;
-  caption?: string;
 }) {
   return (
     <article className={`vr-pkg__card is-${item.accent}${count ? " is-on" : ""}`}>
       <img src={item.image} alt="" />
       <strong>{item.name}</strong>
-      {caption ? <span className="vr-pkg__caption">{caption}</span> : null}
       <div className="vr-pkg__qty" aria-label={`${item.name} 수량`}>
         <button
           type="button"
@@ -362,7 +357,7 @@ function PackageCard({
           disabled={!count}
           onClick={() => onChange(-1)}
         >
-          <Minus size={14} strokeWidth={2.5} />
+          −
         </button>
         <span>{count}</span>
         <button
@@ -371,7 +366,7 @@ function PackageCard({
           disabled={count >= QTY_CAP}
           onClick={() => onChange(1)}
         >
-          <Plus size={14} strokeWidth={2.5} />
+          +
         </button>
       </div>
     </article>
