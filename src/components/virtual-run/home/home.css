@@ -703,6 +703,12 @@
   padding-top: 3.5rem;
 }
 
+.virtual-run .vr-home__trailer .sec__title {
+  font-size: clamp(1.15rem, 4.2vw, 3.4rem);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
 .virtual-run .vr-home__trailer-frame {
   margin-top: 0.4rem;
   background: #000;

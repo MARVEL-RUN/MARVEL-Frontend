@@ -200,17 +200,17 @@ export function VirtualRunHomePage() {
         <div className="wrap reveal">
           <p className="kicker">TRAILER</p>
           <h2 className="sec__title">
-            [어벤져스: 둠스데이]
-            <br />
-            <em>&apos;둠의 심판&apos; 예고편</em>
+            [어벤져스: 둠스데이] <em>&apos;둠의 심판&apos; 예고편</em>
           </h2>
           <div className="vr-home__trailer-frame">
             <video
               className="vr-home__trailer-video"
               src={MAIN_ASSETS.doomsdayTrailer}
+              autoPlay
+              muted
               controls
               playsInline
-              preload="metadata"
+              preload="auto"
               aria-label="어벤져스: 둠스데이 둠의 심판 예고편"
             />
           </div>
