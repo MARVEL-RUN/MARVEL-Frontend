@@ -8,7 +8,7 @@ import {
 
 export const metadata: Metadata = {
   title: {
-    default: "MARVEL RUN 2026 버추얼런",
+    default: "MARVEL 버추얼런 2026",
     template: "%s | MARVEL RUN 버추얼런",
   },
   description: VIRTUAL_RUN_OG_DESCRIPTION,
