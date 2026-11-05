@@ -16,10 +16,10 @@ export function VirtualRunKitPage() {
               수 있습니다.
             </p>
             <VirtualRunKitGallery />
+            <VirtualRunKitReel />
             <div className="vr-kit-page__cta">
               <VirtualRunTicketsCta />
             </div>
-            <VirtualRunKitReel />
           </div>
         </section>
       </VirtualRunSubPage>
