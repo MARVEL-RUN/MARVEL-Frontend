@@ -4,8 +4,8 @@ export const VIRTUAL_RUN_EVENT = {
   lead: "러닝이 가능한 전국 원하는 곳 어디서나",
   schedule: "11.11(화) – 1.19(월)",
   scheduleDays: "70일",
-  ticketSingle: "1회차 55,000원",
-  ticketPackage: "3회차 패키지 110,000원",
+  ticketSingle: "싱글패키지 각 40,000원",
+  ticketPackage: "어셈블 패키지 80,000원",
   location: "온라인 (전국 어디서나)",
   target: "전 연령",
   content:

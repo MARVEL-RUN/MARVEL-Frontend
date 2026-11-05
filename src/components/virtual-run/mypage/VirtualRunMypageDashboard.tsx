@@ -34,17 +34,15 @@ function ticketLabel(p: VirtualRunParticipant) {
   if (p.categoryName?.trim()) return p.categoryName.trim();
   const owned = VIRTUAL_RUN_ROUNDS.filter((r) => p.ownedRoundIds.includes(r.id));
   if (owned.length === 0) return "티켓 없음";
-  if (owned.length >= VIRTUAL_RUN_ROUNDS.length) return "3회차 패키지";
-  if (owned.length === 1) {
-    const r = owned[0];
-    return `1회차 · ${r.theme}`;
-  }
-  return owned.map((r) => r.theme).join(" · ");
+  if (owned.length >= VIRTUAL_RUN_ROUNDS.length) return "어셈블 패키지";
+  if (owned.length === 1) return `${owned[0].theme} 패키지`;
+  return owned.map((r) => `${r.theme} 패키지`).join(" · ");
 }
 
 function isThreeRoundPackage(p: VirtualRunParticipant, label: string) {
   if (p.ownedRoundIds.length >= VIRTUAL_RUN_ROUNDS.length) return true;
-  return /패키지|3종|3회차/.test(label);
+  if (p.ownedRoundIds.length > 0) return false;
+  return /어셈블|3종|3회차/.test(label);
 }
 
 function nextAction(p: VirtualRunParticipant): { href: string; label: string } | null {

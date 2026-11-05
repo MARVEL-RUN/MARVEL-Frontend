@@ -68,8 +68,8 @@ export const VIRTUAL_RUN_FAQ_TABS: { id: "all" | VirtualRunFaqCategory; label: s
 export const VIRTUAL_RUN_FAQS: VirtualRunFaq[] = [
   {
     category: "ticket",
-    q: "1회차 티켓과 3회차 패키지는 무엇이 다른가요?",
-    a: "1회차 티켓은 고른 회차의 키트 1세트, 3회차 패키지는 어벤져스·엑스맨·판타스틱4 키트 3세트를 받습니다. 인증도 구매한 회차만 할 수 있습니다.",
+    q: "싱글패키지와 어셈블 패키지는 무엇이 다른가요?",
+    a: "싱글패키지는 어벤져스·엑스맨·판타스틱4 중 한 테마가 40,000원입니다. 어셈블 패키지는 세 테마를 80,000원에 담습니다. 한 번에 여러 패키지를 함께 살 수 있고, 패키지마다 이름을 입력합니다. 배번호는 정보 수정 기간 이후에 부여됩니다.",
   },
   {
     category: "ticket",
