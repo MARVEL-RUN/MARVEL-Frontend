@@ -35,8 +35,11 @@ type PackageLine = {
   id: string;
   packageId: VrPackageId;
   name: string;
+  phone: string;
   sameAs: boolean;
 };
+
+const phoneDigits = (value: string) => value.replace(/\D/g, "");
 
 function countOf(lines: PackageLine[], packageId: VrPackageId) {
   return lines.filter((line) => line.packageId === packageId).length;
@@ -63,9 +66,10 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
       lines.map((line) => ({
         ...line,
         runnerName: line.sameAs ? filterNoSpaceName(buyerName) : filterNoSpaceName(line.name),
+        runnerPhone: line.sameAs ? phoneDigits(phone) : phoneDigits(line.phone),
         pkg: vrPackageById(line.packageId),
       })),
-    [buyerName, lines],
+    [buyerName, lines, phone],
   );
 
   function setQty(packageId: VrPackageId, delta: number) {
@@ -75,11 +79,13 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
         if (ofType.length >= QTY_CAP) return prev;
         return [
           ...prev,
-          { id: crypto.randomUUID(), packageId, name: "", sameAs: false },
+          { id: crypto.randomUUID(), packageId, name: "", phone: "", sameAs: false },
         ];
       }
       if (!ofType.length) return prev;
-      const empty = [...ofType].reverse().find((line) => !line.name.trim() && !line.sameAs);
+      const empty = [...ofType]
+        .reverse()
+        .find((line) => !line.name.trim() && !line.phone.trim() && !line.sameAs);
       const target = empty ?? ofType[ofType.length - 1];
       return prev.filter((line) => line.id !== target.id);
     });
@@ -94,7 +100,7 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
       prev.map((line) => ({
         ...line,
         sameAs,
-        ...(sameAs ? { name: filterNoSpaceName(buyerName) } : {}),
+        ...(sameAs ? { name: filterNoSpaceName(buyerName), phone } : {}),
       })),
     );
   }
@@ -105,12 +111,17 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
       setError("패키지를 하나 이상 담아 주세요.");
       return;
     }
-    const missing = resolved.find((line) => !line.runnerName);
-    if (missing) {
-      setError(`${missing.pkg.name} 이름을 입력해 주세요.`);
+    const missingName = resolved.find((line) => !line.sameAs && !line.runnerName);
+    if (missingName) {
+      setError(`${missingName.pkg.name} 이름을 입력해 주세요.`);
       return;
     }
-    const digits = phone.replace(/\D/g, "");
+    const missingPhone = resolved.find((line) => !line.sameAs && line.runnerPhone.length < 10);
+    if (missingPhone) {
+      setError(`${missingPhone.pkg.name} 휴대폰 번호를 확인해 주세요.`);
+      return;
+    }
+    const digits = phoneDigits(phone);
     const contactOk = buyerName.trim() && digits.length >= 10 && addr.address;
     if (!contactOk && !virtualRunDemoEnabled) {
       setError(
@@ -195,14 +206,36 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
           {overlapNote ? <p className="vr-pkg__hint">{overlapNote}</p> : null}
         </section>
 
+        <FormSec kicker="01 / SHIPPING" title="신청자 · 배송">
+          <FormRow label="신청자 이름" required>
+            <input
+              type="text"
+              value={buyerName}
+              onChange={(e) => setBuyerName(filterNoSpaceName(e.target.value))}
+              autoComplete="name"
+            />
+          </FormRow>
+          <FormRow label="휴대폰 번호" required>
+            <PhoneField value={phone} onChange={setPhone} autoComplete="tel" placeholder="010-0000-0000" />
+            <p className="form-row__hint">배송 안내를 이 번호로 보냅니다.</p>
+          </FormRow>
+          <FormRow label="배송 주소" required>
+            <AddressField
+              zonecode={addr.zonecode}
+              address={addr.address}
+              addressDetail={addr.addressDetail}
+              onChange={(patch) => setAddr((prev) => ({ ...prev, ...patch }))}
+            />
+          </FormRow>
+        </FormSec>
+
         <FormSec
-          kicker="01 / NAME"
-          title="패키지별 이름"
-          note="패키지마다 참가 이름을 입력합니다. 배번호는 정보 수정 기간 이후에 부여됩니다."
+          kicker="02 / RUNNER"
+          title="패키지별 참가자"
+          note="신청자와 같으면 체크합니다. 다른 사람은 이름과 휴대폰 번호를 입력합니다. 배번호는 정보 수정 기간 이후에 부여됩니다."
         >
           {lines.length > 1 ? (
             <div className="vr-recipients__all">
-              <p>본인 패키지면 신청자 이름으로 채웁니다.</p>
               <label className={`vr-recipients__same${allSame ? " is-on" : ""}`}>
                 <input
                   type="checkbox"
@@ -230,53 +263,46 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
                           const sameAs = e.target.checked;
                           patchLine(line.id, {
                             sameAs,
-                            ...(sameAs ? { name: filterNoSpaceName(buyerName) } : {}),
+                            ...(sameAs
+                              ? { name: filterNoSpaceName(buyerName), phone }
+                              : {}),
                           });
                         }}
                       />
                       신청자와 동일
                     </label>
                   </div>
-                  <FormRow label="참가 이름" required>
-                    <input
-                      type="text"
-                      value={line.sameAs ? filterNoSpaceName(buyerName) : line.name}
-                      readOnly={line.sameAs}
-                      onChange={(e) =>
-                        patchLine(line.id, { name: filterNoSpaceName(e.target.value), sameAs: false })
-                      }
-                      placeholder="패키지에 들어갈 이름"
-                    />
-                  </FormRow>
+                  {line.sameAs ? (
+                    <p className="vr-pkg-lines__same">
+                      {filterNoSpaceName(buyerName) || "신청자"} · {phone || "신청자 휴대폰"}
+                    </p>
+                  ) : (
+                    <>
+                      <FormRow label="이름" required>
+                        <input
+                          type="text"
+                          value={line.name}
+                          onChange={(e) =>
+                            patchLine(line.id, { name: filterNoSpaceName(e.target.value) })
+                          }
+                          placeholder="참가 이름"
+                        />
+                      </FormRow>
+                      <FormRow label="휴대폰 번호" required>
+                        <PhoneField
+                          value={line.phone}
+                          onChange={(next) => patchLine(line.id, { phone: next })}
+                          placeholder="010-0000-0000"
+                        />
+                      </FormRow>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="form__note">패키지를 담으면 이름 칸이 생깁니다.</p>
+            <p className="form__note">패키지를 담으면 참가자 칸이 생깁니다.</p>
           )}
-        </FormSec>
-
-        <FormSec kicker="02 / SHIPPING" title="신청자 · 배송">
-          <FormRow label="신청자 이름" required>
-            <input
-              type="text"
-              value={buyerName}
-              onChange={(e) => setBuyerName(filterNoSpaceName(e.target.value))}
-              autoComplete="name"
-            />
-          </FormRow>
-          <FormRow label="휴대폰 번호" required>
-            <PhoneField value={phone} onChange={setPhone} autoComplete="tel" placeholder="010-0000-0000" />
-            <p className="form-row__hint">배송 안내를 이 번호로 보냅니다.</p>
-          </FormRow>
-          <FormRow label="배송 주소" required>
-            <AddressField
-              zonecode={addr.zonecode}
-              address={addr.address}
-              addressDetail={addr.addressDetail}
-              onChange={(patch) => setAddr((prev) => ({ ...prev, ...patch }))}
-            />
-          </FormRow>
         </FormSec>
 
         <section className="vr-sum" aria-label="결제 요약">
