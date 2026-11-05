@@ -701,6 +701,7 @@
 
 .virtual-run .vr-home__trailer {
   padding-top: 3.5rem;
+  padding-bottom: 5rem;
 }
 
 .virtual-run .vr-home__trailer .sec__title {
@@ -750,7 +751,7 @@
 }
 
 .virtual-run .vr-home__overview {
-  padding-top: 1.25rem;
+  padding-top: 0;
 }
 
 @media (max-width: 720px) {
