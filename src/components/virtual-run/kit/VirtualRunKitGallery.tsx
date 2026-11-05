@@ -12,8 +12,8 @@ import {
   type VirtualRunKitThemeId,
 } from "@/lib/virtual-run/kit";
 
-const SECTION_KINDS: { kind: VirtualRunKitItemKind; code: string }[] = [
-  { kind: "bib", code: "BIB" },
+const SECTION_KINDS: { kind: VirtualRunKitItemKind; code: string; ghostLabel?: string }[] = [
+  { kind: "bib", code: "BIB", ghostLabel: "Bib number" },
   { kind: "keycap-keyring", code: "KEYRING" },
   { kind: "bandana", code: "BANDANA" },
   { kind: "socks", code: "SOCKS" },
@@ -50,6 +50,7 @@ function KitPane({
   id,
   order,
   code,
+  ghostLabel,
   title,
   note,
   children,
@@ -57,6 +58,7 @@ function KitPane({
   id: string;
   order: number;
   code: string;
+  ghostLabel?: string;
   title: string;
   note?: string;
   children: ReactNode;
@@ -67,7 +69,12 @@ function KitPane({
         <p className="vr-kit-pane__index">{`${String(order).padStart(2, "0")} / ${code}`}</p>
         <h2>{title}</h2>
       </header>
-      {children}
+      <div className="vr-kit-pane__stage">
+        <p className="vr-kit-pane__ghost" aria-hidden>
+          <span className="vr-kit-pane__ghost-word">{ghostLabel ?? code}</span>
+        </p>
+        {children}
+      </div>
       {note ? <p className="vr-kit-pane__note">{note}</p> : null}
     </section>
   );
@@ -181,6 +188,7 @@ export function VirtualRunKitGallery() {
           id={section.kind === "package" ? "package-extra" : section.kind}
           order={index + 3}
           code={section.code}
+          ghostLabel={section.ghostLabel}
           title={section.item.label}
         >
           <figure className={figureClass(section.kind)}>
