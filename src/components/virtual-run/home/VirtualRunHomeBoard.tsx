@@ -109,7 +109,7 @@ export function VirtualRunHomeBoard() {
   return (
     <section className="sec board-sec vr-home__board" id="bulletin">
       <div className="wrap reveal">
-        <p className="kicker">04 / BULLETIN</p>
+        <p className="kicker">BULLETIN</p>
         <h2 className="sec__title">
           {tab === "notices" ? (
             <>

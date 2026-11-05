@@ -5,7 +5,7 @@ export function VirtualRunHomeOrigin() {
     <section className="sec about vr-home__origin" id="origin">
       <div className="wrap reveal">
         <div className="about__copy">
-          <p className="kicker">01 / ORIGIN</p>
+          <p className="kicker">ORIGIN</p>
           <h2 className="sec__title">
             <span className="vr-home__origin-accent">둠스데이</span>를 향해 달려라!
           </h2>
