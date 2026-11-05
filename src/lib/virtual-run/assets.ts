@@ -10,6 +10,7 @@ export const VIRTUAL_RUN_ASSETS = {
     fantasticFour: "/images/virtual-run/combined-medal/fantastic-four-front.png",
   },
   kitLoad: "/media/virtual-run/kit-load.mp4",
+  doomsdayPoster: "/images/virtual-run/doomsday-poster.jpg",
   kitSouvenir: {
     avengers: "/images/virtual-run/kit/avengers/souvenir.png",
     "x-men": "/images/virtual-run/kit/x-men/souvenir.png",

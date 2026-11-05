@@ -202,17 +202,27 @@ export function VirtualRunHomePage() {
           <h2 className="sec__title">
             [어벤져스: 둠스데이] <em>&apos;둠의 심판&apos; 예고편</em>
           </h2>
-          <div className="vr-home__trailer-frame">
-            <video
-              className="vr-home__trailer-video"
-              src={MAIN_ASSETS.doomsdayTrailer}
-              autoPlay
-              muted
-              controls
-              playsInline
-              preload="auto"
-              aria-label="어벤져스: 둠스데이 둠의 심판 예고편"
-            />
+          <div className="vr-home__trailer-stage">
+            <figure className="vr-home__poster">
+              <Image
+                src={VIRTUAL_RUN_ASSETS.doomsdayPoster}
+                alt="어벤져스: 둠스데이, 12월 16일 극장 대개봉"
+                width={1978}
+                height={2835}
+              />
+            </figure>
+            <div className="vr-home__trailer-frame">
+              <video
+                className="vr-home__trailer-video"
+                src={MAIN_ASSETS.doomsdayTrailer}
+                autoPlay
+                muted
+                controls
+                playsInline
+                preload="auto"
+                aria-label="어벤져스: 둠스데이 둠의 심판 예고편"
+              />
+            </div>
           </div>
         </div>
       </section>
