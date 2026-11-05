@@ -231,7 +231,7 @@ export function VirtualRunHomePage() {
         <div className="wrap reveal">
           <p className="kicker">OVERVIEW</p>
           <h2 className="sec__title">
-            {VIRTUAL_RUN_EVENT.title}
+            <ScrambleText text={VIRTUAL_RUN_EVENT.title} inView hover={false} />
           </h2>
           <dl className="spec">
             {VIRTUAL_RUN_OVERVIEW_ROWS.map((row) => (

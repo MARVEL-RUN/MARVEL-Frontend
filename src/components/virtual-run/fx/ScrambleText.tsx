@@ -9,11 +9,20 @@ type Props = {
   duration?: number;
   /** 주면 마운트 후 이만큼 뒤에 한 번 재생 */
   delay?: number;
+  /** 화면에 들어올 때 한 번 재생 */
+  inView?: boolean;
   /** false면 호버로는 재생하지 않음 */
   hover?: boolean;
 };
 
-export function ScrambleText({ text, className, duration = 620, delay, hover = true }: Props) {
+export function ScrambleText({
+  text,
+  className,
+  duration = 620,
+  delay,
+  inView = false,
+  hover = true,
+}: Props) {
   const [shown, setShown] = useState(text);
   const elRef = useRef<HTMLSpanElement>(null);
   const timerRef = useRef<number | null>(null);
@@ -50,6 +59,22 @@ export function ScrambleText({ text, className, duration = 620, delay, hover = t
     const id = window.setTimeout(run, delay);
     return () => window.clearTimeout(id);
   }, [delay, run]);
+
+  useEffect(() => {
+    if (!inView) return;
+    const el = elRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        io.disconnect();
+        run();
+      },
+      { threshold: 0.6, rootMargin: "0px 0px -8% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [inView, run]);
 
   useEffect(() => {
     if (timerRef.current !== null) return;
