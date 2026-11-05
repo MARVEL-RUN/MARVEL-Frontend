@@ -218,27 +218,6 @@ export function HomePage() {
         </div>
       </div>
 
-      <section className="sec trailer" id="trailer">
-        <div className="wrap reveal">
-          <p className="kicker">TRAILER</p>
-          <h2 className="sec__title">
-            [어벤져스: 둠스데이]
-            <br />
-            <em>&apos;둠의 심판&apos; 예고편</em>
-          </h2>
-          <div className="trailer__frame">
-            <video
-              className="trailer__video"
-              src={MAIN_ASSETS.doomsdayTrailer}
-              controls
-              playsInline
-              preload="metadata"
-              aria-label="어벤져스: 둠스데이 둠의 심판 예고편"
-            />
-          </div>
-        </div>
-      </section>
-
       <section className="sec about">
         <div className="wrap reveal">
           <div className="about__copy">
