@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { GuideTabs } from "../../main/guide/GuideTabs";
 import { VIRTUAL_RUN_ASSETS } from "@/lib/virtual-run/assets";
 import {
   VIRTUAL_RUN_KIT_THEMES,
@@ -46,12 +47,14 @@ function sectionsFor(items: readonly VirtualRunKitItem[]) {
 }
 
 function KitPane({
+  id,
   order,
   code,
   title,
   note,
   children,
 }: {
+  id: string;
   order: number;
   code: string;
   title: string;
@@ -59,7 +62,7 @@ function KitPane({
   children: ReactNode;
 }) {
   return (
-    <section className="vr-kit-pane">
+    <section id={id} className="vr-kit-pane">
       <header className="vr-kit-pane__head">
         <p className="vr-kit-pane__index">{`${String(order).padStart(2, "0")} / ${code}`}</p>
         <h2>{title}</h2>
@@ -76,7 +79,16 @@ export function VirtualRunKitGallery() {
   const medalCase = itemOf(theme.items, "medal-case");
   const packageFull = itemOf(theme.items, "package-full");
   const cartonBox = itemOf(theme.items, "carton-box");
-  const sections = sectionsFor(theme.items);
+  const sections = useMemo(() => sectionsFor(theme.items), [theme.items]);
+  const tabs = useMemo(() => {
+    const next = [{ href: "#medal", label: "피니셔 메달" }];
+    if (packageFull || cartonBox) next.push({ href: "#package", label: "패키지" });
+    for (const section of sections) {
+      const id = section.kind === "package" ? "package-extra" : section.kind;
+      next.push({ href: `#${id}`, label: section.item.label });
+    }
+    return next;
+  }, [cartonBox, packageFull, sections]);
 
   return (
     <div className="vr-kit">
@@ -103,7 +115,9 @@ export function VirtualRunKitGallery() {
         ))}
       </div>
 
-      <KitPane order={1} code="MEDAL" title="피니셔 메달" note="선택한 테마에 따라 지급됩니다.">
+      <GuideTabs items={tabs} label="기념품 바로가기" />
+
+      <KitPane id="medal" order={1} code="MEDAL" title="피니셔 메달" note="선택한 테마에 따라 지급됩니다.">
         <div className="vr-kit-pane__pair vr-kit-pane__pair--medal">
           <figure>
             <Image
@@ -131,7 +145,7 @@ export function VirtualRunKitGallery() {
       </KitPane>
 
       {packageFull || cartonBox ? (
-        <KitPane order={2} code="PACKAGE" title="패키지">
+        <KitPane id="package" order={2} code="PACKAGE" title="패키지">
           <div className="vr-kit-pane__pair">
             {packageFull ? (
               <figure>
@@ -162,7 +176,13 @@ export function VirtualRunKitGallery() {
       ) : null}
 
       {sections.map((section, index) => (
-        <KitPane key={section.kind} order={index + 3} code={section.code} title={section.item.label}>
+        <KitPane
+          key={section.kind}
+          id={section.kind === "package" ? "package-extra" : section.kind}
+          order={index + 3}
+          code={section.code}
+          title={section.item.label}
+        >
           <figure className={figureClass(section.kind)}>
             <Image
               src={virtualRunKitImage(theme.id, section.item.file)}
