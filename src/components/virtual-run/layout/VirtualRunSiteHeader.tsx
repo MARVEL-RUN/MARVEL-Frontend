@@ -209,6 +209,9 @@ export function VirtualRunSiteHeader() {
 
         <div className="site-header__tools">
           <div className="site-header__actions" data-vr-pick="BUTTON">
+            <VrLink href="/mypage" className="btn btn--ghost site-header__cta">
+              <span>마이페이지</span>
+            </VrLink>
             <VirtualRunTicketsCta compact className="site-header__cta" />
           </div>
 
@@ -301,6 +304,9 @@ export function VirtualRunSiteHeader() {
           })}
         </nav>
         <div className="site-header__drawer-actions">
+          <VrLink href="/mypage" className="btn btn--ghost" onClick={() => setOpen(false)}>
+            마이페이지
+          </VrLink>
           <VrLink href="/tickets" className="btn btn--red" onClick={() => setOpen(false)}>
             티켓 구매
           </VrLink>

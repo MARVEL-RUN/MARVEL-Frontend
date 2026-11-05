@@ -40,9 +40,9 @@ export const VIRTUAL_RUN_NAV_ITEMS: VirtualRunNavItem[] = [
     children: [
       { href: "/event", label: "행사 개요" },
       { href: "/event#schedule", label: "운영 일정" },
-      { href: "/kit", label: "기념품" },
     ],
   },
+  { href: "/kit", label: "기념품", openFlag: "publicInfo" },
   {
     href: "/tickets",
     label: "티켓·참가",
