@@ -22,7 +22,14 @@ export function VirtualRunSiteHeader() {
   const navItems = visibleVirtualRunNav(virtualRunOpenFlags());
   const { isLoggedIn, participant } = useVirtualRunParticipant();
   const accountName = participant?.name.trim() ?? "";
-  const accountLabel = accountName || "마이페이지";
+  const accountFace = accountName ? (
+    <span className="site-header__account-label">
+      <span className="site-header__account-name">{accountName}</span>
+      <span className="site-header__account-honor">님</span>
+    </span>
+  ) : (
+    <span>마이페이지</span>
+  );
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -217,10 +224,10 @@ export function VirtualRunSiteHeader() {
               <VrLink
                 href="/mypage"
                 className="btn btn--ghost site-header__cta site-header__account"
-                aria-label={accountName ? `${accountName}, 마이페이지` : "마이페이지"}
-                title={accountName || undefined}
+                aria-label={accountName ? `${accountName}님, 마이페이지` : "마이페이지"}
+                title={accountName ? `${accountName}님` : undefined}
               >
-                <span>{accountLabel}</span>
+                {accountFace}
               </VrLink>
             ) : (
               <VrLink href="/login" className="btn btn--ghost site-header__cta">
@@ -323,11 +330,11 @@ export function VirtualRunSiteHeader() {
             <VrLink
               href="/mypage"
               className="btn btn--ghost site-header__account"
-              aria-label={accountName ? `${accountName}, 마이페이지` : "마이페이지"}
-              title={accountName || undefined}
+              aria-label={accountName ? `${accountName}님, 마이페이지` : "마이페이지"}
+              title={accountName ? `${accountName}님` : undefined}
               onClick={() => setOpen(false)}
             >
-              {accountLabel}
+              {accountFace}
             </VrLink>
           ) : (
             <VrLink href="/login" className="btn btn--ghost" onClick={() => setOpen(false)}>
