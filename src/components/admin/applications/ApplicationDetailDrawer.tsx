@@ -19,6 +19,7 @@ import {
   adminOrganizationDetailHref,
 } from "@/lib/admin/eventLinks";
 import { APPLICATION_PASSWORD_MIN, formatPhone } from "@/lib/register";
+import { genderLabel } from "@/lib/registration-gender";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
@@ -48,6 +49,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ApplicationBasicInfoEdit } from "./ApplicationBasicInfoEdit";
+import { ApplicationEntriesEdit } from "./ApplicationEntriesEdit";
 import { ApplicationPaySummary } from "./ApplicationPaySummary";
 import { PartialRefundEdit } from "./PartialRefundEdit";
 import { PaymentListDrawer } from "./PaymentListDrawer";
@@ -80,6 +82,15 @@ function dash(value?: string | number | null) {
   if (value == null || value === "") return "-";
   const text = String(value).trim();
   return text || "-";
+}
+
+function displayBirth(value?: string | null) {
+  const raw = (value ?? "").trim();
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 8) {
+    return `${digits.slice(0, 4)}.${digits.slice(4, 6)}.${digits.slice(6, 8)}`;
+  }
+  return raw || "-";
 }
 
 function displayPhone(value?: string | null) {
@@ -264,6 +275,7 @@ export function ApplicationDetailDrawer({
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(false);
+  const [editingEntries, setEditingEntries] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
   const [editError, setEditError] = useState("");
   const [logPayment, setLogPayment] = useState<AdminPayment | null>(null);
@@ -285,6 +297,7 @@ export function ApplicationDetailDrawer({
     setEvidenceCancelId(null);
     setPage(0);
     setEditing(false);
+    setEditingEntries(false);
     setAdjusting(false);
     setEditError("");
     setRefundResult(null);
@@ -591,6 +604,17 @@ export function ApplicationDetailDrawer({
     return () => window.clearInterval(timer);
   }, [row?.eventId, refundResult?.summary.requestId, refundResult?.summary.status, invalidateAfterFinanceChange, showRefundToast]);
 
+  const handleEntriesSaved = async () => {
+    if (!row) return;
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "registration", row.id] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
+    ]);
+    adminToast.success("받는 사람 정보가 수정되었습니다.");
+    setEditingEntries(false);
+    setEditError("");
+  };
+
   const handleBasicInfoSaved = async () => {
     if (!row) return;
     await Promise.all([
@@ -608,14 +632,16 @@ export function ApplicationDetailDrawer({
   const isOrgMemberContext = source === "organization-members";
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
-  const canDeleteUnpaid = !editing && !adjusting && canDeleteUnpaidRegistration(row.status);
+  const formOpen = editing || editingEntries || adjusting;
+  const entries = row.entries ?? [];
+  const canEditEntries = !isGroup && row.entriesEditable === true && entries.length > 0;
+  const canDeleteUnpaid = !formOpen && canDeleteUnpaidRegistration(row.status);
   const externalPayment = !isGroup && row.externalPayment === true;
   const hidePaymentActions = externalPayment || (!isGroup && Boolean(loading));
   const canFullRefund =
     hasAdminRefundBatch &&
     !hidePaymentActions &&
-    !editing &&
-    !adjusting &&
+    !formOpen &&
     !canDeleteUnpaid &&
     (row.kind === "group"
       ? !closedRegistration(row.status)
@@ -623,8 +649,7 @@ export function ApplicationDetailDrawer({
   const canPartialRefund =
     hasAdminRefundBatch &&
     !hidePaymentActions &&
-    !editing &&
-    !adjusting &&
+    !formOpen &&
     !canDeleteUnpaid &&
     !isGroup &&
     hasPartialRefundIds(row) &&
@@ -632,8 +657,7 @@ export function ApplicationDetailDrawer({
   const groupOrgId = row.organizationId || (isGroup ? row.id : "");
   const canGroupPaymentAdjustLink =
     hasAdminRefundBatch &&
-    !editing &&
-    !adjusting &&
+    !formOpen &&
     !canDeleteUnpaid &&
     blockGroupEdit &&
     Boolean(groupOrgId) &&
@@ -701,7 +725,7 @@ export function ApplicationDetailDrawer({
         />
       ) : null}
       <aside
-        className={`admin-drawer admin-drawer--detail${editing || adjusting ? " is-editing" : ""}`}
+        className={`admin-drawer admin-drawer--detail${formOpen ? " is-editing" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label="신청 상세"
@@ -713,6 +737,9 @@ export function ApplicationDetailDrawer({
               {editing ? (
                 <span className="admin-drawer__edit-badge">기본정보 수정</span>
               ) : null}
+              {editingEntries ? (
+                <span className="admin-drawer__edit-badge">받는 사람 수정</span>
+              ) : null}
               {adjusting ? (
                 <span className="admin-drawer__edit-badge">종목 변경</span>
               ) : null}
@@ -722,7 +749,7 @@ export function ApplicationDetailDrawer({
             </button>
           </div>
           <div className="admin-drawer__actions admin-drawer__actions--detail">
-            {!editing && !adjusting && canEditBasicInfo ? (
+            {!formOpen && canEditBasicInfo ? (
               <button
                 type="button"
                 className="admin-btn admin-btn--ghost"
@@ -734,12 +761,13 @@ export function ApplicationDetailDrawer({
               >
                 기본정보 수정
               </button>
-            ) : editing || adjusting ? (
+            ) : formOpen ? (
               <button
                 type="button"
                 className="admin-btn admin-btn--ghost"
                 onClick={() => {
                   setEditing(false);
+                  setEditingEntries(false);
                   setAdjusting(false);
                   setEditError("");
                 }}
@@ -747,7 +775,20 @@ export function ApplicationDetailDrawer({
                 수정 취소
               </button>
             ) : null}
-            {!isGroup && !editing && !adjusting ? (
+            {!formOpen && canEditEntries ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                disabled={loading || Boolean(error)}
+                onClick={() => {
+                  setEditError("");
+                  setEditingEntries(true);
+                }}
+              >
+                받는 사람 수정
+              </button>
+            ) : null}
+            {!isGroup && !formOpen ? (
               <button
                 type="button"
                 className="admin-btn admin-btn--ghost"
@@ -835,6 +876,19 @@ export function ApplicationDetailDrawer({
             </div>
           ) : null}
 
+          {!loading && !error && editingEntries ? (
+            <ApplicationEntriesEdit
+              registrationId={row.id}
+              entries={entries}
+              onCancel={() => {
+                setEditingEntries(false);
+                setEditError("");
+              }}
+              onSaved={() => void handleEntriesSaved()}
+              onError={setEditError}
+            />
+          ) : null}
+
           {!loading && !error && editing ? (
             <ApplicationBasicInfoEdit
               row={row}
@@ -870,7 +924,7 @@ export function ApplicationDetailDrawer({
             />
           ) : null}
 
-          {!loading && !error && !editing && !adjusting ? (
+          {!loading && !error && !formOpen ? (
             <>
               {blockGroupEdit ? (
                 <DrawerGuide
@@ -910,6 +964,39 @@ export function ApplicationDetailDrawer({
                 title={isGroup || isOrgMemberContext ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
+              {entries.length ? (
+                <section className="admin-drawer__section">
+                  <h2 className="admin-drawer__section-title">참가 항목</h2>
+                  {entries.map((entry) => (
+                    <div key={entry.entryId} className="admin-drawer__fields">
+                      <div className="admin-drawer__row">
+                        <dt>종목</dt>
+                        <dd>{dash(entry.categoryName || entry.eventCategoryId)}</dd>
+                      </div>
+                      <div className="admin-drawer__row">
+                        <dt>이름</dt>
+                        <dd>{dash(entry.name)}</dd>
+                      </div>
+                      <div className="admin-drawer__row">
+                        <dt>연락처</dt>
+                        <dd>{displayPhone(entry.phNum)}</dd>
+                      </div>
+                      <div className="admin-drawer__row">
+                        <dt>생년월일</dt>
+                        <dd>{displayBirth(entry.birth)}</dd>
+                      </div>
+                      <div className="admin-drawer__row">
+                        <dt>성별</dt>
+                        <dd>{genderLabel(entry.gender)}</dd>
+                      </div>
+                      <div className="admin-drawer__row">
+                        <dt>배번</dt>
+                        <dd>{entry.bibNumber.trim() ? entry.bibNumber : "미발급"}</dd>
+                      </div>
+                    </div>
+                  ))}
+                </section>
+              ) : null}
               <DetailSection
                 title="보호자"
                 fields={sections.guardianFields}
@@ -923,7 +1010,7 @@ export function ApplicationDetailDrawer({
               />
             </>
           ) : null}
-          {!editing ? (
+          {!editing && !editingEntries ? (
             <ApplicationPaySummary
               data={finance.data}
               loading={finance.isLoading}

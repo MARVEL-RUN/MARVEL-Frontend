@@ -526,6 +526,47 @@
   gap: 0.35rem 0.9rem;
 }
 
+.virtual-run .vr-pkg-lines__themes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.virtual-run .vr-pkg-lines__theme + .vr-pkg-lines__theme {
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.virtual-run .vr-pkg-lines__theme > strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #fff;
+  font-size: 0.88rem;
+}
+
+.virtual-run .vr-pkg-lines__theme > strong::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 0.85rem;
+  margin-right: 0.45rem;
+  vertical-align: -0.08rem;
+  background: var(--tone, #fff);
+}
+
+.virtual-run .vr-pkg-lines__theme.is-gold {
+  --tone: var(--round-gold);
+}
+
+.virtual-run .vr-pkg-lines__theme.is-red {
+  --tone: var(--round-red);
+}
+
+.virtual-run .vr-pkg-lines__theme.is-blue {
+  --tone: var(--round-blue);
+}
+
 .virtual-run .vr-ticket-stage .vr-recipients__all {
   display: flex;
   flex-wrap: wrap;
