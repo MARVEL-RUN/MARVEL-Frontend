@@ -123,7 +123,7 @@ export function UpgradeListPage({ eventId }: { eventId: string }) {
   }
 
   return (
-    <div className="admin-page admin-apps-list">
+    <div className="admin-page admin-apps-list admin-upgrades-list">
       <AdminTableShell
         title="패키지 상향"
         rows={query.data ?? []}
@@ -204,7 +204,8 @@ export function UpgradeListPage({ eventId }: { eventId: string }) {
           {
             key: "cancel",
             header: "관리",
-            width: "72px",
+            className: "is-manage",
+            width: "96px",
             render: (row) => (
               <button
                 type="button"

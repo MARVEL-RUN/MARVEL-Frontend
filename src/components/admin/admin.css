@@ -3612,6 +3612,11 @@ body.admin-mode {
   flex: 0 0 auto;
 }
 
+.admin-upgrades-list .admin-table th.is-manage,
+.admin-upgrades-list .admin-table td.is-manage {
+  padding-right: 16px;
+}
+
 .admin-upgrade-deadline {
   display: inline-flex;
   align-items: center;

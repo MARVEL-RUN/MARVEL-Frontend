@@ -1,0 +1,4 @@
+html.is-main .virtual-run .page__body.vr-login-wrap,
+.virtual-run .page__body.vr-login-wrap {
+  width: min(520px, calc(100% - 2.5rem));
+}

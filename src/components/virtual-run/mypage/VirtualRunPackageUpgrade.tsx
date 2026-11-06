@@ -213,11 +213,11 @@ export function VirtualRunPackageUpgrade() {
             <p className="form__note">신청 정보를 불러오는 중...</p>
           ) : loggedOut ? (
             <section className="block wait">
-              <h2>신청 정보를 찾지 못했습니다</h2>
-              <p className="sec__body">패키지 상향은 신청 정보가 있을 때 진행할 수 있습니다.</p>
+              <h2>다시 로그인해 주세요</h2>
+              <p className="sec__body">패키지 상향은 참가자 로그인 뒤에 할 수 있습니다.</p>
               <div className="flow__nav">
-                <VrLink href="/mypage" className="btn btn--red">
-                  마이페이지
+                <VrLink href="/login" className="btn btn--red">
+                  로그인
                 </VrLink>
               </div>
             </section>
