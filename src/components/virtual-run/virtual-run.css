@@ -19,6 +19,18 @@
   margin-top: auto;
 }
 
+.virtual-run .site-header__account {
+  max-width: 9rem;
+  min-width: 0;
+}
+
+.virtual-run .site-header__account > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .virtual-run .vr-scramble {
   display: inline-block;
   white-space: nowrap;
