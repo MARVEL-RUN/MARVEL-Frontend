@@ -36,6 +36,7 @@ export function VirtualRunTicketsPage() {
     <VirtualRunSubPage kicker="TICKET" title="티켓 구매" en="GET YOUR PASS">
       <div className="page__body wrap vr-ticket-stage">
         <VirtualRunPackageForm
+          consents={consents}
           onBack={() => {
             setAgreed(false);
             window.scrollTo({ top: 0 });
