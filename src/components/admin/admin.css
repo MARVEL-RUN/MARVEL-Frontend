@@ -1556,6 +1556,10 @@ body.admin-mode {
   overflow: hidden;
 }
 
+.admin-drawer__section .admin-drawer__fields + .admin-drawer__fields {
+  margin-top: 8px;
+}
+
 .admin-drawer__actions {
   display: flex;
   flex-wrap: wrap;
@@ -3606,6 +3610,24 @@ body.admin-mode {
 .admin-toolbar__fields select {
   width: 112px;
   flex: 0 0 auto;
+}
+
+.admin-upgrade-deadline {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 8px;
+  font-size: 13px;
+  color: var(--admin-ink);
+}
+
+.admin-upgrade-deadline input {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--admin-ink);
 }
 
 .admin-select {

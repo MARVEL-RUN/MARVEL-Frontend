@@ -115,7 +115,7 @@ export function VirtualRunRegistrationEdit() {
           rows.find((row) => row.registrationId?.trim()) ??
           null;
         if (!match) {
-          setError("신청 내역을 찾지 못했습니다.");
+          setError("신청 내역을 찾지 못했습니다. 다시 로그인해 주세요.");
           return;
         }
         const category = findCategory(options.categories, match.eventCategoryId || "");

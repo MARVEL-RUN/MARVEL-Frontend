@@ -5,6 +5,18 @@ const STORAGE_KEY = "marvel-run:vr-ticket-pending";
 
 export type VirtualRunTicketKind = "single" | "package" | "mixed";
 
+export type VirtualRunTicketPerson = {
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+};
+
+export type VirtualRunTicketRunner = VirtualRunTicketPerson & {
+  packageId: string;
+  packageName: string;
+};
+
 export type VirtualRunTicketPending = {
   registration: PaymentOrder;
   customerName: string;
@@ -12,6 +24,12 @@ export type VirtualRunTicketPending = {
   kind: VirtualRunTicketKind;
   roundIds: VirtualRunRoundId[];
   savedAt: number;
+  buyer?: VirtualRunTicketPerson;
+  runners?: VirtualRunTicketRunner[];
+  guardianName?: string;
+  guardianPhNum?: string;
+  guardianRelationship?: string;
+  guardianConsent?: boolean;
 };
 
 /** Toss orderId: 6~64자, 영문·숫자·`-` `_` */

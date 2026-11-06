@@ -99,6 +99,19 @@ export type AdminApplicationRow = {
   startGroupCode?: string;
   startGroupUnselected?: boolean;
   referenceFilterLabel?: string;
+  entries?: AdminRegistrationEntry[];
+  entriesEditable?: boolean;
+};
+
+export type AdminRegistrationEntry = {
+  entryId: string;
+  eventCategoryId: string;
+  categoryName: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: string;
+  bibNumber: string;
 };
 
 export type AdminSelectedSouvenir = {
@@ -179,6 +192,8 @@ type RegistrationDetail = {
   startGroupCode?: unknown;
   startGroupUnselected?: unknown;
   referenceFilter?: unknown;
+  entries?: unknown;
+  entriesEditable?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -477,7 +492,31 @@ export function applyRegistrationDetail(
     })(),
     referenceFilterLabel:
       referenceFilterDisplay(data.referenceFilter) || row.referenceFilterLabel,
+    entries: asRegistrationEntries(data.entries),
+    entriesEditable: asOptionalBool(data.entriesEditable) === true,
   };
+}
+
+function asRegistrationEntries(value: unknown): AdminRegistrationEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as Record<string, unknown>;
+    const entryId = firstText(row.entryId, row.id);
+    if (!entryId) return [];
+    return [
+      {
+        entryId,
+        eventCategoryId: asText(row.eventCategoryId),
+        categoryName: firstText(row.categoryName, row.eventCategoryName),
+        name: asText(row.name),
+        phNum: firstText(row.phNum, row.phoneNumber),
+        birth: asText(row.birth),
+        gender: asText(row.gender),
+        bibNumber: firstText(row.bibNumber, row.bib),
+      },
+    ];
+  });
 }
 
 export function hasPartialRefundIds(row: AdminApplicationRow) {
@@ -718,6 +757,30 @@ export function updateRegistrationBasicInfo(
     `v1/admin/registrations/${encodeURIComponent(registrationId)}/basic-info`,
     { method: "PATCH", body: JSON.stringify(body) },
   );
+}
+
+export type RegistrationEntryUpdate = {
+  entryId: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+};
+
+export function updateRegistrationEntries(
+  registrationId: string,
+  entries: RegistrationEntryUpdate[],
+) {
+  if (!registrationId.trim()) throw new Error("신청 정보를 찾을 수 없습니다.");
+  if (!entries.length) throw new Error("수정할 참가 항목이 없습니다.");
+  const ids = entries.map((entry) => entry.entryId);
+  if (new Set(ids).size !== ids.length) {
+    throw new Error("같은 참가 항목을 두 번 보낼 수 없습니다.");
+  }
+  return adminFetch<unknown>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}/entries`,
+    { method: "PATCH", body: JSON.stringify({ entries }) },
+  ).then(asRegistrationEntries);
 }
 
 export function resetRegistrationPassword(
