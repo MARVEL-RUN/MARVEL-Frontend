@@ -202,8 +202,97 @@ export async function reopenPackageUpgradePayment() {
   }).then(asUpgradeOrder);
 }
 
+/** 진행 중인 상향이 없으면 404. 조회 API가 아니라 결제 재개로 구분한다 */
+export async function fetchPendingPackageUpgrade() {
+  try {
+    return await reopenPackageUpgradePayment();
+  } catch (error) {
+    if (
+      error instanceof MainHttpError &&
+      (error.status === 404 || error.code === "PACKAGE_UPGRADE_NOT_FOUND")
+    ) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 export async function cancelPackageUpgrade() {
   await participantFetch<void>("v1/participant/registrations/me/upgrade", {
     method: "DELETE",
   });
+}
+
+export type ParticipantEntry = {
+  entryId: string;
+  itemSortOrder: number;
+  productId: string;
+  productName: string;
+  eventCategoryId: string;
+  categoryName: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: string;
+};
+
+export type ParticipantEntryUpdate = {
+  entryId: string;
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+};
+
+function asEntry(value: unknown): ParticipantEntry | null {
+  const row = asRecord(value);
+  const entryId = asText(row?.entryId);
+  if (!entryId) return null;
+  const order = row?.itemSortOrder;
+  return {
+    entryId,
+    itemSortOrder: typeof order === "number" && Number.isFinite(order) ? order : 0,
+    productId: asText(row?.productId),
+    productName: asText(row?.productName),
+    eventCategoryId: asText(row?.eventCategoryId),
+    categoryName: asText(row?.categoryName),
+    name: asText(row?.name),
+    phNum: asText(row?.phNum).replace(/\D/g, ""),
+    birth: asText(row?.birth),
+    gender: asText(row?.gender).toUpperCase(),
+  };
+}
+
+function asEntryList(data: unknown) {
+  const row = asRecord(data);
+  const list = Array.isArray(row?.entries) ? row.entries : [];
+  return list.flatMap((item) => {
+    const entry = asEntry(item);
+    return entry ? [entry] : [];
+  });
+}
+
+export function participantProductLabel(entries: ParticipantEntry[]) {
+  const names: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of entries) {
+    const key = `${entry.itemSortOrder}:${entry.productId || entry.productName}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (entry.productName) names.push(entry.productName);
+  }
+  return names.join(" · ");
+}
+
+export async function fetchParticipantEntries() {
+  const data = await participantFetch<unknown>("v1/participant/registrations/me/entries");
+  return asEntryList(data);
+}
+
+export async function patchParticipantEntries(entries: ParticipantEntryUpdate[]) {
+  const data = await participantFetch<unknown>("v1/participant/registrations/me/entries", {
+    method: "PATCH",
+    body: JSON.stringify({ entries }),
+  });
+  return asEntryList(data);
 }

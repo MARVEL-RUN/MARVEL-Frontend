@@ -8,12 +8,12 @@ import { MainHttpError } from "@/lib/main/fetch";
 import { applicationPasswordError } from "@/lib/register";
 import { writeLoginSession } from "@/lib/virtual-run/login-session";
 import { participantFromLookup } from "@/lib/virtual-run/participant";
-import { loginParticipant } from "@/services/main/participant-auth";
-import { lookupIndividualRegistrations } from "@/services/main/registrations";
-import type {
-  IndividualRegistrationLookupRequest,
-  RegistrationReceipt,
-} from "@/services/main/types";
+import {
+  fetchParticipantEntries,
+  loginParticipant,
+  participantProductLabel,
+} from "@/services/main/participant-auth";
+import type { IndividualRegistrationLookupRequest } from "@/services/main/types";
 import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VrLink, useVrPath } from "../layout/VrLink";
@@ -38,10 +38,6 @@ function loginErrorMessage(err: unknown) {
   if (!message || message.length > 180) return "신청 내역을 조회하지 못했습니다.";
   if (err instanceof MainHttpError && err.status >= 500) return "신청 내역을 조회하지 못했습니다.";
   return message;
-}
-
-function pickReceipt(rows: RegistrationReceipt[]) {
-  return rows.find((row) => row.registrationId?.trim()) ?? rows[0] ?? null;
 }
 
 export function VirtualRunLoginPage() {
@@ -77,27 +73,38 @@ export function VirtualRunLoginPage() {
     setBusy(true);
     try {
       const authed = await loginParticipant(VIRTUAL_RUN_EVENT_ID, body);
-      const found = await lookupIndividualRegistrations(VIRTUAL_RUN_EVENT_ID, body);
-      const rows = Array.isArray(found) ? found : [];
-      const receipt = pickReceipt(rows);
-      if (!receipt) {
-        setError("이름·생년월일·전화번호·비밀번호를 다시 확인해 주세요.");
-        return;
-      }
-      const displayName = receipt.name?.trim() || authed.name || body.name;
       writeLoginSession({
         access: body,
-        registrationId: authed.registrationId || receipt.registrationId?.trim() || "",
-        categoryName: receipt.eventCategoryName?.trim() || "",
-        eventCategoryId: receipt.eventCategoryId?.trim() || "",
+        registrationId: authed.registrationId,
+        categoryName: "",
         eventId: authed.eventId,
         tokens: authed.tokens,
       });
+      let categoryName = "";
+      let eventCategoryId = "";
+      try {
+        const entries = await fetchParticipantEntries();
+        categoryName = participantProductLabel(entries);
+        eventCategoryId = entries.find((row) => row.productId)?.productId ?? "";
+        if (categoryName || eventCategoryId) {
+          writeLoginSession({
+            access: body,
+            registrationId: authed.registrationId,
+            categoryName,
+            eventCategoryId,
+            eventId: authed.eventId,
+            tokens: authed.tokens,
+          });
+        }
+      } catch {
+        /* 종목 표시만 비운다. 공개 조회는 이 대회에서 막혀 있다 */
+      }
+      const displayName = authed.name || body.name;
       update(
         participantFromLookup({
           name: displayName,
           phone: body.phNum,
-          categoryName: receipt.eventCategoryName,
+          categoryName,
         }),
       );
       router.push(toHref("/mypage"));

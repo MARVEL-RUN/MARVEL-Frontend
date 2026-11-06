@@ -46,3 +46,17 @@ export function ownedRoundIdsForCategory(
   }
   return inRoundOrder(owned);
 }
+
+/** 여러 상품·종목의 보유 회차. 같은 회차는 한 번만 남긴다 */
+export function ownedRoundIdsForCategories(
+  categories: RegistrationCategory[],
+  eventCategoryIds: string[],
+): VirtualRunRoundId[] {
+  const owned: VirtualRunRoundId[] = [];
+  for (const eventCategoryId of eventCategoryIds) {
+    for (const id of ownedRoundIdsForCategory(categories, eventCategoryId)) {
+      if (!owned.includes(id)) owned.push(id);
+    }
+  }
+  return inRoundOrder(owned);
+}

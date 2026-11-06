@@ -40,6 +40,8 @@ function ticketLabel(p: VirtualRunParticipant) {
 }
 
 function isThreeRoundPackage(p: VirtualRunParticipant, label: string) {
+  if (p.hasSingleProduct === true) return false;
+  if (p.hasSingleProduct === false) return true;
   if (p.ownedRoundIds.length >= VIRTUAL_RUN_ROUNDS.length) return true;
   if (p.ownedRoundIds.length > 0) return false;
   return /어셈블|3종|3회차/.test(label);
