@@ -34,6 +34,8 @@ export type VirtualRunParticipant = {
   phone: string;
   /** 신청 조회 응답의 종목명. 차수는 조회에 아직 없다 */
   categoryName?: string;
+  /** 단품 줄이 있으면 패키지가 있어도 상향을 연다 */
+  hasSingleProduct?: boolean;
   ownedRoundIds: VirtualRunRoundId[];
   kitShipping: KitShippingStatus;
   trackingNo?: string;

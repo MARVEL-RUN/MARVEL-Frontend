@@ -1,5 +1,6 @@
 "use client";
 
+import { VirtualRoundsPanel } from "@/components/admin/applications/VirtualRoundsPanel";
 import { DailyReportDownload } from "@/components/admin/dashboard/DailyReportDownload";
 import { DeliveryListDownload } from "@/components/admin/dashboard/DeliveryListDownload";
 import { PaymentDailyGraph } from "@/components/admin/dashboard/PaymentDailyGraph";
@@ -7,7 +8,8 @@ import { OpsGuide } from "@/components/admin/dashboard/OpsGuide";
 import { RegistrationStatsTables } from "@/components/admin/dashboard/RegistrationStatsTables";
 import { NAVER_ANALYTICS_URL } from "@/lib/admin/analytics";
 import { hasAdminApi } from "@/lib/admin/config";
-import { fetchAdminEvents } from "@/services/admin/applications";
+import { fetchAdminEvents, raceEventSlug, type AdminEvent } from "@/services/admin/applications";
+import { fetchAdminRegistrationOptions } from "@/services/admin/registration-options";
 import {
   fetchRegistrationStatistics,
   fetchUnansweredCount,
@@ -36,15 +38,21 @@ function EventStatsTables({ eventId, eventName }: { eventId: string; eventName: 
 }
 
 function EventStatsPanel({
-  eventId,
-  eventName,
+  event,
   defaultExpanded,
 }: {
-  eventId: string;
-  eventName: string;
+  event: AdminEvent;
   defaultExpanded: boolean;
 }) {
+  const { eventId, eventName } = event;
   const [open, setOpen] = useState(defaultExpanded);
+  const optionsQuery = useQuery({
+    queryKey: ["admin", "registration-options", eventId],
+    queryFn: () => fetchAdminRegistrationOptions(eventId),
+    enabled: hasAdminApi && open && Boolean(eventId),
+  });
+  const showRounds =
+    raceEventSlug(event) === "virtual" || optionsQuery.data?.eventFormat === "VIRTUAL";
 
   return (
     <div className={`admin-reg-stats-event${open ? " is-open" : ""}`}>
@@ -66,6 +74,7 @@ function EventStatsPanel({
               <DeliveryListDownload eventId={eventId} />
             </>
           ) : null}
+          {showRounds ? <VirtualRoundsPanel eventId={eventId} /> : null}
           <EventStatsTables eventId={eventId} eventName={eventName} />
         </div>
       ) : null}
@@ -109,7 +118,7 @@ function IntakeStatsSection({
   loadingEvents,
   eventsFailed,
 }: {
-  events: { eventId: string; eventName: string }[];
+  events: AdminEvent[];
   loadingEvents: boolean;
   eventsFailed: boolean;
 }) {
@@ -143,12 +152,7 @@ function IntakeStatsSection({
   return (
     <div className="admin-reg-stats-stack">
       {events.map((event, index) => (
-        <EventStatsPanel
-          key={event.eventId}
-          eventId={event.eventId}
-          eventName={event.eventName}
-          defaultExpanded={index === 0}
-        />
+        <EventStatsPanel key={event.eventId} event={event} defaultExpanded={index === 0} />
       ))}
     </div>
   );

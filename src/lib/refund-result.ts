@@ -100,10 +100,12 @@ export function refundCount(counts: AdminRefundCounts | undefined, key: string) 
 }
 
 export function refundItemMessage(item: AdminRefundItem) {
-  const mapped = refundErrorHint(item.errorCode);
-  if (item.errorCode && mapped) {
-    return `${item.errorCode} · ${mapped}`;
-  }
+  const code = item.errorCode?.trim() ?? "";
+  const known = code ? REFUND_ERROR_HINT[code] ?? "" : "";
+  if (code && known) return `${code} · ${known}`;
+  const server = refundItemServerMessage(item);
+  if (server) return server;
+  if (code) return `${code} · 운영자 확인 필요`;
   if (statusKey(item.status) === "NEEDS_REVIEW") {
     return "일부만 처리됐을 수 있습니다. 전원 미환불로 간주하지 마세요.";
   }
@@ -141,10 +143,17 @@ function textField(row: Record<string, unknown> | null, key: string) {
   return typeof value === "string" && value.trim() ? value.trim() : "";
 }
 
-export function refundItemBackendMessage(item: AdminRefundItem) {
+export function refundItemServerMessage(item: AdminRefundItem) {
+  const direct = item.message?.trim() ?? "";
+  if (direct) return direct;
   const result = asRecord(item.result);
-  const fromResult = textField(result, "message");
-  if (fromResult) return fromResult;
+  return textField(result, "message");
+}
+
+export function refundItemBackendMessage(item: AdminRefundItem) {
+  const server = refundItemServerMessage(item);
+  if (server) return server;
+  const result = asRecord(item.result);
   const refunds = result?.refunds;
   if (Array.isArray(refunds)) {
     for (const refund of refunds) {

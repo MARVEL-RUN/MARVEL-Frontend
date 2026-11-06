@@ -9,13 +9,16 @@ import {
   FormRow,
   FormSec,
   GenderPick,
+  PasswordField,
   PhoneField,
 } from "@/components/main/register/ApplyUi";
+import { RegistrationPolicyNotice } from "@/components/main/register/RegistrationPolicyNotice";
+import { useRegistrationOptions } from "@/components/main/register/useRegistrationOptions";
 import { SheetModal } from "@/components/main/SheetModal";
-import { hasTossClientKey } from "@/lib/main/config";
+import { hasTossClientKey, VIRTUAL_RUN_EVENT_ID } from "@/lib/main/config";
+import { MainHttpError } from "@/lib/main/fetch";
 import type { PaymentOrder } from "@/lib/payment/session";
-import { birthToApi, genderToApi } from "@/lib/payment/map";
-import { filterNoSpaceName, formatPhone, needsGuardian, type Gender } from "@/lib/register";
+import { filterNoSpaceName, formatPhone, type Consents, type Gender } from "@/lib/register";
 import { isMobileView } from "@/lib/viewport";
 import {
   VR_ASSEMBLE_PACKAGE,
@@ -29,16 +32,19 @@ import {
   type VrPackage,
   type VrPackageId,
 } from "@/lib/virtual-run/packages";
+import {
+  virtualRunEntryCategory,
+  virtualRunProductForPackage,
+} from "@/lib/virtual-run/product-match";
+import { toVirtualRunItemsRequest } from "@/lib/virtual-run/purchase";
 import { virtualRunRoundById, type VirtualRunRoundId } from "@/lib/virtual-run/rounds";
 import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
-import {
-  createVirtualRunOrderId,
-  saveVirtualRunTicketPending,
-} from "@/lib/virtual-run/ticket-payment";
+import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
+import { createRegistration } from "@/services/main/registrations";
 import { useVrPath } from "../layout/VrLink";
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-const QTY_CAP = 20;
+const ITEM_LIMIT = 10;
 
 type RunnerSlot = {
   id: string;
@@ -120,20 +126,25 @@ function countOf(lines: PackageLine[], packageId: VrPackageId) {
   return lines.filter((line) => line.packageId === packageId).length;
 }
 
-export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
+export function VirtualRunPackageForm({
+  consents,
+  onBack,
+}: {
+  consents: Consents;
+  onBack: () => void;
+}) {
   const router = useRouter();
   const toHref = useVrPath();
+  const options = useRegistrationOptions(VIRTUAL_RUN_EVENT_ID);
   const [lines, setLines] = useState<PackageLine[]>([]);
   const [buyerName, setBuyerName] = useState("");
   const [phone, setPhone] = useState("");
   const [buyerBirth, setBuyerBirth] = useState("");
   const [buyerGender, setBuyerGender] = useState<Gender | "">("");
-  const [guardianName, setGuardianName] = useState("");
-  const [guardianPhone, setGuardianPhone] = useState("");
-  const [guardianRelation, setGuardianRelation] = useState("");
-  const [guardianConsent, setGuardianConsent] = useState(false);
+  const [password, setPassword] = useState("");
   const [addr, setAddr] = useState({ zonecode: "", address: "", addressDetail: "" });
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [payOrder, setPayOrder] = useState<PaymentOrder | null>(null);
   const [payName, setPayName] = useState("");
@@ -172,10 +183,15 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
   );
 
   function setQty(packageId: VrPackageId, delta: number) {
+    if (delta > 0 && lines.length >= ITEM_LIMIT) {
+      setError("한 신청에 상품은 10개까지 담을 수 있습니다.");
+      return;
+    }
+    setError("");
     setLines((prev) => {
       const ofType = prev.filter((line) => line.packageId === packageId);
       if (delta > 0) {
-        if (ofType.length >= QTY_CAP) return prev;
+        if (prev.length >= ITEM_LIMIT) return prev;
         return [...prev, emptyLine(packageId)];
       }
       if (!ofType.length) return prev;
@@ -223,12 +239,9 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
     );
   }
 
-  const guardianOn =
-    needsGuardian(buyer.birth) ||
-    resolved.some((line) => line.runners.some((slot) => needsGuardian(slot.runnerBirth)));
-
-  function onPay(e: FormEvent) {
+  async function onPay(e: FormEvent) {
     e.preventDefault();
+    if (submitting) return;
     if (!lines.length) {
       setError("패키지를 하나 이상 담아 주세요.");
       return;
@@ -254,19 +267,9 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
       setError(runnerIssue);
       return;
     }
-    if (!addr.address.trim() && !virtualRunDemoEnabled) {
+    if ((options.addressRequired || !virtualRunDemoEnabled) && !addr.address.trim()) {
       setError("배송 주소를 입력해 주세요.");
       return;
-    }
-    if (guardianOn) {
-      if (!filterNoSpaceName(guardianName)) {
-        setError("만 14세 미만 참가자의 보호자 이름을 입력해 주세요.");
-        return;
-      }
-      if (!guardianConsent) {
-        setError("만 14세 미만 참가자에 대한 보호자 동의가 필요합니다.");
-        return;
-      }
     }
     if (!hasTossClientKey) {
       setError("결제 연동 설정(NEXT_PUBLIC_TOSS_CLIENT_KEY)이 필요합니다. env 변경 후 dev 서버를 재시작하세요.");
@@ -274,54 +277,92 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
     }
 
     setError("");
-    const customerName = filterNoSpaceName(buyerName);
-    const digits = phoneDigits(phone);
-    const registration: PaymentOrder = {
-      orderId: createVirtualRunOrderId(),
-      orderName: vrPackageOrderName(lines),
-      paymentAmount: total,
-    };
-    const buyerPerson = {
-      name: customerName,
-      phNum: digits,
-      birth: birthToApi(buyerBirth),
-      gender: genderToApi(buyerGender),
-    };
-    saveVirtualRunTicketPending({
-      registration,
-      customerName,
-      phone: digits,
-      kind: vrPackageTicketKind(lines),
-      roundIds: vrPackageRoundIds(lines),
-      savedAt: Date.now(),
-      buyer: buyerPerson,
-      runners: resolved.flatMap((line) =>
-        line.runners.map((slot) => ({
-          packageId: line.packageId,
-          packageName:
-            line.runners.length > 1 ? `${line.pkg.name} · ${slot.theme}` : line.pkg.name,
-          name: slot.runnerName,
-          phNum: slot.runnerPhone,
-          birth: birthToApi(slot.runnerBirth),
-          gender: genderToApi(slot.runnerGender),
-        })),
-      ),
-      ...(guardianOn
-        ? {
-            guardianName: filterNoSpaceName(guardianName),
-            guardianPhNum: phoneDigits(guardianPhone),
-            guardianRelationship: guardianRelation.trim(),
-            guardianConsent: true,
-          }
-        : {}),
-    });
-    if (isMobileView()) {
-      router.push(toHref("/payment"));
-      return;
+    setSubmitting(true);
+    try {
+      const body = toVirtualRunItemsRequest({
+        lines: resolved.map((line) => {
+          const category = virtualRunProductForPackage(options.categories, line.packageId);
+          if (!category) throw new Error(`${line.pkg.name} 상품을 찾지 못했습니다.`);
+          return {
+            category,
+            recipients: line.runners.map((slot) => {
+              const child = virtualRunEntryCategory(options.categories, category, slot.themeId);
+              if (!child) {
+                throw new Error(`${line.pkg.name} ${slot.theme} 종목을 찾지 못했습니다.`);
+              }
+              return {
+                eventCategoryId: child.categoryId,
+                name: slot.runnerName,
+                phone: slot.runnerPhone,
+                birth: slot.runnerBirth,
+                gender: slot.runnerGender,
+              };
+            }),
+          };
+        }),
+        buyer: {
+          name: buyerName,
+          phone,
+          birth: buyerBirth,
+          gender: buyerGender,
+          password,
+          zonecode: addr.zonecode,
+          address: addr.address,
+          addressDetail: addr.addressDetail,
+          guardianName: "",
+          guardianPhone: "",
+          guardianRelation: "",
+          guardianConsent: false,
+        },
+        addressRequired: options.addressRequired,
+        consents,
+      });
+      const created = await createRegistration(VIRTUAL_RUN_EVENT_ID, body);
+      const customerName = filterNoSpaceName(buyerName);
+      const registration: PaymentOrder = {
+        orderId: created.orderId,
+        orderName: created.orderName || vrPackageOrderName(lines),
+        paymentAmount: created.paymentAmount,
+      };
+      saveVirtualRunTicketPending({
+        registration,
+        customerName,
+        phone: phoneDigits(phone),
+        kind: vrPackageTicketKind(lines),
+        roundIds: vrPackageRoundIds(lines),
+        savedAt: Date.now(),
+      });
+      if (isMobileView()) {
+        router.push(toHref("/payment"));
+        return;
+      }
+      setPayOrder(registration);
+      setPayName(customerName);
+      setPayOpen(true);
+    } catch (err) {
+      setError(
+        err instanceof MainHttpError || err instanceof Error ? err.message : "신청에 실패했습니다.",
+      );
+    } finally {
+      setSubmitting(false);
     }
-    setPayOrder(registration);
-    setPayName(customerName);
-    setPayOpen(true);
+  }
+
+  if (options.loading) {
+    return <p className="form__note">신청 옵션을 불러오는 중...</p>;
+  }
+
+  if (!options.registrationOpen) {
+    return (
+      <>
+        <RegistrationPolicyNotice reason={options.registrationReason} />
+        <div className="flow__nav">
+          <button type="button" className="btn btn--ghost" onClick={onBack}>
+            이전
+          </button>
+        </div>
+      </>
+    );
   }
 
   return (
@@ -387,6 +428,9 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
           </FormRow>
           <FormRow label="성별" required>
             <GenderPick name="buyer-gender" value={buyerGender} onChange={setBuyerGender} />
+          </FormRow>
+          <FormRow label="신청 비밀번호" required>
+            <PasswordField value={password} onChange={setPassword} required />
           </FormRow>
           <FormRow label="배송 주소" required>
             <AddressField
@@ -506,37 +550,6 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
           )}
         </FormSec>
 
-        {guardianOn ? (
-          <FormSec kicker="03 / GUARDIAN" title="보호자">
-            <FormRow label="보호자 이름" required>
-              <input
-                type="text"
-                value={guardianName}
-                maxLength={50}
-                onChange={(e) => setGuardianName(filterNoSpaceName(e.target.value))}
-              />
-            </FormRow>
-            <FormRow label="보호자 연락처">
-              <PhoneField value={guardianPhone} onChange={setGuardianPhone} />
-            </FormRow>
-            <FormRow label="관계">
-              <input
-                type="text"
-                value={guardianRelation}
-                onChange={(e) => setGuardianRelation(e.target.value)}
-              />
-            </FormRow>
-            <label className="vr-recipients__check">
-              <input
-                type="checkbox"
-                checked={guardianConsent}
-                onChange={(e) => setGuardianConsent(e.target.checked)}
-              />
-              만 14세 미만 참가자의 신청·개인정보 처리에 동의합니다.
-            </label>
-          </FormSec>
-        ) : null}
-
         <section className="vr-sum" aria-label="결제 요약">
           {resolved.length ? (
             <dl>
@@ -571,8 +584,8 @@ export function VirtualRunPackageForm({ onBack }: { onBack: () => void }) {
           <button type="button" className="btn btn--ghost" onClick={onBack}>
             이전
           </button>
-          <button type="submit" className="btn btn--red" disabled={!lines.length}>
-            {won(total)} 결제하기
+          <button type="submit" className="btn btn--red" disabled={submitting || !lines.length}>
+            {submitting ? "신청 중..." : `${won(total)} 결제하기`}
           </button>
         </div>
       </form>
@@ -618,7 +631,7 @@ function PackageCard({
         <button
           type="button"
           aria-label={`${item.name} 하나 담기`}
-          disabled={count >= QTY_CAP}
+          disabled={count >= ITEM_LIMIT}
           onClick={() => onChange(1)}
         >
           +

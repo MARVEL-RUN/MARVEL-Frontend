@@ -11,9 +11,13 @@ import {
 } from "react";
 import { useRegistrationOptions } from "@/components/main/register/useRegistrationOptions";
 import { VIRTUAL_RUN_EVENT_ID } from "@/lib/main/config";
+import { findCategory } from "@/lib/registration-options";
 import { readLoginSession } from "@/lib/virtual-run/login-session";
-import { logoutParticipantSession } from "@/services/main/participant-auth";
-import { ownedRoundIdsForCategory } from "@/lib/virtual-run/owned-rounds";
+import { fetchParticipantEntries, logoutParticipantSession } from "@/services/main/participant-auth";
+import {
+  ownedRoundIdsForCategories,
+  ownedRoundIdsForCategory,
+} from "@/lib/virtual-run/owned-rounds";
 import {
   clearParticipant,
   readParticipant,
@@ -53,20 +57,45 @@ export function VirtualRunParticipantProvider({ children }: { children: ReactNod
   }, []);
 
   useEffect(() => {
-    if (!hydrated || !participant || options.loading || !options.categories.length) return;
+    if (!hydrated || options.loading || !options.categories.length) return;
     const session = readLoginSession();
-    const eventCategoryId =
-      session?.eventCategoryId?.trim() ||
-      options.categories.find((item) => item.categoryName === participant.categoryName?.trim())
-        ?.categoryId ||
-      "";
-    if (!eventCategoryId) return;
-    const owned = ownedRoundIdsForCategory(options.categories, eventCategoryId);
-    if (!owned.length || sameRoundIds(participant.ownedRoundIds, owned)) return;
-    const next = { ...participant, ownedRoundIds: owned };
-    writeParticipant(next);
-    setParticipant(next);
-  }, [hydrated, participant, options.loading, options.categories]);
+    if (!session?.tokens?.accessToken) return;
+    let cancelled = false;
+    fetchParticipantEntries()
+      .then((entries) => {
+        if (cancelled) return;
+        const ids = [
+          ...new Set(
+            entries.flatMap((entry) => [entry.eventCategoryId, entry.productId].filter(Boolean)),
+          ),
+        ];
+        const owned = ids.length
+          ? ownedRoundIdsForCategories(options.categories, ids)
+          : ownedRoundIdsForCategory(options.categories, session.eventCategoryId?.trim() || "");
+        const hasSingleProduct = entries.some(
+          (entry) => findCategory(options.categories, entry.productId)?.productType === "SINGLE",
+        );
+        if (!owned.length) return;
+        setParticipant((current) => {
+          if (!current) return current;
+          if (
+            sameRoundIds(current.ownedRoundIds, owned) &&
+            current.hasSingleProduct === hasSingleProduct
+          ) {
+            return current;
+          }
+          const next = { ...current, ownedRoundIds: owned, hasSingleProduct };
+          writeParticipant(next);
+          return next;
+        });
+      })
+      .catch(() => {
+        /* 엔트리를 못 받으면 지금 회차를 유지한다 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, options.loading, options.categories]);
 
   const login = useCallback((patch: Partial<VirtualRunParticipant>) => {
     const base = readParticipant() ?? defaultParticipant();
