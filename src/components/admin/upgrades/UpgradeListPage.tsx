@@ -151,36 +151,31 @@ export function UpgradeListPage({ eventId }: { eventId: string }) {
           </>
         }
         columns={[
-          { key: "name", header: "신청자", width: "140px", render: (row) => row.name || "-" },
+          { key: "name", header: "신청자", render: (row) => row.name || "-" },
           {
             key: "current",
             header: "지금 종목",
-            width: "160px",
             render: (row) => row.currentCategoryName || "-",
           },
           {
             key: "target",
             header: "대상 패키지",
-            width: "160px",
             render: (row) => row.targetCategoryName || "-",
           },
-          { key: "amount", header: "차액", width: "100px", render: (row) => won(row.amount) },
+          { key: "amount", header: "차액", render: (row) => won(row.amount) },
           {
             key: "applied",
             header: "신청일",
-            width: "148px",
             render: (row) => formatAdminBoardDate(row.appliedAt),
           },
           {
             key: "requested",
             header: "요청 시각",
-            width: "148px",
             render: (row) => formatAdminBoardDate(row.requestedAt),
           },
           {
             key: "pay",
             header: "결제",
-            width: "88px",
             render: (row) => paymentLabel(row.lastPaymentStatus),
           },
           {
@@ -204,8 +199,6 @@ export function UpgradeListPage({ eventId }: { eventId: string }) {
           {
             key: "cancel",
             header: "관리",
-            className: "is-manage",
-            width: "96px",
             render: (row) => (
               <button
                 type="button"
