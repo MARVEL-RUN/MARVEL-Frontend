@@ -101,6 +101,7 @@ export type AdminApplicationRow = {
   referenceFilterLabel?: string;
   entries?: AdminRegistrationEntry[];
   entriesEditable?: boolean;
+  bibNumbers?: string[];
 };
 
 export type AdminRegistrationEntry = {
@@ -144,6 +145,7 @@ type RegistrationListItem = {
   startGroupCode?: string;
   startGroupUnselected?: unknown;
   referenceFilter?: unknown;
+  bibNumbers?: unknown;
 };
 
 type RegistrationDetail = {
@@ -213,6 +215,7 @@ export type RegistrationListParams = RegistrationFilterParams & {
   size: number;
   startGroupCode?: string;
   startGroupUnselected?: StartGroupUnselectedFilter;
+  bibNumber?: string;
 };
 
 export type RegistrationExcelParams = RegistrationFilterParams;
@@ -243,6 +246,14 @@ function asSelectedSouvenirList(value: unknown): AdminSelectedSouvenir[] {
     const souvenirId = asText(row.souvenirId);
     if (!souvenirId) return [];
     return [{ souvenirId, selectedSize: asText(row.selectedSize) || null }];
+  });
+}
+
+function asBibNumbers(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    const text = asText(item);
+    return text ? [text] : [];
   });
 }
 
@@ -419,6 +430,7 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
     startGroupCode: asText(item.startGroupCode) || undefined,
     startGroupUnselected: asOptionalBool(item.startGroupUnselected),
     referenceFilterLabel: referenceFilterDisplay(item.referenceFilter) || undefined,
+    bibNumbers: asBibNumbers(item.bibNumbers),
   };
 }
 
@@ -580,6 +592,7 @@ export function fetchAdminRegistrations(params: RegistrationListParams) {
   if (params.startGroupUnselected) {
     query.set("startGroupUnselected", params.startGroupUnselected);
   }
+  if (params.bibNumber?.trim()) query.set("bibNumber", params.bibNumber.trim());
   query.set("page", String(params.page));
   query.set("size", String(params.size));
 

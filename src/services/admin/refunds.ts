@@ -85,6 +85,7 @@ export type AdminRefundItem = {
   organizationId?: string | null;
   status?: string;
   errorCode?: string | null;
+  message?: string | null;
   startedAt?: string | null;
   finishedAt?: string | null;
   preparation?: AdminRefundPreparation | null;

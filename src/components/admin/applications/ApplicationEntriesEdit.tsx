@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ENTRY_ERROR: Record<string, string> = {
-  REGISTRATION_ENTRY_PACKAGE_ONLY: "패키지 신청만 받는 사람을 수정할 수 있습니다.",
+  REGISTRATION_ENTRY_PACKAGE_ONLY: "패키지 신청만 참가자를 수정할 수 있습니다.",
   REGISTRATION_ENTRY_DUPLICATED: "같은 참가 항목을 두 번 보낼 수 없습니다.",
   INVALID_REGISTRATION_ENTRIES: "이 신청의 참가 항목이 아닙니다.",
   GUARDIAN_NAME_REQUIRED: "보호자 이름이 필요합니다.",
@@ -104,7 +104,7 @@ function errorText(error: unknown) {
   const message = error instanceof Error ? error.message.trim() : "";
   if (message && ENTRY_ERROR[message]) return ENTRY_ERROR[message];
   if (message) return message;
-  return "받는 사람 정보를 수정하지 못했습니다.";
+  return "참가자 정보를 수정하지 못했습니다.";
 }
 
 export function ApplicationEntriesEdit({
@@ -155,7 +155,7 @@ export function ApplicationEntriesEdit({
   return (
     <form className="admin-drawer__edit" onSubmit={submit} noValidate>
       <p className="admin-drawer__edit-note">
-        패키지 받는 사람의 이름·연락처·생년월일·성별만 수정됩니다. 배번은 바뀌지 않습니다.
+        참가자의 이름·연락처·생년월일·성별만 수정됩니다. 배번은 바뀌지 않습니다.
       </p>
       {rows.map((row) => (
         <section key={row.entryId} className="admin-drawer__section">

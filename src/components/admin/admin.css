@@ -768,6 +768,11 @@ body.admin-mode {
   min-width: 160px;
 }
 
+.admin-apps-list__bib {
+  width: 108px;
+  min-width: 108px;
+}
+
 .admin-apps-list__search-actions {
   display: inline-flex;
   align-items: center;
@@ -3628,6 +3633,133 @@ body.admin-mode {
   border-radius: 4px;
   background: #fff;
   color: var(--admin-ink);
+}
+
+.admin-vr-rounds {
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid var(--admin-line);
+}
+
+.admin-reg-stats-event__body .admin-vr-rounds {
+  margin-bottom: 0;
+}
+
+.admin-vr-rounds__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-vr-rounds__head h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.admin-vr-rounds__head p,
+.admin-vr-rounds__status {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-vr-rounds__status {
+  padding: 12px 14px;
+}
+
+.admin-vr-rounds__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-vr-rounds__name {
+  width: 52px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-vr-rounds__phase {
+  width: 36px;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+
+.admin-vr-rounds__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.admin-vr-rounds__field input {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #cfd5de;
+  border-radius: 2px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-vr-rounds__field input:disabled {
+  background: #f4f6f8;
+  color: var(--admin-muted);
+}
+
+.admin-vr-rounds__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.admin-vr-rounds__tip {
+  position: relative;
+  display: inline-flex;
+}
+
+.admin-vr-rounds__tip-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.admin-vr-rounds__tip-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  z-index: 3;
+  display: none;
+  padding: 6px 8px;
+  border-radius: 2px;
+  background: #1f2430;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.admin-vr-rounds__tip:hover .admin-vr-rounds__tip-bubble {
+  display: block;
+}
+
+.admin-vr-rounds__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
 }
 
 .admin-select {
