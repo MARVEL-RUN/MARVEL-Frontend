@@ -610,7 +610,7 @@ export function ApplicationDetailDrawer({
       queryClient.invalidateQueries({ queryKey: ["admin", "registration", row.id] }),
       queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
     ]);
-    adminToast.success("받는 사람 정보가 수정되었습니다.");
+    adminToast.success("참가자 정보가 수정되었습니다.");
     setEditingEntries(false);
     setEditError("");
   };
@@ -738,7 +738,7 @@ export function ApplicationDetailDrawer({
                 <span className="admin-drawer__edit-badge">기본정보 수정</span>
               ) : null}
               {editingEntries ? (
-                <span className="admin-drawer__edit-badge">받는 사람 수정</span>
+                <span className="admin-drawer__edit-badge">참가자 수정</span>
               ) : null}
               {adjusting ? (
                 <span className="admin-drawer__edit-badge">종목 변경</span>
@@ -785,7 +785,7 @@ export function ApplicationDetailDrawer({
                   setEditingEntries(true);
                 }}
               >
-                받는 사람 수정
+                참가자 수정
               </button>
             ) : null}
             {!isGroup && !formOpen ? (

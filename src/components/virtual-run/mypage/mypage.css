@@ -995,6 +995,41 @@
   margin: 1.6rem auto;
 }
 
+.virtual-run .vr-edit-back {
+  margin-bottom: 2.8rem;
+}
+
+.virtual-run .vr-edit-runners .vr-recipients__all {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.35rem 0.85rem;
+}
+
+.virtual-run .vr-edit-runners .vr-recipients__same {
+  gap: 0.45rem;
+  padding: 0.15rem 0;
+  border: 0;
+  background: none;
+  color: var(--silver);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.virtual-run .vr-edit-runners .vr-recipients__same input {
+  width: 0.95rem;
+  height: 0.95rem;
+  accent-color: var(--marvel-hi);
+}
+
+.virtual-run .vr-edit-runners .vr-recipients__same.is-on {
+  border: 0;
+  background: none;
+  color: var(--marvel-hi);
+}
+
 .virtual-run .block > .apply-hint .flow__nav,
 .virtual-run .block > .ticket-notice + .vr-cert-form {
   margin-top: 1.5rem;

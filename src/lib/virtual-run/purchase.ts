@@ -4,7 +4,6 @@ import { shirtSouvenir } from "@/lib/registration-options";
 import {
   applicationPasswordError,
   filterNoSpaceName,
-  needsGuardian,
   termsAgreementFields,
   type Consents,
   type Gender,
@@ -67,21 +66,56 @@ export function toPackageUpgradeEntries(
   });
 }
 
-export function toVirtualRunCreateRequest(input: {
+export type VirtualRunItemDraft = {
   category: RegistrationCategory;
-  buyer: VirtualRunBuyerDraft;
   recipients: VirtualRunRecipientDraft[];
-  addressRequired: boolean;
-  consents: Consents;
-  selectedSize: string;
-}): RegistrationCreateRequest {
-  const { category, buyer } = input;
+  selectedSize?: string;
+};
+
+function itemFrom(line: VirtualRunItemDraft) {
+  const { category } = line;
   if (category.productType === "OPTION") {
     throw new Error("옵션 상품은 단독으로 구매할 수 없습니다.");
   }
   if (category.productType !== "SINGLE" && category.productType !== "PACKAGE") {
     throw new Error("구매할 수 있는 상품이 아닙니다.");
   }
+  if (category.productType === "SINGLE" && line.recipients.length !== 1) {
+    throw new Error("받는 사람을 입력하세요.");
+  }
+  if (category.productType === "PACKAGE" && !line.recipients.length) {
+    throw new Error("패키지 하위 종목이 없습니다.");
+  }
+  const entries: RegistrationEntryInput[] = line.recipients.map((recipient, index) => {
+    const fields = personFields(`참가자 ${index + 1}`, recipient);
+    return { eventCategoryId: recipient.eventCategoryId, ...fields };
+  });
+
+  const souvenir = shirtSouvenir(category);
+  const sizes = (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
+  const selectedSize = (line.selectedSize ?? "").trim() || (sizes.length === 1 ? sizes[0] : "");
+  if (souvenir && sizes.length && !sizes.includes(selectedSize)) {
+    throw new Error("키트 옵션을 선택하세요.");
+  }
+  const selectedSouvenirList =
+    souvenir && selectedSize ? [{ souvenirId: souvenir.souvenirId, selectedSize }] : [];
+
+  return {
+    eventCategoryId: category.categoryId,
+    selectedSouvenirList,
+    entries,
+  };
+}
+
+export function toVirtualRunItemsRequest(input: {
+  lines: VirtualRunItemDraft[];
+  buyer: VirtualRunBuyerDraft;
+  addressRequired: boolean;
+  consents: Consents;
+}): RegistrationCreateRequest {
+  const { buyer } = input;
+  if (!input.lines.length) throw new Error("패키지를 하나 이상 담아 주세요.");
+  if (input.lines.length > 10) throw new Error("한 신청에 상품은 10개까지 담을 수 있습니다.");
 
   const passwordError = applicationPasswordError(buyer.password);
   if (passwordError) throw new Error(passwordError);
@@ -91,57 +125,36 @@ export function toVirtualRunCreateRequest(input: {
     throw new Error("배송 주소를 입력하세요.");
   }
 
-  const births = [buyer.birth];
-  let entries: RegistrationEntryInput[] | undefined;
-  if (category.productType === "PACKAGE") {
-    if (!input.recipients.length) {
-      throw new Error("패키지 하위 종목이 없습니다.");
-    }
-    entries = input.recipients.map((recipient, index) => {
-      const fields = personFields(`참가자 ${index + 1}`, recipient);
-      births.push(recipient.birth);
-      return { eventCategoryId: recipient.eventCategoryId, ...fields };
-    });
-  }
-
-  const needGuardian = births.some((birth) => needsGuardian(birth));
-  const guardianName = filterNoSpaceName(buyer.guardianName);
-  if (needGuardian && !guardianName) {
-    throw new Error("만 14세 미만 참가자의 보호자 이름을 입력하세요.");
-  }
-  if (needGuardian && !buyer.guardianConsent) {
-    throw new Error("만 14세 미만 참가자에 대한 보호자 동의가 필요합니다.");
-  }
-
-  const souvenir = shirtSouvenir(category);
-  const sizes = (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
-  const selectedSize =
-    input.selectedSize.trim() || (sizes.length === 1 ? sizes[0] : "");
-  if (souvenir && sizes.length && !sizes.includes(selectedSize)) {
-    throw new Error("키트 옵션을 선택하세요.");
-  }
-  const selectedSouvenirList =
-    souvenir && selectedSize
-      ? [{ souvenirId: souvenir.souvenirId, selectedSize }]
-      : [];
-
-  const guardianPhone = phoneDigits(buyer.guardianPhone);
   return {
-    eventCategoryId: category.categoryId,
-    selectedSouvenirList,
+    items: input.lines.map(itemFrom),
     password: buyer.password.trim(),
     ...applicant,
     address: formatAddressForApi(buyer.zonecode.trim(), buyer.address.trim()),
     addressDetail: buyer.addressDetail.trim(),
-    ...(guardianName ? { guardianName } : {}),
-    ...(guardianPhone ? { guardianPhNum: guardianPhone } : {}),
-    ...(buyer.guardianRelation.trim()
-      ? { guardianRelationship: buyer.guardianRelation.trim() }
-      : {}),
-    guardianConsent: needGuardian ? buyer.guardianConsent : false,
     ...termsAgreementFields(input.consents),
     startGroupId: null,
     startGroupUnselected: true,
-    ...(entries ? { entries } : {}),
   };
+}
+
+export function toVirtualRunCreateRequest(input: {
+  category: RegistrationCategory;
+  buyer: VirtualRunBuyerDraft;
+  recipients: VirtualRunRecipientDraft[];
+  addressRequired: boolean;
+  consents: Consents;
+  selectedSize: string;
+}): RegistrationCreateRequest {
+  return toVirtualRunItemsRequest({
+    lines: [
+      {
+        category: input.category,
+        recipients: input.recipients,
+        selectedSize: input.selectedSize,
+      },
+    ],
+    buyer: input.buyer,
+    addressRequired: input.addressRequired,
+    consents: input.consents,
+  });
 }

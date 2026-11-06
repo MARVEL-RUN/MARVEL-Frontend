@@ -34,6 +34,7 @@ import {
   fetchAdminRegistrations,
   mapRegistrationPage,
   matchRaceEvent,
+  raceEventSlug,
   unpaidCancellationFailureText,
   type AdminApplicationRow,
   type ApplicationKind,
@@ -79,6 +80,7 @@ const UNSELECTED_OPTIONS: { value: StartGroupUnselectedFilter; label: string }[]
 
 type Applied = {
   q: string;
+  bib: string;
   kind: ApplicationKind | "";
   status: RegistrationStatus | "";
   eventCategoryId: string;
@@ -89,6 +91,7 @@ type Applied = {
 
 const EMPTY_APPLIED: Applied = {
   q: "",
+  bib: "",
   kind: "",
   status: "",
   eventCategoryId: "",
@@ -224,6 +227,7 @@ export function ApplicationsListPage({ slug }: Props) {
   const statusFromUrl = registrationStatusFromParam(searchParams.get("status"));
 
   const [q, setQ] = useState("");
+  const [bib, setBib] = useState("");
   const [kind, setKind] = useState<ApplicationKind | "">("");
   const [status, setStatus] = useState<RegistrationStatus | "">(statusFromUrl);
   const [course, setCourse] = useState("");
@@ -305,6 +309,11 @@ export function ApplicationsListPage({ slug }: Props) {
     ];
   }, [optionsQuery.data]);
 
+  const showBib =
+    Boolean(slug && getAdminRaceEvent(slug)?.hasRounds) ||
+    (apiEvent ? raceEventSlug(apiEvent) === "virtual" : false) ||
+    optionsQuery.data?.eventFormat === "VIRTUAL";
+
   const listQuery = useQuery({
     queryKey: ["admin", "registrations", apiEventId, applied, page],
     queryFn: async () => {
@@ -313,6 +322,7 @@ export function ApplicationsListPage({ slug }: Props) {
         type: applied.kind,
         status: applied.status,
         keyword: applied.q,
+        bibNumber: applied.bib,
         eventCategoryId: applied.eventCategoryId,
         startGroupCode: applied.startGroupCode,
         startGroupUnselected: applied.startGroupUnselected,
@@ -383,6 +393,7 @@ export function ApplicationsListPage({ slug }: Props) {
   const runSearch = () => {
     setApplied({
       q,
+      bib,
       kind,
       status,
       eventCategoryId: course,
@@ -395,6 +406,7 @@ export function ApplicationsListPage({ slug }: Props) {
 
   const resetSearch = () => {
     setQ("");
+    setBib("");
     setKind("");
     setStatus("");
     setCourse("");
@@ -585,6 +597,22 @@ export function ApplicationsListPage({ slug }: Props) {
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
     },
     {
+      key: "bib",
+      header: "배번",
+      className: "is-clip",
+      width: "120px",
+      render: (row: AdminApplicationRow) => {
+        const text = row.bibNumbers?.filter(Boolean).join(" · ") ?? "";
+        return text ? (
+          <span className="admin-apps-list__clip" title={text}>
+            {text}
+          </span>
+        ) : (
+          "-"
+        );
+      },
+    },
+    {
       key: "startGroup",
       header: "출발 그룹",
       className: "is-course",
@@ -632,7 +660,11 @@ export function ApplicationsListPage({ slug }: Props) {
       width: "124px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
-  ].filter((col) => hasStartGroupFeature || col.key !== "startGroup");
+  ].filter(
+    (col) =>
+      (hasStartGroupFeature || col.key !== "startGroup") &&
+      (showBib || col.key !== "bib"),
+  );
 
   return (
     <div
@@ -764,6 +796,18 @@ export function ApplicationsListPage({ slug }: Props) {
               }}
               placeholder="이름 · 단체명 · 연락처"
             />
+            {showBib ? (
+              <input
+                className="admin-toolbar__search admin-apps-list__bib"
+                value={bib}
+                onChange={(e) => setBib(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") runSearch();
+                }}
+                placeholder="배번"
+                aria-label="배번"
+              />
+            ) : null}
             <div className="admin-apps-list__search-actions">
               <button
                 type="button"

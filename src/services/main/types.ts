@@ -119,10 +119,19 @@ export type SelectedSouvenir = {
   selectedSize: string;
 };
 
-export type RegistrationCreateRequest = {
-  discountLinkCode?: string;
+export type RegistrationItemInput = {
   eventCategoryId: string;
   selectedSouvenirList: SelectedSouvenir[];
+  entries: RegistrationEntryInput[];
+};
+
+export type RegistrationCreateRequest = {
+  discountLinkCode?: string;
+  /** 일반 종목. 상품(단품·패키지)은 items만 보내고 비운다 */
+  eventCategoryId?: string;
+  selectedSouvenirList?: SelectedSouvenir[];
+  /** 상품 한 줄. 단품·패키지는 이 배열로만 신청한다 */
+  items?: RegistrationItemInput[];
   password: string;
   name: string;
   phNum: string;
@@ -138,7 +147,7 @@ export type RegistrationCreateRequest = {
   termsMarketingAgreed: boolean;
   termsMarketingChannelAgreed: boolean;
   email?: string;
-  /** 패키지 하위 종목별 받는 사람. 단품·기존 종목은 보내지 않는다 */
+  /** 일반 종목용. 상품 신청에서는 넣지 않는다 */
   entries?: RegistrationEntryInput[];
 } & StartGroupInput;
 

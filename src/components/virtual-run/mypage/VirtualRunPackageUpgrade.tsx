@@ -18,17 +18,20 @@ import {
   packageChildCategories,
 } from "@/lib/registration-options";
 import { uiGenderFromApi } from "@/lib/registration-gender";
-import { formatFee, type Gender } from "@/lib/register";
+import { filterNoSpaceName, formatFee, type Gender } from "@/lib/register";
+import { VR_ASSEMBLE_PACKAGE } from "@/lib/virtual-run/packages";
 import { readLoginSession } from "@/lib/virtual-run/login-session";
 import { toPackageUpgradeEntries, type VirtualRunRecipientDraft } from "@/lib/virtual-run/purchase";
 import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
 import {
   cancelPackageUpgrade,
+  fetchParticipantEntries,
+  fetchPendingPackageUpgrade,
   reopenPackageUpgradePayment,
   requestPackageUpgrade,
+  type ParticipantEntry,
 } from "@/services/main/participant-auth";
-import { lookupIndividualRegistrations } from "@/services/main/registrations";
-import type { PackageUpgradeOrder, RegistrationReceipt } from "@/services/main/types";
+import type { PackageUpgradeOrder } from "@/services/main/types";
 import { useVrPath, VrLink } from "../layout/VrLink";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VrMypageGate } from "./VrMypageGate";
@@ -44,10 +47,6 @@ function birthDigits(value?: string | null) {
   return (value ?? "").replace(/\D/g, "").slice(0, 8);
 }
 
-function pickReceipt(rows: RegistrationReceipt[]) {
-  return rows.find((row) => row.registrationId?.trim()) ?? rows[0] ?? null;
-}
-
 function roundAccent(categoryId: string, categoryName: string, index: number) {
   const text = `${categoryId} ${categoryName}`.toLowerCase();
   if (text.includes("avenger") || categoryName.includes("어벤")) return "gold";
@@ -56,11 +55,37 @@ function roundAccent(categoryId: string, categoryName: string, index: number) {
   return (["gold", "red", "blue"] as const)[index % 3];
 }
 
+function themeName(categoryId: string, categoryName: string) {
+  const text = `${categoryId} ${categoryName}`.toLowerCase();
+  if (text.includes("avenger") || categoryName.includes("어벤")) return "어벤져스";
+  if (text.includes("xmen") || text.includes("x-men") || categoryName.includes("엑스")) return "엑스맨";
+  if (text.includes("fantastic") || categoryName.includes("판타")) return "판타스틱4";
+  return categoryName;
+}
+
+function birthLabel(ymd: string) {
+  if (!/^\d{8}$/.test(ymd)) return "";
+  return `${ymd.slice(0, 4)}.${ymd.slice(4, 6)}.${ymd.slice(6, 8)}`;
+}
+
+function genderLabel(gender: Gender | "") {
+  if (gender === "male") return "남성";
+  if (gender === "female") return "여성";
+  return "";
+}
+
+function phoneLabel(raw: string) {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 11) return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  return digits;
+}
+
 export function VirtualRunPackageUpgrade() {
   const router = useRouter();
   const toHref = useVrPath();
   const options = useRegistrationOptions(VIRTUAL_RUN_EVENT_ID);
-  const [receipt, setReceipt] = useState<RegistrationReceipt | null>(null);
+  const [entries, setEntries] = useState<ParticipantEntry[]>([]);
+  const [pending, setPending] = useState<PackageUpgradeOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -68,15 +93,16 @@ export function VirtualRunPackageUpgrade() {
 
   useEffect(() => {
     const session = readLoginSession();
-    if (!session || !VIRTUAL_RUN_EVENT_ID) {
+    if (!session?.tokens?.accessToken || !VIRTUAL_RUN_EVENT_ID) {
       setLoading(false);
       return;
     }
     let cancelled = false;
-    lookupIndividualRegistrations(VIRTUAL_RUN_EVENT_ID, session.access)
-      .then((found) => {
+    Promise.all([fetchParticipantEntries(), fetchPendingPackageUpgrade()])
+      .then(([rows, order]) => {
         if (cancelled) return;
-        setReceipt(pickReceipt(found));
+        setEntries(rows);
+        setPending(order);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -90,7 +116,15 @@ export function VirtualRunPackageUpgrade() {
     };
   }, []);
 
-  const category = findCategory(options.categories, receipt?.eventCategoryId || "");
+  const singleEntry =
+    entries.find((entry) => findCategory(options.categories, entry.productId)?.productType === "SINGLE") ??
+    entries.find(
+      (entry) => findCategory(options.categories, entry.eventCategoryId)?.productType === "SINGLE",
+    );
+  const category = findCategory(
+    options.categories,
+    singleEntry?.productId || singleEntry?.eventCategoryId || "",
+  );
   const targetId = category?.parentCategoryId?.trim() || "";
   const target = targetId ? findCategory(options.categories, targetId) : undefined;
   const others = useMemo(
@@ -122,14 +156,19 @@ export function VirtualRunPackageUpgrade() {
     });
   }, [others]);
 
+  const session = readLoginSession();
+  const applicantEntry =
+    entries.find((entry) => entry.phNum === (session?.access.phNum ?? "").replace(/\D/g, "")) ??
+    entries[0];
   const applicant = {
-    name: receipt?.name?.trim() || "",
-    phone: receipt?.phNum?.trim() || "",
-    birth: birthDigits(receipt?.birth),
-    gender: (uiGenderFromApi(receipt?.gender) ?? "") as Gender | "",
+    name: session?.access.name.trim() || applicantEntry?.name || "",
+    phone: session?.access.phNum || applicantEntry?.phNum || "",
+    birth: birthDigits(session?.access.birth || applicantEntry?.birth),
+    gender: (uiGenderFromApi(applicantEntry?.gender) ?? "") as Gender | "",
   };
-  const pending = receipt?.pendingUpgrade ?? null;
-  const alreadyPackage = category?.productType === "PACKAGE";
+  const alreadyPackage =
+    !singleEntry &&
+    entries.some((entry) => findCategory(options.categories, entry.productId)?.productType === "PACKAGE");
   const loggedOut = !readLoginSession()?.tokens?.accessToken;
 
   function openPayment(order: PackageUpgradeOrder) {
@@ -165,11 +204,7 @@ export function VirtualRunPackageUpgrade() {
     setBusy(true);
     try {
       await cancelPackageUpgrade();
-      const session = readLoginSession();
-      if (session && VIRTUAL_RUN_EVENT_ID) {
-        const found = await lookupIndividualRegistrations(VIRTUAL_RUN_EVENT_ID, session.access);
-        setReceipt(pickReceipt(found));
-      }
+      setPending(null);
       setError("");
     } catch (err) {
       setError(errorMessage(err));
@@ -274,84 +309,146 @@ export function VirtualRunPackageUpgrade() {
               </div>
             </section>
           ) : (
-            <form className="form" onSubmit={(event) => void onSubmit(event)} noValidate>
+            <form className="form vr-edit-runners" onSubmit={(event) => void onSubmit(event)} noValidate>
               <FormSec
-                title={target.categoryName || "패키지"}
-                note="지금 단품을 뺀 회차의 참가자를 입력합니다. 배송지는 신청한 주소 그대로입니다."
+                kicker="02 / RUNNER"
+                title="패키지별 참가자"
+                note="지금 단품을 뺀 회차의 참가자를 입력합니다. 신청자와 같으면 체크합니다. 배송지는 신청한 주소 그대로입니다."
               >
                 <FormRow label="지금 티켓" locked>
-                  <p className="form-row__hint">{category ? categoryLabel(category) : "단품"}</p>
+                  <p className="form-row__hint">
+                    {singleEntry?.productName || (category ? categoryLabel(category) : "단품")}
+                  </p>
                 </FormRow>
-              </FormSec>
-              <ul className="vr-recipients">
-                {others.map((child, index) => {
-                  const row =
-                    recipients.find((item) => item.eventCategoryId === child.categoryId) ??
-                    ({
-                      eventCategoryId: child.categoryId,
-                      sameAs: false,
-                      name: "",
-                      phone: "",
-                      birth: "",
-                      gender: "",
-                    } satisfies RecipientRow);
-                  const shown = row.sameAs ? { ...row, ...applicant } : row;
-                  return (
-                    <li key={child.categoryId} className={`is-${roundAccent(child.categoryId, child.categoryName, index)}`}>
-                      <div className="vr-recipients__head">
-                        <strong>{categoryLabel(child)}</strong>
-                        <label className={`vr-recipients__same${row.sameAs ? " is-on" : ""}`}>
-                          <input
-                            type="checkbox"
-                            checked={row.sameAs}
-                            onChange={(e) => {
-                              const sameAs = e.target.checked;
-                              setRecipients((prev) =>
-                                prev.map((item) =>
-                                  item.eventCategoryId === child.categoryId
-                                    ? {
-                                        ...item,
-                                        sameAs,
-                                        ...(sameAs ? applicant : {}),
-                                      }
-                                    : item,
-                                ),
-                              );
-                            }}
-                          />
-                          신청자 정보와 동일
-                        </label>
+                {others.length > 1 ? (
+                  <div className="vr-recipients__all">
+                    <label className={`vr-recipients__same${recipients.length > 0 && recipients.every((row) => row.sameAs) ? " is-on" : ""}`}>
+                      <input
+                        type="checkbox"
+                        checked={recipients.length > 0 && recipients.every((row) => row.sameAs)}
+                        disabled={busy}
+                        onChange={(e) => {
+                          const sameAs = e.target.checked;
+                          setRecipients((prev) =>
+                            prev.map((item) => ({
+                              ...item,
+                              sameAs,
+                              ...(sameAs ? applicant : {}),
+                            })),
+                          );
+                        }}
+                      />
+                      모두 신청자와 동일
+                    </label>
+                  </div>
+                ) : null}
+                <ul className="vr-pkg-lines">
+                  <li className={`is-${VR_ASSEMBLE_PACKAGE.accent}`}>
+                    <img src={VR_ASSEMBLE_PACKAGE.image} alt="" width={72} height={72} />
+                    <div className="vr-pkg-lines__body">
+                      <div className="vr-pkg-lines__head">
+                        <strong>1. {VR_ASSEMBLE_PACKAGE.name}</strong>
                       </div>
-                      <FormRow label="이름" required>
-                        <input
-                          type="text"
-                          value={shown.name}
-                          onChange={(e) => patchRecipient(child.categoryId, { name: e.target.value })}
-                        />
-                      </FormRow>
-                      <FormRow label="생년월일" required>
-                        <BirthPick
-                          value={shown.birth}
-                          onChange={(birth) => patchRecipient(child.categoryId, { birth })}
-                        />
-                      </FormRow>
-                      <FormRow label="휴대폰 번호" required>
-                        <PhoneField
-                          value={shown.phone}
-                          onChange={(phone) => patchRecipient(child.categoryId, { phone })}
-                        />
-                      </FormRow>
-                      <FormRow label="성별" required>
-                        <GenderPick
-                          name={`gender-${child.categoryId}`}
-                          value={shown.gender}
-                          onChange={(gender) => patchRecipient(child.categoryId, { gender })}
-                        />
-                      </FormRow>
-                    </li>
-                  );
-                })}
-              </ul>
+                      <div className="vr-pkg-lines__themes">
+                        {others.map((child, index) => {
+                          const row =
+                            recipients.find((item) => item.eventCategoryId === child.categoryId) ??
+                            ({
+                              eventCategoryId: child.categoryId,
+                              sameAs: false,
+                              name: "",
+                              phone: "",
+                              birth: "",
+                              gender: "",
+                            } satisfies RecipientRow);
+                          const shown = row.sameAs ? { ...row, ...applicant } : row;
+                          return (
+                            <div
+                              key={child.categoryId}
+                              className={`vr-pkg-lines__theme is-${roundAccent(child.categoryId, child.categoryName, index)}`}
+                            >
+                              <strong>{themeName(child.categoryId, child.categoryName)}</strong>
+                              <label className={`vr-recipients__same${row.sameAs ? " is-on" : ""}`}>
+                                <input
+                                  type="checkbox"
+                                  checked={row.sameAs}
+                                  disabled={busy}
+                                  onChange={(e) => {
+                                    const sameAs = e.target.checked;
+                                    setRecipients((prev) =>
+                                      prev.map((item) =>
+                                        item.eventCategoryId === child.categoryId
+                                          ? {
+                                              ...item,
+                                              sameAs,
+                                              ...(sameAs ? applicant : {}),
+                                            }
+                                          : item,
+                                      ),
+                                    );
+                                  }}
+                                />
+                                신청자와 동일
+                              </label>
+                              {row.sameAs ? (
+                                <p className="vr-pkg-lines__same">
+                                  {shown.name || "신청자"}
+                                  {" · "}
+                                  {birthLabel(birthDigits(shown.birth)) || "생년월일"}
+                                  {" · "}
+                                  {genderLabel(shown.gender) || "성별"}
+                                  {" · "}
+                                  {phoneLabel(shown.phone) || "휴대폰"}
+                                </p>
+                              ) : (
+                                <>
+                                  <FormRow label="이름" required>
+                                    <input
+                                      type="text"
+                                      value={shown.name}
+                                      maxLength={50}
+                                      placeholder="참가 이름"
+                                      disabled={busy}
+                                      onChange={(e) =>
+                                        patchRecipient(child.categoryId, {
+                                          name: filterNoSpaceName(e.target.value),
+                                        })
+                                      }
+                                    />
+                                  </FormRow>
+                                  <FormRow label="생년월일" required>
+                                    <BirthPick
+                                      value={shown.birth}
+                                      disabled={busy}
+                                      onChange={(birth) => patchRecipient(child.categoryId, { birth })}
+                                    />
+                                  </FormRow>
+                                  <FormRow label="휴대폰 번호" required>
+                                    <PhoneField
+                                      value={shown.phone}
+                                      placeholder="010-0000-0000"
+                                      disabled={busy}
+                                      onChange={(phone) => patchRecipient(child.categoryId, { phone })}
+                                    />
+                                  </FormRow>
+                                  <FormRow label="성별" required>
+                                    <GenderPick
+                                      name={`gender-${child.categoryId}`}
+                                      value={shown.gender}
+                                      disabled={busy}
+                                      onChange={(gender) => patchRecipient(child.categoryId, { gender })}
+                                    />
+                                  </FormRow>
+                                </>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </FormSec>
               {error ? (
                 <p className="form__err" role="alert">
                   {error}

@@ -1,6 +1,6 @@
 "use client";
 
-/** 신청 API는 상품 1건만 받는다. 티켓 화면은 VirtualRunPackageForm. */
+/** 상품 하나는 items 한 줄로 신청한다. 단품도 받는 사람을 받는다. */
 import { Check } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,6 @@ import {
 } from "@/lib/registration-options";
 import {
   GENDERS,
-  needsGuardian,
   type Consents,
   type Gender,
 } from "@/lib/register";
@@ -120,18 +119,28 @@ export function VirtualRunTicketPurchase({
   }, [kind, single, packageProduct]);
 
   useEffect(() => {
-    if (product?.productType !== "PACKAGE") {
+    if (product?.productType === "PACKAGE") {
+      setRecipients((prev) =>
+        children.map(
+          (child) =>
+            prev.find((row) => row.eventCategoryId === child.categoryId) ??
+            emptyRecipient(child.categoryId),
+        ),
+      );
+      return;
+    }
+    if (product?.productType !== "SINGLE") {
       setRecipients([]);
       return;
     }
-    setRecipients((prev) =>
-      children.map(
-        (child) =>
-          prev.find((row) => row.eventCategoryId === child.categoryId) ??
-          emptyRecipient(child.categoryId),
-      ),
-    );
-  }, [children, product?.productType]);
+    const categoryId = product.categoryId;
+    setRecipients((prev) => {
+      const kept = prev.find((row) => row.eventCategoryId === categoryId) ?? prev[0];
+      if (!kept) return [{ ...emptyRecipient(categoryId), sameAs: true }];
+      if (kept.eventCategoryId === categoryId && prev.length === 1) return prev;
+      return [{ ...kept, eventCategoryId: categoryId }];
+    });
+  }, [children, product?.categoryId, product?.productType]);
 
   function patchBuyer(patch: Partial<VirtualRunBuyerDraft>) {
     setBuyer((prev) => ({ ...prev, ...patch }));
@@ -190,9 +199,7 @@ export function VirtualRunTicketPurchase({
     );
   }
 
-  const guardianOn =
-    needsGuardian(buyer.birth) ||
-    resolvedRecipients().some((row) => needsGuardian(row.birth));
+  const recipientSlots = product?.productType === "PACKAGE" ? children : product ? [product] : [];
 
   async function onPay(e: FormEvent) {
     e.preventDefault();
@@ -396,21 +403,27 @@ export function VirtualRunTicketPurchase({
           ) : null}
         </FormSec>
 
-        {product.productType === "PACKAGE" ? (
+        {recipientSlots.length ? (
           <FormSec kicker="02 / RUNNERS" title="참가자">
             <div className="vr-recipients__all">
-              <p>회차마다 참가할 사람을 입력합니다. 본인이면 체크하세요.</p>
-              <label className={`vr-recipients__same${allSame ? " is-on" : ""}`}>
-                <input
-                  type="checkbox"
-                  checked={allSame}
-                  onChange={(e) => setAllSame(e.target.checked)}
-                />
-                모두 신청자 정보와 동일
-              </label>
+              <p>
+                {product.productType === "PACKAGE"
+                  ? "회차마다 참가할 사람을 입력합니다. 본인이면 체크하세요."
+                  : "받는 사람을 입력합니다. 본인이면 체크하세요."}
+              </p>
+              {recipientSlots.length > 1 ? (
+                <label className={`vr-recipients__same${allSame ? " is-on" : ""}`}>
+                  <input
+                    type="checkbox"
+                    checked={allSame}
+                    onChange={(e) => setAllSame(e.target.checked)}
+                  />
+                  모두 신청자 정보와 동일
+                </label>
+              ) : null}
             </div>
             <ul className="vr-recipients">
-              {children.map((child, index) => {
+              {recipientSlots.map((child, index) => {
                 const row =
                   recipients.find((item) => item.eventCategoryId === child.categoryId) ??
                   emptyRecipient(child.categoryId);
@@ -487,39 +500,6 @@ export function VirtualRunTicketPurchase({
                 );
               })}
             </ul>
-          </FormSec>
-        ) : null}
-
-        {guardianOn ? (
-          <FormSec kicker="03 / GUARDIAN" title="보호자">
-            <FormRow label="보호자 이름" required>
-              <input
-                type="text"
-                value={buyer.guardianName}
-                onChange={(e) => patchBuyer({ guardianName: e.target.value })}
-              />
-            </FormRow>
-            <FormRow label="보호자 연락처">
-              <PhoneField
-                value={buyer.guardianPhone}
-                onChange={(guardianPhone) => patchBuyer({ guardianPhone })}
-              />
-            </FormRow>
-            <FormRow label="관계">
-              <input
-                type="text"
-                value={buyer.guardianRelation}
-                onChange={(e) => patchBuyer({ guardianRelation: e.target.value })}
-              />
-            </FormRow>
-            <label className="vr-recipients__check">
-              <input
-                type="checkbox"
-                checked={buyer.guardianConsent}
-                onChange={(e) => patchBuyer({ guardianConsent: e.target.checked })}
-              />
-              만 14세 미만 참가자의 신청·개인정보 처리에 동의합니다.
-            </label>
           </FormSec>
         ) : null}
 
