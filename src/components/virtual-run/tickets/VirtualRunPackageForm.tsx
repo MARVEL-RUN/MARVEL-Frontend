@@ -40,7 +40,7 @@ import { toVirtualRunItemsRequest } from "@/lib/virtual-run/purchase";
 import { virtualRunRoundById, type VirtualRunRoundId } from "@/lib/virtual-run/rounds";
 import { virtualRunDemoEnabled } from "@/lib/virtual-run/site";
 import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
-import { createRegistration } from "@/services/main/registrations";
+import { submitVirtualRunRegistration } from "@/services/main/participant-auth";
 import { useVrPath } from "../layout/VrLink";
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -317,7 +317,7 @@ export function VirtualRunPackageForm({
         addressRequired: options.addressRequired,
         consents,
       });
-      const created = await createRegistration(VIRTUAL_RUN_EVENT_ID, body);
+      const created = await submitVirtualRunRegistration(VIRTUAL_RUN_EVENT_ID, body);
       const customerName = filterNoSpaceName(buyerName);
       const registration: PaymentOrder = {
         orderId: created.orderId,
@@ -341,7 +341,11 @@ export function VirtualRunPackageForm({
       setPayOpen(true);
     } catch (err) {
       setError(
-        err instanceof MainHttpError || err instanceof Error ? err.message : "신청에 실패했습니다.",
+        err instanceof MainHttpError && err.code === "REGISTRATION_ADDITIONAL_ORDER_LOGIN_REQUIRED"
+          ? "이미 신청한 내역이 있습니다. 로그인한 뒤 추가 주문해 주세요."
+          : err instanceof MainHttpError || err instanceof Error
+            ? err.message
+            : "신청에 실패했습니다.",
       );
     } finally {
       setSubmitting(false);

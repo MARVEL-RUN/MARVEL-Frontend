@@ -26,6 +26,7 @@ import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
 import {
   cancelPackageUpgrade,
   fetchParticipantEntries,
+  fetchParticipantOrder,
   fetchPendingPackageUpgrade,
   reopenPackageUpgradePayment,
   requestPackageUpgrade,
@@ -86,6 +87,7 @@ export function VirtualRunPackageUpgrade() {
   const options = useRegistrationOptions(VIRTUAL_RUN_EVENT_ID);
   const [entries, setEntries] = useState<ParticipantEntry[]>([]);
   const [pending, setPending] = useState<PackageUpgradeOrder | null>(null);
+  const [canceled, setCanceled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -98,11 +100,16 @@ export function VirtualRunPackageUpgrade() {
       return;
     }
     let cancelled = false;
-    Promise.all([fetchParticipantEntries(), fetchPendingPackageUpgrade()])
-      .then(([rows, order]) => {
+    Promise.all([
+      fetchParticipantEntries(),
+      fetchPendingPackageUpgrade(),
+      fetchParticipantOrder(session.registrationId),
+    ])
+      .then(([rows, order, current]) => {
         if (cancelled) return;
         setEntries(rows);
         setPending(order);
+        setCanceled(current.canceled);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -253,6 +260,16 @@ export function VirtualRunPackageUpgrade() {
               <div className="flow__nav">
                 <VrLink href="/login" className="btn btn--red">
                   로그인
+                </VrLink>
+              </div>
+            </section>
+          ) : canceled ? (
+            <section className="block wait">
+              <h2>취소한 주문입니다</h2>
+              <p className="sec__body">취소한 주문은 패키지로 상향할 수 없습니다.</p>
+              <div className="flow__nav">
+                <VrLink href="/mypage" className="btn btn--ghost">
+                  마이페이지
                 </VrLink>
               </div>
             </section>

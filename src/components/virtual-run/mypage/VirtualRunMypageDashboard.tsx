@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   combinedMedalCount,
@@ -22,6 +23,9 @@ import {
   VIRTUAL_RUN_ROUND_STATUS_TONE,
   maskPhone,
 } from "@/lib/virtual-run/status";
+import { readLoginSession } from "@/lib/virtual-run/login-session";
+import { fetchParticipantOrder } from "@/services/main/participant-auth";
+import type { ParticipantOrder } from "@/services/main/participant-orders";
 import { useVirtualRunParticipantOrDemo } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
 import { VrLink, useVrPath } from "../layout/VrLink";
@@ -77,6 +81,34 @@ export function VirtualRunMypageDashboard() {
   const ticket = ticketLabel(participant);
   const action = nextAction(participant);
   const packageRounds = isThreeRoundPackage(participant, ticket);
+  const [account, setAccount] = useState<{
+    orderCount: number;
+    order: ParticipantOrder | null;
+  }>({ orderCount: 0, order: null });
+
+  useEffect(() => {
+    const session = readLoginSession();
+    const orderCount = session?.orderCount ?? 0;
+    if (!session?.tokens?.accessToken || !session.registrationId) {
+      setAccount({ orderCount, order: null });
+      return;
+    }
+    let cancelled = false;
+    fetchParticipantOrder(session.registrationId)
+      .then((order) => {
+        if (!cancelled) setAccount({ orderCount, order });
+      })
+      .catch(() => {
+        if (!cancelled) setAccount({ orderCount, order: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const canceled = account.order?.canceled === true;
+  const canEdit = account.order ? !canceled && account.order.modifyAllowed && !account.order.hasPendingUpgrade : true;
+  const canUpgrade = account.order ? !canceled && !account.order.hasPendingUpgrade : true;
 
   function onLogout() {
     logout();
@@ -101,14 +133,26 @@ export function VirtualRunMypageDashboard() {
                     <span aria-hidden>·</span>
                     {maskPhone(participant.phone)}
                   </p>
-                  <VrLink href="/mypage/edit" className="vr-me__edit">
-                    신청 정보 수정
-                  </VrLink>
-                  {packageRounds ? null : (
+                  {canEdit ? (
+                    <VrLink href="/mypage/edit" className="vr-me__edit">
+                      신청 정보 수정
+                    </VrLink>
+                  ) : null}
+                  {canUpgrade && !packageRounds ? (
                     <VrLink href="/mypage/upgrade" className="vr-me__edit">
                       패키지 상향
                     </VrLink>
+                  ) : null}
+                  {account.orderCount > 1 ? (
+                    <VrLink href="/mypage/orders" className="vr-me__edit">
+                      주문 목록
+                    </VrLink>
+                  ) : (
+                    <VrLink href="/mypage/orders" className="vr-me__edit">
+                      내 주문
+                    </VrLink>
                   )}
+                  {canceled ? <p className="form__note">취소한 주문은 수정·상향할 수 없습니다.</p> : null}
                 </div>
 
                 <dl className="vr-me__facts">
