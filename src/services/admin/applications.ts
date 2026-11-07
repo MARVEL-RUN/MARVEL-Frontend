@@ -102,6 +102,23 @@ export type AdminApplicationRow = {
   entries?: AdminRegistrationEntry[];
   entriesEditable?: boolean;
   bibNumbers?: string[];
+  registrationId?: string;
+  entryId?: string;
+  itemId?: string;
+  productName?: string;
+  ordererName?: string;
+  ordererPhone?: string;
+  items?: AdminRegistrationItem[];
+};
+
+export type AdminRegistrationItem = {
+  itemId: string;
+  eventCategoryId: string;
+  eventCategoryName: string;
+  productType: string;
+  amount: number;
+  canceledAt: string | null;
+  souvenirs: AdminSelectedSouvenir[];
 };
 
 export type AdminRegistrationEntry = {
@@ -113,7 +130,13 @@ export type AdminRegistrationEntry = {
   birth: string;
   gender: string;
   bibNumber: string;
+  itemId?: string;
+  productName?: string;
 };
+
+export function applicationRegistrationId(row: Pick<AdminApplicationRow, "id" | "registrationId">) {
+  return row.registrationId?.trim() || row.id;
+}
 
 export type AdminSelectedSouvenir = {
   souvenirId: string;
@@ -146,6 +169,11 @@ type RegistrationListItem = {
   startGroupUnselected?: unknown;
   referenceFilter?: unknown;
   bibNumbers?: unknown;
+  entryId?: unknown;
+  itemId?: unknown;
+  productName?: unknown;
+  ordererName?: unknown;
+  ordererPhoneNumber?: unknown;
 };
 
 type RegistrationDetail = {
@@ -196,6 +224,7 @@ type RegistrationDetail = {
   referenceFilter?: unknown;
   entries?: unknown;
   entriesEditable?: unknown;
+  items?: unknown;
 };
 
 export type RegistrationFilterParams = {
@@ -398,8 +427,16 @@ function toRow(item: RegistrationListItem, eventId: string): AdminApplicationRow
   const personName = asText(item.name);
   const groupName = firstText(item.orgName, item.groupName, item.organizationName);
   const organizationId = firstText(item.organizationId, item.orgId) || undefined;
+  const registrationId = firstText(item.registrationId, item.id);
+  const entryId = asText(item.entryId);
   return {
-    id: firstText(item.registrationId, item.id),
+    id: entryId || registrationId,
+    registrationId,
+    entryId: entryId || undefined,
+    itemId: asText(item.itemId) || undefined,
+    productName: asText(item.productName) || undefined,
+    ordererName: asText(item.ordererName) || undefined,
+    ordererPhone: asText(item.ordererPhoneNumber) || undefined,
     no: asAmount(item.listNumber, 0),
     eventId,
     kind,
@@ -454,7 +491,7 @@ export function applyRegistrationDetail(
   const createdAt = asText(data.createdAt);
   const organizationId =
     firstText(data.organizationId, data.orgId) || row.organizationId;
-  return {
+  const merged: AdminApplicationRow = {
     ...row,
     personName,
     groupName,
@@ -494,6 +531,7 @@ export function applyRegistrationDetail(
       asOptionalBool(data.termsMarketingAgreed) ?? row.marketingConsent,
     eventCategoryId: firstText(data.eventCategoryId) || row.eventCategoryId,
     externalPayment: asOptionalBool(data.externalPayment) ?? row.externalPayment,
+    items: asRegistrationItems(data.items),
     startGroupId: firstText(data.startGroupId) || row.startGroupId,
     startGroupCode: firstText(data.startGroupCode) || row.startGroupCode,
     startGroupUnselected:
@@ -506,6 +544,22 @@ export function applyRegistrationDetail(
       referenceFilterDisplay(data.referenceFilter) || row.referenceFilterLabel,
     entries: asRegistrationEntries(data.entries),
     entriesEditable: asOptionalBool(data.entriesEditable) === true,
+  };
+  if (!row.entryId) return merged;
+  const ordererName = firstText(data.name) || row.ordererName;
+  const ordererPhone = firstText(data.phoneNumber, data.phNum) || row.ordererPhone;
+  return {
+    ...merged,
+    personName: row.personName,
+    name: row.name,
+    birth: row.birth || merged.birth,
+    gender: row.gender ?? merged.gender,
+    phone: row.phone || merged.phone,
+    courseName: row.courseName || merged.courseName,
+    productName: row.productName || merged.productName,
+    bibNumbers: row.bibNumbers?.length ? row.bibNumbers : merged.bibNumbers,
+    ordererName,
+    ordererPhone,
   };
 }
 
@@ -526,6 +580,29 @@ function asRegistrationEntries(value: unknown): AdminRegistrationEntry[] {
         birth: asText(row.birth),
         gender: asText(row.gender),
         bibNumber: firstText(row.bibNumber, row.bib),
+        itemId: asText(row.itemId) || undefined,
+        productName: asText(row.productName) || undefined,
+      },
+    ];
+  });
+}
+
+function asRegistrationItems(value: unknown): AdminRegistrationItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as Record<string, unknown>;
+    const itemId = asText(row.itemId);
+    if (!itemId) return [];
+    return [
+      {
+        itemId,
+        eventCategoryId: asText(row.eventCategoryId),
+        eventCategoryName: asText(row.eventCategoryName),
+        productType: asText(row.productType),
+        amount: asAmount(row.amount, 0),
+        canceledAt: asText(row.canceledAt) || null,
+        souvenirs: asSelectedSouvenirList(row.selectedSouvenirList),
       },
     ];
   });
@@ -794,6 +871,25 @@ export function updateRegistrationEntries(
     `v1/admin/registrations/${encodeURIComponent(registrationId)}/entries`,
     { method: "PATCH", body: JSON.stringify({ entries }) },
   ).then(asRegistrationEntries);
+}
+
+export async function cancelAdminRegistrationItem(
+  registrationId: string,
+  itemId: string,
+  reason: string,
+) {
+  const text = reason.trim();
+  if (!registrationId.trim() || !itemId.trim()) {
+    throw new Error("취소할 상품을 찾을 수 없습니다.");
+  }
+  if (!text) throw new Error("취소 사유를 입력하세요.");
+  if (text.length > 200) throw new Error("취소 사유는 200자까지 입력할 수 있습니다.");
+  const data = await adminFetch<unknown>(
+    `v1/admin/registrations/${encodeURIComponent(registrationId)}/items/${encodeURIComponent(itemId)}/cancellation`,
+    { method: "POST", body: JSON.stringify({ reason: text }) },
+  );
+  const row = data && typeof data === "object" ? (data as { orderCanceled?: unknown }) : {};
+  return { orderCanceled: row.orderCanceled === true };
 }
 
 export function resetRegistrationPassword(
