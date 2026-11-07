@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { noticeCategoryTone } from "@/lib/noticeCategories";
 import {
   listPublicNotices,
@@ -22,7 +23,7 @@ type NoticesPageProps = {
 };
 
 export function NoticesPage({
-  eventId,
+  eventId = DEFAULT_EVENT_ID,
   toHref,
   Banner = SideBanner,
 }: NoticesPageProps = {}) {

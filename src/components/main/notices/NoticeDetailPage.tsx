@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { noticeCategoryTone } from "@/lib/noticeCategories";
 import {
   getPublicNoticeDetail,
@@ -19,7 +20,7 @@ type NoticeDetailPageProps = {
 };
 
 export function NoticeDetailPage({
-  eventId,
+  eventId = DEFAULT_EVENT_ID,
   toHref,
 }: NoticeDetailPageProps = {}) {
   const href = (path: string) => (toHref ? toHref(path) : path);
