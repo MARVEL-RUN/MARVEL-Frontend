@@ -1169,3 +1169,38 @@
 .virtual-run .vr-order__confirm {
   margin-top: 0.75rem;
 }
+
+.virtual-run .vr-order__items {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.virtual-run .vr-order__items li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.virtual-run .vr-order__items li.is-off {
+  color: var(--note);
+}
+
+.virtual-run .vr-order__items strong,
+.virtual-run .vr-order__items span {
+  display: block;
+}
+
+.virtual-run .vr-order__items span {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+}
+
+.virtual-run .vr-order__select {
+  width: 100%;
+}

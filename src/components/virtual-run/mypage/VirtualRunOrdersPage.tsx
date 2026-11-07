@@ -9,6 +9,7 @@ import { readLoginSession, writeLoginSession } from "@/lib/virtual-run/login-ses
 import { syncVirtualRunSessionFromLookup } from "@/lib/virtual-run/sync-session";
 import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
 import {
+  cancelParticipantItem,
   cancelParticipantOrder,
   fetchParticipantOrders,
   retryParticipantPayment,
@@ -16,6 +17,7 @@ import {
 import {
   orderProductLabel,
   type ParticipantOrder,
+  type ParticipantOrderItem,
 } from "@/services/main/participant-orders";
 import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
@@ -64,6 +66,7 @@ export function VirtualRunOrdersPage() {
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
   const [confirmId, setConfirmId] = useState("");
+  const [confirmItemId, setConfirmItemId] = useState("");
 
   useEffect(() => {
     const session = readLoginSession();
@@ -113,6 +116,29 @@ export function VirtualRunOrdersPage() {
       setOrders(await fetchParticipantOrders());
     } catch (err) {
       setError(errorMessage(err, "주문을 취소하지 못했습니다."));
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function cancelItem(order: ParticipantOrder, item: ParticipantOrderItem) {
+    if (busyId) return;
+    setBusyId(item.itemId);
+    setError("");
+    try {
+      const result = await cancelParticipantItem(order.registrationId, item.itemId);
+      const refund =
+        result.refundCount > 0 ? ` 환불 ${formatFee(result.refundAmount)}.` : "";
+      const living = order.items.filter((row) => !row.canceledAt).length;
+      mainToast.success(
+        living <= 1
+          ? `마지막 상품이라 주문 전체를 취소했습니다.${refund}`
+          : `상품을 취소했습니다.${refund}`,
+      );
+      setConfirmItemId("");
+      setOrders(await fetchParticipantOrders());
+    } catch (err) {
+      setError(errorMessage(err, "상품을 취소하지 못했습니다."));
     } finally {
       setBusyId("");
     }
@@ -177,6 +203,7 @@ export function VirtualRunOrdersPage() {
                 Boolean(order.paymentId);
               const canCancel = !order.canceled && order.refundAllowed;
               const confirming = confirmId === order.registrationId;
+              const livingItems = order.items.filter((item) => !item.canceledAt);
               return (
                 <article key={order.registrationId} className="block vr-order">
                   <header className="vr-order__head">
@@ -198,6 +225,67 @@ export function VirtualRunOrdersPage() {
                   ) : null}
                   {order.canceled ? (
                     <p className="form__note">취소한 주문은 수정·환불·재결제를 할 수 없습니다.</p>
+                  ) : null}
+                  {order.items.length ? (
+                    <ul className="vr-order__items">
+                      {order.items.map((item) => {
+                        const canceled = Boolean(item.canceledAt);
+                        const itemKey = `${order.registrationId}:${item.itemId}`;
+                        const confirmingItem = confirmItemId === itemKey;
+                        const lastLiving = !canceled && livingItems.length <= 1;
+                        return (
+                          <li key={item.itemId} className={canceled ? "is-off" : undefined}>
+                            <div>
+                              <strong>{item.eventCategoryName || "상품"}</strong>
+                              <span>
+                                {formatFee(item.amount)}
+                                {canceled ? ` · 취소 ${whenLabel(item.canceledAt)}` : ""}
+                              </span>
+                            </div>
+                            {canCancel && !canceled && !confirmingItem ? (
+                              <button
+                                type="button"
+                                className="btn btn--ghost"
+                                disabled={Boolean(busyId)}
+                                onClick={() => {
+                                  setConfirmId("");
+                                  setConfirmItemId(itemKey);
+                                }}
+                              >
+                                이 상품 취소
+                              </button>
+                            ) : null}
+                            {confirmingItem ? (
+                              <div className="vr-order__confirm">
+                                <p>
+                                  {lastLiving
+                                    ? "남은 마지막 상품이라 주문 전체가 취소됩니다."
+                                    : "이 상품만 취소하고 그 금액을 환불합니다."}
+                                </p>
+                                <div className="flow__nav">
+                                  <button
+                                    type="button"
+                                    className="btn btn--red"
+                                    disabled={Boolean(busyId)}
+                                    onClick={() => void cancelItem(order, item)}
+                                  >
+                                    취소하기
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn--ghost"
+                                    disabled={Boolean(busyId)}
+                                    onClick={() => setConfirmItemId("")}
+                                  >
+                                    닫기
+                                  </button>
+                                </div>
+                              </div>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
                   ) : null}
                   <div className="flow__nav">
                     <button
@@ -223,7 +311,10 @@ export function VirtualRunOrdersPage() {
                         type="button"
                         className="btn btn--ghost"
                         disabled={Boolean(busyId)}
-                        onClick={() => setConfirmId(order.registrationId)}
+                        onClick={() => {
+                          setConfirmItemId("");
+                          setConfirmId(order.registrationId);
+                        }}
                       >
                         주문 취소
                       </button>
