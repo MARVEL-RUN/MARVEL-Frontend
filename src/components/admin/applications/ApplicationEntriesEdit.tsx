@@ -52,7 +52,9 @@ function toApiBirth(raw: string) {
 function draftFromEntry(entry: AdminRegistrationEntry): Draft {
   return {
     entryId: entry.entryId,
-    categoryName: entry.categoryName || entry.eventCategoryId || "종목",
+    categoryName:
+      [entry.productName, entry.categoryName || entry.eventCategoryId].filter(Boolean).join(" · ") ||
+      "종목",
     name: entry.name.trim(),
     phNum: digits(entry.phNum, 14),
     birth: digits(entry.birth, 8),

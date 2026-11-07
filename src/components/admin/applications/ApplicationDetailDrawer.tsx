@@ -18,14 +18,18 @@ import {
   adminMembersHref,
   adminOrganizationDetailHref,
 } from "@/lib/admin/eventLinks";
+import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { APPLICATION_PASSWORD_MIN, formatPhone } from "@/lib/register";
 import { genderLabel } from "@/lib/registration-gender";
 import {
   applicationCourseLabel,
   applicationGenderLabel,
   applicationKindLabel,
+  applicationRegistrationId,
   applicationStartGroupLabel,
+  cancelAdminRegistrationItem,
   deleteAdminRegistration,
+  formatAmount,
   hasPartialRefundIds,
   resetRegistrationPassword,
   type AdminApplicationRow,
@@ -379,7 +383,7 @@ export function ApplicationDetailDrawer({
 
   const resetPassword = useMutation({
     mutationFn: (password: string) =>
-      resetRegistrationPassword(row!.id, password),
+      resetRegistrationPassword(applicationRegistrationId(row!), password),
     onSuccess: () => adminToast.success("비밀번호가 초기화되었습니다."),
     onError: (err) =>
       adminToast.error(
@@ -388,7 +392,7 @@ export function ApplicationDetailDrawer({
   });
 
   const removeUnpaid = useMutation({
-    mutationFn: () => deleteAdminRegistration(row!.id),
+    mutationFn: () => deleteAdminRegistration(applicationRegistrationId(row!)),
     onSuccess: async (data) => {
       await invalidateAfterFinanceChange();
       const message = data?.message?.trim();
@@ -536,7 +540,7 @@ export function ApplicationDetailDrawer({
         body: {
           requestId: newRefundRequestId(),
           reason: reason.slice(0, REFUND_REASON_MAX),
-          registrationIds: row.kind === "group" ? [] : [row.id],
+          registrationIds: row.kind === "group" ? [] : [applicationRegistrationId(row)],
           organizationIds:
             row.kind === "group" ? [row.organizationId || row.id] : [],
         },
@@ -607,7 +611,7 @@ export function ApplicationDetailDrawer({
   const handleEntriesSaved = async () => {
     if (!row) return;
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["admin", "registration", row.id] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "registration", applicationRegistrationId(row)] }),
       queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
     ]);
     adminToast.success("참가자 정보가 수정되었습니다.");
@@ -618,7 +622,7 @@ export function ApplicationDetailDrawer({
   const handleBasicInfoSaved = async () => {
     if (!row) return;
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["admin", "registration", row.id] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "registration", applicationRegistrationId(row)] }),
       queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] }),
     ]);
     adminToast.success("기본정보가 수정되었습니다.");
@@ -633,7 +637,38 @@ export function ApplicationDetailDrawer({
   const blockGroupEdit = source === "applications" && isGroup;
   const canEditBasicInfo = !blockGroupEdit;
   const formOpen = editing || editingEntries || adjusting;
-  const entries = row.entries ?? [];
+  const items = row.items ?? [];
+  const canceledItemIds = new Set(
+    items.filter((item) => item.canceledAt).map((item) => item.itemId),
+  );
+  const entries = (row.entries ?? []).filter(
+    (entry) => !entry.itemId || !canceledItemIds.has(entry.itemId),
+  );
+  const registrationId = applicationRegistrationId(row);
+  const canCancelItem =
+    !row.externalPayment &&
+    !["PENDING", "PAYMENT_PENDING", "EXPIRED", "CANCELED"].includes(statusKey(row.status));
+
+  async function cancelItem(itemId: string, label: string) {
+    const reason = await prompt({
+      title: "상품 취소",
+      description: `${label}만 취소하고 그 금액을 환불합니다. 남은 마지막 상품이면 주문 전체가 취소됩니다.`,
+      label: "사유",
+      placeholder: "참가자 요청에 따른 상품 취소",
+      confirmLabel: "취소 요청",
+    });
+    if (!reason) return;
+    try {
+      const result = await cancelAdminRegistrationItem(registrationId, itemId, reason);
+      adminToast.success(
+        result.orderCanceled ? "마지막 상품이라 주문 전체를 취소했습니다." : "상품을 취소했습니다.",
+      );
+      await queryClient.invalidateQueries({ queryKey: ["admin", "registration", registrationId] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "registrations"] });
+    } catch (error) {
+      adminToast.error(error instanceof Error ? error.message : "상품을 취소하지 못했습니다.");
+    }
+  }
   const canEditEntries = !isGroup && row.entriesEditable === true && entries.length > 0;
   const canDeleteUnpaid = !formOpen && canDeleteUnpaidRegistration(row.status);
   const externalPayment = !isGroup && row.externalPayment === true;
@@ -716,7 +751,7 @@ export function ApplicationDetailDrawer({
           page={page}
           totalPages={totalPages}
           totalCount={totalCount}
-          highlightRegistrationId={isGroup ? undefined : row.id}
+          highlightRegistrationId={isGroup ? undefined : applicationRegistrationId(row)}
           activeLogPaymentId={logPayment?.paymentId ?? null}
           activeEvidenceCancelId={evidenceCancelId}
           onOpenLog={openLog}
@@ -878,7 +913,7 @@ export function ApplicationDetailDrawer({
 
           {!loading && !error && editingEntries ? (
             <ApplicationEntriesEdit
-              registrationId={row.id}
+              registrationId={applicationRegistrationId(row)}
               entries={entries}
               onCancel={() => {
                 setEditingEntries(false);
@@ -964,6 +999,60 @@ export function ApplicationDetailDrawer({
                 title={isGroup || isOrgMemberContext ? "참가자" : "신청자"}
                 fields={sections.personFields}
               />
+              {row.ordererName ? (
+                <DetailSection
+                  title="주문자"
+                  fields={[
+                    { label: "이름", value: dash(row.ordererName) },
+                    { label: "연락처", value: displayPhone(row.ordererPhone) },
+                  ]}
+                />
+              ) : null}
+              {items.length ? (
+                <section className="admin-drawer__section">
+                  <h2 className="admin-drawer__section-title">구매 상품</h2>
+                  {items.map((item) => {
+                    const label = item.eventCategoryName || item.itemId;
+                    return (
+                      <div key={item.itemId} className="admin-drawer__fields">
+                        <div className="admin-drawer__row">
+                          <dt>상품</dt>
+                          <dd>
+                            {dash(label)}
+                            {item.canceledAt ? ` · 취소 ${formatAdminBoardDate(item.canceledAt)}` : ""}
+                          </dd>
+                        </div>
+                        <div className="admin-drawer__row">
+                          <dt>금액</dt>
+                          <dd>{formatAmount(item.amount)}</dd>
+                        </div>
+                        <div className="admin-drawer__row">
+                          <dt>기념품</dt>
+                          <dd>
+                            {item.souvenirs.length
+                              ? `${item.souvenirs.length}종`
+                              : "기념품 확인이 필요합니다"}
+                          </dd>
+                        </div>
+                        {canCancelItem && !item.canceledAt ? (
+                          <div className="admin-drawer__row">
+                            <dt>취소</dt>
+                            <dd>
+                              <button
+                                type="button"
+                                className="admin-btn admin-btn--ghost admin-btn--danger-text"
+                                onClick={() => void cancelItem(item.itemId, label)}
+                              >
+                                이 상품 취소
+                              </button>
+                            </dd>
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </section>
+              ) : null}
               {entries.length ? (
                 <section className="admin-drawer__section">
                   <h2 className="admin-drawer__section-title">참가 항목</h2>
@@ -971,7 +1060,13 @@ export function ApplicationDetailDrawer({
                     <div key={entry.entryId} className="admin-drawer__fields">
                       <div className="admin-drawer__row">
                         <dt>종목</dt>
-                        <dd>{dash(entry.categoryName || entry.eventCategoryId)}</dd>
+                        <dd>
+                          {dash(
+                            [entry.productName, entry.categoryName || entry.eventCategoryId]
+                              .filter(Boolean)
+                              .join(" · "),
+                          )}
+                        </dd>
                       </div>
                       <div className="admin-drawer__row">
                         <dt>이름</dt>
