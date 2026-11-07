@@ -4,8 +4,11 @@ import { useAdminConfirm } from "@/components/admin/ConfirmModal";
 import { AdminSelect } from "@/components/admin/Select";
 import { AdminTableShell } from "@/components/admin/Table/AdminTableShell";
 import { adminToast } from "@/components/admin/Toast";
+import { hasAdminApi } from "@/lib/admin/config";
+import { adminNoticeEditHref, adminNoticeWriteHref } from "@/lib/admin/eventLinks";
 import { formatAdminBoardDate } from "@/lib/admin/formatDate";
 import { noticeCategoryTone } from "@/lib/noticeCategories";
+import { fetchAdminEvents } from "@/services/admin/applications";
 import {
   deleteAdminNotice,
   listAdminNotices,
@@ -16,7 +19,8 @@ import type { NoticeRow } from "@/types/main/notices";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type SearchField = "all" | "title" | "content";
 
@@ -41,6 +45,8 @@ function toTarget(field: SearchField): AdminNoticeSearchTarget {
 }
 
 export function NoticesAdminPage() {
+  const searchParams = useSearchParams();
+  const apiEventId = searchParams.get("eventId")?.trim() ?? "";
   const queryClient = useQueryClient();
   const [q, setQ] = useState("");
   const [field, setField] = useState<SearchField>("all");
@@ -48,17 +54,34 @@ export function NoticesAdminPage() {
   const [page, setPage] = useState(1);
   const { confirm, modal } = useAdminConfirm();
 
+  const eventsQuery = useQuery({
+    queryKey: ["admin", "events"],
+    queryFn: fetchAdminEvents,
+    enabled: hasAdminApi,
+  });
+
+  const eventTitle = useMemo(() => {
+    const events = eventsQuery.data ?? [];
+    return events.find((event) => event.eventId === apiEventId)?.eventName || "공지사항";
+  }, [apiEventId, eventsQuery.data]);
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin", "notices", applied, page],
+    queryKey: ["admin", "notices", apiEventId, applied, page],
     queryFn: () =>
       listAdminNotices({
+        eventId: apiEventId,
         target: toTarget(applied.field),
         keyword: applied.q.trim() || undefined,
         page: page - 1,
         size: PAGE_SIZE,
         sort: "LATEST",
       }),
+    enabled: hasAdminApi && Boolean(apiEventId),
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [apiEventId]);
 
   const remove = useMutation({
     mutationFn: deleteAdminNotice,
@@ -96,10 +119,14 @@ export function NoticesAdminPage() {
   return (
     <div className="admin-page">
       <AdminTableShell<NoticeRow>
-        title="공지사항"
+        title={eventTitle}
         rows={rows}
         loading={isLoading}
-        empty="등록된 공지가 없습니다."
+        empty={
+          !hasAdminApi
+            ? "관리자 API 주소가 설정되지 않았습니다."
+            : "등록된 공지가 없습니다."
+        }
         rowKey={(row) => row.id}
         page={page}
         pageCount={pageCount}
@@ -107,12 +134,15 @@ export function NoticesAdminPage() {
         onPage={setPage}
         pageUnit="게시물"
         actions={
-          <Link href="/admin/boards/notice/write" className="admin-btn admin-btn--red">
+          <Link href={adminNoticeWriteHref(apiEventId)} className="admin-btn admin-btn--red">
             등록하기
           </Link>
         }
         tools={
           <>
+            <Link href="/admin/boards/notice" className="admin-btn admin-btn--ghost">
+              대회 목록
+            </Link>
             <AdminSelect
               value={field}
               options={FIELD_OPTIONS}
@@ -157,7 +187,7 @@ export function NoticesAdminPage() {
             key: "title",
             header: "제목",
             render: (row) => (
-              <Link href={`/admin/boards/notice/edit?id=${row.id}`}>{row.title}</Link>
+              <Link href={adminNoticeEditHref(row.id, row.eventId || apiEventId)}>{row.title}</Link>
             ),
           },
           {

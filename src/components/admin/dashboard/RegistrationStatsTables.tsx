@@ -38,10 +38,12 @@ function StatsTable({
   title,
   courses,
   rows,
+  columnGroupLabel,
 }: {
   title: string;
   courses: string[];
   rows: RegistrationStatRow[] | null;
+  columnGroupLabel: string;
 }) {
   const skeleton = rows === null;
   return (
@@ -59,7 +61,7 @@ function StatsTable({
                 className="is-group is-course is-section-start"
                 colSpan={Math.max(courses.length, 1)}
               >
-                코스별
+                {columnGroupLabel}
               </th>
               <th className="is-group is-total is-section-start">합계</th>
               <th className="is-group is-pay is-section-start" colSpan={3}>
@@ -133,9 +135,11 @@ function StatsTable({
 export function RegistrationStatsTables({
   data,
   eventName,
+  columnGroupLabel = "코스별",
 }: {
   data?: RegistrationStatistics;
   eventName?: string;
+  columnGroupLabel?: string;
 }) {
   const courses = data ? orderedCourses(data.courseHeaders) : SKELETON_COURSES;
   const rowsByKey: Record<TableKey, RegistrationStatRow[]> | null = data
@@ -152,6 +156,7 @@ export function RegistrationStatsTables({
             title={table.title}
             courses={courses}
             rows={rowsByKey ? rowsByKey[table.key] : null}
+            columnGroupLabel={columnGroupLabel}
           />
         ))}
       </div>

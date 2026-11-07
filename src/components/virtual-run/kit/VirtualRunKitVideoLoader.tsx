@@ -6,6 +6,7 @@ import "./kit-medal-load.css";
 
 const FADE_MS = 750;
 const GIVE_UP_MS = 16000;
+const PLAYBACK_RATE = 1.5;
 
 export function VirtualRunKitVideoLoader({ children }: { children: ReactNode }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -30,6 +31,8 @@ export function VirtualRunKitVideoLoader({ children }: { children: ReactNode }) 
     if (!video) return;
     video.muted = true;
     video.volume = 0;
+    video.defaultPlaybackRate = PLAYBACK_RATE;
+    video.playbackRate = PLAYBACK_RATE;
     const play = video.play();
     if (play) play.catch(() => undefined);
 
@@ -60,6 +63,7 @@ export function VirtualRunKitVideoLoader({ children }: { children: ReactNode }) 
             onPlay={(e) => {
               e.currentTarget.muted = true;
               e.currentTarget.volume = 0;
+              e.currentTarget.playbackRate = PLAYBACK_RATE;
             }}
             onEnded={dismiss}
             onError={dismiss}

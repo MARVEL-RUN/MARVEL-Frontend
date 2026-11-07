@@ -26,7 +26,7 @@ export function VirtualRunKitReel() {
           <video
             ref={videoRef}
             className="vr-kit-reel__video"
-            src={VIRTUAL_RUN_ASSETS.kitLoad}
+            src={VIRTUAL_RUN_ASSETS.kitReel}
             autoPlay
             loop
             muted

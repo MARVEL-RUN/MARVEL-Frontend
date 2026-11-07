@@ -23,18 +23,31 @@ import "./dashboard-stats.css";
 /** API 안정화 전까지 운영 홈 일별 그래프·엑셀 비표시 */
 const INTAKE_DAILY_TOOLS_ENABLED = true;
 
-function EventStatsTables({ eventId, eventName }: { eventId: string; eventName: string }) {
+function EventStatsTables({
+  eventId,
+  eventName,
+  columnGroupLabel,
+}: {
+  eventId: string;
+  eventName: string;
+  columnGroupLabel?: string;
+}) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin", "registration-statistics", eventId],
     queryFn: () => fetchRegistrationStatistics(eventId),
     enabled: hasAdminApi && Boolean(eventId),
   });
 
-  if (isLoading) return <RegistrationStatsTables />;
+  if (isLoading) return <RegistrationStatsTables columnGroupLabel={columnGroupLabel} />;
   if (isError || !data) {
     return <p className="admin-empty">{eventName} 통계를 불러오지 못했습니다.</p>;
   }
-  return <RegistrationStatsTables data={data} />;
+  return (
+    <RegistrationStatsTables
+      data={data}
+      columnGroupLabel={columnGroupLabel}
+    />
+  );
 }
 
 function EventStatsPanel({
@@ -75,7 +88,11 @@ function EventStatsPanel({
             </>
           ) : null}
           {showRounds ? <VirtualRoundsPanel eventId={eventId} /> : null}
-          <EventStatsTables eventId={eventId} eventName={eventName} />
+          <EventStatsTables
+            eventId={eventId}
+            eventName={eventName}
+            columnGroupLabel={showRounds ? "패키지별" : "코스별"}
+          />
         </div>
       ) : null}
     </div>

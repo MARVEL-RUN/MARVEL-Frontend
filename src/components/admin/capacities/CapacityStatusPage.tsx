@@ -327,6 +327,8 @@ function ParticipantPanel({
   onPageSizeChange: (size: string) => void;
   onPage: (page: number) => void;
 }) {
+  const showQuantity = rows.some((row) => typeof row.quantity === "number");
+
   return (
     <aside className="admin-capacity__panel">
       <div className="admin-capacity__panel-head">
@@ -397,6 +399,7 @@ function ParticipantPanel({
                 <th className="is-muted is-section-start">생년월일</th>
                 <th className="is-phone">전화번호</th>
                 <th className="is-name is-section-start">단체명</th>
+                {showQuantity ? <th className="is-num is-section-start">수량</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -413,6 +416,11 @@ function ParticipantPanel({
                       {dash(row.organizationName)}
                     </span>
                   </td>
+                  {showQuantity ? (
+                    <td className="is-num is-section-start">
+                      {typeof row.quantity === "number" ? row.quantity.toLocaleString() : "—"}
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>

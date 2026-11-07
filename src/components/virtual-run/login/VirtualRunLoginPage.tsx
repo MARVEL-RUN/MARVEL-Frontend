@@ -33,6 +33,12 @@ function loginFormError(name: string, birth: string, phone: string, password: st
 }
 
 function loginErrorMessage(err: unknown) {
+  if (err instanceof MainHttpError && err.code === "PARTICIPANT_LOGIN_NOT_AVAILABLE") {
+    return err.message.trim() || "이 대회는 신청 조회에서 신청 내역을 확인해 주세요.";
+  }
+  if (err instanceof MainHttpError && err.code === "REGISTRATION_ACCESS_DENIED") {
+    return err.message.trim() || "로그인할 수 있는 주문이 없습니다.";
+  }
   if (!(err instanceof Error)) return "신청 내역을 조회하지 못했습니다.";
   const message = err.message.trim();
   if (!message || message.length > 180) return "신청 내역을 조회하지 못했습니다.";
@@ -73,31 +79,36 @@ export function VirtualRunLoginPage() {
     setBusy(true);
     try {
       const authed = await loginParticipant(VIRTUAL_RUN_EVENT_ID, body);
+      const several = authed.orderCount > 1;
       writeLoginSession({
         access: body,
         registrationId: authed.registrationId,
         categoryName: "",
         eventId: authed.eventId,
+        orderCount: authed.orderCount,
         tokens: authed.tokens,
       });
       let categoryName = "";
       let eventCategoryId = "";
-      try {
-        const entries = await fetchParticipantEntries();
-        categoryName = participantProductLabel(entries);
-        eventCategoryId = entries.find((row) => row.productId)?.productId ?? "";
-        if (categoryName || eventCategoryId) {
-          writeLoginSession({
-            access: body,
-            registrationId: authed.registrationId,
-            categoryName,
-            eventCategoryId,
-            eventId: authed.eventId,
-            tokens: authed.tokens,
-          });
+      if (!several) {
+        try {
+          const entries = await fetchParticipantEntries();
+          categoryName = participantProductLabel(entries);
+          eventCategoryId = entries.find((row) => row.productId)?.productId ?? "";
+          if (categoryName || eventCategoryId) {
+            writeLoginSession({
+              access: body,
+              registrationId: authed.registrationId,
+              categoryName,
+              eventCategoryId,
+              eventId: authed.eventId,
+              orderCount: authed.orderCount,
+              tokens: authed.tokens,
+            });
+          }
+        } catch {
+          /* 종목 표시만 비운다. 공개 조회는 이 대회에서 막혀 있다 */
         }
-      } catch {
-        /* 종목 표시만 비운다. 공개 조회는 이 대회에서 막혀 있다 */
       }
       const displayName = authed.name || body.name;
       update(
@@ -107,7 +118,7 @@ export function VirtualRunLoginPage() {
           categoryName,
         }),
       );
-      router.push(toHref("/mypage"));
+      router.push(toHref(several ? "/mypage/orders" : "/mypage"));
     } catch (err) {
       setError(loginErrorMessage(err));
     } finally {

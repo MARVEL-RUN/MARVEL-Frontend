@@ -7,6 +7,6 @@ import { useVirtualRunCommunityBoard } from "../useVirtualRunCommunityBoard";
 export function VirtualRunNoticeDetailPage() {
   const { toHref } = useVirtualRunCommunityBoard();
   return (
-    <NoticeDetailPage eventId={VIRTUAL_RUN_EVENT_ID || undefined} toHref={toHref} />
+    <NoticeDetailPage eventId={VIRTUAL_RUN_EVENT_ID} toHref={toHref} />
   );
 }

@@ -2,8 +2,11 @@
 
 import { AdminSelect } from "@/components/admin/Select";
 import { adminToast } from "@/components/admin/Toast";
+import { hasAdminApi } from "@/lib/admin/config";
+import { adminNoticesHref } from "@/lib/admin/eventLinks";
 import { AdminHttpError } from "@/lib/admin/fetch";
 import { isNoticeCategoryName } from "@/lib/noticeCategories";
+import { fetchAdminEvents } from "@/services/admin/applications";
 import {
   createAdminNotice,
   getAdminNotice,
@@ -14,9 +17,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+const TITLE_MAX = 50;
+
 export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
   const router = useRouter();
-  const id = useSearchParams().get("id") ?? "";
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id") ?? "";
+  const queryEventId = searchParams.get("eventId")?.trim() ?? "";
   const editing = mode === "edit";
   const queryClient = useQueryClient();
   const { data } = useQuery({
@@ -24,6 +31,15 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
     queryFn: () => getAdminNotice(id),
     enabled: editing && Boolean(id),
   });
+  const eventId = queryEventId || data?.eventId?.trim() || "";
+  const eventsQuery = useQuery({
+    queryKey: ["admin", "events"],
+    queryFn: fetchAdminEvents,
+    enabled: hasAdminApi && Boolean(eventId),
+  });
+  const eventName =
+    eventsQuery.data?.find((event) => event.eventId === eventId)?.eventName ||
+    "";
   const { data: categories = [] } = useQuery({
     queryKey: ["admin", "notice-categories"],
     queryFn: listAdminNoticeCategories,
@@ -38,6 +54,11 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
     setCategoryId(data.noticeCategoryId);
     setBody(data.content);
   }, [data]);
+
+  useEffect(() => {
+    if (editing || queryEventId) return;
+    router.replace("/admin/boards/notice");
+  }, [editing, queryEventId, router]);
 
   useEffect(() => {
     if (categoryId) return;
@@ -65,18 +86,20 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
         await updateAdminNotice(id, payload);
         return;
       }
-      await createAdminNotice(payload);
+      await createAdminNotice(eventId, payload);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "notices"] });
       adminToast.success(editing ? "공지가 수정되었습니다." : "공지가 등록되었습니다.");
-      router.replace("/admin/boards/notice");
+      router.replace(eventId ? adminNoticesHref(eventId) : "/admin/boards/notice");
     },
     onError: (err) => {
       const fallback = editing ? "공지 수정에 실패했습니다." : "공지 등록에 실패했습니다.";
       adminToast.error(err instanceof AdminHttpError ? err.message : fallback);
     },
   });
+
+  if (!editing && !queryEventId) return null;
 
   return (
     <div className="admin-page">
@@ -92,6 +115,14 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
               alert("제목과 본문을 입력해 주세요.");
               return;
             }
+            if (title.trim().length > TITLE_MAX) {
+              alert(`제목은 ${TITLE_MAX}자까지입니다.`);
+              return;
+            }
+            if (!editing && !eventId) {
+              alert("대회를 선택해 주세요.");
+              return;
+            }
             if (!categoryId) {
               alert("카테고리를 선택해 주세요.");
               return;
@@ -99,6 +130,9 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
             save.mutate();
           }}
         >
+          {eventName || eventId ? (
+            <p className="admin-form__hint">대회 · {eventName || eventId}</p>
+          ) : null}
           <div className="admin-form__row">
             <label className="admin-form__category">
               카테고리
@@ -118,7 +152,12 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
           </div>
           <label>
             제목
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" />
+            <input
+              value={title}
+              maxLength={TITLE_MAX}
+              onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
+              placeholder="제목을 입력하세요"
+            />
           </label>
           <label>
             본문
@@ -133,7 +172,9 @@ export function NoticeWritePage({ mode }: { mode: "write" | "edit" }) {
             <button
               type="button"
               className="admin-btn admin-btn--ghost"
-              onClick={() => router.push("/admin/boards/notice")}
+              onClick={() =>
+                router.push(eventId ? adminNoticesHref(eventId) : "/admin/boards/notice")
+              }
             >
               취소하기
             </button>

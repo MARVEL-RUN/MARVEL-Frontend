@@ -176,6 +176,7 @@ export function mapOrganizationMemberToApplicationRow(
 ): AdminApplicationRow {
   return {
     id: member.registrationId,
+    registrationId: member.registrationId,
     no: member.listNumber,
     eventId,
     kind: "individual",

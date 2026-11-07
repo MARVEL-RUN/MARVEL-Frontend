@@ -37,4 +37,5 @@ export type AdminNoticeDetail = {
   createdAt: string;
   viewCount?: number;
   attachmentUrls?: string[];
+  eventId?: string | null;
 };

@@ -23,11 +23,19 @@ export async function getAdminNotice(noticeId: string) {
   );
 }
 
-export async function createAdminNotice(body: AdminNoticeCreateBody) {
-  return adminFetch<{ id: string }>("v1/notice", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+export async function createAdminNotice(
+  eventId: string,
+  body: AdminNoticeCreateBody,
+) {
+  const id = eventId.trim();
+  if (!id) throw new Error("대회 정보가 없습니다.");
+  return adminFetch<{ id: string }>(
+    `v1/event/${encodeURIComponent(id)}/notice`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 export async function updateAdminNotice(

@@ -23,6 +23,7 @@ import {
 import {
   applicationCourseLabel,
   applicationGenderLabel,
+  applicationRegistrationId,
   applicationKindLabel,
   applyRegistrationDetail,
   cancelUnpaidRegistrations,
@@ -241,6 +242,7 @@ export function ApplicationsListPage({ slug }: Props) {
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [pickedOrder, setPickedOrder] = useState<Map<string, string>>(new Map());
   const [pickedStatus, setPickedStatus] = useState<Map<string, string>>(new Map());
   const [excelBusy, setExcelBusy] = useState(false);
   const [cancelBusy, setCancelBusy] = useState(false);
@@ -336,10 +338,18 @@ export function ApplicationsListPage({ slug }: Props) {
     placeholderData: keepPreviousData,
   });
 
+  const detailRegistrationId = selectedId
+    ? applicationRegistrationId(
+        (listQuery.data?.content ?? []).find((item) => item.id === selectedId) ?? {
+          id: selectedId,
+        },
+      )
+    : "";
+
   const detailQuery = useQuery({
-    queryKey: ["admin", "registration", selectedId],
-    queryFn: () => fetchAdminRegistration(selectedId as string),
-    enabled: Boolean(selectedId),
+    queryKey: ["admin", "registration", detailRegistrationId],
+    queryFn: () => fetchAdminRegistration(detailRegistrationId),
+    enabled: Boolean(detailRegistrationId),
   });
 
   useEffect(() => {
@@ -368,6 +378,7 @@ export function ApplicationsListPage({ slug }: Props) {
 
   useEffect(() => {
     setPicked(new Set());
+    setPickedOrder(new Map());
     setPickedStatus(new Map());
   }, [apiEventId, applied]);
 
@@ -417,27 +428,50 @@ export function ApplicationsListPage({ slug }: Props) {
     setPage(1);
   };
 
+  const participantRows = showBib || rows.some((row) => Boolean(row.entryId));
   const pageIds = rows.map((row) => row.id).filter(Boolean);
+
+  function registrationIdFor(key: string) {
+    return (
+      pickedOrder.get(key) ||
+      applicationRegistrationId(rows.find((row) => row.id === key) ?? { id: key })
+    );
+  }
+
   const unpaidIds = [...picked].filter((id) => {
     const onPage = rows.find((row) => row.id === id);
     return canDeleteUnpaidRegistration(onPage?.status ?? pickedStatus.get(id));
   });
+  const unpaidOrderIds = [...new Set(unpaidIds.map(registrationIdFor))];
 
   const togglePick = (id: string) => {
+    const registrationId = registrationIdFor(id);
     setPicked((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+    setPickedOrder((prev) => {
+      const next = new Map(prev);
+      if (prev.has(id)) next.delete(id);
+      else next.set(id, registrationId);
+      return next;
+    });
   };
 
   const togglePage = () => {
+    const allPicked = pageIds.length > 0 && pageIds.every((id) => picked.has(id));
     setPicked((prev) => {
       const next = new Set(prev);
-      const allPicked = pageIds.length > 0 && pageIds.every((id) => next.has(id));
       if (allPicked) pageIds.forEach((id) => next.delete(id));
       else pageIds.forEach((id) => next.add(id));
+      return next;
+    });
+    setPickedOrder((prev) => {
+      const next = new Map(prev);
+      if (allPicked) pageIds.forEach((id) => next.delete(id));
+      else pageIds.forEach((id) => next.set(id, registrationIdFor(id)));
       return next;
     });
   };
@@ -471,28 +505,37 @@ export function ApplicationsListPage({ slug }: Props) {
       adminToast.error("결제 대기 신청만 취소할 수 있습니다.");
       return;
     }
-    const mixed = unpaidIds.length < picked.size;
+    const mixed = unpaidOrderIds.length < new Set([...picked].map(registrationIdFor)).size;
     const ok = await confirm({
       title: "미결제 신청 취소",
       message: mixed
-        ? `선택한 ${picked.size}건 중 결제 대기 ${unpaidIds.length}건만 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`
-        : `${unpaidIds.length}건의 미결제 신청을 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`,
+        ? `선택한 신청 중 결제 대기 ${unpaidOrderIds.length}건만 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`
+        : `${unpaidOrderIds.length}건의 미결제 신청을 취소할까요? 정원은 반환되고 결제 이력은 남습니다.`,
       confirmLabel: "취소 처리",
     });
     if (!ok) return;
     setCancelBusy(true);
     try {
-      const result = await cancelUnpaidRegistrations(apiEventId, unpaidIds);
+      const result = await cancelUnpaidRegistrations(apiEventId, unpaidOrderIds);
       const done = new Set(
         result.successes.map((item) => item.registrationId).filter(Boolean),
       );
       if (done.size === 0 && result.failureCount === 0 && result.successCount > 0) {
-        unpaidIds.forEach((id) => done.add(id));
+        unpaidOrderIds.forEach((id) => done.add(id));
       }
       if (done.size > 0) {
         setPicked((prev) => {
           const next = new Set(prev);
-          done.forEach((id) => next.delete(id));
+          for (const key of prev) {
+            if (done.has(key) || done.has(registrationIdFor(key))) next.delete(key);
+          }
+          return next;
+        });
+        setPickedOrder((prev) => {
+          const next = new Map(prev);
+          for (const [key, registrationId] of prev) {
+            if (done.has(key) || done.has(registrationId)) next.delete(key);
+          }
           return next;
         });
       }
@@ -566,7 +609,7 @@ export function ApplicationsListPage({ slug }: Props) {
     },
     {
       key: "name",
-      header: "이름/단체명",
+      header: participantRows ? "참가자" : "이름/단체명",
       className: "is-name",
       width: "140px",
       render: (row: AdminApplicationRow) => (
@@ -591,7 +634,7 @@ export function ApplicationsListPage({ slug }: Props) {
     },
     {
       key: "course",
-      header: "코스",
+      header: participantRows ? "종목" : "코스",
       className: "is-course",
       width: "96px",
       render: (row: AdminApplicationRow) => <CourseTag row={row} />,
@@ -626,7 +669,7 @@ export function ApplicationsListPage({ slug }: Props) {
       width: "92px",
       render: (row: AdminApplicationRow) => (
         <span className="admin-apps-list__souvenir" title={row.souvenir || undefined}>
-          {row.souvenir || "-"}
+          {row.souvenir || (participantRows && row.productName ? "확인 필요" : "-")}
         </span>
       ),
     },
@@ -660,7 +703,41 @@ export function ApplicationsListPage({ slug }: Props) {
       width: "124px",
       render: (row: AdminApplicationRow) => row.appliedAt || "-",
     },
-  ].filter(
+  ];
+  if (participantRows) {
+    const nameIndex = columns.findIndex((col) => col.key === "name");
+    columns.splice(nameIndex + 1, 0, {
+      key: "product",
+      header: "상품",
+      className: "is-clip",
+      width: "120px",
+      render: (row: AdminApplicationRow) => (
+        <span className="admin-apps-list__clip" title={row.productName || undefined}>
+          {row.productName || "-"}
+        </span>
+      ),
+    });
+    const phoneIndex = columns.findIndex((col) => col.key === "phone");
+    columns.splice(
+      phoneIndex,
+      0,
+      {
+        key: "orderer",
+        header: "주문자",
+        className: "is-name",
+        width: "110px",
+        render: (row: AdminApplicationRow) => row.ordererName || "-",
+      },
+      {
+        key: "ordererPhone",
+        header: "주문자 연락처",
+        className: "is-phone",
+        width: "120px",
+        render: (row: AdminApplicationRow) => displayPhone(row.ordererPhone),
+      },
+    );
+  }
+  const visibleColumns = columns.filter(
     (col) =>
       (hasStartGroupFeature || col.key !== "startGroup") &&
       (showBib || col.key !== "bib"),
@@ -680,7 +757,7 @@ export function ApplicationsListPage({ slug }: Props) {
         pageCount={pageCount}
         totalCount={totalCount}
         onPage={(n) => setPage(n)}
-        pageUnit="신청"
+        pageUnit={participantRows ? "참가자" : "신청"}
         onRowClick={(row) => {
           if (!row.id) return;
           setSelectedId(row.id);
@@ -697,7 +774,7 @@ export function ApplicationsListPage({ slug }: Props) {
             >
               {cancelBusy
                 ? "취소 처리 중…"
-                : `미결제 취소${unpaidIds.length ? ` (${unpaidIds.length})` : ""}`}
+                : `미결제 취소${unpaidOrderIds.length ? ` (${unpaidOrderIds.length})` : ""}`}
             </button>
             <ExcelDownloadButtons
               busy={excelBusy}
@@ -706,7 +783,9 @@ export function ApplicationsListPage({ slug }: Props) {
               onFiltered={() => void runExcel(() => downloadRegistrationsExcel(excelFilters))}
               onSelected={() =>
                 void runExcel(() =>
-                  downloadRegistrationsExcelByIds(apiEventId, [...picked]),
+                  downloadRegistrationsExcelByIds(apiEventId, [
+                    ...new Set([...picked].map(registrationIdFor)),
+                  ]),
                 )
               }
             />
@@ -742,13 +821,19 @@ export function ApplicationsListPage({ slug }: Props) {
               />
               <AdminSelect
                 value={course}
-                options={courseOptions}
+                options={
+                  participantRows
+                    ? courseOptions.map((option, index) =>
+                        index === 0 ? { ...option, label: "전체 종목" } : option,
+                      )
+                    : courseOptions
+                }
                 onChange={(value) => {
                   setCourse(value);
                   setApplied((prev) => ({ ...prev, eventCategoryId: value }));
                   setPage(1);
                 }}
-                ariaLabel="코스"
+                ariaLabel={participantRows ? "종목" : "코스"}
                 width={128}
               />
               <AdminReferenceFilterSelect
@@ -794,7 +879,7 @@ export function ApplicationsListPage({ slug }: Props) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") runSearch();
               }}
-              placeholder="이름 · 단체명 · 연락처"
+              placeholder={participantRows ? "참가자 이름 · 연락처" : "이름 · 단체명 · 연락처"}
             />
             {showBib ? (
               <input
@@ -828,7 +913,7 @@ export function ApplicationsListPage({ slug }: Props) {
             </div>
           </>
         }
-        columns={columns}
+        columns={visibleColumns}
       />
       {confirmModal}
       <ApplicationDetailDrawer

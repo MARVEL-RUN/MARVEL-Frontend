@@ -19,6 +19,29 @@
   margin-top: auto;
 }
 
+.virtual-run .site-header__account {
+  max-width: 9rem;
+  min-width: 0;
+}
+
+.virtual-run .site-header__account-label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.virtual-run .site-header__account-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.virtual-run .site-header__account-honor {
+  flex-shrink: 0;
+}
+
 .virtual-run .vr-scramble {
   display: inline-block;
   white-space: nowrap;

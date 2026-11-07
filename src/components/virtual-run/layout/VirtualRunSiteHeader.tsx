@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { MAIN_ASSETS } from "@/lib/assets";
 import { pinToHeader } from "@/lib/pin-header";
@@ -13,14 +13,25 @@ import { virtualRunOpenFlags } from "@/lib/virtual-run/open-schedule";
 import { useVirtualRunParticipant } from "../participant/VirtualRunParticipantProvider";
 import { MOBILE_MQ } from "@/lib/viewport";
 import { VirtualRunTicketsCta } from "./VirtualRunTicketsCta";
-import { VrLink } from "./VrLink";
+import { useVrPath, VrLink } from "./VrLink";
 
 export function VirtualRunSiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const toHref = useVrPath();
   const prefixed = pathname.startsWith("/virtual-run");
   const home = isVirtualRunHomePath(pathname);
   const navItems = visibleVirtualRunNav(virtualRunOpenFlags());
-  const { isLoggedIn } = useVirtualRunParticipant();
+  const { isLoggedIn, participant, logout } = useVirtualRunParticipant();
+  const accountName = participant?.name.trim() ?? "";
+  const accountFace = accountName ? (
+    <span className="site-header__account-label">
+      <span className="site-header__account-name">{accountName}</span>
+      <span className="site-header__account-honor">님</span>
+    </span>
+  ) : (
+    <span>마이페이지</span>
+  );
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -84,6 +95,12 @@ export function VirtualRunSiteHeader() {
       window.removeEventListener("hashchange", jump);
     };
   }, [pathname]);
+
+  function onLogout() {
+    logout();
+    setOpen(false);
+    router.push(toHref("/login"));
+  }
 
   function closeDrop(href: string) {
     setClosedDrop(href);
@@ -212,8 +229,13 @@ export function VirtualRunSiteHeader() {
         <div className="site-header__tools">
           <div className="site-header__actions" data-vr-pick="BUTTON">
             {isLoggedIn ? (
-              <VrLink href="/mypage" className="btn btn--ghost site-header__cta">
-                <span>마이페이지</span>
+              <VrLink
+                href="/mypage"
+                className="btn btn--ghost site-header__cta site-header__account"
+                aria-label={accountName ? `${accountName}님, 마이페이지` : "마이페이지"}
+                title={accountName ? `${accountName}님` : undefined}
+              >
+                {accountFace}
               </VrLink>
             ) : (
               <VrLink href="/login" className="btn btn--ghost site-header__cta">
@@ -313,9 +335,22 @@ export function VirtualRunSiteHeader() {
         </nav>
         <div className="site-header__drawer-actions">
           {isLoggedIn ? (
-            <VrLink href="/mypage" className="btn btn--ghost" onClick={() => setOpen(false)}>
-              마이페이지
-            </VrLink>
+            <div className={accountName ? "site-header__drawer-account" : undefined}>
+              <VrLink
+                href="/mypage"
+                className="btn btn--ghost site-header__account"
+                aria-label={accountName ? `${accountName}님, 마이페이지` : "마이페이지"}
+                title={accountName ? `${accountName}님` : undefined}
+                onClick={() => setOpen(false)}
+              >
+                {accountFace}
+              </VrLink>
+              {accountName ? (
+                <button type="button" className="btn btn--ghost site-header__logout" onClick={onLogout}>
+                  로그아웃
+                </button>
+              ) : null}
+            </div>
           ) : (
             <VrLink href="/login" className="btn btn--ghost" onClick={() => setOpen(false)}>
               로그인

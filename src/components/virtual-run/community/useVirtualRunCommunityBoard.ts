@@ -10,7 +10,7 @@ export function useVirtualRunCommunityBoard(): VirtualRunCommunityBoardOptions &
 } {
   const toHref = useVrPath();
   return {
-    eventId: VIRTUAL_RUN_EVENT_ID || undefined,
+    eventId: VIRTUAL_RUN_EVENT_ID,
     toHref,
     Banner: VirtualRunSideBanner,
   };

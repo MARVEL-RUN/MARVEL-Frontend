@@ -14,6 +14,8 @@ export type VirtualRunLoginSession = {
   categoryName: string;
   eventCategoryId?: string;
   eventId?: string;
+  /** 이 주문자의 주문 수. 취소 주문 포함 */
+  orderCount?: number;
   tokens?: VirtualRunAuthTokens;
 };
 

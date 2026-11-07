@@ -28,6 +28,7 @@ export type CapacityRegistration = {
   birth: string;
   phNum: string;
   organizationName: string | null;
+  quantity?: number | null;
 };
 
 export type CapacityRegistrationPage = {

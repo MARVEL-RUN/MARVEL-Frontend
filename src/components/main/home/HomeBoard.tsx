@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_EVENT_ID } from "@/lib/main/config";
 import { listFaqs } from "@/services/admin/faqs";
 import {
   getPublicNoticeDetail,
@@ -48,6 +49,7 @@ export function HomeBoard() {
     let cancelled = false;
 
     void listPublicNotices({
+      eventId: DEFAULT_EVENT_ID || undefined,
       page: 0,
       size: 5,
       limit: 5,

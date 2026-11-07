@@ -38,7 +38,7 @@ import {
   type VirtualRunRecipientDraft,
 } from "@/lib/virtual-run/purchase";
 import { saveVirtualRunTicketPending } from "@/lib/virtual-run/ticket-payment";
-import { createRegistration } from "@/services/main/registrations";
+import { submitVirtualRunRegistration } from "@/services/main/participant-auth";
 import { useVrPath } from "../layout/VrLink";
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -219,7 +219,7 @@ export function VirtualRunTicketPurchase({
         consents,
         selectedSize,
       });
-      const created = await createRegistration(VIRTUAL_RUN_EVENT_ID, body);
+      const created = await submitVirtualRunRegistration(VIRTUAL_RUN_EVENT_ID, body);
       const registration: PaymentOrder = {
         orderId: created.orderId,
         orderName: created.orderName || categoryLabel(product),
@@ -240,7 +240,13 @@ export function VirtualRunTicketPurchase({
       setPayOrder(registration);
       setPayOpen(true);
     } catch (err) {
-      setError(err instanceof MainHttpError || err instanceof Error ? err.message : "신청에 실패했습니다.");
+      setError(
+        err instanceof MainHttpError && err.code === "REGISTRATION_ADDITIONAL_ORDER_LOGIN_REQUIRED"
+          ? "이미 신청한 내역이 있습니다. 로그인한 뒤 추가 주문해 주세요."
+          : err instanceof MainHttpError || err instanceof Error
+            ? err.message
+            : "신청에 실패했습니다.",
+      );
     } finally {
       setSubmitting(false);
     }
