@@ -3,6 +3,7 @@ const UPGRADES = "/admin/upgrades";
 const CAPS = "/admin/capacities";
 const MEMBERS = "/admin/members";
 const INQUIRY = "/admin/boards/inquiry";
+const NOTICE = "/admin/boards/notice";
 
 type AdminRaceSlug = "marvel" | "virtual";
 type EventRef = { eventId: string };
@@ -64,6 +65,26 @@ export function adminOrganizationDetailHref(
     eventId: options.apiEventId,
   });
   return `${MEMBERS}/detail?${params}`;
+}
+
+export function adminNoticesHref(eventId: string) {
+  return `${NOTICE}/list?eventId=${encodeURIComponent(eventId)}`;
+}
+
+export function adminNoticesHrefFromEvent(event: EventRef) {
+  return adminNoticesHref(event.eventId);
+}
+
+export function adminNoticeWriteHref(eventId: string) {
+  return `${NOTICE}/write?eventId=${encodeURIComponent(eventId)}`;
+}
+
+export function adminNoticeEditHref(noticeId: string, eventId: string) {
+  const params = new URLSearchParams({
+    id: noticeId,
+    eventId,
+  });
+  return `${NOTICE}/edit?${params}`;
 }
 
 export function adminInquiriesHref(eventId: string) {
