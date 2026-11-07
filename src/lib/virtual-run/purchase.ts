@@ -1,6 +1,6 @@
 import { formatAddressForApi } from "@/lib/daumPostcode";
 import { birthToApi, genderToApi, phoneDigits } from "@/lib/payment/map";
-import { shirtSouvenir } from "@/lib/registration-options";
+import { sortedSouvenirs } from "@/lib/registration-options";
 import {
   applicationPasswordError,
   filterNoSpaceName,
@@ -72,6 +72,25 @@ export type VirtualRunItemDraft = {
   selectedSize?: string;
 };
 
+function souvenirSize(sizes: string[], selectedSize: string) {
+  if (sizes.length === 1) return sizes[0];
+  if (selectedSize && sizes.includes(selectedSize)) return selectedSize;
+  if (!sizes.length) return "FREE";
+  return "";
+}
+
+/** 종목에 연결된 기념품을 모두 보낸다. 단품은 1개, 패키지는 키트 3개 */
+function souvenirSelections(category: RegistrationCategory, selectedSize: string) {
+  const souvenirs = sortedSouvenirs(category);
+  if (!souvenirs.length) return [];
+  return souvenirs.map((souvenir) => {
+    const sizes = (souvenir.sizes ?? []).map((size) => size.trim()).filter(Boolean);
+    const size = souvenirSize(sizes, selectedSize);
+    if (!size) throw new Error("키트 옵션을 선택하세요.");
+    return { souvenirId: souvenir.souvenirId, selectedSize: size };
+  });
+}
+
 function itemFrom(line: VirtualRunItemDraft) {
   const { category } = line;
   if (category.productType === "OPTION") {
@@ -91,14 +110,8 @@ function itemFrom(line: VirtualRunItemDraft) {
     return { eventCategoryId: recipient.eventCategoryId, ...fields };
   });
 
-  const souvenir = shirtSouvenir(category);
-  const sizes = (souvenir?.sizes ?? []).map((size) => size.trim()).filter(Boolean);
-  const selectedSize = (line.selectedSize ?? "").trim() || (sizes.length === 1 ? sizes[0] : "");
-  if (souvenir && sizes.length && !sizes.includes(selectedSize)) {
-    throw new Error("키트 옵션을 선택하세요.");
-  }
-  const selectedSouvenirList =
-    souvenir && selectedSize ? [{ souvenirId: souvenir.souvenirId, selectedSize }] : [];
+  const selectedSize = (line.selectedSize ?? "").trim();
+  const selectedSouvenirList = souvenirSelections(category, selectedSize);
 
   return {
     eventCategoryId: category.categoryId,
