@@ -32,6 +32,7 @@ import {
   requestPackageUpgrade,
   type ParticipantEntry,
 } from "@/services/main/participant-auth";
+import type { ParticipantOrder, ParticipantOrderItem } from "@/services/main/participant-orders";
 import type { PackageUpgradeOrder } from "@/services/main/types";
 import { useVrPath, VrLink } from "../layout/VrLink";
 import { VirtualRunSubPage } from "../layout/VirtualRunSubPage";
@@ -75,6 +76,11 @@ function genderLabel(gender: Gender | "") {
   return "";
 }
 
+function itemLabel(item: ParticipantOrderItem) {
+  const name = item.eventCategoryName || "단품";
+  return item.amount > 0 ? `${name} · ${formatFee(item.amount)}` : name;
+}
+
 function phoneLabel(raw: string) {
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 11) return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
@@ -86,6 +92,8 @@ export function VirtualRunPackageUpgrade() {
   const toHref = useVrPath();
   const options = useRegistrationOptions(VIRTUAL_RUN_EVENT_ID);
   const [entries, setEntries] = useState<ParticipantEntry[]>([]);
+  const [order, setOrder] = useState<ParticipantOrder | null>(null);
+  const [itemId, setItemId] = useState("");
   const [pending, setPending] = useState<PackageUpgradeOrder | null>(null);
   const [canceled, setCanceled] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -108,6 +116,7 @@ export function VirtualRunPackageUpgrade() {
       .then(([rows, order, current]) => {
         if (cancelled) return;
         setEntries(rows);
+        setOrder(current);
         setPending(order);
         setCanceled(current.canceled);
       })
@@ -123,15 +132,18 @@ export function VirtualRunPackageUpgrade() {
     };
   }, []);
 
-  const singleEntry =
-    entries.find((entry) => findCategory(options.categories, entry.productId)?.productType === "SINGLE") ??
-    entries.find(
-      (entry) => findCategory(options.categories, entry.eventCategoryId)?.productType === "SINGLE",
-    );
-  const category = findCategory(
-    options.categories,
-    singleEntry?.productId || singleEntry?.eventCategoryId || "",
-  );
+  const singles = useMemo(() => {
+    const living = (order?.items ?? []).filter((item) => !item.canceledAt);
+    const typed = living.filter((item) => item.productType === "SINGLE");
+    if (typed.length || living.some((item) => item.productType)) return typed;
+    return living.filter((item) => {
+      const category = findCategory(options.categories, item.eventCategoryId);
+      return category?.productType === "SINGLE";
+    });
+  }, [order, options.categories]);
+  const selectedItem =
+    singles.find((item) => item.itemId === itemId) ?? singles[0];
+  const category = findCategory(options.categories, selectedItem?.eventCategoryId || "");
   const targetId = category?.parentCategoryId?.trim() || "";
   const target = targetId ? findCategory(options.categories, targetId) : undefined;
   const others = useMemo(
@@ -143,6 +155,11 @@ export function VirtualRunPackageUpgrade() {
         : [],
     [options.categories, target, category?.categoryId],
   );
+
+  useEffect(() => {
+    if (!selectedItem?.itemId) return;
+    setItemId((current) => (current === selectedItem.itemId ? current : selectedItem.itemId));
+  }, [selectedItem?.itemId]);
 
   useEffect(() => {
     setRecipients((prev) => {
@@ -174,8 +191,10 @@ export function VirtualRunPackageUpgrade() {
     gender: (uiGenderFromApi(applicantEntry?.gender) ?? "") as Gender | "",
   };
   const alreadyPackage =
-    !singleEntry &&
-    entries.some((entry) => findCategory(options.categories, entry.productId)?.productType === "PACKAGE");
+    singles.length === 0 &&
+    (order?.items ?? []).some(
+      (item) => !item.canceledAt && item.productType === "PACKAGE",
+    );
   const loggedOut = !readLoginSession()?.tokens?.accessToken;
 
   function openPayment(order: PackageUpgradeOrder) {
@@ -232,7 +251,12 @@ export function VirtualRunPackageUpgrade() {
             : row,
         ),
       );
-      openPayment(await requestPackageUpgrade(entries));
+      if (!selectedItem?.itemId) {
+        setError("상향할 단품을 선택하세요.");
+        setBusy(false);
+        return;
+      }
+      openPayment(await requestPackageUpgrade(entries, selectedItem.itemId));
     } catch (err) {
       setError(err instanceof MainHttpError || err instanceof Error ? errorMessage(err) : errorMessage(err));
       setBusy(false);
@@ -332,11 +356,28 @@ export function VirtualRunPackageUpgrade() {
                 title="패키지별 참가자"
                 note="지금 단품을 뺀 회차의 참가자를 입력합니다. 신청자와 같으면 체크합니다. 배송지는 신청한 주소 그대로입니다."
               >
-                <FormRow label="지금 티켓" locked>
-                  <p className="form-row__hint">
-                    {singleEntry?.productName || (category ? categoryLabel(category) : "단품")}
-                  </p>
-                </FormRow>
+                {singles.length > 1 ? (
+                  <FormRow label="상향할 단품">
+                    <select
+                      className="vr-order__select"
+                      value={selectedItem?.itemId ?? ""}
+                      disabled={busy}
+                      onChange={(event) => setItemId(event.target.value)}
+                    >
+                      {singles.map((item) => (
+                        <option key={item.itemId} value={item.itemId}>
+                          {itemLabel(item)}
+                        </option>
+                      ))}
+                    </select>
+                  </FormRow>
+                ) : (
+                  <FormRow label="지금 티켓" locked>
+                    <p className="form-row__hint">
+                      {selectedItem ? itemLabel(selectedItem) : category ? categoryLabel(category) : "단품"}
+                    </p>
+                  </FormRow>
+                )}
                 {others.length > 1 ? (
                   <div className="vr-recipients__all">
                     <label className={`vr-recipients__same${recipients.length > 0 && recipients.every((row) => row.sameAs) ? " is-on" : ""}`}>

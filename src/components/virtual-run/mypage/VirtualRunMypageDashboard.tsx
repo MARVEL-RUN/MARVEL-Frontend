@@ -108,7 +108,14 @@ export function VirtualRunMypageDashboard() {
 
   const canceled = account.order?.canceled === true;
   const canEdit = account.order ? !canceled && account.order.modifyAllowed && !account.order.hasPendingUpgrade : true;
-  const canUpgrade = account.order ? !canceled && !account.order.hasPendingUpgrade : true;
+  const livingItems = account.order?.items.filter((item) => !item.canceledAt) ?? [];
+  const upgradeable =
+    !account.order ||
+    livingItems.some((item) => item.productType === "SINGLE") ||
+    (livingItems.length > 0 && livingItems.every((item) => !item.productType));
+  const canUpgrade = account.order
+    ? !canceled && !account.order.hasPendingUpgrade && upgradeable
+    : true;
 
   function onLogout() {
     logout();

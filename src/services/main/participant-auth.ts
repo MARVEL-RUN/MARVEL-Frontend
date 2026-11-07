@@ -221,10 +221,14 @@ export async function logoutParticipantSession() {
   clearLoginSession();
 }
 
-export async function requestPackageUpgrade(entries: RegistrationEntryInput[]) {
+export async function requestPackageUpgrade(
+  entries: RegistrationEntryInput[],
+  itemId?: string,
+) {
+  const id = itemId?.trim() ?? "";
   return participantFetch<unknown>(registrationPath("/upgrade"), {
     method: "POST",
-    body: JSON.stringify({ entries }),
+    body: JSON.stringify(id ? { itemId: id, entries } : { entries }),
   }).then(asUpgradeOrder);
 }
 
@@ -413,6 +417,14 @@ export async function createParticipantAdditionalOrder(body: RegistrationCreateR
 export async function cancelParticipantOrder(registrationId: string) {
   const data = await participantFetch<unknown>(
     `v1/participant/registrations/${encodeURIComponent(registrationId)}/cancellation`,
+    { method: "POST" },
+  );
+  return parseOrderSettlement(data);
+}
+
+export async function cancelParticipantItem(registrationId: string, itemId: string) {
+  const data = await participantFetch<unknown>(
+    `v1/participant/registrations/${encodeURIComponent(registrationId)}/items/${encodeURIComponent(itemId)}/cancellation`,
     { method: "POST" },
   );
   return parseOrderSettlement(data);
