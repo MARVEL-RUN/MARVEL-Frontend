@@ -19,6 +19,7 @@ export type PublicNoticeListItem = {
   createdAt: string;
   author: string;
   viewCount: number;
+  eventId?: string | null;
 };
 
 export type PinnedNotice = {
@@ -28,6 +29,7 @@ export type PinnedNotice = {
   createdAt: string;
   author: string;
   viewCount: number;
+  eventId?: string | null;
 };
 
 export type SpringPage<T> = {
@@ -56,6 +58,7 @@ export type PublicNoticeDetail = {
   viewCount: number;
   createdAt: string;
   attachmentUrls?: string[];
+  eventId?: string | null;
 };
 
 export type NoticeRow = PinnedNotice & {
