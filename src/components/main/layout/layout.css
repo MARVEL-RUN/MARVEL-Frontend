@@ -407,6 +407,23 @@ button.site-header__link {
   justify-content: center;
 }
 
+.site-header__drawer-account {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.site-header__drawer-actions .site-header__drawer-account .btn {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  align-self: stretch;
+  min-height: 2.8rem;
+  max-width: none;
+  justify-content: center;
+}
+
 .site-header__drawer-link {
   color: #fff;
   font-size: 1.2rem;
