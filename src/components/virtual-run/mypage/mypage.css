@@ -1132,3 +1132,40 @@
     width: 100%;
   }
 }
+
+.virtual-run .vr-orders {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.virtual-run .vr-order__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.virtual-run .vr-order__head h2 {
+  margin: 0;
+}
+
+.virtual-run .vr-order__badge {
+  flex: none;
+  color: var(--marvel-hi);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.virtual-run .vr-order__badge.is-off {
+  color: var(--note);
+}
+
+.virtual-run .vr-order__meta {
+  margin: 0.35rem 0 0;
+  font-weight: 700;
+}
+
+.virtual-run .vr-order__confirm {
+  margin-top: 0.75rem;
+}

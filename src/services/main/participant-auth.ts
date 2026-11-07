@@ -5,9 +5,21 @@ import {
   clearLoginSession,
   type VirtualRunAuthTokens,
 } from "@/lib/virtual-run/login-session";
+import {
+  entriesFromParticipantOrder,
+  parseOrderSettlement,
+  parseParticipantOrder,
+  parseParticipantOrderList,
+  type ParticipantOrder,
+  type ParticipantOrderSettlement,
+} from "./participant-orders";
+import { createRegistration } from "./registrations";
 import type {
   IndividualRegistrationLookupRequest,
   PackageUpgradeOrder,
+  PaymentRetryResponse,
+  RegistrationCreateRequest,
+  RegistrationCreateResponse,
   RegistrationEntryInput,
 } from "./types";
 
@@ -15,7 +27,13 @@ export type ParticipantAuthResult = {
   registrationId: string;
   eventId: string;
   name: string;
+  orderCount: number;
   tokens: VirtualRunAuthTokens;
+};
+
+export type {
+  ParticipantOrder,
+  ParticipantOrderSettlement,
 };
 
 function bearer(token: string) {
@@ -59,10 +77,12 @@ function authFromResponse(data: unknown, headers: Headers): ParticipantAuthResul
   if (!accessToken || !refreshToken) {
     throw new MainHttpError(200, "로그인 토큰을 받지 못했습니다.");
   }
+  const orderCount = asAmount(row?.orderCount);
   return {
     registrationId: asText(row?.registrationId),
     eventId: asText(row?.eventId),
     name: asText(row?.name),
+    orderCount: Number.isInteger(orderCount) ? orderCount : 0,
     tokens: { accessToken, refreshToken },
   };
 }
@@ -129,8 +149,20 @@ function storeTokens(tokens: VirtualRunAuthTokens, patch?: Partial<ParticipantAu
   writeLoginSession({
     ...session,
     tokens,
-    ...(patch?.registrationId ? { registrationId: patch.registrationId } : {}),
+    ...(typeof patch?.orderCount === "number" ? { orderCount: patch.orderCount } : {}),
   });
+}
+
+function activeRegistrationId() {
+  const registrationId = readLoginSession()?.registrationId?.trim() ?? "";
+  if (!registrationId) {
+    throw new MainHttpError(400, "주문을 선택하세요.");
+  }
+  return registrationId;
+}
+
+function registrationPath(suffix = "") {
+  return `v1/participant/registrations/${encodeURIComponent(activeRegistrationId())}${suffix}`;
 }
 
 export async function participantFetch<T>(
@@ -190,14 +222,14 @@ export async function logoutParticipantSession() {
 }
 
 export async function requestPackageUpgrade(entries: RegistrationEntryInput[]) {
-  return participantFetch<unknown>("v1/participant/registrations/me/upgrade", {
+  return participantFetch<unknown>(registrationPath("/upgrade"), {
     method: "POST",
     body: JSON.stringify({ entries }),
   }).then(asUpgradeOrder);
 }
 
 export async function reopenPackageUpgradePayment() {
-  return participantFetch<unknown>("v1/participant/registrations/me/upgrade/payment", {
+  return participantFetch<unknown>(registrationPath("/upgrade/payment"), {
     method: "POST",
   }).then(asUpgradeOrder);
 }
@@ -218,7 +250,7 @@ export async function fetchPendingPackageUpgrade() {
 }
 
 export async function cancelPackageUpgrade() {
-  await participantFetch<void>("v1/participant/registrations/me/upgrade", {
+  await participantFetch<void>(registrationPath("/upgrade"), {
     method: "DELETE",
   });
 }
@@ -284,15 +316,131 @@ export function participantProductLabel(entries: ParticipantEntry[]) {
   return names.join(" · ");
 }
 
+export async function fetchParticipantOrders() {
+  const data = await participantFetch<unknown>("v1/participant/registrations");
+  return parseParticipantOrderList(data);
+}
+
+export async function fetchParticipantOrder(registrationId: string) {
+  const data = await participantFetch<unknown>(
+    `v1/participant/registrations/${encodeURIComponent(registrationId)}`,
+  );
+  return parseParticipantOrder(data);
+}
+
 export async function fetchParticipantEntries() {
-  const data = await participantFetch<unknown>("v1/participant/registrations/me/entries");
-  return asEntryList(data);
+  const order = await fetchParticipantOrder(activeRegistrationId());
+  return entriesFromParticipantOrder(order);
 }
 
 export async function patchParticipantEntries(entries: ParticipantEntryUpdate[]) {
-  const data = await participantFetch<unknown>("v1/participant/registrations/me/entries", {
+  const data = await participantFetch<unknown>(registrationPath("/entries"), {
     method: "PATCH",
     body: JSON.stringify({ entries }),
   });
   return asEntryList(data);
+}
+
+export async function modifyParticipantAddress(body: { address: string; addressDetail: string }) {
+  await participantFetch<void>(registrationPath(), {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function modifyParticipantOrderer(body: {
+  name: string;
+  phNum: string;
+  birth: string;
+  gender: "M" | "F";
+}) {
+  await participantFetch<void>("v1/participant/orderer", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+  const session = readLoginSession();
+  if (!session) return;
+  writeLoginSession({
+    ...session,
+    access: {
+      ...session.access,
+      name: body.name,
+      phNum: body.phNum,
+      birth: body.birth,
+    },
+  });
+}
+
+export async function changeParticipantPassword(body: {
+  currentPassword: string;
+  newPassword: string;
+}) {
+  await participantFetch<void>("v1/participant/orderer/password", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+  const session = readLoginSession();
+  if (!session?.tokens) return;
+  writeLoginSession({
+    ...session,
+    access: { ...session.access, password: body.newPassword },
+    tokens: { ...session.tokens, refreshToken: "" },
+  });
+}
+
+export async function createParticipantAdditionalOrder(body: RegistrationCreateRequest) {
+  const payload = {
+    items: body.items ?? [],
+    address: body.address,
+    addressDetail: body.addressDetail,
+    guardianConsent: body.guardianConsent ?? false,
+    ...(body.guardianName ? { guardianName: body.guardianName } : {}),
+    ...(body.guardianPhNum ? { guardianPhNum: body.guardianPhNum } : {}),
+    ...(body.guardianRelationship ? { guardianRelationship: body.guardianRelationship } : {}),
+    termsEssentialAgreed: body.termsEssentialAgreed,
+    termsMarketingAgreed: body.termsMarketingAgreed,
+    termsMarketingChannelAgreed: body.termsMarketingChannelAgreed,
+    ...(body.startGroupId ? { startGroupId: body.startGroupId } : {}),
+    startGroupUnselected: body.startGroupUnselected,
+    ...(body.discountLinkCode ? { discountLinkCode: body.discountLinkCode } : {}),
+  };
+  return participantFetch<RegistrationCreateResponse>("v1/participant/registrations", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function cancelParticipantOrder(registrationId: string) {
+  const data = await participantFetch<unknown>(
+    `v1/participant/registrations/${encodeURIComponent(registrationId)}/cancellation`,
+    { method: "POST" },
+  );
+  return parseOrderSettlement(data);
+}
+
+export async function retryParticipantPayment(registrationId: string, paymentId: string) {
+  const data = await participantFetch<unknown>(
+    `v1/participant/registrations/${encodeURIComponent(registrationId)}/payments/${encodeURIComponent(paymentId)}/retry`,
+    { method: "POST" },
+  );
+  const row = asRecord(data);
+  const orderId = asText(row?.orderId);
+  if (!orderId) throw new MainHttpError(200, "결제 주문번호가 없습니다.");
+  const result: PaymentRetryResponse = {
+    paymentId: asText(row?.paymentId),
+    orderId,
+    orderName: asText(row?.orderName),
+    amount: asAmount(row?.amount),
+  };
+  return result;
+}
+
+export async function submitVirtualRunRegistration(
+  eventId: string,
+  body: RegistrationCreateRequest,
+) {
+  if (readLoginSession()?.tokens?.accessToken) {
+    return createParticipantAdditionalOrder(body);
+  }
+  return createRegistration(eventId, body);
 }
